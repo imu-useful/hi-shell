@@ -203,8 +203,6 @@ Scope {
         }
     }
 
-    property real superDownAt: 0
-
     IpcHandler {
         target: "launcher"
 
@@ -216,17 +214,6 @@ Scope {
         }
         function close(): void {
             root.close();
-        }
-        // Tapping Super (hypr/hi-shell.lua): superDown on press, superUp on release.
-        // Hyprland only sends the release when nothing else was pressed in between;
-        // long holds (Super + mouse to move a window) don't count as a tap.
-        function superDown(): void {
-            root.superDownAt = Date.now();
-        }
-        function superUp(): void {
-            if (Date.now() - root.superDownAt < 500)
-                root.toggle();
-            root.superDownAt = 0;
         }
         // Open with text already typed, e.g. "<" for keybinds or "=" for the calculator.
         function search(text: string): void {

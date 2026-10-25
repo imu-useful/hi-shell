@@ -22,17 +22,38 @@ end)
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
 bind("SUPER + Space", "launcher toggle", "Toggle app launcher")
 
--- Tap Super alone for the launcher too. The release bind only fires when Super was the
--- last key pressed (so Super+1 etc. don't open it); the launcher also ignores holds
--- longer than half a second (Super + mouse to move or resize a window).
-for _, key in ipairs({ "SUPER + Super_L", "SUPER + Super_R" }) do
-    if hl.unbind then
+-- Tap Super alone for the launcher too. Watched from raw key events: it's a tap when
+-- Super goes down and up within half a second with no other key in between, and
+-- nothing moved meanwhile (Super + wheel through workspaces, Super + drag or click
+-- on a window are mouse actions, not keys).
+local SUPER_KEYS = { [133] = true, [134] = true } -- xkb keycodes of Super_L / Super_R
+local superTap = nil
+local function snapshot()
+    return { ws = tostring(hl.get_active_workspace()), win = tostring(hl.get_active_window()), cursor = hl.get_cursor_pos() }
+end
+if hl.unbind then
+    -- ii's Super binds (its search / workspace numbers) would fire alongside.
+    for _, key in ipairs({ "Super_L", "Super_R", "SUPER + Super_L", "SUPER + Super_R" }) do
         hl.unbind(key)
     end
-    hl.bind(key, hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher superDown"), { transparent = true })
-    hl.bind(key, hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher superUp"),
-        { release = true, transparent = true, description = "hi-shell: App launcher (tap Super)" })
 end
+hl.on("input.keyboard.key", function(keycode, time, pressed)
+    if SUPER_KEYS[keycode] then
+        if pressed == 1 then
+            superTap = snapshot()
+            superTap.time = time
+        elseif superTap then
+            local tap, now = superTap, snapshot()
+            superTap = nil
+            local moved = math.abs(now.cursor.x - tap.cursor.x) + math.abs(now.cursor.y - tap.cursor.y)
+            if time - tap.time < 500 and now.ws == tap.ws and now.win == tap.win and moved < 8 then
+                hl.exec_cmd("qs -c hi-shell ipc call launcher toggle")
+            end
+        end
+    elseif pressed == 1 then
+        superTap = nil -- another key while Super is held: a shortcut, not a tap
+    end
+end)
 
 -- Blur behind the translucent launcher card
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, blur = true })
