@@ -20,10 +20,10 @@
 - [x] Implement a loading state (spinner) while Claude is thinking.
 
 ## Stage 4: Control Center & System Stats
-- [ ] Create a slide-out panel for the Control Center.
-- [ ] Add volume slider (using `pactl` or Pipewire).
-- [ ] Add Wi-Fi/Bluetooth toggles (using `nmcli` and `bluetoothctl`).
-- [ ] Add CPU/RAM usage bars (using `psutil` or `/proc/stat`).
+- [x] Create a slide-out panel for the Control Center.
+- [x] Add volume slider (Quickshell PipeWire service).
+- [x] Add Wi-Fi/Bluetooth toggles (Quickshell Networking / Bluetooth modules).
+- [x] Add CPU/RAM usage bars (`/proc/stat`, `/proc/meminfo`).
 
 ## Stage 5: Material 3 Theming (Matugen)
 - [ ] Write a Python script (`theme_updater.py`) that runs `matugen` to generate a `Colors.qml` file from the wallpaper.

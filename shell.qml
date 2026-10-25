@@ -14,4 +14,6 @@ ShellRoot {
     Launcher {}
 
     AIWidget {}
+
+    ControlCenter {}
 }

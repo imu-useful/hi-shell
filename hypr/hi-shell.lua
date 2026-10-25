@@ -13,3 +13,8 @@ hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, ignore_alpha = 0.3 
 hl.bind("SUPER + Y", hl.dsp.global("hi-shell:aiToggle"), { description = "hi-shell: Toggle Claude AI palette" })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
+
+-- Control center (also opens from the status button on the right of the bar)
+hl.bind("SUPER + U", hl.dsp.global("hi-shell:controlCenterToggle"), { description = "hi-shell: Toggle control center" })
+hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, ignore_alpha = 0.3 })

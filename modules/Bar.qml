@@ -49,5 +49,12 @@ PanelWindow {
             id: clock
             anchors.centerIn: parent
         }
+
+        // Right: system status / control center button
+        StatusButton {
+            anchors.right: parent.right
+            anchors.rightMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+        }
     }
 }
