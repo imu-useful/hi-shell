@@ -31,6 +31,6 @@
 - [x] Ensure all UI components use the dynamic colors.
 
 ## Stage 6: Build, Test, and README
-- [ ] Ensure the shell starts correctly on boot (add to Hyprland config).
-- [ ] Write a comprehensive `README.md` with installation instructions (dependencies: `quickshell`, `matugen`, `python`).
-- [ ] Push final code to GitHub.
+- [x] Ensure the shell starts correctly on boot (`hypr/hi-shell.lua` runs `qs -c hi-shell` on `hyprland.start`).
+- [x] Write a comprehensive `README.md` with installation instructions (dependencies: `quickshell`, `matugen`, `python`).
+- [x] Push final code to GitHub.

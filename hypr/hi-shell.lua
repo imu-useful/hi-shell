@@ -1,6 +1,11 @@
 -- hi-shell Hyprland integration (Lua config, Hyprland 0.56+).
--- Copy to ~/.config/hypr/custom/ and `require` it from hyprland.lua,
--- or paste the lines into your own config.
+-- Load it from your config (e.g. ~/.config/hypr/custom/execs.lua):
+--   dofile(os.getenv("HOME") .. "/.config/quickshell/hi-shell/hypr/hi-shell.lua")
+
+-- Start the shell with Hyprland
+hl.on("hyprland.start", function()
+    hl.exec_cmd("qs -c hi-shell")
+end)
 
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
 hl.bind("SUPER + Space", hl.dsp.global("hi-shell:launcherToggle"), { description = "hi-shell: Toggle app launcher" })
