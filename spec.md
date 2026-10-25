@@ -34,3 +34,87 @@
 - [x] Ensure the shell starts correctly on boot (`hypr/hi-shell.lua` runs `qs -c hi-shell` on `hyprland.start`).
 - [x] Write a comprehensive `README.md` with installation instructions (dependencies: `quickshell`, `matugen`, `python`).
 - [x] Push final code to GitHub.
+
+---
+
+# Phase 2: end4-pC-style shell
+
+Goal: grow hi-shell into a full desktop shell in the style of [end4-pC](https://github.com/pctrade/end4-pC)
+(an illogical-impulse fork): Material 3 Expressive shapes, a configurable bar, two sidebars, desktop widgets,
+a wallpaper selector and a settings app. hi-shell stays **standalone** (it does not need `ii` running) and
+everything is written from scratch: end4-pC is GPL-3.0 and its code is not copied here.
+
+Out of scope for now: Niri support, community presets gallery, booru/anime, football, on-screen keyboard,
+screen translator, translations other than en/ru.
+
+## Stage 7: Foundation (config, design tokens, widget kit)
+- [ ] `common/Config.qml`: user config in `~/.config/hi-shell/config.json` (JSON, live reload, defaults merged, writes from the UI).
+- [ ] `common/Appearance.qml`: M3 Expressive tokens (shape scale, elevation, motion curves/durations, transparency), replaces `Style.qml`.
+- [ ] Material shapes (`common/shapes/`): cookie/clover/flower/blob polygons as `Shape` items, used by icons, clock, avatar, wallpaper frame.
+- [ ] Widget kit: `StyledPopup` (hover popups anchored to the bar), `Card`, `Chip`, `SegmentedButton`, `Switch`, `ListRow`, `StyledFlickable`.
+- [ ] `PanelLoader`: lazy-load panels so closed panels cost nothing.
+
+## Stage 8: Core services
+- [ ] `services/Mpris.qml`: active player, controls, position (Quickshell.Services.Mpris).
+- [ ] `services/Weather.qml`: Open-Meteo (no API key), location from config or IP, cached.
+- [ ] `services/Battery.qml` (UPower), `services/Brightness.qml` (brightnessctl/ddcutil), `services/NetworkSpeed.qml` (`/proc/net/dev`).
+- [ ] `services/Notifications.qml`: notification server (Quickshell.Services.Notifications), history persisted to state.
+- [ ] `services/Tray.qml`, `services/Updates.qml` (`checkupdates`), resource usage extended with disk/GPU/temps.
+
+## Stage 9: Bar v2
+- [ ] Configurable layout: `bar.left/center/right` lists of widget ids, edited from settings (Stage 14).
+- [ ] Position top/bottom/left/right (vertical bar variant) and styles **Hug / Float / Islands / M3**.
+- [ ] Widgets: workspaces (dots + app icons), active window, media, resources, weather, clock/date, tray, system icons,
+      util buttons (screenshot, color picker, wallpaper), network speed, battery, updates, keyboard layout, power, divider.
+- [ ] Hover/click popups per widget (resources, weather, battery, clock → existing calendar, media).
+- [ ] Bar cava visualizer (optional, `cava`).
+
+## Stage 10: Notifications & OSD
+- [ ] Notification popups (stacked, actions, inline reply, images, grouping by app, timeout progress).
+- [ ] Do-not-disturb, unread count on the bar.
+- [ ] OSD for volume / brightness / mic mute / keyboard layout.
+
+## Stage 11: Right sidebar (replaces Control Center)
+- [ ] Header: avatar, uptime, edit / reload / settings / power buttons.
+- [ ] Quick toggles in two styles (Android-style pills and classic tiles), editable order: Wi-Fi, Bluetooth, dark mode,
+      night light (hyprsunset), idle inhibitor, DND, mic, game mode, VPN, color picker, screenshot.
+- [ ] Quick sliders: volume, brightness, mic; per-app volume and output device picker.
+- [ ] Wi-Fi and Bluetooth sub-pages (scan, connect, password prompt).
+- [ ] Bottom group: notification center, calendar (reuse the clock popup), to-do, timers.
+
+## Stage 12: Left sidebar
+- [ ] Home page: greeting card, media player with synced lyrics (LRCLIB), weather.
+- [ ] AI chat: move the Claude palette here as a full chat (history, markdown + code blocks, model picker,
+      Claude usage indicator); keep Super+Y as a quick palette.
+- [ ] Translator page (`trans` / Google endpoint), clipboard history page (`cliphist`).
+
+## Stage 13: Desktop widgets
+- [ ] Background layer window with widgets: shape analog clock, big digital clock, weather, CPU/RAM/disk tiles,
+      calendar, media + lyrics, user card (lock/settings/power), to-do, notes, world clock, focus/stopwatch/countdown timers,
+      image frame.
+- [ ] Edit mode: drag to place, snap to grid, per-widget on/off; positions saved in config.
+- [ ] Full-width cava visualizer at the bottom (optional).
+
+## Stage 14: Wallpapers & color schemes
+- [ ] Wallpaper service of our own (no dependency on `ii`'s state file): set via `swww`, transitions, per-monitor.
+- [ ] Wallpaper selector: local folders grid with thumbnails, random, online search (Wallhaven, Unsplash), resolution filter.
+- [ ] Shaped wallpaper frame widget (cookie / blob mask over the wallpaper).
+- [ ] matugen scheme variants (Tonal Spot, Content, Expressive, Fidelity, Fruit Salad, Monochrome, Neutral, Rainbow), auto mode,
+      transparency toggle; optional GTK/Qt/terminal theming.
+
+## Stage 15: Settings app
+- [ ] Overlay panel (Super+Escape) with pages: Quick, General, Bar, Desktop, Interface, Services, Hyprland, About.
+- [ ] Bar layout editor (chips per section, add/remove/reorder), positioning & styles.
+- [ ] Hyprland page: displays (resolution, refresh, scale, rotation, position via `hyprctl`), input, gaps/rounding/blur.
+- [ ] "Config file" button, settings search from the launcher (type `wallpaper`, `bar`, ...).
+
+## Stage 16: Launcher v2 & system overlays
+- [ ] Launcher prefixes: `<` keybinds list, `:` emoji, `=` calculator, `>` commands, `/` settings, clipboard.
+- [ ] Workspace overview (live window previews, drag windows between workspaces).
+- [ ] Session screen (lock, logout, suspend, reboot, shutdown), lock screen (or hyprlock integration), polkit agent.
+- [ ] Dock (pinned + running apps, magnify), screen corners, region selector (screenshot / OCR / record).
+
+## Stage 17: Polish & release
+- [ ] First-run welcome, ru/en translations, presets export/import (config + wallpaper + scheme in one archive).
+- [ ] Performance pass (lazy loading, idle CPU < 1%), multi-monitor test.
+- [ ] README with screenshots, update `hypr/hi-shell.lua` with all new binds; push.
