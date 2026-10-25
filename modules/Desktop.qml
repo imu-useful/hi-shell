@@ -122,22 +122,57 @@ Scope {
                 }
             }
 
-            // Shaped frame: the sharp wallpaper inside a big Material shape.
+            // Shaped frame: the sharp wallpaper inside a big Material shape. While music
+            // plays (and the desktop is in view) the shape turns and pulses to the bass.
             Item {
+                id: frame
                 visible: root.options.wallpaper && root.frame !== ""
                 anchors.centerIn: parent
                 width: Math.min(parent.width, parent.height) * 0.62
                 height: width
 
+                readonly property bool dancing: visible && Config.options.wallpapers.frameDance && Mpris.playing
+                    && !window.covered && Appearance.anim.speed > 0
+                property real spin: 0
+
+                // Count in with the Beat service while dancing.
+                property bool counted: false
+                onDancingChanged: {
+                    if (dancing !== counted) {
+                        Beat.users += dancing ? 1 : -1;
+                        counted = dancing;
+                    }
+                }
+                Component.onCompleted: if (dancing) { Beat.users++; counted = true; }
+                Component.onDestruction: if (counted) Beat.users--
+
+                Connections {
+                    target: Beat
+                    enabled: frame.dancing
+                    // A slow turn that speeds up on bass hits.
+                    function onFrame(dt) {
+                        frame.spin = (frame.spin + dt * (8 + 70 * Beat.bass)) % 360;
+                    }
+                }
+
+                // Swell with the bass; ease back when the music stops.
+                scale: dancing ? 1 + 0.07 * Beat.bass : 1
+                Behavior on scale {
+                    enabled: !frame.dancing
+                    SpatialAnim { duration: Appearance.anim.spatial }
+                }
+
                 MaterialShape {
                     anchors.fill: parent
                     anchors.margins: -6
+                    rotation: frame.spin
                     shape: root.frame || "circle"
-                    color: Qt.alpha(Colors.m3primary, 0.5)
+                    color: Qt.alpha(Colors.m3primary, 0.5 + 0.3 * (frame.dancing ? Beat.bass : 0))
                 }
                 ShapeImage {
                     anchors.fill: parent
                     shape: root.frame || "circle"
+                    maskRotation: frame.spin
                     source: wallpaper.source
                 }
             }

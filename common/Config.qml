@@ -132,6 +132,8 @@ Singleton {
                 property string wallhavenKey: ""
                 // Shape the wallpaper is shown in on the desktop ("" = full screen): sunny, cookie9, arch, blob, clover4, ...
                 property string frame: ""
+                // The frame turns and pulses to the music while something plays.
+                property bool frameDance: true
             }
 
             property JsonObject desktop: JsonObject {

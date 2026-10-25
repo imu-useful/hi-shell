@@ -202,7 +202,7 @@ Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
 - `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`
-- `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape
+- `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape, `frameDance` (the frame turns and pulses to the music)
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,

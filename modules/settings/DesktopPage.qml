@@ -91,6 +91,13 @@ ColumnLayout {
                 }
             }
         }
+        SwitchRow {
+            icon: "graphic_eq"
+            title: Translation.tr("Move to the music")
+            subtitle: Translation.tr("The frame turns and pulses to the bass while something plays")
+            checked: Config.options.wallpapers.frameDance
+            onToggled: checked => Config.options.wallpapers.frameDance = checked
+        }
         TextRow {
             icon: "image"
             title: Translation.tr("Image frame widget picture")

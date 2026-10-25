@@ -11,6 +11,9 @@ Item {
     property alias status: image.status
     property alias shape: mask.shape
     property alias shapeRotation: mask.shapeRotation
+    // Turns only the outline (the picture stays upright); cheap to animate,
+    // unlike shapeRotation, which recomputes the shape.
+    property real maskRotation: 0
 
     implicitWidth: 64
     implicitHeight: 64
@@ -24,19 +27,25 @@ Item {
         sourceSize: Qt.size(root.width * 2, root.height * 2)
     }
 
-    MaterialShape {
-        id: mask
+    Item {
+        id: maskLayer
         anchors.fill: parent
         visible: false
         layer.enabled: true
-        color: "black"
+
+        MaterialShape {
+            id: mask
+            anchors.fill: parent
+            rotation: root.maskRotation
+            color: "black"
+        }
     }
 
     MultiEffect {
         anchors.fill: parent
         source: image
         maskEnabled: true
-        maskSource: mask
+        maskSource: maskLayer
         maskThresholdMin: 0.5
         maskSpreadAtMin: 1
     }
