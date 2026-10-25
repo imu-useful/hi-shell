@@ -168,50 +168,6 @@ Scope {
                 onActivated: root.setEditing(false)
             }
 
-            // --- Visualizer along the bottom ---
-            Item {
-                id: visualizer
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: 180
-                visible: root.options.visualizer && window.hasWidgets && Mpris.playing && !window.covered
-
-                readonly property int bars: 64
-                property list<real> levels: []
-
-                Process {
-                    running: visualizer.visible && Appearance.anim.speed > 0
-                    command: ["sh", "-c", 'cfg=$(mktemp); printf "%b" "$1" > "$cfg"; exec cava -p "$cfg"', "sh",
-                        `[general]\nbars = ${visualizer.bars}\nframerate = 30\n[input]\nmethod = pipewire\n[output]\nmethod = raw\nraw_target = /dev/stdout\ndata_format = ascii\nascii_max_range = 100\nbar_delimiter = 59\n[smoothing]\nmonstercat = 1\n`]
-                    stdout: SplitParser {
-                        onRead: line => visualizer.levels = line.split(";").filter(v => v !== "").map(v => Number(v) / 100)
-                    }
-                    onRunningChanged: if (!running) visualizer.levels = []
-                }
-
-                Row {
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 4
-
-                    Repeater {
-                        model: visualizer.bars
-
-                        Rectangle {
-                            required property int index
-                            readonly property real level: visualizer.levels[index] ?? 0
-                            anchors.bottom: parent.bottom
-                            width: (visualizer.width - (visualizer.bars - 1) * 4) / visualizer.bars
-                            height: Math.max(4, level * visualizer.height)
-                            radius: width / 2
-                            color: Qt.alpha(Colors.m3primary, 0.55)
-                            Behavior on height { NumberAnimation { duration: 60 } }
-                        }
-                    }
-                }
-            }
-
             // --- Widgets ---
             Item {
                 id: widgets

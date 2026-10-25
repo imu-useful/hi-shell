@@ -259,7 +259,7 @@ ColumnLayout {
         SwitchRow {
             icon: "album"
             title: Translation.tr("Spin cover art while playing")
-            subtitle: Translation.tr("Redraws the bar every frame, uses more CPU")
+            subtitle: Translation.tr("Uses a little more CPU while music plays")
             checked: root.bar.media.spinArt
             onToggled: checked => root.bar.media.spinArt = checked
         }

@@ -1,29 +1,44 @@
-# hi-shell
+<div align="center">
 
-A Quickshell-based desktop shell for Hyprland with Material 3 design and a built-in Claude AI palette.
+# ✦ hi-shell
 
-- **Bar** — configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles,
-  hover popups for media, resources, weather, battery and updates
-- **App launcher** — apps and settings, plus prefixes: `=` calculator (qalc), `>` run a command, `<` keybinds,
-  `:` emoji, `;` clipboard, `/` settings
-- **Overlays** — workspace overview with window previews (drag windows between workspaces), session screen,
-  polkit password dialog, region screenshot / OCR / screen recording, optional dock, rounded screen corners
-- **Claude AI** — quick palette (Super+Y) and a full chat in the left sidebar through the `claude` CLI: streamed answers,
-  code blocks with copy buttons, model picker, token / cost usage, saved chats
-- **Left sidebar** — greeting, now playing with synced lyrics (LRCLIB), weather, Claude chat, translator
-  (translate-shell), clipboard history (cliphist, with image thumbnails)
-- **Right sidebar** — quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic sliders,
-  Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
-- **Desktop** — wallpaper plus widgets: shape clock, big clock, weather, resource tiles, week calendar, media with lyrics,
-  greeting, to-do, notes, world clock, timers, user card, image frame; full-width visualizer; drag-to-place edit mode
-- **Settings** — Quick, General, Bar (layout editor), Desktop, Interface, Services, Hyprland (displays, gaps, rounding,
-  blur, input), About; also searchable from the launcher (type `blur`, `wallpaper`, `bar`, ...)
-- **Wallpapers & theming** — wallpaper picker (local folders, Wallhaven / Unsplash), matugen scheme variants,
-  light / dark / auto, shaped wallpaper frame; Material 3 palette from the wallpaper, reloaded live
-- **Google Calendar** — month view with event dots and an agenda (optional)
-- **English and Russian** — the whole interface, dates and plural forms; follows `$LANG` or the setting
-- **First-run welcome** — language, wallpaper, mode, bar style and the main shortcuts; lists missing programs
-- **Presets** — save your config, wallpaper and colors to one file, restore it later or share it
+**A Material 3 Expressive desktop shell for Hyprland — with Claude AI built in.**
+
+Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, animations everywhere, English and Russian.
+
+[![Arch Linux](https://img.shields.io/badge/Arch_Linux-1793D1?style=for-the-badge&logo=archlinux&logoColor=white)](https://archlinux.org)
+[![Hyprland 0.56+](https://img.shields.io/badge/Hyprland-0.56%2B-58E1FF?style=for-the-badge&logo=hyprland&logoColor=black)](https://hyprland.org)
+[![Quickshell](https://img.shields.io/badge/Quickshell-QML-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://quickshell.org)
+[![Material You](https://img.shields.io/badge/Material_3-Expressive-7F67BE?style=for-the-badge&logo=materialdesign&logoColor=white)](https://m3.material.io)
+<br>
+[![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue?style=for-the-badge)](LICENSE)
+[![Telegram chat](https://img.shields.io/badge/Telegram-tux__empire-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/tux_empire)
+
+[Install](#installation) · [Shortcuts](#usage) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting) · [Community](#community)
+
+</div>
+
+---
+
+## Features
+
+| | |
+| --- | --- |
+| 🧭 **Bar** | Configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles, hover popups for media, resources, weather, battery and updates, a live audio spectrum |
+| 🚀 **App launcher** | Apps and settings, plus prefixes: `=` calculator, `>` run a command, `<` keybinds, `:` emoji, `;` clipboard, `/` settings |
+| ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats |
+| 🪟 **Overlays** | Workspace overview with window previews (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording, optional dock, rounded screen corners |
+| ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics, weather, Claude chat, translator, clipboard history with image thumbnails |
+| ➡️ **Right sidebar** | Quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic, Wi-Fi and Bluetooth pages, per-app volume, notification center, calendar, to-do, focus / stopwatch / countdown timers |
+| 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics, greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
+| 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
+| ⚙️ **Settings** | Every option in a settings app, Hyprland displays / gaps / blur / input included, searchable from the launcher |
+| 🌍 **Languages** | English and Russian: the whole interface, dates and plural forms |
+| 👋 **Welcome & presets** | A first-run setup, and presets that save your config, wallpaper and colors to one shareable file |
+| 📅 **Google Calendar** | Month view with event dots and an agenda (optional) |
+
+Animations run everywhere, yet the shell idles at about 1% CPU: hidden panels and disabled widgets aren't created,
+and the audio spectrum is drawn by a single shader.
 
 ## Requirements
 
@@ -58,6 +73,50 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 
 ## Installation
 
+### Quick install
+
+```sh
+git clone https://github.com/imu-useful/hi-shell.git ~/Projects/hi-shell
+~/Projects/hi-shell/install.sh
+```
+
+or without cloning first (the repo goes to `~/.local/share/hi-shell/repo`):
+
+```sh
+bash <(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)
+```
+
+The installer:
+
+1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
+2. links the repo to `~/.config/quickshell/hi-shell`
+3. loads `hypr/hi-shell.lua` from your Hyprland config — `~/.config/hypr/custom/execs.lua` on illogical-impulse dots,
+   `~/.config/hypr/hyprland.lua` otherwise (one marked line, with a backup of the file)
+4. starts the shell and warns about other bars or notification daemons that are still running
+
+Options: `--yes` (don't ask), `--no-deps`, `--no-start`. Then press <kbd>Super</kbd>+<kbd>Space</kbd>.
+
+### Update
+
+```sh
+~/.config/quickshell/hi-shell/update.sh
+```
+
+Pulls the latest version (`git pull --ff-only`, so your local changes are never overwritten), shows what's new,
+restarts the shell and reloads Hyprland when the keybinds changed.
+
+### Uninstall
+
+```sh
+~/.config/quickshell/hi-shell/uninstall.sh            # keeps your settings and presets
+~/.config/quickshell/hi-shell/uninstall.sh --purge    # also deletes settings, state and cache (asks first)
+```
+
+Stops the shell, removes the line from your Hyprland config and the link. Packages stay installed.
+
+<details>
+<summary>Manual installation</summary>
+
 1. Clone the repo and link it where Quickshell looks for configs:
 
    ```sh
@@ -80,6 +139,8 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
    ```
 
 3. Check `hyprctl configerrors` is empty and press <kbd>Super</kbd>+<kbd>Space</kbd>.
+
+</details>
 
 ## Usage
 
@@ -144,8 +205,7 @@ Sections:
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
   `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
-  `bar.resources`, `bar.utilButtons`, `bar.updates`; `bar.media.spinArt` spins the cover art while playing (off by default,
-  it redraws the bar every frame)
+  `bar.resources`, `bar.utilButtons`, `bar.updates`; `bar.media.spinArt` spins the cover art like a record while playing (on by default)
 - `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
   in the sidebar), night light temperature
 - `desktop`: draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
@@ -259,18 +319,29 @@ the same file.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, Settings, Welcome, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, DesktopVisualizer, Settings, Welcome, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Translation, Paths)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
-                     StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)
+                     StyledPopup, StyledFlickable, PanelLoader, Spectrum, animations, buttons, slider)
+common/widgets/shaders/  spectrum.frag (+ compiled .qsb) for the audio spectrum
 common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
                      Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), gcal.py,
                      presets.py
 translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
+install.sh           install packages, link the repo, hook into Hyprland
+update.sh            pull and restart
+uninstall.sh         unhook and unlink (--purge: settings too)
 ```
+
+## Community
+
+Questions, screenshots of your setup, ideas and bug reports — join the Telegram chat:
+**[t.me/tux_empire](https://t.me/tux_empire)**
+
+Bugs can also go to [GitHub issues](https://github.com/imu-useful/hi-shell/issues).
 
 ## License
 
-See [LICENSE](LICENSE).
+GPL-2.0 — see [LICENSE](LICENSE).

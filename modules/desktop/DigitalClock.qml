@@ -34,8 +34,9 @@ ColumnLayout {
         Digits {
             text: ":"
             color: Colors.m3onSurface
-            // No fade: an animation every second would keep redrawing the desktop.
+            // Seconds only tick while the desktop is in view (see precision above).
             opacity: clock.date.getSeconds() % 2 ? 0.25 : 0.9
+            Behavior on opacity { EffectAnim {} }
         }
         Digits {
             text: Qt.formatTime(clock.date, "mm")

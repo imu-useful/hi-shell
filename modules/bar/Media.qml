@@ -31,14 +31,26 @@ BarWidget {
         height: root.artSize
         shape: "cookie7"
         source: Mpris.artUrl
+        // Spinning turns a cached texture instead of re-masking the cover every frame.
+        layer.enabled: spin.running
+        layer.smooth: true
 
-        RotationAnimation on rotation {
+        // Like a record: a turn every 20 s while playing, stopping where it is on pause.
+        // 15 steps a second look smooth at this speed; a 60 fps animation would redraw
+        // the whole bar every frame for as long as music plays.
+        Timer {
+            id: spin
             running: Config.options.bar.media.spinArt && Mpris.playing && Appearance.anim.speed > 0
-            loops: Animation.Infinite
-            from: 0
-            to: 360
-            duration: 20000
-            onRunningChanged: if (!running) art.rotation = 0
+            interval: 66
+            repeat: true
+            onTriggered: art.rotation = (art.rotation + 360 * interval / 20000) % 360
+        }
+        Connections {
+            target: Config.options.bar.media
+            function onSpinArtChanged() {
+                if (!Config.options.bar.media.spinArt)
+                    art.rotation = 0;
+            }
         }
     }
 

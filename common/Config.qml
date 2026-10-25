@@ -94,8 +94,8 @@ Singleton {
                 }
                 property JsonObject media: JsonObject {
                     property int maxWidth: 220
-                    // Spin the cover art while playing (redraws the bar every frame).
-                    property bool spinArt: false
+                    // Spin the cover art while playing.
+                    property bool spinArt: true
                 }
                 property JsonObject resources: JsonObject {
                     // cpu, ram, swap, gpu, disk

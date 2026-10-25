@@ -22,6 +22,8 @@ Row {
                 battery: { icon: Battery.icon, label: Translation.tr("Battery"), value: Battery.percentage, shape: "flower", tone: 2 },
                 disk: { icon: "hard_drive", label: Translation.tr("Disk"), value: SystemStats.diskUsage, shape: "flower", tone: 2 }
             })[modelData]
+            property real shown: info.value
+            Behavior on shown { EffectAnim { duration: Appearance.anim.slow } }
             readonly property color accent: [Colors.m3primaryContainer, Colors.m3secondaryContainer, Colors.m3tertiaryContainer][tile.info.tone]
             readonly property color ink: [Colors.m3onPrimaryContainer, Colors.m3onSecondaryContainer, Colors.m3onTertiaryContainer][tile.info.tone]
 
@@ -55,7 +57,7 @@ Row {
                 anchors.margins: 14
                 spacing: -2
                 StyledText {
-                    text: `${Math.round(tile.info.value * 100)}%`
+                    text: `${Math.round(tile.shown * 100)}%`
                     font.family: Appearance.font.title
                     font.pixelSize: 28
                     font.weight: Font.DemiBold

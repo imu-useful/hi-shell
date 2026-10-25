@@ -488,7 +488,6 @@
     "A .tar.gz preset someone shared": "Пресет .tar.gz, которым с вами поделились",
     "Open presets folder": "Открыть папку пресетов",
     "Spin cover art while playing": "Вращать обложку во время воспроизведения",
-    "Redraws the bar every frame, uses more CPU": "Панель перерисовывается каждый кадр, больше нагрузка на ЦП",
     "Preset saved": "Пресет сохранён",
     "colors from the wallpaper": "цвета из обоев",
     "Claude AI": "Claude AI",
@@ -514,5 +513,6 @@
     "mph": "миль/ч",
     "m/s": "м/с",
     "%1d %2h": "%1 д %2 ч",
-    "%1h %2m": "%1 ч %2 мин"
+    "%1h %2m": "%1 ч %2 мин",
+    "Uses a little more CPU while music plays": "Немного больше нагрузка на ЦП во время музыки"
 }

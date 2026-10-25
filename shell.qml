@@ -17,6 +17,8 @@ ShellRoot {
 
     Desktop {}
 
+    DesktopVisualizer {}
+
     Variants {
         model: Quickshell.screens
 

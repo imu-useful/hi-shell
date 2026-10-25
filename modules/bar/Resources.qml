@@ -36,6 +36,9 @@ BarWidget {
                 id: item
                 required property string modelData
                 readonly property var info: root.all[modelData]
+                // The number counts to the new value along with the ring.
+                property real shown: info.value
+                Behavior on shown { EffectAnim { duration: Appearance.anim.slow } }
                 columns: root.vertical ? 1 : 2
                 spacing: 4
                 horizontalItemAlignment: Grid.AlignHCenter
@@ -45,7 +48,6 @@ BarWidget {
                     implicitWidth: 20
                     implicitHeight: 20
                     value: item.info.value
-                    animated: false
                     color: item.info.value > 0.9 ? Colors.m3error : Colors.m3primary
 
                     MaterialIcon {
@@ -58,7 +60,7 @@ BarWidget {
                 }
 
                 StyledText {
-                    text: Math.round(item.info.value * 100)
+                    text: Math.round(item.shown * 100)
                     font.pixelSize: Appearance.font.size.labelMedium
                     font.features: { "tnum": 1 }
                 }
