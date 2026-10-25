@@ -84,10 +84,10 @@ screen translator, translations other than en/ru.
 - [x] Bottom group: notification center (grouped by app), calendar (reuse the clock popup), to-do, timers.
 
 ## Stage 12: Left sidebar
-- [ ] Home page: greeting card, media player with synced lyrics (LRCLIB), weather.
-- [ ] AI chat: move the Claude palette here as a full chat (history, markdown + code blocks, model picker,
+- [x] Home page: greeting card, media player with synced lyrics (LRCLIB), weather.
+- [x] AI chat: move the Claude palette here as a full chat (history, markdown + code blocks, model picker,
       Claude usage indicator); keep Super+Y as a quick palette.
-- [ ] Translator page (`trans` / Google endpoint), clipboard history page (`cliphist`).
+- [x] Translator page (`trans` / Google endpoint), clipboard history page (`cliphist`).
 
 ## Stage 13: Desktop widgets
 - [ ] Background layer window with widgets: shape analog clock, big digital clock, weather, CPU/RAM/disk tiles,

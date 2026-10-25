@@ -2,7 +2,7 @@ import QtQuick
 import qs.common
 import qs.common.widgets
 
-// Opens the app launcher.
+// Left click: app launcher. Right click: left sidebar.
 BarWidget {
     id: root
 
@@ -10,7 +10,12 @@ BarWidget {
     padding: 4
     contentWidth: thickness - padding * 2
     contentHeight: contentWidth
-    onClicked: ShellState.launcherOpen = !ShellState.launcherOpen
+    onClicked: mouse => {
+        if (mouse.button === Qt.RightButton)
+            ShellState.sidebarLeftOpen = !ShellState.sidebarLeftOpen;
+        else
+            ShellState.launcherOpen = !ShellState.launcherOpen;
+    }
 
     MaterialIcon {
         anchors.centerIn: parent

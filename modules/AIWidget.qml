@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
+import qs.services
 import qs.common.widgets
 import qs.modules.ai
 
@@ -25,9 +26,8 @@ Scope {
         open = false;
     }
 
-    ClaudeSession {
-        id: session
-    }
+    // Shared with the left sidebar's chat.
+    readonly property var session: Claude
 
 
     IpcHandler {

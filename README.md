@@ -5,7 +5,10 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
 - **Bar** — configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles,
   hover popups for media, resources, weather, battery and updates
 - **App launcher** — fuzzy search over desktop entries
-- **Claude AI palette** — type a prompt, the `claude` CLI answers in a Material 3 card (streamed, non-blocking)
+- **Claude AI** — quick palette (Super+Y) and a full chat in the left sidebar through the `claude` CLI: streamed answers,
+  code blocks with copy buttons, model picker, token / cost usage, saved chats
+- **Left sidebar** — greeting, now playing with synced lyrics (LRCLIB), weather, Claude chat, translator
+  (translate-shell), clipboard history (cliphist, with image thumbnails)
 - **Right sidebar** — quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic sliders,
   Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
 - **Theming** — Material 3 palette generated from the wallpaper with matugen, reloaded live
@@ -29,6 +32,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `pacman-contrib`, `yay` or `paru` (optional) | update count |
 | `libnotify` | battery warnings (`notify-send`) |
 | `hyprsunset` | night light (uses a running hyprsunset daemon, or starts one) |
+| `cliphist`, `translate-shell` | clipboard history and translator in the left sidebar |
 | `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
@@ -69,6 +73,7 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
+| <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
 | click the system icons | Right sidebar (scroll there to change the volume) |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
@@ -80,6 +85,9 @@ qs -c hi-shell ipc call launcher toggle       # also: ai, sidebarRight, calendar
 qs -c hi-shell ipc call sidebarRight openTab todo     # notifications, calendar, todo, timers
 qs -c hi-shell ipc call sidebarRight openPage wifi    # bluetooth, audio
 qs -c hi-shell ipc call todo add "Buy milk"           # list
+qs -c hi-shell ipc call sidebarLeft openTab claude    # home, claude, translator, clipboard
+qs -c hi-shell ipc call ai ask "What's a good name for a cat?"
+qs -c hi-shell ipc call claude chats                 # deleteChat <id>, newChat
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
@@ -101,6 +109,9 @@ Edits apply live, no restart needed. Sections:
   `bar.resources`, `bar.utilButtons`, `bar.updates`
 - `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
   in the sidebar), night light temperature
+- `ai.model`: claude CLI model alias (empty = CLI default, `opus`, `sonnet`, `haiku`; also the picker in the chat)
+- `translator`: target language and the quick-pick list
+- `clipboard.watch`: start `wl-paste --watch cliphist store` with the shell (skipped if already running)
 - `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval
 - `battery`: low / critical thresholds and warning notifications
 - `notifications`: default popup timeout, history size
@@ -171,7 +182,7 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Launcher, AIWidget, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)

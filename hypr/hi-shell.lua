@@ -22,6 +22,9 @@ hl.bind("SUPER + Y", hl.dsp.exec_cmd("qs -c hi-shell ipc call ai toggle"), { des
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 
+-- Left sidebar: home / Claude chat / translator / clipboard
+hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarLeft toggle"), { description = "hi-shell: Toggle left sidebar" })
+
 -- Right sidebar (also opens from the system icons on the bar)
 hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggle"), { description = "hi-shell: Toggle right sidebar" })
 hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, blur = true })

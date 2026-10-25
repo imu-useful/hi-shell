@@ -109,6 +109,22 @@ Singleton {
                 property int nightLightTemperature: 4500
             }
 
+            property JsonObject ai: JsonObject {
+                // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
+                property string model: ""
+            }
+
+            property JsonObject translator: JsonObject {
+                property string target: "en"
+                // Shown as quick picks in the translator.
+                property list<string> languages: ["en", "ru", "de", "fr", "es", "uk", "ja", "zh"]
+            }
+
+            property JsonObject clipboard: JsonObject {
+                // Start `wl-paste --watch cliphist store` (text and images) with the shell.
+                property bool watch: true
+            }
+
             property JsonObject weather: JsonObject {
                 property bool enabled: true
                 // Empty city and 0/0 coordinates = locate by IP address.
