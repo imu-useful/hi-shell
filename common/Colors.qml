@@ -21,4 +21,6 @@ Singleton {
     readonly property color m3outline: "#938f99"
     readonly property color m3outlineVariant: "#49454f"
     readonly property color m3error: "#f2b8b5"
+    readonly property color m3errorContainer: "#8c1d18"
+    readonly property color m3onErrorContainer: "#f9dedc"
 }

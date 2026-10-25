@@ -8,3 +8,8 @@ hl.bind("SUPER + Space", hl.dsp.global("hi-shell:launcherToggle"), { description
 -- Blur behind the translucent launcher card
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, ignore_alpha = 0.3 })
+
+-- Claude AI palette (Super+A / Super+C are commonly taken; Super+Y is free by default)
+hl.bind("SUPER + Y", hl.dsp.global("hi-shell:aiToggle"), { description = "hi-shell: Toggle Claude AI palette" })
+hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })

@@ -13,11 +13,11 @@
 - [x] Add Material 3 styling (rounded corners, blur background).
 
 ## Stage 3: Claude AI Command Palette (The Core Feature)
-- [ ] Create a floating Window for the AI widget (triggered by Super+A).
-- [ ] Add a text input and a "Send" button.
-- [ ] Use Quickshell's Process module to run `claude --print "USER_PROMPT"` and capture the output.
-- [ ] Display the output in a scrollable Material 3 card.
-- [ ] Implement a loading state (spinner) while Claude is thinking.
+- [x] Create a floating Window for the AI widget (Super+Y via `hypr/hi-shell.lua`; Super+A/Super+C are taken).
+- [x] Add a text input and a "Send" button.
+- [x] Use Quickshell's Process module to run `claude --print` with `--output-format stream-json` and stream the output live.
+- [x] Display the output in a scrollable Material 3 card.
+- [x] Implement a loading state (spinner) while Claude is thinking.
 
 ## Stage 4: Control Center & System Stats
 - [ ] Create a slide-out panel for the Control Center.
