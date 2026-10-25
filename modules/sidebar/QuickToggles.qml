@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -111,6 +111,14 @@ ColumnLayout {
             active: Toggles.vpnActive,
             available: Toggles.vpnAvailable,
             toggle: () => Toggles.setVpn(!Toggles.vpnActive)
+        },
+        focusMode: {
+            icon: "center_focus_strong",
+            label: Translation.tr("Focus mode"),
+            subtitle: Config.options.desktop.focusMode ? Translation.tr("Clean desktop behind windows") : Translation.tr("Off"),
+            active: Config.options.desktop.focusMode,
+            available: true,
+            toggle: () => Config.options.desktop.focusMode = !Config.options.desktop.focusMode
         },
         coverMode: {
             icon: "album",

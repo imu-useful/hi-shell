@@ -522,5 +522,8 @@
     "Cover mode": "Режим обложки",
     "Showing the cover": "Показывает обложку",
     "Waiting for music": "Ждёт музыку",
-    "The playing track's cover instead of the wallpaper, colors included": "Обложка играющего трека вместо обоев, вместе с цветами"
+    "The playing track's cover instead of the wallpaper, colors included": "Обложка играющего трека вместо обоев, вместе с цветами",
+    "Focus mode": "Режим фокуса",
+    "Clean desktop behind windows": "Чистый стол под окнами",
+    "With windows open: sharp wallpaper, widgets and frame hidden": "При открытых окнах: обои без размытия, виджеты и рамка скрыты"
 }

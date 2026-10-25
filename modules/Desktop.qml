@@ -59,9 +59,9 @@ Scope {
             readonly property bool hasWidgets: root.options.widgets && (root.options.monitor ? modelData?.name === root.options.monitor : modelData === Quickshell.screens[0])
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
             readonly property bool covered: !root.editing && Hyprland.toplevels.values.some(t => t.workspace?.id === monitor?.activeWorkspace?.id)
-            // 1 on the empty desktop, 0 with windows open: blur, frame and widgets fade
-            // with it, so the wallpaper behind windows is sharp and uncluttered.
-            property real reveal: covered ? 0 : 1
+            // 1 on the empty desktop, 0 with windows open (in focus mode): blur, frame and
+            // widgets fade with it, so the wallpaper behind windows is sharp and uncluttered.
+            property real reveal: covered && root.options.focusMode ? 0 : 1
             Behavior on reveal {
                 NumberAnimation { duration: Appearance.anim.slow * 1.5; easing.type: Easing.InOutCubic }
             }

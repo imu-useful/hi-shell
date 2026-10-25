@@ -25,6 +25,13 @@ ColumnLayout {
 
         SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
         SwitchRow {
+            icon: "center_focus_strong"
+            title: Translation.tr("Focus mode")
+            subtitle: Translation.tr("With windows open: sharp wallpaper, widgets and frame hidden")
+            checked: root.d.focusMode
+            onToggled: checked => root.d.focusMode = checked
+        }
+        SwitchRow {
             icon: "album"
             title: Translation.tr("Cover mode")
             subtitle: Translation.tr("The playing track's cover instead of the wallpaper, colors included")
