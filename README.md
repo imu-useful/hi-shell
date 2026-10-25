@@ -62,7 +62,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
 | `imagemagick`, `curl` | wallpaper thumbnails and downloads |
 | `libqalculate` (`qalc`) | launcher calculator |
-| `tesseract`, `tesseract-data-eng` (+ other languages), `wf-recorder` | region OCR and screen recording |
+| `tesseract`, `tesseract-data-eng`, `tesseract-data-rus` (+ other languages), `wf-recorder` | region OCR and screen recording |
 | `hyprlock` | lock screen (hi-shell's Lock runs it) |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
@@ -225,7 +225,7 @@ Sections:
 - `updates`: check interval, include AUR (via `yay` or `paru`)
 - `tray.hidden`: tray item ids to hide
 - `dock`: enabled (off by default), auto-hide, magnify, icon size, pinned app ids
-- `capture`: OCR languages (e.g. `eng+rus`), record audio
+- `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`), record audio
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 

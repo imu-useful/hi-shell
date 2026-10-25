@@ -222,8 +222,9 @@ Singleton {
             }
 
             property JsonObject capture: JsonObject {
-                // tesseract languages for OCR, e.g. "eng+rus" (install tesseract-data-rus for Russian)
-                property string ocrLanguages: "eng"
+                // tesseract languages for OCR, e.g. "eng+rus"; auto = every installed one
+                // (install tesseract-data-rus for Russian)
+                property string ocrLanguages: "auto"
                 property bool recordAudio: false
             }
 

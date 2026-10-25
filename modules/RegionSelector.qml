@@ -28,6 +28,15 @@ Scope {
 
     readonly property string tmp: Paths.cache + "/region"
 
+    // Shell snippet: OCR of region $2 of image $1 in languages $3 into $t.
+    // tesseract misses light text on dark backgrounds (dark themes, terminals), so
+    // the crop is made gray, inverted when it's mostly dark, and enlarged first.
+    // "auto" = every installed language.
+    readonly property string ocrScript: 'img=$(mktemp --suffix=.png); magick "$1" -crop "$2" +repage -colorspace Gray "$img"; '
+        + 'neg=; [ "$(magick "$img" -format "%[fx:mean<0.5]" info:)" = 1 ] && neg=-negate; '
+        + 'l="$3"; [ "$l" = auto ] && l=$(tesseract --list-langs 2>/dev/null | tail -n +2 | grep -vx osd | paste -sd+); '
+        + 't=$(magick "$img" $neg -resize 200% png:- | tesseract stdin - -l "${l:-eng}" 2>/dev/null); rm -f "$img"; '
+
     function start(newMode) {
         if (selecting || freeze.running)
             return;
@@ -56,10 +65,10 @@ Scope {
             run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy --type image/png < "$3" && notify-send -a hi-shell -i "$3" "$4" "$5"', frozen, crop, file, Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").arg(file)]);
         } else if (mode === "ocr") {
             const lang = Config.options.capture.ocrLanguages;
-            run(['t=$(magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null); if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "$4" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "$5"; fi', frozen, crop, lang, Translation.tr("Text copied"), Translation.tr("No text found")]);
+            run([ocrScript + 'if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "$4" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "$5"; fi', frozen, crop, lang, Translation.tr("Text copied"), Translation.tr("No text found")]);
         } else if (mode === "translate") {
             // OCR, then into the translator in the left sidebar.
-            translator.command = ["sh", "-c", 'magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null', "sh",
+            translator.command = ["sh", "-c", ocrScript + 'printf %s "$t"', "sh",
                 frozen, crop, Config.options.capture.ocrLanguages];
             translator.running = true;
         } else {
