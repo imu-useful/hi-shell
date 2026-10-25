@@ -16,7 +16,7 @@ PanelWindow {
     readonly property int maxShown: 5
 
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    visible: Notifications.popups.length > 0 || column.height > 0
+    visible: Notifications.popups.length > 0
 
     anchors.top: !atBottom
     anchors.bottom: atBottom
