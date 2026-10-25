@@ -69,7 +69,7 @@ DesktopCard {
                 tonal: true
                 icon: "lock"
                 text: "Lock"
-                onClicked: Quickshell.execDetached(["loginctl", "lock-session"])
+                onClicked: Session.lock()
             }
             IconButton {
                 icon: "settings"
@@ -88,15 +88,15 @@ DesktopCard {
             spacing: 6
             Repeater {
                 model: [
-                    { icon: "bedtime", text: "Sleep", command: ["systemctl", "suspend"] },
-                    { icon: "restart_alt", text: "Reboot", command: ["systemctl", "reboot"] },
-                    { icon: "power_settings_new", text: "Off", command: ["systemctl", "poweroff"] }
+                    { icon: "bedtime", text: "Sleep", run: () => Session.suspend() },
+                    { icon: "restart_alt", text: "Reboot", run: () => Session.reboot() },
+                    { icon: "power_settings_new", text: "Off", run: () => Session.poweroff() }
                 ]
                 Chip {
                     required property var modelData
                     icon: modelData.icon
                     text: modelData.text
-                    onClicked: Quickshell.execDetached(modelData.command)
+                    onClicked: modelData.run()
                 }
             }
         }

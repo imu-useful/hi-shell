@@ -64,11 +64,11 @@ RowLayout {
     // Power actions replace the regular buttons while open.
     Repeater {
         model: root.powerMenu ? [
-            { icon: "lock", run: () => Quickshell.execDetached(["loginctl", "lock-session"]) },
-            { icon: "bedtime", run: () => Quickshell.execDetached(["systemctl", "suspend"]) },
-            { icon: "logout", run: () => Hyprland.dispatch("hl.dsp.exit()") },
-            { icon: "restart_alt", run: () => Quickshell.execDetached(["systemctl", "reboot"]) },
-            { icon: "power_settings_new", run: () => Quickshell.execDetached(["systemctl", "poweroff"]) }
+            { icon: "lock", run: () => Session.lock() },
+            { icon: "bedtime", run: () => Session.suspend() },
+            { icon: "logout", run: () => Session.logout() },
+            { icon: "restart_alt", run: () => Session.reboot() },
+            { icon: "power_settings_new", run: () => Session.poweroff() }
         ] : [
             { icon: "edit", active: root.editing, run: () => root.editing = !root.editing },
             { icon: "refresh", run: () => Quickshell.reload(false) },

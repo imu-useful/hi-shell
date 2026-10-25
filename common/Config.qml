@@ -61,6 +61,8 @@ Singleton {
                 property bool autoMode: false
                 // Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light.
                 property bool gtkColorScheme: true
+                // Rounded black screen corners, radius in px (0 = off).
+                property int screenCorners: 16
             }
 
             property JsonObject bar: JsonObject {
@@ -199,6 +201,23 @@ Singleton {
                 property var monitors: ({})
                 // option path ("general.gaps_in") -> value
                 property var options: ({})
+            }
+
+            property JsonObject dock: JsonObject {
+                property bool enabled: false
+                property bool autoHide: true
+                property bool magnify: true
+                property int iconSize: 44
+                // Screen name; empty = first screen.
+                property string monitor: ""
+                // App ids (desktop file names / window classes), right click an icon to pin.
+                property list<string> pinned: ["firefox", "kitty", "org.gnome.Nautilus"]
+            }
+
+            property JsonObject capture: JsonObject {
+                // tesseract languages for OCR, e.g. "eng+rus" (install tesseract-data-rus for Russian)
+                property string ocrLanguages: "eng"
+                property bool recordAudio: false
             }
 
             property JsonObject apps: JsonObject {

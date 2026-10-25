@@ -4,7 +4,10 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
 
 - **Bar** — configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles,
   hover popups for media, resources, weather, battery and updates
-- **App launcher** — fuzzy search over desktop entries
+- **App launcher** — apps and settings, plus prefixes: `=` calculator (qalc), `>` run a command, `<` keybinds,
+  `:` emoji, `;` clipboard, `/` settings
+- **Overlays** — workspace overview with window previews (drag windows between workspaces), session screen,
+  polkit password dialog, region screenshot / OCR / screen recording, optional dock, rounded screen corners
 - **Claude AI** — quick palette (Super+Y) and a full chat in the left sidebar through the `claude` CLI: streamed answers,
   code blocks with copy buttons, model picker, token / cost usage, saved chats
 - **Left sidebar** — greeting, now playing with synced lyrics (LRCLIB), weather, Claude chat, translator
@@ -40,6 +43,9 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `cliphist`, `translate-shell` | clipboard history and translator in the left sidebar |
 | `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
 | `imagemagick`, `curl` | wallpaper thumbnails and downloads |
+| `libqalculate` (`qalc`) | launcher calculator |
+| `tesseract`, `tesseract-data-eng` (+ other languages), `wf-recorder` | region OCR and screen recording |
+| `hyprlock` | lock screen (hi-shell's Lock runs it) |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
 ```sh
@@ -80,6 +86,9 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
+| <kbd>Super</kbd>+<kbd>Tab</kbd> | Workspace overview |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Region screenshot / OCR / recording (also the bar's screenshot button) |
+| bar power button | Session screen (lock, log out, suspend, reboot, power off) |
 | <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
@@ -98,6 +107,10 @@ qs -c hi-shell ipc call sidebarLeft openTab claude    # home, claude, translator
 qs -c hi-shell ipc call ai ask "What's a good name for a cat?"
 qs -c hi-shell ipc call claude chats                 # deleteChat <id>, newChat
 qs -c hi-shell ipc call desktop toggleEdit            # edit, done, resetLayout
+qs -c hi-shell ipc call launcher search "=2+2"        # open the launcher with text typed
+qs -c hi-shell ipc call region screenshot             # ocr, record, stop, cancel, fullscreen
+qs -c hi-shell ipc call session lock                  # logout, suspend, hibernate, reboot, poweroff, toggleScreen
+qs -c hi-shell ipc call overview toggle
 qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
@@ -133,6 +146,9 @@ Sections:
 - `notifications`: default popup timeout, history size
 - `updates`: check interval, include AUR (via `yay` or `paru`)
 - `tray.hidden`: tray item ids to hide
+- `dock`: enabled (off by default), auto-hide, magnify, icon size, pinned app ids
+- `capture`: OCR languages (e.g. `eng+rus`), record audio
+- `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
 ## Notifications
@@ -197,6 +213,9 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
 - **Developing:** start with `HI_SHELL_DEV=1 qs -c hi-shell` to reload on file changes (off by default: the current
   Quickshell build can crash while reloading).
+- **Screen doesn't lock on idle:** if your `hypridle.conf` came with illogical-impulse, its `lock_cmd`
+  (`hyprctl dispatch global quickshell:lock & pidof qs quickshell hyprlock || hyprlock`) never starts hyprlock
+  while hi-shell runs. Use `lock_cmd = pidof hyprlock || hyprlock`.
 - **Two bars:** illogical-impulse starts its own shell (`qs -c ii`). Remove that line from
   `~/.config/hypr/hyprland/execs.lua` if you want hi-shell alone.
 - **Shortcuts do nothing:** another bind may already use the key — check `hyprctl binds`.
@@ -208,7 +227,7 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, Settings, WallpaperSelector, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, Settings, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)

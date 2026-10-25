@@ -8,8 +8,8 @@ BarWidget {
     id: root
 
     readonly property var all: ({
-        // Region to clipboard and ~/Pictures/Screenshots.
-        screenshot: { icon: "screenshot_region", command: ["sh", "-c", 'mkdir -p ~/Pictures/Screenshots && f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png && grim -g "$(slurp)" "$f" && wl-copy < "$f"'] },
+        // Region selector: screenshot / OCR / recording.
+        screenshot: { icon: "screenshot_region", action: () => ShellState.captureRequest = "screenshot" },
         colorPicker: { icon: "colorize", command: ["hyprpicker", "-a"] },
         darkMode: { icon: Colors.dark ? "dark_mode" : "light_mode", action: () => Theme.toggleMode() },
         wallpaper: { icon: "wallpaper", action: () => ShellState.wallpaperSelectorOpen = !ShellState.wallpaperSelectorOpen },

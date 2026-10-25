@@ -110,10 +110,10 @@ screen translator, translations other than en/ru.
 - [x] "Config file" button, settings search from the launcher (type `wallpaper`, `bar`, ...).
 
 ## Stage 16: Launcher v2 & system overlays
-- [ ] Launcher prefixes: `<` keybinds list, `:` emoji, `=` calculator, `>` commands, `/` settings, clipboard.
-- [ ] Workspace overview (live window previews, drag windows between workspaces).
-- [ ] Session screen (lock, logout, suspend, reboot, shutdown), lock screen (or hyprlock integration), polkit agent.
-- [ ] Dock (pinned + running apps, magnify), screen corners, region selector (screenshot / OCR / record).
+- [x] Launcher prefixes: `<` keybinds list, `:` emoji, `=` calculator, `>` commands, `/` settings, clipboard.
+- [x] Workspace overview (live window previews, drag windows between workspaces).
+- [x] Session screen (lock, logout, suspend, reboot, shutdown), hyprlock for locking, polkit agent.
+- [x] Dock (pinned + running apps, magnify), screen corners, region selector (screenshot / OCR / record).
 
 ## Stage 17: Polish & release
 - [ ] First-run welcome, ru/en translations, presets export/import (config + wallpaper + scheme in one archive).

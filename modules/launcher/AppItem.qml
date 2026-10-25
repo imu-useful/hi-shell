@@ -5,13 +5,13 @@ import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
 
-// One application row in the launcher results list (or a settings page:
-// a plain object with name / comment / materialIcon / settingsPage).
+// One launcher result: a DesktopEntry app, or a plain object with
+// name / comment and materialIcon or glyph (an emoji).
 Rectangle {
     id: root
 
     required property var modelData
-    readonly property bool isSetting: modelData.settingsPage !== undefined
+    readonly property bool isSetting: modelData.run !== undefined
     required property int index
     property bool selected: false
 
@@ -35,9 +35,17 @@ Rectangle {
             implicitWidth: 32
             implicitHeight: 32
             radius: 16
-            color: Colors.m3primaryContainer
+            // Emoji sit on their own; icons get a tonal disc.
+            color: root.modelData.glyph !== undefined ? "transparent" : Colors.m3primaryContainer
+            Text {
+                anchors.centerIn: parent
+                visible: root.modelData.glyph !== undefined
+                text: root.modelData.glyph ?? ""
+                font.pixelSize: 22
+            }
             MaterialIcon {
                 anchors.centerIn: parent
+                visible: root.modelData.glyph === undefined
                 icon: root.modelData.materialIcon ?? ""
                 iconSize: 18
                 color: Colors.m3onPrimaryContainer

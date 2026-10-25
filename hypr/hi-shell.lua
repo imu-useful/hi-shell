@@ -25,6 +25,19 @@ hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 -- Left sidebar: home / Claude chat / translator / clipboard
 hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarLeft toggle"), { description = "hi-shell: Toggle left sidebar" })
 
+-- Workspace overview, session menu, region capture
+hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs -c hi-shell ipc call overview toggle"), { description = "hi-shell: Workspace overview" })
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("qs -c hi-shell ipc call region screenshot"), { description = "hi-shell: Screenshot / OCR / record a region" })
+hl.layer_rule({ match = { namespace = "hi-shell-overview" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-overview" }, ignore_alpha = 0.3 })
+hl.layer_rule({ match = { namespace = "hi-shell-session" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-session" }, ignore_alpha = 0.3 })
+hl.layer_rule({ match = { namespace = "hi-shell-polkit" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-dock" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-dock" }, ignore_alpha = 0.3 })
+-- The region selector shows a frozen screenshot; no animation so it doesn't flicker.
+hl.layer_rule({ match = { namespace = "hi-shell-region" }, no_anim = true })
+
 -- Settings
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call settings toggle"), { description = "hi-shell: Settings" })
 hl.layer_rule({ match = { namespace = "hi-shell-settings" }, blur = true })

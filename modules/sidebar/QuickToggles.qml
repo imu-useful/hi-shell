@@ -123,10 +123,10 @@ ColumnLayout {
         screenshot: {
             icon: "screenshot_region",
             label: "Screenshot",
-            subtitle: "Region to clipboard",
+            subtitle: "Region, text or video",
             active: false,
             available: true,
-            toggle: () => root.runAfterClose(["sh", "-c", 'mkdir -p ~/Pictures/Screenshots && f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png && grim -g "$(slurp)" "$f" && wl-copy < "$f"'])
+            toggle: () => { root.closeRequested(); ShellState.captureRequest = "screenshot"; }
         }
     })
 

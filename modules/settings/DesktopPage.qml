@@ -64,6 +64,16 @@ ColumnLayout {
     }
 
     Section {
+        icon: "dock_to_bottom"
+        title: "Dock"
+
+        SwitchRow { icon: "dock_to_bottom"; title: "Dock"; checked: Config.options.dock.enabled; onToggled: checked => Config.options.dock.enabled = checked }
+        SwitchRow { icon: "visibility_off"; title: "Hide until the pointer reaches the bottom edge"; checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
+        SwitchRow { icon: "zoom_in"; title: "Magnify on hover"; checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }
+        SliderRow { icon: "photo_size_select_large"; title: "Icon size"; value: Config.options.dock.iconSize; from: 28; to: 72; suffix: " px"; onMoved: value => Config.options.dock.iconSize = value }
+    }
+
+    Section {
         icon: "crop_free"
         title: "Wallpaper frame"
 

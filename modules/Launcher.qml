@@ -6,10 +6,13 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
+import qs.services
 import qs.modules.launcher
 import "settings/Pages.js" as Pages
 
-// Spotlight-style app launcher.
+// Spotlight-style launcher. Plain text searches apps (and settings pages);
+// prefixes switch the source:  = calculator · > run a command · < keybinds ·
+// : emoji · ; clipboard · / settings.
 // Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call launcher toggle`.
 Scope {
     id: root
@@ -17,18 +20,67 @@ Scope {
     readonly property bool open: ShellState.launcherOpen
     property string query: ""
 
-    // Settings pages matching the query come first, then apps.
-    readonly property var results: [...settingsMatches(query), ...filterApps(query)]
+    readonly property var prefixes: [
+        { key: "=", icon: "calculate", name: "Calculator" },
+        { key: ">", icon: "terminal", name: "Run command" },
+        { key: "<", icon: "keyboard", name: "Keybinds" },
+        { key: ":", icon: "mood", name: "Emoji" },
+        { key: ";", icon: "content_paste", name: "Clipboard" },
+        { key: "/", icon: "settings", name: "Settings" }
+    ]
+    readonly property string mode: prefixes.some(p => p.key === query[0]) ? query[0] : ""
+    readonly property string term: mode ? query.slice(1).trim() : query.trim()
 
-    function settingsMatches(text) {
-        if (text.trim().length < 2)
-            return [];
-        return Pages.search(text).slice(0, 3).map(p => ({
-            settingsPage: p.id,
+    property string calcResult: ""
+    property var binds: []
+    property var emoji: []
+
+    // Items are DesktopEntry apps or plain objects { name, comment, materialIcon | glyph, run() }.
+    readonly property var results: {
+        switch (mode) {
+        case "=":
+            return term === "" ? [] : [{
+                name: calcResult || "…",
+                comment: calcResult ? "Enter copies the result" : term,
+                materialIcon: "calculate",
+                run: () => Quickshell.clipboardText = calcResult.replace(/^[≈=]\s*/, "")
+            }];
+        case ">":
+            return term === "" ? [] : [
+                { name: term, comment: "Run", materialIcon: "terminal", run: () => Quickshell.execDetached(["sh", "-c", term]) },
+                { name: term, comment: "Run in a terminal", materialIcon: "keyboard_command_key",
+                  run: () => Quickshell.execDetached([Config.options.apps.terminal, "-e", "sh", "-c", `${term}; exec $SHELL`]) }
+            ];
+        case "<":
+            return binds.filter(b => (b.label + " " + b.keys).toLowerCase().includes(term.toLowerCase())).slice(0, 60)
+                .map(b => ({ name: b.label, comment: b.keys, materialIcon: "keyboard", run: () => {} }));
+        case ":":
+            return term === "" ? [] : emoji.filter(e => e[1].includes(term.toLowerCase())).slice(0, 40)
+                .map(e => ({ name: e[1], comment: "Enter copies it", glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
+        case ";":
+            return Clipboard.entries.filter(e => !e.image && e.text.toLowerCase().includes(term.toLowerCase())).slice(0, 40)
+                .map(e => ({ name: e.text.replace(/\s+/g, " "), comment: "Copy", materialIcon: "content_paste", run: () => Clipboard.copy(e) }));
+        case "/":
+            return (term ? Pages.search(term) : Pages.pages).map(settingsItem);
+        default:
+            return [...settingsMatches(term), ...filterApps(term)];
+        }
+    }
+
+    function settingsItem(p) {
+        return {
             name: `Settings › ${p.title}`,
             comment: p.keywords.split(" ").slice(0, 8).join(", ") + "…",
-            materialIcon: p.icon
-        }));
+            materialIcon: p.icon,
+            run: () => {
+                ShellState.settingsPage = p.id;
+                ShellState.settingsOpen = true;
+            }
+        };
+    }
+
+    function settingsMatches(text) {
+        return text.length < 2 ? [] : Pages.search(text).slice(0, 3).map(settingsItem);
     }
 
     function toggle() {
@@ -56,7 +108,7 @@ Scope {
 
     function filterApps(text) {
         const apps = DesktopEntries.applications.values.filter(a => !a.noDisplay);
-        const q = text.trim().toLowerCase();
+        const q = text.toLowerCase();
         if (q === "")
             return apps.sort((a, b) => a.name.localeCompare(b.name));
         return apps.map(a => ({ app: a, score: scoreApp(a, q) }))
@@ -65,22 +117,91 @@ Scope {
             .map(r => r.app);
     }
 
-    function launch(app) {
-        if (!app)
+    function launch(item) {
+        if (!item)
             return;
-        if (app.settingsPage) {
-            ShellState.settingsPage = app.settingsPage;
-            ShellState.settingsOpen = true;
-            close();
-            return;
+        if (item.run) {
+            item.run();
+        } else if (item.runInTerminal) {
+            Quickshell.execDetached([Config.options.apps.terminal, "-e", ...item.command]);
+        } else {
+            item.execute();
         }
-        if (app.runInTerminal)
-            Quickshell.execDetached([Config.options.apps.terminal, "-e", ...app.command]);
-        else
-            app.execute();
         close();
     }
 
+    // Calculator: qalc, debounced.
+    onTermChanged: if (mode === "=") calcTimer.restart()
+    Timer {
+        id: calcTimer
+        interval: 150
+        onTriggered: {
+            calc.running = false;
+            calc.command = ["qalc", "-t", "--", root.term];
+            calc.running = true;
+        }
+    }
+    Process {
+        id: calc
+        stdout: StdioCollector {
+            onStreamFinished: root.calcResult = text.trim()
+        }
+        onExited: code => {
+            if (code === 127)
+                root.calcResult = "qalc (libqalculate) is not installed";
+        }
+    }
+
+    // Keybinds: loaded each time "<" is typed (they change with the config).
+    onModeChanged: {
+        if (mode === "<")
+            bindLoader.running = true;
+        else if (mode === ":" && emoji.length === 0)
+            emojiFile.reload();
+        else if (mode === ";")
+            Clipboard.refresh();
+        calcResult = "";
+    }
+    readonly property var modNames: [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]]
+    Process {
+        id: bindLoader
+        command: ["hyprctl", "binds", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.binds = JSON.parse(text).filter(b => !b.submap).map(b => {
+                        const mods = root.modNames.filter(([bit]) => b.modmask & bit).map(([, n]) => n);
+                        return {
+                            label: b.description || `${b.dispatcher} ${b.arg}`.trim(),
+                            keys: [...mods, b.key].join(" + ")
+                        };
+                    });
+                } catch (e) {}
+            }
+        }
+    }
+
+    // Emoji list, generated once by services/emoji.py.
+    FileView {
+        id: emojiFile
+        path: Paths.cache + "/emoji.json"
+        printErrors: false
+        blockLoading: true
+        onLoaded: {
+            try {
+                root.emoji = JSON.parse(text());
+            } catch (e) {}
+        }
+        onLoadFailed: emojiMaker.running = true
+    }
+    Process {
+        id: emojiMaker
+        command: ["python3", Quickshell.shellDir + "/services/emoji.py", Paths.cache + "/emoji.json"]
+        onExited: code => {
+            if (code === 0)
+                emojiFile.reload();
+        }
+    }
 
     IpcHandler {
         target: "launcher"
@@ -93,6 +214,11 @@ Scope {
         }
         function close(): void {
             root.close();
+        }
+        // Open with text already typed, e.g. "<" for keybinds or "=" for the calculator.
+        function search(text: string): void {
+            ShellState.launcherOpen = true;
+            ShellState.launcherQuery = text;
         }
     }
 
@@ -125,9 +251,11 @@ Scope {
             }
 
             function reset() {
-                root.query = "";
-                search.text = "";
+                search.text = ShellState.launcherQuery;
+                ShellState.launcherQuery = "";
+                root.query = search.text;
                 list.currentIndex = 0;
+                search.cursorPosition = search.length;
                 search.forceActiveFocus();
             }
 
@@ -177,11 +305,10 @@ Scope {
                             anchors.rightMargin: 18
                             spacing: 12
 
-                            Text {
-                                text: "search"
-                                font.family: Appearance.font.icon
-                                font.pixelSize: 24
-                                color: Colors.m3onSurfaceVariant
+                            MaterialIcon {
+                                icon: root.prefixes.find(p => p.key === root.mode)?.icon ?? "search"
+                                iconSize: 24
+                                color: root.mode ? Colors.m3primary : Colors.m3onSurfaceVariant
                             }
 
                             TextInput {
@@ -207,12 +334,32 @@ Scope {
                                 Keys.onTabPressed: list.incrementCurrentIndex()
                                 Keys.onBacktabPressed: list.decrementCurrentIndex()
 
-                                Text {
+                                StyledText {
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: search.text === ""
-                                    text: "Search apps"
+                                    text: "Search apps, or type = > < : ; /"
                                     font: search.font
                                     color: Colors.m3onSurfaceVariant
+                                }
+                            }
+                        }
+                    }
+
+                    // Prefix hints while the field is empty
+                    Flow {
+                        Layout.fillWidth: true
+                        visible: search.text === ""
+                        spacing: 6
+
+                        Repeater {
+                            model: root.prefixes
+                            Chip {
+                                required property var modelData
+                                icon: modelData.icon
+                                text: `${modelData.key}  ${modelData.name}`
+                                onClicked: {
+                                    search.text = modelData.key;
+                                    search.forceActiveFocus();
                                 }
                             }
                         }
@@ -237,13 +384,12 @@ Scope {
                         }
                     }
 
-                    Text {
+                    StyledText {
                         Layout.fillWidth: true
                         Layout.margins: 12
-                        visible: list.count === 0
-                        text: "No apps match “" + root.query + "”"
+                        visible: list.count === 0 && search.text !== ""
+                        text: root.mode === "" ? `No apps match “${root.query}”` : root.mode === ":" && root.emoji.length === 0 ? "Loading emoji…" : root.term === "" ? "Type to search" : "Nothing found"
                         horizontalAlignment: Text.AlignHCenter
-                        font.family: Appearance.font.main
                         font.pixelSize: 13
                         color: Colors.m3onSurfaceVariant
                     }

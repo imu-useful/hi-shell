@@ -43,6 +43,14 @@ ColumnLayout {
             from: 0; to: 50; suffix: "%"
             onMoved: value => a.transparencyLevel = value / 100
         }
+        SliderRow {
+            icon: "rounded_corner"
+            title: "Screen corners"
+            subtitle: "0 turns them off"
+            value: a.screenCorners
+            from: 0; to: 32; suffix: " px"
+            onMoved: value => a.screenCorners = value
+        }
     }
 
     Section {
