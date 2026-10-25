@@ -7,13 +7,13 @@ import Quickshell.Hyprland
 import qs.common
 
 // Session actions used by the power menus and the session screen.
-// Locking runs hyprlock directly (also when hypridle's lock_cmd can't).
+// Locking runs hyprlock with hi-shell's lock screen (services/LockScreen.qml).
 // IPC: `qs -c hi-shell ipc call session lock` (logout, suspend, hibernate, reboot, poweroff, toggleScreen).
 Singleton {
     id: root
 
     function lock() {
-        Quickshell.execDetached(["sh", "-c", "pidof hyprlock || exec hyprlock"]);
+        LockScreen.lock();
     }
     function logout() {
         Hyprland.dispatch("hl.dsp.exit()");

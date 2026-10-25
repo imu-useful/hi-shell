@@ -230,6 +230,18 @@ Sections:
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
+## Lock screen
+
+hi-shell locks with hyprlock, using a lock screen it generates from its own look in
+`~/.config/hi-shell/hyprlock.conf`: the current wallpaper blurred, a big clock in the palette's primary color, the date
+and a greeting in the interface language, your avatar (`~/.face`), a Material password field, now playing, battery and
+keyboard layout. It follows wallpaper, palette, font and language changes. Lock from the session menu or
+`qs -c hi-shell ipc call session lock`; for idle and suspend, point hypridle at it:
+
+```ini
+$lock_cmd = pidof hyprlock || hyprlock -c ~/.config/hi-shell/hyprlock.conf || hyprlock
+```
+
 ## Notifications
 
 hi-shell is a notification daemon. Only one daemon can run at a time: while another one
@@ -314,7 +326,7 @@ the same file.
   Quickshell build can crash while reloading).
 - **Screen doesn't lock on idle:** if your `hypridle.conf` came with illogical-impulse, its `lock_cmd`
   (`hyprctl dispatch global quickshell:lock & pidof qs quickshell hyprlock || hyprlock`) never starts hyprlock
-  while hi-shell runs. Use `lock_cmd = pidof hyprlock || hyprlock`.
+  while hi-shell runs. Use the `lock_cmd` from [Lock screen](#lock-screen).
 - **Two bars:** illogical-impulse starts its own shell (`qs -c ii`). Remove that line from
   `~/.config/hypr/hyprland/execs.lua` if you want hi-shell alone.
 - **Shortcuts do nothing:** another bind may already use the key — check `hyprctl binds`.
