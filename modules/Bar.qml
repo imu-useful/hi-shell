@@ -79,6 +79,7 @@ PanelWindow {
     anchors.right: position !== "left"
 
     // The window also covers the screen corners; only the bar reserves space and takes input.
+    visible: !ShellState.barHidden
     exclusiveZone: thickness + margin
     implicitWidth: thickness + margin + cornerSize
     implicitHeight: thickness + margin + cornerSize

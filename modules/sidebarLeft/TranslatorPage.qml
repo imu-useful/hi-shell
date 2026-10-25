@@ -155,6 +155,21 @@ ColumnLayout {
     }
 
     readonly property TextEdit source: sourceCard.edit
+
+    // Text handed over by the region capture (Super+Shift+T).
+    function takeInput() {
+        if (ShellState.translatorInput === "")
+            return;
+        source.text = ShellState.translatorInput;
+        ShellState.translatorInput = "";
+    }
+    Connections {
+        target: ShellState
+        function onTranslatorInputChanged() {
+            root.takeInput();
+        }
+    }
+    Component.onCompleted: takeInput()
     Connections {
         target: sourceCard.edit
         function onTextChanged() {

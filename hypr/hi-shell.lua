@@ -40,12 +40,23 @@ bind("SUPER + Period", "launcher search ':'", "Emoji")
 
 -- Workspace overview, session menu, region capture
 bind("SUPER + Tab", "overview toggle", "Workspace overview")
+
+-- Alt+Tab: hold Alt, Tab / Shift+Tab through recent windows, release Alt to switch.
+bind("ALT + Tab", "switcher next", "Switch windows")
+bind("ALT + SHIFT + Tab", "switcher prev", "Switch windows (back)")
+for _, key in ipairs({ "Alt_L", "Alt_R" }) do
+    hl.bind(key, hl.dsp.exec_cmd("qs -c hi-shell ipc call switcher commit"),
+        { release = true, ignore_mods = true, transparent = true, description = "hi-shell: Switch to the chosen window" })
+end
+hl.layer_rule({ match = { namespace = "hi-shell-switcher" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-switcher" }, ignore_alpha = 0.3 })
 bind("CTRL + ALT + Delete", "session toggleScreen", "Session menu")
 bind("SUPER + SHIFT + S", "region screenshot", "Screenshot / OCR / record a region")
 -- Screenshots always go to ~/Pictures/Screenshots and the clipboard.
 bind("Print", "region fullscreen", "Screenshot of the screen (file + clipboard)")
 bind("CTRL + Print", "region screenshot", "Screenshot of a region or window (file + clipboard)")
 bind("SUPER + SHIFT + X", "region ocr", "Copy text from a region (OCR)")
+bind("SUPER + SHIFT + T", "region translate", "Translate text from a region")
 bind("SUPER + SHIFT + R", "region record", "Record a region (again to stop)")
 hl.layer_rule({ match = { namespace = "hi-shell-overview" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-overview" }, ignore_alpha = 0.3 })

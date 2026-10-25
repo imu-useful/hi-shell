@@ -43,6 +43,8 @@ ShellRoot {
 
     Overview {}
 
+    WindowSwitcher {}
+
     RegionSelector {}
 
     Dock {}

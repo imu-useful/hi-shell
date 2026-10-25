@@ -12,11 +12,11 @@ import qs.services
 // recording. Drag to select, click a window to take exactly that window, or
 // click the empty desktop for the whole screen; Esc cancels. The screen is frozen (grim) first, so the overlay is never in
 // the picture. Recording shows a pill with the time; click it to stop.
-// IPC: `qs -c hi-shell ipc call region screenshot` (ocr, record, stop, fullscreen).
+// IPC: `qs -c hi-shell ipc call region screenshot` (ocr, translate, record, stop, fullscreen).
 Scope {
     id: root
 
-    property string mode: "screenshot" // screenshot | ocr | record
+    property string mode: "screenshot" // screenshot | ocr | translate | record
     property bool selecting: false
     property string frozen: "" // full screenshot of the focused output
     property var screenInfo: null // { name, x, y, scale }
@@ -57,6 +57,11 @@ Scope {
         } else if (mode === "ocr") {
             const lang = Config.options.capture.ocrLanguages;
             run(['t=$(magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null); if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "$4" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "$5"; fi', frozen, crop, lang, Translation.tr("Text copied"), Translation.tr("No text found")]);
+        } else if (mode === "translate") {
+            // OCR, then into the translator in the left sidebar.
+            translator.command = ["sh", "-c", 'magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null', "sh",
+                frozen, crop, Config.options.capture.ocrLanguages];
+            translator.running = true;
         } else {
             // wf-recorder takes global logical coordinates.
             recordFile = `${Paths.home}/Videos/Recordings/${stamp}.mp4`;
@@ -93,6 +98,22 @@ Scope {
     Component {
         id: procComponent
         Process {}
+    }
+
+    Process {
+        id: translator
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const t = text.replace(/\s+/g, " ").trim();
+                if (!t) {
+                    Quickshell.execDetached(["notify-send", "-a", "hi-shell", Translation.tr("No text found")]);
+                    return;
+                }
+                ShellState.translatorInput = t;
+                ShellState.sidebarLeftTab = "translator";
+                ShellState.sidebarLeftOpen = true;
+            }
+        }
     }
 
     // Freeze the focused output and collect window rectangles, then show the overlay.
@@ -144,6 +165,10 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         }
         function ocr(): void {
             root.start("ocr");
+        }
+        // OCR a region and open the text in the translator.
+        function translate(): void {
+            root.start("translate");
         }
         // Starts a region recording, or stops the one running.
         function record(): void {
@@ -286,9 +311,9 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 SegmentedButton {
                     id: modes
                     anchors.centerIn: parent
-                    model: [{ text: Translation.tr("Screenshot"), icon: "screenshot_region" }, { text: Translation.tr("Text (OCR)"), icon: "document_scanner" }, { text: Translation.tr("Record"), icon: "videocam" }]
-                    currentIndex: ["screenshot", "ocr", "record"].indexOf(root.mode)
-                    onSelected: index => root.mode = ["screenshot", "ocr", "record"][index]
+                    model: [{ text: Translation.tr("Screenshot"), icon: "screenshot_region" }, { text: Translation.tr("Text (OCR)"), icon: "document_scanner" }, { text: Translation.tr("Translate"), icon: "translate" }, { text: Translation.tr("Record"), icon: "videocam" }]
+                    currentIndex: ["screenshot", "ocr", "translate", "record"].indexOf(root.mode)
+                    onSelected: index => root.mode = ["screenshot", "ocr", "translate", "record"][index]
                 }
             }
 

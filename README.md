@@ -151,10 +151,12 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | Workspace overview |
+| <kbd>Alt</kbd>+<kbd>Tab</kbd> | Switch windows: hold Alt, Tab / Shift+Tab through recent windows (with previews), release to switch; a quick tap goes to the previous window |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Region screenshot / OCR / recording (also the bar's screenshot button) |
 | <kbd>Print</kbd> | Screenshot of the focused screen (saved to `~/Pictures/Screenshots` and copied) |
 | <kbd>Ctrl</kbd>+<kbd>Print</kbd> | Screenshot of a region or window (saved and copied) |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Copy text from a region (OCR) |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> | Translate text from a region (OCR into the sidebar translator) |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> | Record a region (press again to stop) |
 | <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history (Enter copies) |
 | <kbd>Super</kbd>+<kbd>.</kbd> | Emoji picker |
@@ -179,9 +181,11 @@ qs -c hi-shell ipc call ai ask "What's a good name for a cat?"
 qs -c hi-shell ipc call claude chats                 # deleteChat <id>, newChat
 qs -c hi-shell ipc call desktop toggleEdit            # edit, done, resetLayout
 qs -c hi-shell ipc call launcher search "=2+2"        # open the launcher with text typed
-qs -c hi-shell ipc call region screenshot             # ocr, record, stop, cancel, fullscreen
+qs -c hi-shell ipc call region screenshot             # ocr, translate, record, stop, cancel, fullscreen
 qs -c hi-shell ipc call session lock                  # logout, suspend, hibernate, reboot, poweroff, toggleScreen
 qs -c hi-shell ipc call overview toggle
+qs -c hi-shell ipc call switcher next                # prev, commit, cancel (Alt+Tab)
+qs -c hi-shell ipc call bar toggle                   # show, hide
 qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
@@ -321,7 +325,7 @@ the same file.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, DesktopVisualizer, Settings, Welcome, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, DesktopVisualizer, Settings, Welcome, WindowSwitcher, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Translation, Paths)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, Spectrum, animations, buttons, slider)

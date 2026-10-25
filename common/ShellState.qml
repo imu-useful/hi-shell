@@ -2,9 +2,12 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 // Shell-wide UI state shared between modules (e.g. bar button -> panel).
 Singleton {
+    id: root
+
     property bool sidebarRightOpen: false
     // Right sidebar bottom tab: notifications | calendar | todo | timers
     property string sidebarTab: "notifications"
@@ -25,6 +28,24 @@ Singleton {
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "quick"
     property bool launcherOpen: false
+    // Bar hidden on every screen (`qs -c hi-shell ipc call bar toggle`).
+    property bool barHidden: false
+    // Text for the translator to take (region "translate"); consumed by the page.
+    property string translatorInput: ""
+
+    IpcHandler {
+        target: "bar"
+
+        function toggle(): void {
+            root.barHidden = !root.barHidden;
+        }
+        function show(): void {
+            root.barHidden = false;
+        }
+        function hide(): void {
+            root.barHidden = true;
+        }
+    }
     // Text to start the launcher with (IPC launcher search), consumed on open.
     property string launcherQuery: ""
 }
