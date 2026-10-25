@@ -58,24 +58,11 @@ ColumnLayout {
             width: parent.width
             spacing: 12
 
-            // Empty state
-            ColumnLayout {
+            // Empty state: Chrome's T-rex; click it to play.
+            DinoGame {
                 visible: Notifications.list.length === 0
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 40
-                spacing: 8
-
-                MaterialIcon {
-                    Layout.alignment: Qt.AlignHCenter
-                    icon: "notifications_paused"
-                    iconSize: 48
-                    color: Colors.m3outline
-                }
-                StyledText {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: Translation.tr("Nothing new")
-                    color: Colors.m3onSurfaceVariant
-                }
+                Layout.fillWidth: true
+                Layout.topMargin: 16
             }
 
             Repeater {

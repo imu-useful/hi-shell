@@ -248,6 +248,8 @@ $lock_cmd = pidof hyprlock || hyprlock -c ~/.config/hi-shell/hyprlock.conf || hy
 hi-shell is a notification daemon. Only one daemon can run at a time: while another one
 (illogical-impulse's `qs -c ii`, mako, dunst, ...) is running, hi-shell waits and takes over once it exits.
 History is kept in `~/.local/state/hi-shell/notifications.json`.
+With no notifications, the notification center shows Chrome's T-rex: click it to play (Space / Up / click to jump, Down
+to duck; the best score is kept in `~/.local/state/hi-shell/dino.txt`).
 
 Popups appear in the corner next to the bar: click a popup for the app's default action (or to expand it),
 use its buttons or inline reply, swipe it sideways or press × to dismiss. Hovering pauses its timeout.

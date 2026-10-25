@@ -525,5 +525,7 @@
     "The playing track's cover instead of the wallpaper, colors included": "Обложка играющего трека вместо обоев, вместе с цветами",
     "Focus mode": "Режим фокуса",
     "Clean desktop behind windows": "Чистый стол под окнами",
-    "With windows open: sharp wallpaper, widgets and frame hidden": "При открытых окнах: обои без размытия, виджеты и рамка скрыты"
+    "With windows open: sharp wallpaper, widgets and frame hidden": "При открытых окнах: обои без размытия, виджеты и рамка скрыты",
+    "Click the dino to play": "Нажми на динозаврика, чтобы сыграть",
+    "Space or click to try again": "Пробел или клик — ещё раз"
 }
