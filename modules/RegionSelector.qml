@@ -9,8 +9,8 @@ import qs.common.widgets
 import qs.services
 
 // Region capture: screenshot (copy + save), OCR (copy the text) or screen
-// recording. Drag to select, or click a window to take exactly that window;
-// Esc cancels. The screen is frozen (grim) first, so the overlay is never in
+// recording. Drag to select, click a window to take exactly that window, or
+// click the empty desktop for the whole screen; Esc cancels. The screen is frozen (grim) first, so the overlay is never in
 // the picture. Recording shows a pill with the time; click it to stop.
 // IPC: `qs -c hi-shell ipc call region screenshot` (ocr, record, stop, fullscreen).
 Scope {
@@ -257,10 +257,19 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                     if (Math.abs(window.ex - window.sx) > 4 || Math.abs(window.ey - window.sy) > 4)
                         window.dragging = true;
                 }
-                onReleased: {
+                onReleased: event => {
+                    if (event.button !== Qt.LeftButton || !root.selecting)
+                        return;
+                    // Copy the numbers first: `sel` is a value-type reference, and resetting
+                    // `dragging` below would turn it into the hovered window.
                     const r = window.sel;
+                    const x = r.x, y = r.y, w = r.width, h = r.height;
                     window.dragging = false;
-                    root.finish(r.x, r.y, r.width, r.height);
+                    if (w >= 4 && h >= 4)
+                        root.finish(x, y, w, h);
+                    else
+                        // A click on the empty desktop (no window under it): the whole screen.
+                        root.finish(0, 0, window.width, window.height);
                 }
             }
 
@@ -287,7 +296,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 32
-                text: Translation.tr("Drag to select · click a window · Esc or right click to cancel")
+                text: Translation.tr("Drag to select · click a window, or the desktop for the whole screen · Esc or right click to cancel")
                 color: "white"
                 style: Text.Outline
                 styleColor: Qt.alpha("black", 0.6)

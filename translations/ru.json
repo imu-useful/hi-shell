@@ -40,7 +40,6 @@
     "Screenshot": "Снимок экрана",
     "Text (OCR)": "Текст (OCR)",
     "Record": "Запись",
-    "Drag to select · click a window · Esc or right click to cancel": "Выделите область · клик по окну · Esc или правый клик — отмена",
     "Lock": "Заблокировать",
     "Log out": "Выйти",
     "Suspend": "Сон",
@@ -514,5 +513,6 @@
     "m/s": "м/с",
     "%1d %2h": "%1 д %2 ч",
     "%1h %2m": "%1 ч %2 мин",
-    "Uses a little more CPU while music plays": "Немного больше нагрузка на ЦП во время музыки"
+    "Uses a little more CPU while music plays": "Немного больше нагрузка на ЦП во время музыки",
+    "Drag to select · click a window, or the desktop for the whole screen · Esc or right click to cancel": "Выделите область · клик по окну, или по рабочему столу — весь экран · Esc или правый клик — отмена"
 }
