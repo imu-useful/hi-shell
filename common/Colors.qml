@@ -14,6 +14,8 @@ Singleton {
 
     property var scheme: ({})
     property string mode: "dark"
+    // Wallpaper the palette was generated from (desktop layer draws it).
+    property string wallpaper: ""
     readonly property bool dark: mode !== "light"
 
     function reload() {
@@ -60,6 +62,7 @@ Singleton {
                 const data = JSON.parse(text());
                 root.scheme = data.colors ?? {};
                 root.mode = data.mode ?? "dark";
+                root.wallpaper = data.wallpaper ?? "";
             } catch (e) {
                 console.warn("Colors: invalid palette file", root.path, e);
             }

@@ -43,3 +43,4 @@ hl.layer_rule({ match = { namespace = "hi-shell-notifications" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-notifications" }, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "hi-shell-osd" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-osd" }, ignore_alpha = 0.3 })
+

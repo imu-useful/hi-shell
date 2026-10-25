@@ -109,6 +109,22 @@ Singleton {
                 property int nightLightTemperature: 4500
             }
 
+            property JsonObject desktop: JsonObject {
+                // Draw the wallpaper (the theme's current one) behind the widgets.
+                property bool wallpaper: true
+                property bool widgets: true
+                // Screen name (e.g. "eDP-1") for the widgets; empty = first screen.
+                property string monitor: ""
+                // Widget id -> { enabled, x, y } with x / y as fractions of the screen;
+                // missing ids use the defaults in modules/desktop/Layout.js. Edit mode writes this.
+                property var layout: ({})
+                property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]
+                // Picture for the image frame widget (empty = the wallpaper).
+                property string image: ""
+                // Full-width audio visualizer along the bottom while media plays (needs cava).
+                property bool visualizer: true
+            }
+
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""

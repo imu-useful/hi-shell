@@ -12,5 +12,6 @@ Singleton {
     // Left sidebar tab: home | claude | translator | clipboard
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
+    property bool desktopEditing: false
     property bool launcherOpen: false
 }

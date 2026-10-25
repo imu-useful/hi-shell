@@ -11,6 +11,8 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
   (translate-shell), clipboard history (cliphist, with image thumbnails)
 - **Right sidebar** — quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic sliders,
   Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
+- **Desktop** — wallpaper plus widgets: shape clock, big clock, weather, resource tiles, week calendar, media with lyrics,
+  greeting, to-do, notes, world clock, timers, user card, image frame; full-width visualizer; drag-to-place edit mode
 - **Theming** — Material 3 palette generated from the wallpaper with matugen, reloaded live
 - **Google Calendar** — month view with event dots and an agenda (optional)
 
@@ -76,6 +78,7 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
 | click the system icons | Right sidebar (scroll there to change the volume) |
+| right click the desktop | Edit desktop widgets (drag them, toggle them in the toolbar; Esc or Done to finish) |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 
 Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
@@ -88,6 +91,7 @@ qs -c hi-shell ipc call todo add "Buy milk"           # list
 qs -c hi-shell ipc call sidebarLeft openTab claude    # home, claude, translator, clipboard
 qs -c hi-shell ipc call ai ask "What's a good name for a cat?"
 qs -c hi-shell ipc call claude chats                 # deleteChat <id>, newChat
+qs -c hi-shell ipc call desktop toggleEdit            # edit, done, resetLayout
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
@@ -109,6 +113,8 @@ Edits apply live, no restart needed. Sections:
   `bar.resources`, `bar.utilButtons`, `bar.updates`
 - `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
   in the sidebar), night light temperature
+- `desktop`: draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
+  mode), `worldClocks` (IANA zones), `image` for the image frame, bottom `visualizer`
 - `ai.model`: claude CLI model alias (empty = CLI default, `opus`, `sonnet`, `haiku`; also the picker in the chat)
 - `translator`: target language and the quick-pick list
 - `clipboard.watch`: start `wl-paste --watch cliphist store` with the shell (skipped if already running)
@@ -182,7 +188,7 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)

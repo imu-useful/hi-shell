@@ -90,11 +90,11 @@ screen translator, translations other than en/ru.
 - [x] Translator page (`trans` / Google endpoint), clipboard history page (`cliphist`).
 
 ## Stage 13: Desktop widgets
-- [ ] Background layer window with widgets: shape analog clock, big digital clock, weather, CPU/RAM/disk tiles,
+- [x] Background layer window (also draws the wallpaper) with widgets: shape analog clock, big digital clock, weather, CPU/RAM/disk tiles,
       calendar, media + lyrics, user card (lock/settings/power), to-do, notes, world clock, focus/stopwatch/countdown timers,
       image frame.
-- [ ] Edit mode: drag to place, snap to grid, per-widget on/off; positions saved in config.
-- [ ] Full-width cava visualizer at the bottom (optional).
+- [x] Edit mode: drag to place, snap to grid, per-widget on/off; positions saved in config.
+- [x] Full-width cava visualizer at the bottom (optional).
 
 ## Stage 14: Wallpapers & color schemes
 - [ ] Wallpaper service of our own (no dependency on `ii`'s state file): set via `swww`, transitions, per-monitor.
