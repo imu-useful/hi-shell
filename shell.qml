@@ -10,4 +10,6 @@ ShellRoot {
 
         Bar {}
     }
+
+    Launcher {}
 }

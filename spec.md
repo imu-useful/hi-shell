@@ -7,10 +7,10 @@
 - [x] Test that it runs: `qs -c hi-shell`
 
 ## Stage 2: App Launcher
-- [ ] Create a floating Window for the App Launcher.
-- [ ] Bind a keybind (e.g., Super+D) to toggle the launcher.
-- [ ] Implement a search field that filters installed desktop applications (parse `/usr/share/applications`).
-- [ ] Add Material 3 styling (rounded corners, blur background).
+- [x] Create a floating Window for the App Launcher.
+- [x] Bind a keybind (Super+Space via `hypr/hi-shell.lua`; Super+D is taken by maximize) to toggle the launcher.
+- [x] Implement a search field that filters installed desktop applications (parse `/usr/share/applications`).
+- [x] Add Material 3 styling (rounded corners, blur background).
 
 ## Stage 3: Claude AI Command Palette (The Core Feature)
 - [ ] Create a floating Window for the AI widget (triggered by Super+A).

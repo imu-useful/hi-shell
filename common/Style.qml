@@ -15,4 +15,7 @@ Singleton {
     readonly property string fontFamily: "sans-serif"
     readonly property string iconFont: "Material Symbols Rounded"
     readonly property int fontSize: 13
+
+    // Used for desktop entries with Terminal=true
+    readonly property string terminal: "kitty"
 }
