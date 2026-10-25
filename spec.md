@@ -26,9 +26,9 @@
 - [x] Add CPU/RAM usage bars (`/proc/stat`, `/proc/meminfo`).
 
 ## Stage 5: Material 3 Theming (Matugen)
-- [ ] Write a Python script (`theme_updater.py`) that runs `matugen` to generate a `Colors.qml` file from the wallpaper.
-- [ ] Connect this script to Hyprland's wallpaper change event.
-- [ ] Ensure all UI components use the dynamic colors.
+- [x] Write a Python script (`theme_updater.py`) that runs `matugen` to generate the palette from the wallpaper (`~/.local/state/hi-shell/colors.json`, loaded live by `common/Colors.qml` — no shell reload).
+- [x] Re-run on wallpaper change (Hyprland has no such event; `common/Theme.qml` watches illogical-impulse's wallpaper path file) and on dark/light toggle.
+- [x] Ensure all UI components use the dynamic colors.
 
 ## Stage 6: Build, Test, and README
 - [ ] Ensure the shell starts correctly on boot (add to Hyprland config).

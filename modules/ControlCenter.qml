@@ -134,6 +134,16 @@ Scope {
                         enabled: root.btAdapter !== null
                         onClicked: root.btAdapter.enabled = !root.btAdapter.enabled
                     }
+
+                    ToggleTile {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        icon: Colors.dark ? "dark_mode" : "light_mode"
+                        label: "Dark mode"
+                        subtitle: Theme.busy ? "Applying…" : Colors.dark ? "On" : "Off"
+                        active: Colors.dark
+                        onClicked: Theme.toggleMode()
+                    }
                 }
 
                 VolumeControl {

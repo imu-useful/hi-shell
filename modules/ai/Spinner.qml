@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Shapes
+import qs.common
 
 // Material 3 style indeterminate circular progress indicator.
 Item {
     id: root
 
-    property color color: "white"
+    property color color: Colors.m3primary
     property real lineWidth: 3
 
     implicitWidth: 24
