@@ -20,4 +20,6 @@ ShellRoot {
     AIWidget {}
 
     ControlCenter {}
+
+    CalendarPopup {}
 }

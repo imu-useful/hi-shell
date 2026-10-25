@@ -2,11 +2,14 @@ import QtQuick
 import Quickshell
 import qs.common
 
+// Bar clock; click toggles the calendar popup.
 Rectangle {
     implicitWidth: label.implicitWidth + 24
     implicitHeight: Style.barHeight - 12
     radius: Style.radiusFull
-    color: Colors.m3secondaryContainer
+    color: ShellState.calendarOpen || mouse.containsMouse ? Qt.lighter(Colors.m3secondaryContainer, 1.15) : Colors.m3secondaryContainer
+
+    Behavior on color { ColorAnimation { duration: 150 } }
 
     SystemClock {
         id: clock
@@ -21,5 +24,13 @@ Rectangle {
         font.pixelSize: Style.fontSize
         font.weight: Font.Medium
         color: Colors.m3onSecondaryContainer
+    }
+
+    MouseArea {
+        id: mouse
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: ShellState.calendarOpen = !ShellState.calendarOpen
     }
 }

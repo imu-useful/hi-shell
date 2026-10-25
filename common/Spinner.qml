@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Shapes
-import qs.common
 
 // Material 3 style indeterminate circular progress indicator.
 Item {

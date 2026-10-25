@@ -18,3 +18,7 @@ hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 hl.bind("SUPER + U", hl.dsp.global("hi-shell:controlCenterToggle"), { description = "hi-shell: Toggle control center" })
 hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, ignore_alpha = 0.3 })
+
+-- Calendar popup (opens from the bar clock)
+hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, ignore_alpha = 0.3 })
