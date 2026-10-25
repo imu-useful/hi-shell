@@ -135,6 +135,7 @@ ColumnLayout {
                     color: Colors.m3onSurfaceVariant
                 }
                 M3Slider {
+                    playback: true
                     Layout.fillWidth: true
                     implicitHeight: 22
                     value: Mpris.progress

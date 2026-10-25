@@ -3,11 +3,15 @@ import qs.common
 
 // Material 3 slider: thick track, active part in primary, bar-shaped handle.
 // Emits moved(value) on drag / click / scroll; `value` is 0..1 and owned by the caller.
+// Changes animate (scroll, keys, other apps), except while the handle is dragged.
 Item {
     id: root
 
     property real value: 0
     property real step: 0.05
+    // Track position of something playing: small forward steps (the player's
+    // once-a-second reports) glide at playback speed instead of easing.
+    property bool playback: false
 
     signal moved(real value)
 
@@ -15,7 +19,32 @@ Item {
     implicitHeight: 40
 
     readonly property real clamped: Math.max(0, Math.min(1, value))
-    readonly property real handleX: clamped * (width - handle.width)
+    // What's drawn: follows `clamped` with an animation.
+    property real shown: 0
+    readonly property real handleX: shown * (width - handle.width)
+
+    function glide() {
+        glideAnim.stop();
+        if (mouse.pressed || Appearance.anim.speed === 0) {
+            shown = clamped;
+            return;
+        }
+        const step = clamped - shown;
+        const tick = playback && step >= 0 && step < 0.05;
+        glideAnim.from = shown;
+        glideAnim.to = clamped;
+        glideAnim.duration = tick ? 1000 : Appearance.anim.normal;
+        glideAnim.easing.type = tick ? Easing.Linear : Easing.OutCubic;
+        glideAnim.start();
+    }
+    onClampedChanged: glide()
+    Component.onCompleted: shown = clamped
+
+    NumberAnimation {
+        id: glideAnim
+        target: root
+        property: "shown"
+    }
 
     function moveTo(x) {
         root.moved(Math.max(0, Math.min(1, (x - handle.width / 2) / (width - handle.width))));

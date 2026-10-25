@@ -146,6 +146,7 @@ BarWidget {
             }
 
             M3Slider {
+                playback: true
                 Layout.fillWidth: true
                 implicitHeight: 24
                 visible: Mpris.length > 0

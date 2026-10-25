@@ -166,7 +166,7 @@ Scope {
                             height: parent.height
                             radius: 4
                             color: Colors.m3primary
-                            Behavior on width { EffectAnim { duration: Appearance.anim.fast } }
+                            Behavior on width { EffectAnim { duration: Appearance.anim.normal } }
                         }
                     }
 

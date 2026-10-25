@@ -273,6 +273,8 @@ Item {
             anchors.bottomMargin: 1
             anchors.leftMargin: Appearance.rounding.large
             width: (parent.width - Appearance.rounding.large * 2) * root.notif.remaining
+            // The countdown ticks 20 times a second; smooth out the steps.
+            Behavior on width { NumberAnimation { duration: 60; easing.type: Easing.Linear } }
             height: 2
             radius: 1
             color: Qt.alpha(Colors.m3primary, 0.7)
