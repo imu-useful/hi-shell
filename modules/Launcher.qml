@@ -281,10 +281,10 @@ Scope {
                 border.color: Colors.m3outlineVariant
 
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.95
+                scale: loader.revealed ? 1 : 0.85
                 transformOrigin: Item.Top
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { EffectAnim {} }
+                Behavior on scale { SpringAnim {} }
 
                 ColumnLayout {
                     id: column

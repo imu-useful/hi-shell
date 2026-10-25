@@ -89,9 +89,9 @@ Scope {
                 anchors.centerIn: parent
                 spacing: 40
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.92
+                scale: loader.revealed ? 1 : 0.85
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { SpatialAnim { duration: Appearance.anim.slow } }
+                Behavior on scale { SpringAnim {} }
 
                 ColumnLayout {
                     Layout.alignment: Qt.AlignHCenter

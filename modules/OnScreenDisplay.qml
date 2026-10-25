@@ -128,9 +128,9 @@ Scope {
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.9
+                scale: loader.revealed ? 1 : 0.85
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { EffectAnim {} }
+                Behavior on scale { SpringAnim {} }
 
                 RowLayout {
                     anchors.fill: parent

@@ -182,9 +182,9 @@ Scope {
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.94
+                scale: loader.revealed ? 1 : 0.85
                 Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
-                Behavior on scale { SpatialAnim { duration: Appearance.anim.normal } }
+                Behavior on scale { SpringAnim {} }
 
                 MouseArea {
                     anchors.fill: parent // keep clicks on the card from cancelling

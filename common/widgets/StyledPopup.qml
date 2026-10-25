@@ -99,10 +99,10 @@ PopupWindow {
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
             opacity: root.shown ? 1 : 0
-            scale: root.shown ? 1 : 0.96
+            scale: root.shown ? 1 : 0.88
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
-            Behavior on scale { EffectAnim {} }
-            Behavior on slide { EffectAnim {} }
+            Behavior on scale { SpringAnim {} }
+            Behavior on slide { SpringAnim {} }
 
             layer.enabled: true
             layer.effect: MultiEffect {

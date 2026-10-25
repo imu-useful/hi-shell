@@ -59,7 +59,10 @@ Scope {
             margins.top: Appearance.sizes.barMargin
             margins.bottom: Appearance.sizes.barMargin
             margins.left: Appearance.sizes.barMargin
-            implicitWidth: panelWidth
+            // Room on the inner side for the slide-in to bounce past its spot.
+            readonly property int bounceRoom: 40
+            implicitWidth: panelWidth + bounceRoom
+            mask: Region { item: panel }
             color: "transparent"
 
             WlrLayershell.namespace: "hi-shell-sidebar"
@@ -88,7 +91,7 @@ Scope {
                 border.width: 1
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
-                Behavior on x { SpatialAnim { duration: Appearance.anim.slow; easing.bezierCurve: Appearance.anim.emphasizedDecel } }
+                Behavior on x { SpringAnim { overshoot: 0.9 } }
 
                 ColumnLayout {
                     anchors.fill: parent

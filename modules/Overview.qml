@@ -92,9 +92,9 @@ Scope {
                 columns: root.columns
                 spacing: 16
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.94
+                scale: loader.revealed ? 1 : 0.85
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { EffectAnim {} }
+                Behavior on scale { SpringAnim {} }
 
                 Repeater {
                     model: root.perGroup

@@ -63,7 +63,7 @@ PanelWindow {
                 transform: Translate { x: (1 - card.enter) * 60 }
                 opacity: card.enter
                 Component.onCompleted: enter = 1
-                Behavior on enter { SpatialAnim { duration: Appearance.anim.slow; easing.bezierCurve: Appearance.anim.emphasizedDecel } }
+                Behavior on enter { SpringAnim { overshoot: 1.4 } }
             }
         }
     }
