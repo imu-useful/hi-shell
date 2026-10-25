@@ -59,6 +59,12 @@ Scope {
             readonly property bool hasWidgets: root.options.widgets && (root.options.monitor ? modelData?.name === root.options.monitor : modelData === Quickshell.screens[0])
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
             readonly property bool covered: !root.editing && Hyprland.toplevels.values.some(t => t.workspace?.id === monitor?.activeWorkspace?.id)
+            // 1 on the empty desktop, 0 with windows open: blur, frame and widgets fade
+            // with it, so the wallpaper behind windows is sharp and uncluttered.
+            property real reveal: covered ? 0 : 1
+            Behavior on reveal {
+                NumberAnimation { duration: Appearance.anim.slow * 1.5; easing.type: Easing.InOutCubic }
+            }
 
             Binding {
                 when: window.hasWidgets
@@ -85,14 +91,15 @@ Scope {
                 id: wallpaper
                 anchors.fill: parent
                 visible: root.options.wallpaper
-                // With a frame shape the full-screen copy is blurred and dimmed behind it.
-                layer.enabled: root.frame !== ""
+                // With a frame shape the full-screen copy is blurred and dimmed behind it,
+                // on the empty desktop only; sharp again behind windows.
+                layer.enabled: root.frame !== "" && window.reveal > 0
                 layer.effect: MultiEffect {
                     blurEnabled: true
-                    blur: 1
+                    blur: window.reveal
                     blurMax: 64
-                    brightness: -0.25
-                    saturation: -0.2
+                    brightness: -0.25 * window.reveal
+                    saturation: -0.2 * window.reveal
                 }
 
                 property string source: Wallpapers.current ? `file://${Wallpapers.current}` : ""
@@ -126,7 +133,8 @@ Scope {
             // plays (and the desktop is in view) the shape turns and pulses to the bass.
             Item {
                 id: frame
-                visible: root.options.wallpaper && root.frame !== ""
+                visible: root.options.wallpaper && root.frame !== "" && window.reveal > 0
+                opacity: window.reveal
                 anchors.centerIn: parent
                 width: Math.min(parent.width, parent.height) * 0.62
                 height: width
@@ -155,8 +163,8 @@ Scope {
                     }
                 }
 
-                // Swell with the bass; ease back when the music stops.
-                scale: dancing ? 1 + 0.07 * Beat.bass : 1
+                // Swell with the bass; ease back when the music stops. Grows in as it appears.
+                scale: (0.9 + 0.1 * window.reveal) * (dancing ? 1 + 0.07 * Beat.bass : 1)
                 Behavior on scale {
                     enabled: !frame.dancing
                     SpatialAnim { duration: Appearance.anim.spatial }
@@ -208,6 +216,9 @@ Scope {
                 id: widgets
                 anchors.fill: parent
                 visible: window.hasWidgets
+                // Hidden (not unloaded) behind windows, so widgets keep their state.
+                opacity: window.reveal
+                scale: 0.97 + 0.03 * window.reveal
 
                 // Alignment guides while a widget is dragged (-1 = none); set by DesktopWidget.
                 property real guideX: -1
