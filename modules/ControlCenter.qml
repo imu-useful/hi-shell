@@ -12,8 +12,7 @@ import qs.common.widgets
 import qs.modules.controlcenter
 
 // Slide-out quick settings panel on the right edge.
-// Toggle: bar status button, Hyprland global shortcut "hi-shell:controlCenterToggle",
-//         or `qs -c hi-shell ipc call controlcenter toggle`.
+// Toggle: bar system icons, Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call controlcenter toggle`.
 Scope {
     id: root
 
@@ -30,12 +29,6 @@ Scope {
         ShellState.controlCenterOpen = value;
     }
 
-    GlobalShortcut {
-        appid: "hi-shell"
-        name: "controlCenterToggle"
-        description: "Toggle the hi-shell control center"
-        onPressed: root.setOpen(!root.open)
-    }
 
     IpcHandler {
         target: "controlcenter"

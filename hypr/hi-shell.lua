@@ -2,25 +2,28 @@
 -- Load it from your config (e.g. ~/.config/hypr/custom/execs.lua):
 --   dofile(os.getenv("HOME") .. "/.config/quickshell/hi-shell/hypr/hi-shell.lua")
 
+-- Keybinds go through IPC rather than Hyprland global shortcuts: Quickshell
+-- (0.3.2) segfaults on exit while destroying GlobalShortcut objects.
+
 -- Start the shell with Hyprland
 hl.on("hyprland.start", function()
     hl.exec_cmd("qs -c hi-shell")
 end)
 
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
-hl.bind("SUPER + Space", hl.dsp.global("hi-shell:launcherToggle"), { description = "hi-shell: Toggle app launcher" })
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher toggle"), { description = "hi-shell: Toggle app launcher" })
 
 -- Blur behind the translucent launcher card
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, ignore_alpha = 0.3 })
 
 -- Claude AI palette (Super+A / Super+C are commonly taken; Super+Y is free by default)
-hl.bind("SUPER + Y", hl.dsp.global("hi-shell:aiToggle"), { description = "hi-shell: Toggle Claude AI palette" })
+hl.bind("SUPER + Y", hl.dsp.exec_cmd("qs -c hi-shell ipc call ai toggle"), { description = "hi-shell: Toggle Claude AI palette" })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 
 -- Control center (also opens from the status button on the right of the bar)
-hl.bind("SUPER + U", hl.dsp.global("hi-shell:controlCenterToggle"), { description = "hi-shell: Toggle control center" })
+hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call controlcenter toggle"), { description = "hi-shell: Toggle control center" })
 hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, ignore_alpha = 0.3 })
 

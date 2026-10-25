@@ -9,8 +9,7 @@ import qs.common.widgets
 import qs.modules.launcher
 
 // Spotlight-style app launcher.
-// Toggle: Hyprland global shortcut "hi-shell:launcherToggle"
-//         or `qs -c hi-shell ipc call launcher toggle`.
+// Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call launcher toggle`.
 Scope {
     id: root
 
@@ -63,12 +62,6 @@ Scope {
         close();
     }
 
-    GlobalShortcut {
-        appid: "hi-shell"
-        name: "launcherToggle"
-        description: "Toggle the hi-shell app launcher"
-        onPressed: root.toggle()
-    }
 
     IpcHandler {
         target: "launcher"
