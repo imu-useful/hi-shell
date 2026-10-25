@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
+import qs.common.widgets
 import qs.modules.ai
 
 // Claude AI command palette.
@@ -14,6 +15,8 @@ Scope {
     id: root
 
     property bool open: false
+    // Unsent prompt; kept here because the window is destroyed while closed.
+    property string draft: ""
 
     function toggle() {
         open = !open;
@@ -55,190 +58,198 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: window
+    PanelLoader {
+        id: loader
+        shown: root.open
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || card.opacity > 0
+        PanelWindow {
+            id: window
 
-        anchors.top: true
-        margins.top: screen ? screen.height * 0.12 : 0
-        implicitWidth: 720
-        implicitHeight: card.implicitHeight
-        color: "transparent"
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.namespace: "hi-shell-ai"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            anchors.top: true
+            margins.top: screen ? screen.height * 0.12 : 0
+            implicitWidth: 720
+            implicitHeight: card.implicitHeight
+            color: "transparent"
 
-        HyprlandFocusGrab {
-            windows: [window]
-            active: root.open
-            onCleared: root.close()
-        }
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.namespace: "hi-shell-ai"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        Connections {
-            target: root
-            function onOpenChanged() {
-                if (root.open)
-                    input.forceActiveFocus();
+            HyprlandFocusGrab {
+                windows: [window]
+                active: root.open
+                onCleared: root.close()
             }
-        }
 
-        // Esc stops a running request first, then closes the palette.
-        Shortcut {
-            sequence: "Escape"
-            onActivated: session.busy ? session.cancel() : root.close()
-        }
-        Shortcut {
-            sequence: "Ctrl+N"
-            onActivated: session.reset()
-        }
+            // The window is created already open, so also focus on creation.
+            Component.onCompleted: input.forceActiveFocus()
+            Connections {
+                target: root
+                function onOpenChanged() {
+                    if (root.open)
+                        input.forceActiveFocus();
+                }
+            }
 
-        Rectangle {
-            id: card
+            // Esc stops a running request first, then closes the palette.
+            Shortcut {
+                sequence: "Escape"
+                onActivated: session.busy ? session.cancel() : root.close()
+            }
+            Shortcut {
+                sequence: "Ctrl+N"
+                onActivated: session.reset()
+            }
 
-            width: parent.width
-            implicitHeight: column.implicitHeight + 24
-            radius: 28
-            color: Qt.alpha(Colors.m3surfaceContainer, 0.9)
-            border.width: 1
-            border.color: Colors.m3outlineVariant
+            Rectangle {
+                id: card
 
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 0.95
-            transformOrigin: Item.Top
-            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                width: parent.width
+                implicitHeight: column.implicitHeight + 24
+                radius: Appearance.rounding.extraLarge
+                color: Appearance.translucent(Colors.m3surfaceContainer)
+                border.width: 1
+                border.color: Colors.m3outlineVariant
 
-            ColumnLayout {
-                id: column
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 10
+                opacity: loader.revealed ? 1 : 0
+                scale: loader.revealed ? 1 : 0.95
+                transformOrigin: Item.Top
+                Behavior on opacity { EffectAnim {} }
+                Behavior on scale { EffectAnim {} }
 
-                // Header
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 8
+                ColumnLayout {
+                    id: column
+                    anchors.fill: parent
+                    anchors.margins: 12
                     spacing: 10
 
-                    Text {
-                        text: "auto_awesome"
-                        font.family: Style.iconFont
-                        font.pixelSize: 22
-                        color: Colors.m3primary
+                    // Header
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        spacing: 10
+
+                        Text {
+                            text: "auto_awesome"
+                            font.family: Appearance.font.icon
+                            font.pixelSize: 22
+                            color: Colors.m3primary
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Claude"
+                            font.family: Appearance.font.main
+                            font.pixelSize: 16
+                            font.weight: Font.Medium
+                            color: Colors.m3onSurface
+                        }
+
+                        IconButton {
+                            icon: "content_copy"
+                            visible: session.messages.count > 0
+                            enabled: !session.busy
+                            onClicked: Quickshell.clipboardText = session.lastAnswer()
+                        }
+
+                        IconButton {
+                            icon: "add_comment"
+                            visible: session.messages.count > 0
+                            onClicked: {
+                                session.reset();
+                                input.forceActiveFocus();
+                            }
+                        }
+                    }
+
+                    // Conversation
+                    ListView {
+                        id: list
+
+                        readonly property real maxHeight: window.screen ? window.screen.height * 0.55 : 500
+
+                        Layout.fillWidth: true
+                        implicitHeight: Math.min(contentHeight, maxHeight)
+                        visible: count > 0
+                        clip: true
+                        spacing: 10
+                        model: session.messages
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        // Follow the answer while it streams in.
+                        onContentHeightChanged: if (session.busy || atYEnd) Qt.callLater(positionViewAtEnd)
+                        onCountChanged: Qt.callLater(positionViewAtEnd)
+
+                        delegate: MessageBubble {
+                            width: list.width
+                        }
                     }
 
                     Text {
                         Layout.fillWidth: true
-                        text: "Claude"
-                        font.family: Style.fontFamily
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
-                        color: Colors.m3onSurface
+                        Layout.margins: 8
+                        visible: session.messages.count === 0
+                        text: "Ask Claude anything.  Enter to send · Esc to close · Ctrl+N for a new chat"
+                        wrapMode: Text.Wrap
+                        font.family: Appearance.font.main
+                        font.pixelSize: 12
+                        color: Colors.m3onSurfaceVariant
                     }
 
-                    IconButton {
-                        icon: "content_copy"
-                        visible: session.messages.count > 0
-                        enabled: !session.busy
-                        onClicked: Quickshell.clipboardText = session.lastAnswer()
-                    }
+                    // Prompt input
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 56
+                        radius: Appearance.rounding.full
+                        color: Colors.m3surfaceContainerHighest
 
-                    IconButton {
-                        icon: "add_comment"
-                        visible: session.messages.count > 0
-                        onClicked: {
-                            session.reset();
-                            input.forceActiveFocus();
-                        }
-                    }
-                }
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 20
+                            anchors.rightMargin: 8
+                            spacing: 12
 
-                // Conversation
-                ListView {
-                    id: list
+                            TextInput {
+                                id: input
+                                Layout.fillWidth: true
+                                Component.onCompleted: text = root.draft
+                                onTextChanged: root.draft = text
+                                font.family: Appearance.font.main
+                                font.pixelSize: 16
+                                color: Colors.m3onSurface
+                                selectionColor: Colors.m3primary
+                                selectedTextColor: Colors.m3onPrimary
+                                clip: true
 
-                    readonly property real maxHeight: window.screen ? window.screen.height * 0.55 : 500
+                                function submit() {
+                                    if (session.busy || text.trim() === "")
+                                        return;
+                                    session.send(text);
+                                    text = "";
+                                }
 
-                    Layout.fillWidth: true
-                    implicitHeight: Math.min(contentHeight, maxHeight)
-                    visible: count > 0
-                    clip: true
-                    spacing: 10
-                    model: session.messages
-                    boundsBehavior: Flickable.StopAtBounds
+                                Keys.onReturnPressed: submit()
+                                Keys.onEnterPressed: submit()
 
-                    // Follow the answer while it streams in.
-                    onContentHeightChanged: if (session.busy || atYEnd) Qt.callLater(positionViewAtEnd)
-                    onCountChanged: Qt.callLater(positionViewAtEnd)
-
-                    delegate: MessageBubble {
-                        width: list.width
-                    }
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    Layout.margins: 8
-                    visible: session.messages.count === 0
-                    text: "Ask Claude anything.  Enter to send · Esc to close · Ctrl+N for a new chat"
-                    wrapMode: Text.Wrap
-                    font.family: Style.fontFamily
-                    font.pixelSize: 12
-                    color: Colors.m3onSurfaceVariant
-                }
-
-                // Prompt input
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 56
-                    radius: Style.radiusFull
-                    color: Colors.m3surfaceContainerHighest
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 20
-                        anchors.rightMargin: 8
-                        spacing: 12
-
-                        TextInput {
-                            id: input
-                            Layout.fillWidth: true
-                            font.family: Style.fontFamily
-                            font.pixelSize: 16
-                            color: Colors.m3onSurface
-                            selectionColor: Colors.m3primary
-                            selectedTextColor: Colors.m3onPrimary
-                            clip: true
-
-                            function submit() {
-                                if (session.busy || text.trim() === "")
-                                    return;
-                                session.send(text);
-                                text = "";
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: input.text === ""
+                                    text: session.messages.count > 0 ? "Ask a follow-up…" : "Ask Claude…"
+                                    font: input.font
+                                    color: Colors.m3onSurfaceVariant
+                                }
                             }
 
-                            Keys.onReturnPressed: submit()
-                            Keys.onEnterPressed: submit()
-
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: input.text === ""
-                                text: session.messages.count > 0 ? "Ask a follow-up…" : "Ask Claude…"
-                                font: input.font
-                                color: Colors.m3onSurfaceVariant
+                            // Send / stop
+                            IconButton {
+                                filled: true
+                                icon: session.busy ? "stop" : "arrow_upward"
+                                enabled: session.busy || input.text.trim() !== ""
+                                onClicked: session.busy ? session.cancel() : input.submit()
                             }
-                        }
-
-                        // Send / stop
-                        IconButton {
-                            filled: true
-                            icon: session.busy ? "stop" : "arrow_upward"
-                            enabled: session.busy || input.text.trim() !== ""
-                            onClicked: session.busy ? session.cancel() : input.submit()
                         }
                     }
                 }

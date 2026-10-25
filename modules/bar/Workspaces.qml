@@ -18,8 +18,8 @@ Rectangle {
     }
 
     implicitWidth: row.implicitWidth + 12
-    implicitHeight: Style.barHeight - 12
-    radius: Style.radiusFull
+    implicitHeight: Appearance.sizes.barHeight - 12
+    radius: Appearance.rounding.full
     color: Colors.m3surfaceContainerHigh
 
     RowLayout {
@@ -37,7 +37,7 @@ Rectangle {
 
                 implicitHeight: 20
                 implicitWidth: isActive ? 36 : 20
-                radius: Style.radiusFull
+                radius: Appearance.rounding.full
                 color: isActive ? Colors.m3primary : mouse.containsMouse ? Colors.m3surfaceContainerHighest : "transparent"
 
                 Behavior on implicitWidth { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
@@ -46,7 +46,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: pill.modelData.id
-                    font.family: Style.fontFamily
+                    font.family: Appearance.font.main
                     font.pixelSize: 11
                     font.bold: pill.isActive
                     color: pill.isActive ? Colors.m3onPrimary : Colors.m3onSurfaceVariant

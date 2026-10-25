@@ -7,6 +7,7 @@ import Quickshell.Wayland
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import qs.common
+import qs.common.widgets
 import qs.modules.controlcenter
 
 // Slide-out quick settings panel on the right edge.
@@ -49,127 +50,131 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: window
+    PanelLoader {
+        id: loader
+        shown: root.open
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || panel.x < window.width
+        PanelWindow {
+            id: window
 
-        anchors.top: true
-        anchors.right: true
-        // Sit below the bars (respect their exclusive zones) without reserving space.
-        exclusiveZone: 0
-        margins.top: Style.barMargin
-        implicitWidth: 400 + Style.barMargin
-        implicitHeight: panel.implicitHeight
-        color: "transparent"
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-        WlrLayershell.namespace: "hi-shell-controlcenter"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            anchors.top: true
+            anchors.right: true
+            // Sit below the bars (respect their exclusive zones) without reserving space.
+            exclusiveZone: 0
+            margins.top: Appearance.sizes.barMargin
+            implicitWidth: 400 + Appearance.sizes.barMargin
+            implicitHeight: panel.implicitHeight
+            color: "transparent"
 
-        HyprlandFocusGrab {
-            windows: [window]
-            active: root.open
-            onCleared: root.setOpen(false)
-        }
+            WlrLayershell.namespace: "hi-shell-controlcenter"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        Shortcut {
-            sequence: "Escape"
-            onActivated: root.setOpen(false)
-        }
+            HyprlandFocusGrab {
+                windows: [window]
+                active: root.open
+                onCleared: root.setOpen(false)
+            }
 
-        Rectangle {
-            id: panel
+            Shortcut {
+                sequence: "Escape"
+                onActivated: root.setOpen(false)
+            }
 
-            x: root.open ? 0 : window.width
-            width: 400
-            implicitHeight: column.implicitHeight + 32
-            radius: 28
-            color: Qt.alpha(Colors.m3surfaceContainer, 0.92)
-            border.width: 1
-            border.color: Colors.m3outlineVariant
+            Rectangle {
+                id: panel
 
-            Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                x: loader.revealed ? 0 : window.width
+                width: 400
+                implicitHeight: column.implicitHeight + 32
+                radius: Appearance.rounding.extraLarge
+                color: Appearance.translucent(Colors.m3surfaceContainer)
+                border.width: 1
+                border.color: Colors.m3outlineVariant
 
-            ColumnLayout {
-                id: column
-                anchors.fill: parent
-                anchors.margins: 16
-                spacing: 16
+                Behavior on x { SpatialAnim { duration: Appearance.anim.slow; easing.bezierCurve: Appearance.anim.emphasizedDecel } }
 
-                Text {
-                    Layout.leftMargin: 4
-                    text: "Control Center"
-                    font.family: Style.fontFamily
-                    font.pixelSize: 18
-                    font.weight: Font.Medium
-                    color: Colors.m3onSurface
-                }
+                ColumnLayout {
+                    id: column
+                    anchors.fill: parent
+                    anchors.margins: 16
+                    spacing: 16
 
-                GridLayout {
-                    Layout.fillWidth: true
-                    columns: 2
-                    columnSpacing: 10
-                    rowSpacing: 10
-
-                    ToggleTile {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        icon: Networking.wifiEnabled ? "wifi" : "wifi_off"
-                        label: "Wi-Fi"
-                        subtitle: !Networking.wifiHardwareEnabled ? "Blocked" : !Networking.wifiEnabled ? "Off" : root.wifiNetwork ? root.wifiNetwork.name : "Not connected"
-                        active: Networking.wifiEnabled
-                        enabled: Networking.wifiHardwareEnabled
-                        onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                    Text {
+                        Layout.leftMargin: 4
+                        text: "Control Center"
+                        font.family: Appearance.font.main
+                        font.pixelSize: 18
+                        font.weight: Font.Medium
+                        color: Colors.m3onSurface
                     }
 
-                    ToggleTile {
+                    GridLayout {
                         Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        icon: !root.btEnabled ? "bluetooth_disabled" : root.btConnected.length > 0 ? "bluetooth_connected" : "bluetooth"
-                        label: "Bluetooth"
-                        subtitle: !root.btAdapter ? "Unavailable" : !root.btEnabled ? "Off" : root.btConnected.length > 0 ? root.btConnected.map(d => d.name).join(", ") : "On"
-                        active: root.btEnabled
-                        enabled: root.btAdapter !== null
-                        onClicked: root.btAdapter.enabled = !root.btAdapter.enabled
+                        columns: 2
+                        columnSpacing: 10
+                        rowSpacing: 10
+
+                        ToggleTile {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            icon: Networking.wifiEnabled ? "wifi" : "wifi_off"
+                            label: "Wi-Fi"
+                            subtitle: !Networking.wifiHardwareEnabled ? "Blocked" : !Networking.wifiEnabled ? "Off" : root.wifiNetwork ? root.wifiNetwork.name : "Not connected"
+                            active: Networking.wifiEnabled
+                            enabled: Networking.wifiHardwareEnabled
+                            onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                        }
+
+                        ToggleTile {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            icon: !root.btEnabled ? "bluetooth_disabled" : root.btConnected.length > 0 ? "bluetooth_connected" : "bluetooth"
+                            label: "Bluetooth"
+                            subtitle: !root.btAdapter ? "Unavailable" : !root.btEnabled ? "Off" : root.btConnected.length > 0 ? root.btConnected.map(d => d.name).join(", ") : "On"
+                            active: root.btEnabled
+                            enabled: root.btAdapter !== null
+                            onClicked: root.btAdapter.enabled = !root.btAdapter.enabled
+                        }
+
+                        ToggleTile {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            icon: Colors.dark ? "dark_mode" : "light_mode"
+                            label: "Dark mode"
+                            subtitle: Theme.busy ? "Applying…" : Colors.dark ? "On" : "Off"
+                            active: Colors.dark
+                            onClicked: Theme.toggleMode()
+                        }
                     }
 
-                    ToggleTile {
+                    VolumeControl {
                         Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        icon: Colors.dark ? "dark_mode" : "light_mode"
-                        label: "Dark mode"
-                        subtitle: Theme.busy ? "Applying…" : Colors.dark ? "On" : "Off"
-                        active: Colors.dark
-                        onClicked: Theme.toggleMode()
                     }
-                }
 
-                VolumeControl {
-                    Layout.fillWidth: true
-                }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 1
+                        color: Colors.m3outlineVariant
+                    }
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 1
-                    color: Colors.m3outlineVariant
-                }
+                    StatBar {
+                        Layout.fillWidth: true
+                        icon: "memory"
+                        label: "CPU"
+                        detail: Math.round(SystemStats.cpuUsage * 100) + "%"
+                        value: SystemStats.cpuUsage
+                    }
 
-                StatBar {
-                    Layout.fillWidth: true
-                    icon: "memory"
-                    label: "CPU"
-                    detail: Math.round(SystemStats.cpuUsage * 100) + "%"
-                    value: SystemStats.cpuUsage
-                }
-
-                StatBar {
-                    Layout.fillWidth: true
-                    icon: "memory_alt"
-                    label: "RAM"
-                    detail: `${SystemStats.memUsedGiB.toFixed(1)} / ${SystemStats.memTotalGiB.toFixed(1)} GiB`
-                    value: SystemStats.memUsage
+                    StatBar {
+                        Layout.fillWidth: true
+                        icon: "memory_alt"
+                        label: "RAM"
+                        detail: `${SystemStats.memUsedGiB.toFixed(1)} / ${SystemStats.memTotalGiB.toFixed(1)} GiB`
+                        value: SystemStats.memUsage
+                    }
                 }
             }
         }

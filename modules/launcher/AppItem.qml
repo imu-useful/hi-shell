@@ -16,7 +16,7 @@ Rectangle {
     signal hovered
 
     implicitHeight: 52
-    radius: Style.radiusMedium
+    radius: Appearance.rounding.medium
     color: selected ? Colors.m3secondaryContainer : "transparent"
 
     Behavior on color { ColorAnimation { duration: 120 } }
@@ -41,7 +41,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.modelData.name
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 14
                 font.weight: Font.Medium
                 color: root.selected ? Colors.m3onSecondaryContainer : Colors.m3onSurface
@@ -52,7 +52,7 @@ Rectangle {
                 visible: text !== ""
                 text: root.modelData.comment || root.modelData.genericName
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 11
                 color: Colors.m3onSurfaceVariant
             }

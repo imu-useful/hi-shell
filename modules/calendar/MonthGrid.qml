@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.common.widgets
 
 // Month view: header with navigation, weekday row, 6x7 day grid.
 // Days with events get a dot; today is filled with primary.
@@ -32,7 +33,7 @@ ColumnLayout {
                 const name = root.locale.standaloneMonthName(root.month.getMonth());
                 return name.charAt(0).toUpperCase() + name.slice(1) + " " + root.month.getFullYear();
             }
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 16
             font.weight: Font.Medium
             color: Colors.m3onSurface
@@ -70,7 +71,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: root.locale.dayName((root.firstDay + index) % 7, Locale.ShortFormat).slice(0, 2)
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 12
                 color: Colors.m3onSurfaceVariant
             }
@@ -93,14 +94,14 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: 38
                 implicitHeight: 38
-                radius: Style.radiusFull
+                radius: Appearance.rounding.full
                 color: isToday ? Colors.m3primary : isSelected ? Colors.m3secondaryContainer : mouse.containsMouse ? Colors.m3surfaceContainerHighest : "transparent"
 
                 Text {
                     anchors.centerIn: parent
                     anchors.verticalCenterOffset: cell.hasEvents ? -3 : 0
                     text: cell.date.getDate()
-                    font.family: Style.fontFamily
+                    font.family: Appearance.font.main
                     font.pixelSize: 13
                     font.weight: cell.isToday ? Font.Bold : Font.Normal
                     color: cell.isToday ? Colors.m3onPrimary : cell.isSelected ? Colors.m3onSecondaryContainer : Colors.m3onSurface

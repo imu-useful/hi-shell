@@ -14,8 +14,8 @@ Rectangle {
     readonly property bool btEnabled: Bluetooth.defaultAdapter !== null && Bluetooth.defaultAdapter.enabled
 
     implicitWidth: row.implicitWidth + 24
-    implicitHeight: Style.barHeight - 12
-    radius: Style.radiusFull
+    implicitHeight: Appearance.sizes.barHeight - 12
+    radius: Appearance.rounding.full
     color: ShellState.controlCenterOpen ? Colors.m3secondaryContainer : mouse.containsMouse ? Colors.m3surfaceContainerHighest : Colors.m3surfaceContainerHigh
 
     Behavior on color { ColorAnimation { duration: 150 } }
@@ -25,13 +25,13 @@ Rectangle {
     }
 
     component Icon: Text {
-        font.family: Style.iconFont
+        font.family: Appearance.font.icon
         font.pixelSize: 17
         color: Colors.m3onSurfaceVariant
     }
 
     component Label: Text {
-        font.family: Style.fontFamily
+        font.family: Appearance.font.main
         font.pixelSize: 12
         color: Colors.m3onSurfaceVariant
     }

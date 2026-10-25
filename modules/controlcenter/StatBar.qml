@@ -19,7 +19,7 @@ ColumnLayout {
 
         Text {
             text: root.icon
-            font.family: Style.iconFont
+            font.family: Appearance.font.icon
             font.pixelSize: 18
             color: Colors.m3onSurfaceVariant
         }
@@ -27,7 +27,7 @@ ColumnLayout {
         Text {
             Layout.fillWidth: true
             text: root.label
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 13
             font.weight: Font.Medium
             color: Colors.m3onSurface
@@ -35,7 +35,7 @@ ColumnLayout {
 
         Text {
             text: root.detail
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 12
             color: Colors.m3onSurfaceVariant
         }

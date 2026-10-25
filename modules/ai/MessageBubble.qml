@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.common.widgets
 
 // A single chat message: user prompt (right-aligned pill), Claude's answer
 // (full-width Markdown card), or an error card.
@@ -46,8 +47,8 @@ Item {
 
                 Text {
                     text: "Claude is thinking…"
-                    font.family: Style.fontFamily
-                    font.pixelSize: Style.fontSize
+                    font.family: Appearance.font.main
+                    font.pixelSize: Appearance.font.size.normal
                     color: Colors.m3onSurfaceVariant
                 }
             }
@@ -61,7 +62,7 @@ Item {
                 wrapMode: TextEdit.Wrap
                 readOnly: true
                 selectByMouse: true
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 14
                 color: root.isUser ? Colors.m3onPrimaryContainer : root.isError ? Colors.m3onErrorContainer : Colors.m3onSurface
                 selectionColor: Colors.m3primary

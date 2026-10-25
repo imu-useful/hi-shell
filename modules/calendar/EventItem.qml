@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.common.widgets
 
 // One agenda entry: calendar color bar, title, time and location.
 // Click opens the event in Google Calendar; the camera button joins Meet.
@@ -63,7 +64,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.event.title
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 14
                 font.weight: Font.Medium
                 color: root.ongoing ? Colors.m3onPrimaryContainer : Colors.m3onSurface
@@ -76,7 +77,7 @@ Rectangle {
                     return [root.ongoing ? "Now" : "", time, root.event.location].filter(s => s).join(" · ");
                 }
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 12
                 color: root.ongoing ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
             }

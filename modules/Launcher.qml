@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
+import qs.common.widgets
 import qs.modules.launcher
 
 // Spotlight-style app launcher.
@@ -56,7 +57,7 @@ Scope {
         if (!app)
             return;
         if (app.runInTerminal)
-            Quickshell.execDetached([Style.terminal, "-e", ...app.command]);
+            Quickshell.execDetached([Config.options.apps.terminal, "-e", ...app.command]);
         else
             app.execute();
         close();
@@ -83,148 +84,157 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: window
+    PanelLoader {
+        id: loader
+        shown: root.open
 
-        // Open on the monitor that currently has focus.
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || card.opacity > 0
+        PanelWindow {
+            id: window
 
-        anchors.top: true
-        margins.top: screen ? screen.height * 0.18 : 0
-        implicitWidth: 600
-        implicitHeight: card.implicitHeight
-        color: "transparent"
+            // Open on the monitor that currently has focus.
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.namespace: "hi-shell-launcher"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            anchors.top: true
+            margins.top: screen ? screen.height * 0.18 : 0
+            implicitWidth: 600
+            implicitHeight: card.implicitHeight
+            color: "transparent"
 
-        // Clicking anywhere outside the launcher closes it.
-        HyprlandFocusGrab {
-            windows: [window]
-            active: root.open
-            onCleared: root.close()
-        }
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.namespace: "hi-shell-launcher"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        Connections {
-            target: root
-            function onOpenChanged() {
-                if (root.open) {
-                    root.query = "";
-                    search.text = "";
-                    list.currentIndex = 0;
-                    search.forceActiveFocus();
+            // Clicking anywhere outside the launcher closes it.
+            HyprlandFocusGrab {
+                windows: [window]
+                active: root.open
+                onCleared: root.close()
+            }
+
+            function reset() {
+                root.query = "";
+                search.text = "";
+                list.currentIndex = 0;
+                search.forceActiveFocus();
+            }
+
+            // The window is created already open, so also reset on creation.
+            Component.onCompleted: reset()
+            Connections {
+                target: root
+                function onOpenChanged() {
+                    if (root.open)
+                        window.reset();
                 }
             }
-        }
 
-        Rectangle {
-            id: card
+            Rectangle {
+                id: card
 
-            width: parent.width
-            implicitHeight: column.implicitHeight + 24
-            radius: 28
-            // Translucent so the compositor blur (see hypr/hi-shell.lua) shows through.
-            color: Qt.alpha(Colors.m3surfaceContainer, 0.88)
-            border.width: 1
-            border.color: Colors.m3outlineVariant
+                width: parent.width
+                implicitHeight: column.implicitHeight + 24
+                radius: Appearance.rounding.extraLarge
+                // Translucent so the compositor blur (see hypr/hi-shell.lua) shows through.
+                color: Appearance.translucent(Colors.m3surfaceContainer)
+                border.width: 1
+                border.color: Colors.m3outlineVariant
 
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 0.95
-            transformOrigin: Item.Top
-            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                opacity: loader.revealed ? 1 : 0
+                scale: loader.revealed ? 1 : 0.95
+                transformOrigin: Item.Top
+                Behavior on opacity { EffectAnim {} }
+                Behavior on scale { EffectAnim {} }
 
-            ColumnLayout {
-                id: column
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
+                ColumnLayout {
+                    id: column
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 8
 
-                // Search field (M3 search bar)
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 56
-                    radius: Style.radiusFull
-                    color: Colors.m3surfaceContainerHighest
+                    // Search field (M3 search bar)
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 56
+                        radius: Appearance.rounding.full
+                        color: Colors.m3surfaceContainerHighest
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 18
-                        anchors.rightMargin: 18
-                        spacing: 12
-
-                        Text {
-                            text: "search"
-                            font.family: Style.iconFont
-                            font.pixelSize: 24
-                            color: Colors.m3onSurfaceVariant
-                        }
-
-                        TextInput {
-                            id: search
-                            Layout.fillWidth: true
-                            font.family: Style.fontFamily
-                            font.pixelSize: 16
-                            color: Colors.m3onSurface
-                            selectionColor: Colors.m3primary
-                            selectedTextColor: Colors.m3onPrimary
-                            clip: true
-
-                            onTextChanged: {
-                                root.query = text;
-                                list.currentIndex = 0;
-                            }
-
-                            Keys.onEscapePressed: root.close()
-                            Keys.onReturnPressed: root.launch(root.results[list.currentIndex])
-                            Keys.onEnterPressed: root.launch(root.results[list.currentIndex])
-                            Keys.onUpPressed: list.decrementCurrentIndex()
-                            Keys.onDownPressed: list.incrementCurrentIndex()
-                            Keys.onTabPressed: list.incrementCurrentIndex()
-                            Keys.onBacktabPressed: list.decrementCurrentIndex()
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 18
+                            anchors.rightMargin: 18
+                            spacing: 12
 
                             Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: search.text === ""
-                                text: "Search apps"
-                                font: search.font
+                                text: "search"
+                                font.family: Appearance.font.icon
+                                font.pixelSize: 24
                                 color: Colors.m3onSurfaceVariant
+                            }
+
+                            TextInput {
+                                id: search
+                                Layout.fillWidth: true
+                                font.family: Appearance.font.main
+                                font.pixelSize: 16
+                                color: Colors.m3onSurface
+                                selectionColor: Colors.m3primary
+                                selectedTextColor: Colors.m3onPrimary
+                                clip: true
+
+                                onTextChanged: {
+                                    root.query = text;
+                                    list.currentIndex = 0;
+                                }
+
+                                Keys.onEscapePressed: root.close()
+                                Keys.onReturnPressed: root.launch(root.results[list.currentIndex])
+                                Keys.onEnterPressed: root.launch(root.results[list.currentIndex])
+                                Keys.onUpPressed: list.decrementCurrentIndex()
+                                Keys.onDownPressed: list.incrementCurrentIndex()
+                                Keys.onTabPressed: list.incrementCurrentIndex()
+                                Keys.onBacktabPressed: list.decrementCurrentIndex()
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: search.text === ""
+                                    text: "Search apps"
+                                    font: search.font
+                                    color: Colors.m3onSurfaceVariant
+                                }
                             }
                         }
                     }
-                }
 
-                ListView {
-                    id: list
-                    Layout.fillWidth: true
-                    implicitHeight: Math.min(count, 8) * 52 + Math.max(0, Math.min(count, 8) - 1) * spacing
-                    visible: count > 0
-                    clip: true
-                    spacing: 2
-                    model: root.results
-                    highlightMoveDuration: 0
-                    boundsBehavior: Flickable.StopAtBounds
+                    ListView {
+                        id: list
+                        Layout.fillWidth: true
+                        implicitHeight: Math.min(count, 8) * 52 + Math.max(0, Math.min(count, 8) - 1) * spacing
+                        visible: count > 0
+                        clip: true
+                        spacing: 2
+                        model: root.results
+                        highlightMoveDuration: 0
+                        boundsBehavior: Flickable.StopAtBounds
 
-                    delegate: AppItem {
-                        width: list.width
-                        selected: ListView.isCurrentItem
-                        onHovered: list.currentIndex = index
-                        onActivated: root.launch(modelData)
+                        delegate: AppItem {
+                            width: list.width
+                            selected: ListView.isCurrentItem
+                            onHovered: list.currentIndex = index
+                            onActivated: root.launch(modelData)
+                        }
                     }
-                }
 
-                Text {
-                    Layout.fillWidth: true
-                    Layout.margins: 12
-                    visible: list.count === 0
-                    text: "No apps match “" + root.query + "”"
-                    horizontalAlignment: Text.AlignHCenter
-                    font.family: Style.fontFamily
-                    font.pixelSize: 13
-                    color: Colors.m3onSurfaceVariant
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.margins: 12
+                        visible: list.count === 0
+                        text: "No apps match “" + root.query + "”"
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: Appearance.font.main
+                        font.pixelSize: 13
+                        color: Colors.m3onSurfaceVariant
+                    }
                 }
             }
         }

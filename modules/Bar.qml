@@ -16,15 +16,15 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: Style.barHeight
+    implicitHeight: Appearance.sizes.barHeight
     color: "transparent"
 
     Rectangle {
         anchors.fill: parent
-        anchors.topMargin: Style.barMargin
-        anchors.leftMargin: Style.barMargin
-        anchors.rightMargin: Style.barMargin
-        radius: Style.radiusLarge
+        anchors.topMargin: Appearance.sizes.barMargin
+        anchors.leftMargin: Appearance.sizes.barMargin
+        anchors.rightMargin: Appearance.sizes.barMargin
+        radius: Appearance.rounding.large
         color: Colors.m3surface
 
         // Left: workspaces + window title
@@ -33,7 +33,7 @@ PanelWindow {
             anchors.leftMargin: 6
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width / 2 - clock.width / 2 - 12
-            spacing: Style.spacing
+            spacing: Appearance.sizes.spacing
 
             Workspaces {
                 screen: root.screen

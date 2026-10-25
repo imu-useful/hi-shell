@@ -48,11 +48,12 @@ Out of scope for now: Niri support, community presets gallery, booru/anime, foot
 screen translator, translations other than en/ru.
 
 ## Stage 7: Foundation (config, design tokens, widget kit)
-- [ ] `common/Config.qml`: user config in `~/.config/hi-shell/config.json` (JSON, live reload, defaults merged, writes from the UI).
-- [ ] `common/Appearance.qml`: M3 Expressive tokens (shape scale, elevation, motion curves/durations, transparency), replaces `Style.qml`.
-- [ ] Material shapes (`common/shapes/`): cookie/clover/flower/blob polygons as `Shape` items, used by icons, clock, avatar, wallpaper frame.
-- [ ] Widget kit: `StyledPopup` (hover popups anchored to the bar), `Card`, `Chip`, `SegmentedButton`, `Switch`, `ListRow`, `StyledFlickable`.
-- [ ] `PanelLoader`: lazy-load panels so closed panels cost nothing.
+- [x] `common/Config.qml`: user config in `~/.config/hi-shell/config.json` (JSON, live reload, defaults merged, writes from the UI).
+- [x] `common/Appearance.qml`: M3 Expressive tokens (shape scale, type scale, motion curves/durations, transparency), replaces `Style.qml`.
+- [x] Extra M3 color roles (secondary, tertiary, surfaceContainerLow).
+- [x] Material shapes (`common/shapes/`): cookie/clover/flower/blob polygons as `Shape` items, used by icons, clock, avatar, wallpaper frame.
+- [x] Widget kit: `StyledPopup` (hover popups anchored to the bar), `Card`, `Chip`, `SegmentedButton`, `Switch`, `ListRow`, `StyledFlickable`.
+- [x] `PanelLoader`: lazy-load panels so closed panels cost nothing.
 
 ## Stage 8: Core services
 - [ ] `services/Mpris.qml`: active player, controls, position (Quickshell.Services.Mpris).

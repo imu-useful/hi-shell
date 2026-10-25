@@ -1,4 +1,5 @@
 import QtQuick
+import qs.common
 
 // Material 3 slider: thick track, active part in primary, bar-shaped handle.
 // Emits moved(value) on drag / click / scroll; `value` is 0..1 and owned by the caller.

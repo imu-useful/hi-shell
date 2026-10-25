@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import qs.common
 
 // Material 3 filled (or tonal) text button with optional leading icon.
 Rectangle {
@@ -15,7 +16,7 @@ Rectangle {
 
     implicitWidth: row.implicitWidth + 40
     implicitHeight: 40
-    radius: Style.radiusFull
+    radius: Appearance.rounding.full
     color: {
         const base = tonal ? Colors.m3secondaryContainer : Colors.m3primary;
         return mouse.containsMouse ? Qt.lighter(base, 1.08) : base;
@@ -30,14 +31,14 @@ Rectangle {
         Text {
             visible: root.icon !== ""
             text: root.icon
-            font.family: Style.iconFont
+            font.family: Appearance.font.icon
             font.pixelSize: 18
             color: root.contentColor
         }
 
         Text {
             text: root.text
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 14
             font.weight: Font.Medium
             color: root.contentColor

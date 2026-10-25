@@ -29,13 +29,13 @@ Rectangle {
         Rectangle {
             implicitWidth: 40
             implicitHeight: 40
-            radius: Style.radiusFull
+            radius: Appearance.rounding.full
             color: root.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
 
             Text {
                 anchors.centerIn: parent
                 text: root.icon
-                font.family: Style.iconFont
+                font.family: Appearance.font.icon
                 font.pixelSize: 22
                 color: root.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
             }
@@ -49,7 +49,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.label
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 14
                 font.weight: Font.Medium
                 color: root.active ? Colors.m3onPrimaryContainer : Colors.m3onSurface
@@ -59,7 +59,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.subtitle
                 elide: Text.ElideRight
-                font.family: Style.fontFamily
+                font.family: Appearance.font.main
                 font.pixelSize: 12
                 color: root.active ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
             }

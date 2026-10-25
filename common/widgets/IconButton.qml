@@ -1,4 +1,5 @@
 import QtQuick
+import qs.common
 
 // Material 3 icon button (standard or filled) using Material Symbols.
 Rectangle {
@@ -13,7 +14,7 @@ Rectangle {
 
     implicitWidth: 40
     implicitHeight: 40
-    radius: Style.radiusFull
+    radius: Appearance.rounding.full
     color: filled ? (mouse.containsMouse ? Qt.lighter(Colors.m3primary, 1.08) : Colors.m3primary)
                   : (mouse.containsMouse ? Colors.m3surfaceContainerHighest : "transparent")
     opacity: enabled ? 1 : 0.38
@@ -23,7 +24,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         text: root.icon
-        font.family: Style.iconFont
+        font.family: Appearance.font.icon
         font.pixelSize: 22
         color: root.iconColor
     }

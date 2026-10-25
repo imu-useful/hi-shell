@@ -9,7 +9,7 @@ Text {
     text: toplevel && toplevel.title ? toplevel.title : "Desktop"
     elide: Text.ElideRight
     maximumLineCount: 1
-    font.family: Style.fontFamily
-    font.pixelSize: Style.fontSize
+    font.family: Appearance.font.main
+    font.pixelSize: Appearance.font.size.normal
     color: Colors.m3onSurfaceVariant
 }

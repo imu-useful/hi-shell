@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.common.widgets
 
 // Event list: upcoming events grouped by day, or a single selected day.
 // Also shows setup / sign-in / error states of the calendar backend.
@@ -60,7 +61,7 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.leftMargin: 8
             text: root.selectedDay !== "" ? "Day" : "Upcoming"
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 16
             font.weight: Font.Medium
             color: Colors.m3onSurface
@@ -103,7 +104,7 @@ ColumnLayout {
                     topPadding: 6
                     leftPadding: 8
                     text: modelData.header
-                    font.family: Style.fontFamily
+                    font.family: Appearance.font.main
                     font.pixelSize: 12
                     font.weight: Font.Medium
                     color: Colors.m3primary
@@ -131,7 +132,7 @@ ColumnLayout {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: Calendar.status === "error" ? "error" : Calendar.status === "ok" ? "event_available" : "calendar_month"
-            font.family: Style.iconFont
+            font.family: Appearance.font.icon
             font.pixelSize: 40
             color: Calendar.status === "error" ? Colors.m3error : Colors.m3onSurfaceVariant
         }
@@ -140,7 +141,7 @@ ColumnLayout {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 14
             color: Colors.m3onSurface
             text: {
@@ -166,7 +167,7 @@ ColumnLayout {
             visible: text !== ""
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
-            font.family: Style.fontFamily
+            font.family: Appearance.font.main
             font.pixelSize: 12
             color: Colors.m3onSurfaceVariant
             text: Calendar.status === "needs_setup"

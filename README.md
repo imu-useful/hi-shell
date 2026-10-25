@@ -69,6 +69,12 @@ Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC
 qs -c hi-shell ipc call launcher toggle       # also: ai, controlcenter, calendar
 ```
 
+## Configuration
+
+Settings live in `~/.config/hi-shell/config.json`, created with the defaults on first start.
+Edits apply live, no restart needed. Currently: fonts, transparency, animation speed (`0` disables animations),
+bar height/margin and the terminal used for terminal apps.
+
 ## Theming
 
 `common/Theme.qml` runs `services/theme_updater.py` at startup, whenever the wallpaper changes and when you switch dark/light
@@ -119,7 +125,10 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 ```
 shell.qml            entry point
 modules/             Bar, Launcher, AIWidget, ControlCenter, CalendarPopup (+ subcomponents)
-common/              singletons (Colors, Theme, Style, ShellState, Calendar, SystemStats) and shared widgets
+common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
+common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
+                     StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)
+common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
 services/            theme_updater.py (matugen), gcal.py (Google Calendar)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 ```

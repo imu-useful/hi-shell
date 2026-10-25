@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
+import qs.common.widgets
 import qs.modules.calendar
 
 // Calendar popup under the bar clock: month grid + Google Calendar agenda.
@@ -47,73 +48,77 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: window
+    PanelLoader {
+        id: loader
+        shown: root.open
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || card.opacity > 0
+        PanelWindow {
+            id: window
 
-        anchors.top: true
-        exclusiveZone: 0
-        margins.top: Style.barMargin
-        implicitWidth: 720
-        implicitHeight: 400
-        color: "transparent"
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-        WlrLayershell.namespace: "hi-shell-calendar"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            anchors.top: true
+            exclusiveZone: 0
+            margins.top: Appearance.sizes.barMargin
+            implicitWidth: 720
+            implicitHeight: 400
+            color: "transparent"
 
-        HyprlandFocusGrab {
-            windows: [window]
-            active: root.open
-            onCleared: root.setOpen(false)
-        }
+            WlrLayershell.namespace: "hi-shell-calendar"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        Shortcut {
-            sequence: "Escape"
-            onActivated: root.setOpen(false)
-        }
+            HyprlandFocusGrab {
+                windows: [window]
+                active: root.open
+                onCleared: root.setOpen(false)
+            }
 
-        Rectangle {
-            id: card
+            Shortcut {
+                sequence: "Escape"
+                onActivated: root.setOpen(false)
+            }
 
-            anchors.fill: parent
-            radius: 28
-            color: Qt.alpha(Colors.m3surfaceContainer, 0.92)
-            border.width: 1
-            border.color: Colors.m3outlineVariant
+            Rectangle {
+                id: card
 
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 0.95
-            transformOrigin: Item.Top
-            Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-            RowLayout {
                 anchors.fill: parent
-                anchors.margins: 16
-                spacing: 16
+                radius: Appearance.rounding.extraLarge
+                color: Appearance.translucent(Colors.m3surfaceContainer)
+                border.width: 1
+                border.color: Colors.m3outlineVariant
 
-                MonthGrid {
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 300
-                    Layout.maximumWidth: 300
-                    selectedDay: root.selectedDay
-                    onDaySelected: day => root.selectedDay = day
-                }
+                opacity: loader.revealed ? 1 : 0
+                scale: loader.revealed ? 1 : 0.95
+                transformOrigin: Item.Top
+                Behavior on opacity { EffectAnim {} }
+                Behavior on scale { EffectAnim {} }
 
-                Rectangle {
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    color: Colors.m3outlineVariant
-                }
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 16
+                    spacing: 16
 
-                Agenda {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    Layout.fillHeight: true
-                    selectedDay: root.selectedDay
+                    MonthGrid {
+                        Layout.alignment: Qt.AlignTop
+                        Layout.preferredWidth: 300
+                        Layout.maximumWidth: 300
+                        selectedDay: root.selectedDay
+                        onDaySelected: day => root.selectedDay = day
+                    }
+
+                    Rectangle {
+                        Layout.fillHeight: true
+                        implicitWidth: 1
+                        color: Colors.m3outlineVariant
+                    }
+
+                    Agenda {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        Layout.fillHeight: true
+                        selectedDay: root.selectedDay
+                    }
                 }
             }
         }

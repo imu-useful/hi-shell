@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Pipewire
 import qs.common
+import qs.common.widgets
 
 // Default output volume via PipeWire.
 RowLayout {
@@ -41,7 +42,7 @@ RowLayout {
         Layout.preferredWidth: 40
         horizontalAlignment: Text.AlignRight
         text: root.ready ? Math.round(root.volume * 100) + "%" : "—"
-        font.family: Style.fontFamily
+        font.family: Appearance.font.main
         font.pixelSize: 13
         color: Colors.m3onSurfaceVariant
     }
