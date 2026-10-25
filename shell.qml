@@ -7,9 +7,13 @@ import qs.services
 import qs.modules
 
 ShellRoot {
+    // Reloading on file changes is for development (HI_SHELL_DEV=1): this Quickshell
+    // build can crash while reloading, and nothing in normal use needs it.
+    settings.watchFiles: Quickshell.env("HI_SHELL_DEV") === "1"
+
     // Singletons load lazily; create the background services (and their IPC
     // handlers) at startup: palette, notification daemon, battery warnings, ...
-    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock]
+    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode]
 
     Desktop {}
 
@@ -26,6 +30,8 @@ ShellRoot {
     SidebarRight {}
 
     SidebarLeft {}
+
+    WallpaperSelector {}
 
     CalendarPopup {}
 

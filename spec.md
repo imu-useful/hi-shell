@@ -66,7 +66,7 @@ screen translator, translations other than en/ru.
 - [x] Configurable layout: `bar.left/center/right` lists of widget ids in config.json (UI editor in Stage 15).
 - [x] Position top/bottom/left/right (vertical bar variant) and styles **Hug / Float / Islands / M3**.
 - [x] Widgets: workspaces (dots + app icons), active window, media, resources, weather, clock/date, tray, system icons,
-      util buttons (screenshot, color picker, dark mode, mic; wallpaper picker comes with Stage 14), network speed, battery, updates, keyboard layout, power, divider.
+      util buttons (screenshot, color picker, wallpaper picker, dark mode, mic), network speed, battery, updates, keyboard layout, power, divider.
 - [x] Hover/click popups per widget (resources, weather, battery, clock → existing calendar, media).
 - [x] Bar cava visualizer (optional, `cava`).
 
@@ -97,11 +97,11 @@ screen translator, translations other than en/ru.
 - [x] Full-width cava visualizer at the bottom (optional).
 
 ## Stage 14: Wallpapers & color schemes
-- [ ] Wallpaper service of our own (no dependency on `ii`'s state file): set via `swww`, transitions, per-monitor.
-- [ ] Wallpaper selector: local folders grid with thumbnails, random, online search (Wallhaven, Unsplash), resolution filter.
-- [ ] Shaped wallpaper frame widget (cookie / blob mask over the wallpaper).
-- [ ] matugen scheme variants (Tonal Spot, Content, Expressive, Fidelity, Fruit Salad, Monochrome, Neutral, Rainbow), auto mode,
-      transparency toggle; optional GTK/Qt/terminal theming.
+- [x] Wallpaper service of our own (no dependency on `ii`'s state file); drawn by the desktop layer with a cross-fade (no swww needed).
+- [x] Wallpaper selector: local folders grid with thumbnails, random, online search (Wallhaven, Unsplash), resolution filter.
+- [x] Shaped wallpaper frame widget (cookie / blob mask over the wallpaper).
+- [x] matugen scheme variants (Tonal Spot, Content, Expressive, Fidelity, Fruit Salad, Monochrome, Neutral, Rainbow), auto mode,
+      transparency toggle; GTK color-scheme follows dark / light.
 
 ## Stage 15: Settings app
 - [ ] Overlay panel (Super+Escape) with pages: Quick, General, Bar, Desktop, Interface, Services, Hyprland, About.

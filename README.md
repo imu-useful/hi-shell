@@ -13,7 +13,8 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
   Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
 - **Desktop** — wallpaper plus widgets: shape clock, big clock, weather, resource tiles, week calendar, media with lyrics,
   greeting, to-do, notes, world clock, timers, user card, image frame; full-width visualizer; drag-to-place edit mode
-- **Theming** — Material 3 palette generated from the wallpaper with matugen, reloaded live
+- **Wallpapers & theming** — wallpaper picker (local folders, Wallhaven / Unsplash), matugen scheme variants,
+  light / dark / auto, shaped wallpaper frame; Material 3 palette from the wallpaper, reloaded live
 - **Google Calendar** — month view with event dots and an agenda (optional)
 
 ## Requirements
@@ -36,6 +37,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `hyprsunset` | night light (uses a running hyprsunset daemon, or starts one) |
 | `cliphist`, `translate-shell` | clipboard history and translator in the left sidebar |
 | `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
+| `imagemagick`, `curl` | wallpaper thumbnails and downloads |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
 ```sh
@@ -75,6 +77,7 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
+| <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
 | click the system icons | Right sidebar (scroll there to change the volume) |
@@ -105,7 +108,8 @@ qs -c hi-shell ipc call tray list             # item ids for tray.hidden
 Settings live in `~/.config/hi-shell/config.json`, created with the defaults on first start.
 Edits apply live, no restart needed. Sections:
 
-- `appearance`: fonts, transparency, animation speed (`0` disables animations)
+- `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`
+- `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
@@ -139,18 +143,26 @@ The bell in the bar shows the unread count: left click marks all read, right cli
 Volume, mic mute, brightness and keyboard layout changes show a short indicator under the bar, whatever
 made the change (keys, `wpctl`, `brightnessctl`, ...).
 
-## Theming
+## Wallpapers & theming
 
-`common/Theme.qml` runs `services/theme_updater.py` at startup, whenever the wallpaper changes and when you switch dark/light
-mode in the right sidebar. The palette is written to `~/.local/state/hi-shell/colors.json` and picked up by
-`common/Colors.qml` without restarting the shell. Only matugen's JSON output is used, so your other matugen templates are untouched.
+hi-shell draws the wallpaper itself (desktop layer) and generates the Material 3 palette from it with matugen.
+Open the picker with <kbd>Super</kbd>+<kbd>R</kbd> or the wallpaper button on the bar:
 
-The wallpaper is detected from illogical-impulse's state file, hyprpaper or swww. Hyprland has no wallpaper-change event,
-so live updates currently rely on illogical-impulse's state file; with another wallpaper tool, tell the shell yourself:
+- **Local**: every image in `wallpapers.directories` (default `~/Pictures/Wallpapers`), with thumbnails cached in
+  `~/.cache/hi-shell/thumbnails` (the first scan of a big folder takes a minute; the grid fills in as it goes)
+- **Online**: Wallhaven search with a minimum resolution (1080p / 2K / 4K) and paging; picks are downloaded to
+  `wallpapers.downloadDirectory`. Unsplash appears too once `wallpapers.unsplashKey` is set
+  (free key from [unsplash.com/developers](https://unsplash.com/developers))
+- **Random**, matugen **scheme** (Tonal Spot, Content, Expressive, Fidelity, Fruit Salad, Monochrome, Neutral, Rainbow,
+  Vibrant), **Light / Dark / Auto** (auto = light between sunrise and sunset), transparency, and a **frame**: the
+  wallpaper inside a Material shape over a blurred copy of itself
+
+The current wallpaper is kept in `~/.local/state/hi-shell/wallpaper.txt`, the palette in
+`~/.local/state/hi-shell/colors.json`. Dark / light also sets GTK's `color-scheme` (`appearance.gtkColorScheme`).
 
 ```sh
-qs -c hi-shell ipc call theme setWallpaper ~/Pictures/wall.png
-qs -c hi-shell ipc call theme setMode light     # or: toggleMode, update
+qs -c hi-shell ipc call wallpaper set ~/Pictures/wall.png    # random, get, toggleSelector
+qs -c hi-shell ipc call theme setMode light                  # toggleMode, setScheme expressive, update
 ```
 
 ## Google Calendar
@@ -177,6 +189,8 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 ## Troubleshooting
 
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
+- **Developing:** start with `HI_SHELL_DEV=1 qs -c hi-shell` to reload on file changes (off by default: the current
+  Quickshell build can crash while reloading).
 - **Two bars:** illogical-impulse starts its own shell (`qs -c ii`). Remove that line from
   `~/.config/hypr/hyprland/execs.lua` if you want hi-shell alone.
 - **Shortcuts do nothing:** another bind may already use the key — check `hyprctl binds`.

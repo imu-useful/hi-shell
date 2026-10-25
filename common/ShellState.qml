@@ -13,5 +13,6 @@ Singleton {
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
     property bool desktopEditing: false
+    property bool wallpaperSelectorOpen: false
     property bool launcherOpen: false
 }

@@ -4,27 +4,33 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Keeps the Material 3 palette in sync with the wallpaper by running
-// services/theme_updater.py at startup, when the wallpaper changes, and when
-// the dark/light mode is toggled. Colors.qml picks up the result live.
+// Keeps the Material 3 palette in sync with the wallpaper, dark / light mode and
+// the matugen scheme (Config appearance.scheme) by running services/theme_updater.py.
+// Colors.qml picks up the result live. The wallpaper itself comes from the
+// Wallpapers service (setWallpaper).
 Singleton {
     id: root
 
-    // illogical-impulse records the current wallpaper here on every change.
-    // Hyprland has no wallpaper event, so this file is the change signal.
-    readonly property string wallpaperFile: `${Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state"}/quickshell/user/generated/wallpaper/path.txt`
-
+    readonly property var options: Config.options.appearance
     readonly property bool busy: updater.running
     property var pendingArgs: null
+
+    readonly property list<string> schemes: ["tonal-spot", "content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "vibrant"]
 
     function update(extraArgs) {
         const args = extraArgs ?? [];
         if (updater.running) {
-            pendingArgs = args;
+            // Keep the latest request; a newer wallpaper / mode replaces an older one.
+            pendingArgs = [...(pendingArgs ?? []), ...args];
             return;
         }
-        updater.command = ["python3", Quickshell.shellDir + "/services/theme_updater.py", "--output", Colors.path, ...args];
+        const scheme = schemes.includes(options.scheme) ? options.scheme : "tonal-spot";
+        updater.command = ["python3", Quickshell.shellDir + "/services/theme_updater.py", "--output", Colors.path, "--scheme", scheme, ...args];
         updater.running = true;
+    }
+
+    function setWallpaper(path) {
+        update(["--wallpaper", path]);
     }
 
     function setMode(mode) {
@@ -33,6 +39,22 @@ Singleton {
 
     function toggleMode() {
         setMode(Colors.dark ? "light" : "dark");
+    }
+
+    Connections {
+        target: root.options
+        function onSchemeChanged() {
+            root.update();
+        }
+    }
+
+    // GTK apps follow dark / light through the freedesktop color-scheme setting.
+    Connections {
+        target: Colors
+        function onModeChanged() {
+            if (root.options.gtkColorScheme)
+                Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", Colors.dark ? "prefer-dark" : "default"]);
+        }
     }
 
     Process {
@@ -51,15 +73,6 @@ Singleton {
         }
     }
 
-    FileView {
-        path: root.wallpaperFile
-        watchChanges: true
-        printErrors: false
-        onFileChanged: reload()
-        onLoaded: root.update()
-    }
-
-    // Also run once at startup (covers setups without the illogical-impulse file).
     Component.onCompleted: update()
 
     IpcHandler {
@@ -74,8 +87,9 @@ Singleton {
         function toggleMode(): void {
             root.toggleMode();
         }
-        function setWallpaper(path: string): void {
-            root.update(["--wallpaper", path]);
+        // tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
+        function setScheme(scheme: string): void {
+            root.options.scheme = scheme;
         }
     }
 }

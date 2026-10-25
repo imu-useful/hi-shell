@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
+import qs.common.shapes
 import qs.services
 import qs.modules.desktop
 import "desktop/Layout.js" as DesktopLayout
@@ -16,6 +18,7 @@ Scope {
     id: root
 
     readonly property var options: Config.options.desktop
+    readonly property string frame: Config.options.wallpapers.frame
     readonly property bool editing: ShellState.desktopEditing
 
     function setEditing(value) {
@@ -69,10 +72,20 @@ Scope {
 
             // --- Wallpaper, cross-faded on change ---
             Item {
+                id: wallpaper
                 anchors.fill: parent
                 visible: root.options.wallpaper
+                // With a frame shape the full-screen copy is blurred and dimmed behind it.
+                layer.enabled: root.frame !== ""
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blur: 1
+                    blurMax: 64
+                    brightness: -0.25
+                    saturation: -0.2
+                }
 
-                property string source: Colors.wallpaper ? `file://${Colors.wallpaper}` : ""
+                property string source: Wallpapers.current ? `file://${Wallpapers.current}` : ""
                 property bool flip: false
                 onSourceChanged: {
                     flip = !flip;
@@ -96,6 +109,26 @@ Scope {
                     sourceSize: Qt.size(window.width, window.height)
                     opacity: parent.flip && status === Image.Ready ? 1 : 0
                     Behavior on opacity { EffectAnim { duration: Appearance.anim.slow * 2 } }
+                }
+            }
+
+            // Shaped frame: the sharp wallpaper inside a big Material shape.
+            Item {
+                visible: root.options.wallpaper && root.frame !== ""
+                anchors.centerIn: parent
+                width: Math.min(parent.width, parent.height) * 0.62
+                height: width
+
+                MaterialShape {
+                    anchors.fill: parent
+                    anchors.margins: -6
+                    shape: root.frame || "circle"
+                    color: Qt.alpha(Colors.m3primary, 0.5)
+                }
+                ShapeImage {
+                    anchors.fill: parent
+                    shape: root.frame || "circle"
+                    source: wallpaper.source
                 }
             }
 

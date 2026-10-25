@@ -3,7 +3,7 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 
-// Quick actions (bar.utilButtons.shown): screenshot, colorPicker, darkMode, mic.
+// Quick actions (bar.utilButtons.shown): screenshot, colorPicker, darkMode, wallpaper, mic.
 BarWidget {
     id: root
 
@@ -12,6 +12,7 @@ BarWidget {
         screenshot: { icon: "screenshot_region", command: ["sh", "-c", 'mkdir -p ~/Pictures/Screenshots && f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png && grim -g "$(slurp)" "$f" && wl-copy < "$f"'] },
         colorPicker: { icon: "colorize", command: ["hyprpicker", "-a"] },
         darkMode: { icon: Colors.dark ? "dark_mode" : "light_mode", action: () => Theme.toggleMode() },
+        wallpaper: { icon: "wallpaper", action: () => ShellState.wallpaperSelectorOpen = !ShellState.wallpaperSelectorOpen },
         mic: { icon: "mic", command: ["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"] }
     })
     readonly property var buttons: Config.options.bar.utilButtons.shown.filter(k => all[k]).map(k => all[k])

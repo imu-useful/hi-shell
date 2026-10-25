@@ -25,6 +25,11 @@ hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 -- Left sidebar: home / Claude chat / translator / clipboard
 hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarLeft toggle"), { description = "hi-shell: Toggle left sidebar" })
 
+-- Wallpaper picker (local + online, color scheme, frame)
+hl.bind("SUPER + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call wallpaper toggleSelector"), { description = "hi-shell: Wallpaper picker" })
+hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, ignore_alpha = 0.3 })
+
 -- Right sidebar (also opens from the system icons on the bar)
 hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggle"), { description = "hi-shell: Toggle right sidebar" })
 hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, blur = true })

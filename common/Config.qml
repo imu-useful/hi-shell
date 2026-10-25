@@ -55,6 +55,12 @@ Singleton {
                 }
                 // Global multiplier for animation durations (0 disables animations).
                 property real animationSpeed: 1
+                // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
+                property string scheme: "tonal-spot"
+                // Switch dark / light at sunset / sunrise (from the weather service's location).
+                property bool autoMode: false
+                // Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light.
+                property bool gtkColorScheme: true
             }
 
             property JsonObject bar: JsonObject {
@@ -89,8 +95,8 @@ Singleton {
                     property list<string> shown: ["cpu", "ram"]
                 }
                 property JsonObject utilButtons: JsonObject {
-                    // screenshot, colorPicker, darkMode, mic
-                    property list<string> shown: ["screenshot", "colorPicker", "darkMode"]
+                    // screenshot, colorPicker, darkMode, wallpaper, mic
+                    property list<string> shown: ["screenshot", "colorPicker", "wallpaper", "darkMode"]
                 }
                 property JsonObject updates: JsonObject {
                     property bool hideWhenNone: true
@@ -107,6 +113,18 @@ Singleton {
                 }
                 // Night light color temperature (K) for hyprsunset.
                 property int nightLightTemperature: 4500
+            }
+
+            property JsonObject wallpapers: JsonObject {
+                property list<string> directories: ["~/Pictures/Wallpapers"]
+                // Online pictures are saved here before being set.
+                property string downloadDirectory: "~/Pictures/Wallpapers/online"
+                // Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one.
+                property string unsplashKey: ""
+                // Optional Wallhaven API key (only needed for NSFW / account features).
+                property string wallhavenKey: ""
+                // Shape the wallpaper is shown in on the desktop ("" = full screen): sunny, cookie9, arch, blob, clover4, ...
+                property string frame: ""
             }
 
             property JsonObject desktop: JsonObject {

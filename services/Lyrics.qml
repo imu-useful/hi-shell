@@ -50,6 +50,8 @@ Singleton {
     }
 
     onKeyChanged: fetchTimer.restart()
+    // A track may already be playing at startup.
+    Component.onCompleted: fetchTimer.restart()
 
     // Players often change title and artist in separate updates; wait for both.
     Timer {
@@ -141,10 +143,12 @@ Singleton {
         if (data.syncedLyrics) {
             const out = [];
             for (const raw of data.syncedLyrics.split("\n")) {
-                const stamps = [...raw.matchAll(/\[(\d+):(\d+(?:\.\d+)?)\]/g)];
                 const text = raw.replace(/\[[^\]]*\]/g, "").trim();
-                for (const s of stamps)
-                    out.push({ time: Number(s[1]) * 60 + Number(s[2]), text });
+                // (no String.matchAll in Qt's JS engine)
+                const re = /\[(\d+):(\d+(?:\.\d+)?)\]/g;
+                let m;
+                while ((m = re.exec(raw)) !== null)
+                    out.push({ time: Number(m[1]) * 60 + Number(m[2]), text });
             }
             out.sort((a, b) => a.time - b.time);
             return { synced: true, lines: out };
