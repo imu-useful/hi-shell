@@ -132,7 +132,10 @@ def main() -> int:
     # Written in place with a single write (not tmp + rename): Quickshell's file
     # watcher follows the inode, so a rename would silently detach it.
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps({"wallpaper": str(wallpaper), "mtime": mtime, "mode": mode, "scheme": scheme, "colors": colors}, indent=2))
+    # Atomic: the shell watches this file and would otherwise read it half-written.
+    tmp = args.output.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"wallpaper": str(wallpaper), "mtime": mtime, "mode": mode, "scheme": scheme, "colors": colors}, indent=2))
+    tmp.replace(args.output)
     log(f"generated {mode} {scheme} palette from {wallpaper.name} -> {args.output}")
     return 0
 

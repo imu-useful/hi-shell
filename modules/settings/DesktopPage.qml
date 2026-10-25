@@ -24,6 +24,13 @@ ColumnLayout {
         title: Translation.tr("Desktop")
 
         SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
+        SwitchRow {
+            icon: "album"
+            title: Translation.tr("Cover mode")
+            subtitle: Translation.tr("The playing track's cover instead of the wallpaper, colors included")
+            checked: root.d.coverMode
+            onToggled: checked => root.d.coverMode = checked
+        }
         SwitchRow { icon: "widgets"; title: Translation.tr("Widgets"); checked: root.d.widgets; onToggled: checked => root.d.widgets = checked }
         SwitchRow { icon: "graphic_eq"; title: Translation.tr("Visualizer while music plays"); subtitle: Translation.tr("Needs cava"); checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
         ChoiceRow {

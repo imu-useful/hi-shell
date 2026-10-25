@@ -93,16 +93,19 @@ Scope {
                 visible: root.options.wallpaper
                 // With a frame shape the full-screen copy is blurred and dimmed behind it,
                 // on the empty desktop only; sharp again behind windows.
-                layer.enabled: root.frame !== "" && window.reveal > 0
+                // A cover is small, so it stays blurred behind windows too.
+                readonly property real blurAmount: CoverMode.active ? 1 : window.reveal
+                layer.enabled: (root.frame !== "" || CoverMode.active) && blurAmount > 0
                 layer.effect: MultiEffect {
                     blurEnabled: true
-                    blur: window.reveal
+                    blur: wallpaper.blurAmount
                     blurMax: 64
-                    brightness: -0.25 * window.reveal
-                    saturation: -0.2 * window.reveal
+                    brightness: -0.25 * wallpaper.blurAmount
+                    saturation: -0.2 * wallpaper.blurAmount
                 }
 
-                property string source: Wallpapers.current ? `file://${Wallpapers.current}` : ""
+                // The wallpaper, or the playing track's cover in cover mode.
+                property string source: CoverMode.active ? Mpris.artUrl : Wallpapers.current ? `file://${Wallpapers.current}` : ""
                 property bool flip: false
                 onSourceChanged: {
                     flip = !flip;
@@ -133,7 +136,9 @@ Scope {
             // plays (and the desktop is in view) the shape turns and pulses to the bass.
             Item {
                 id: frame
-                visible: root.options.wallpaper && root.frame !== "" && window.reveal > 0
+                // In cover mode the cover always gets a frame (a square one without a chosen shape).
+                readonly property string shape: root.frame || (CoverMode.active ? "square" : "")
+                visible: root.options.wallpaper && shape !== "" && window.reveal > 0
                 opacity: window.reveal
                 anchors.centerIn: parent
                 width: Math.min(parent.width, parent.height) * 0.62
@@ -174,12 +179,12 @@ Scope {
                     anchors.fill: parent
                     anchors.margins: -6
                     rotation: frame.spin
-                    shape: root.frame || "circle"
+                    shape: frame.shape || "circle"
                     color: Qt.alpha(Colors.m3primary, 0.5 + 0.3 * (frame.dancing ? Beat.bass : 0))
                 }
                 ShapeImage {
                     anchors.fill: parent
-                    shape: root.frame || "circle"
+                    shape: frame.shape || "circle"
                     maskRotation: frame.spin
                     source: wallpaper.source
                 }

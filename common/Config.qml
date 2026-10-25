@@ -115,7 +115,7 @@ Singleton {
                     // android: two-column pills with labels | classic: round icon buttons
                     property string style: "android"
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
-                    // gameMode, vpn, colorPicker, screenshot
+                    // gameMode, vpn, colorPicker, screenshot, coverMode
                     property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "colorPicker", "screenshot"]
                 }
                 // Night light color temperature (K) for hyprsunset.
@@ -148,6 +148,8 @@ Singleton {
                 property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]
                 // Picture for the image frame widget (empty = the wallpaper).
                 property string image: ""
+                // Cover mode: the playing track's cover instead of the wallpaper (and its colors).
+                property bool coverMode: false
                 // Full-width audio visualizer along the bottom while media plays (needs cava).
                 property bool visualizer: true
             }

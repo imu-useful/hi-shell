@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -111,6 +111,14 @@ ColumnLayout {
             active: Toggles.vpnActive,
             available: Toggles.vpnAvailable,
             toggle: () => Toggles.setVpn(!Toggles.vpnActive)
+        },
+        coverMode: {
+            icon: "album",
+            label: Translation.tr("Cover mode"),
+            subtitle: !CoverMode.enabled ? Translation.tr("Off") : CoverMode.active ? Translation.tr("Showing the cover") : Translation.tr("Waiting for music"),
+            active: CoverMode.enabled,
+            available: true,
+            toggle: () => CoverMode.toggle()
         },
         colorPicker: {
             icon: "colorize",

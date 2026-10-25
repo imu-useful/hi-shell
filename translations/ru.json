@@ -518,5 +518,9 @@
     "Move to the music": "Двигаться под музыку",
     "The frame turns and pulses to the bass while something plays": "Рамка вращается и пульсирует под басы, пока играет музыка",
     "Wrong password": "Неверный пароль",
-    "Caps Lock is on": "Включён Caps Lock"
+    "Caps Lock is on": "Включён Caps Lock",
+    "Cover mode": "Режим обложки",
+    "Showing the cover": "Показывает обложку",
+    "Waiting for music": "Ждёт музыку",
+    "The playing track's cover instead of the wallpaper, colors included": "Обложка играющего трека вместо обоев, вместе с цветами"
 }
