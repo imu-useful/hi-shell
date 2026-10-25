@@ -48,11 +48,12 @@ Scope {
         const s = screenInfo.scale;
         // Pixels in the frozen image are physical: scale the logical selection.
         const crop = `${Math.round(w * s)}x${Math.round(h * s)}+${Math.round(x * s)}+${Math.round(y * s)}`;
-        const stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
+        // Local time, same naming as fullscreen shots (`date +%F_%H-%M-%S`).
+        const stamp = Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss");
 
         if (mode === "screenshot") {
             const file = `${Paths.home}/Pictures/Screenshots/${stamp}.png`;
-            run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy < "$3" && notify-send -a hi-shell -i "$3" "$4" "$5"', frozen, crop, file, Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").arg(file)]);
+            run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy --type image/png < "$3" && notify-send -a hi-shell -i "$3" "$4" "$5"', frozen, crop, file, Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").arg(file)]);
         } else if (mode === "ocr") {
             const lang = Config.options.capture.ocrLanguages;
             run(['t=$(magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null); if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "$4" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "$5"; fi', frozen, crop, lang, Translation.tr("Text copied"), Translation.tr("No text found")]);
@@ -159,7 +160,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         }
         // Whole focused screen straight to clipboard + file, no selection.
         function fullscreen(): void {
-            Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy < "$f" && notify-send -a hi-shell -i "$f" "$1" "$(printf "$2" "$f")"', "sh", Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").replace("%1", "%s")]);
+            Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy --type image/png < "$f" && notify-send -a hi-shell -i "$f" "$1" "$(printf "$2" "$f")"', "sh", Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").replace("%1", "%s")]);
         }
     }
 
