@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.common
 
 // Google Calendar events via services/gcal.py, refreshed every 5 minutes
 // and whenever the calendar popup opens or changes month.
@@ -72,7 +73,7 @@ Singleton {
             data = JSON.parse(text);
         } catch (e) {
             status = "error";
-            message = "Calendar backend returned invalid output";
+            message = Translation.tr("Calendar backend returned invalid output");
             return;
         }
         status = data.status;

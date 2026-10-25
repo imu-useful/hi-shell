@@ -243,7 +243,7 @@ Item {
                         StyledText {
                             anchors.fill: parent
                             visible: reply.text === ""
-                            text: root.notif.notification?.inlineReplyPlaceholder || "Reply"
+                            text: root.notif.notification?.inlineReplyPlaceholder || Translation.tr("Reply")
                             color: Colors.m3outline
                         }
                     }

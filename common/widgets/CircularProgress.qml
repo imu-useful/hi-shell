@@ -15,8 +15,14 @@ Item {
     implicitWidth: 24
     implicitHeight: 24
 
+    // Off for values that update all the time (each animation redraws the window).
+    property bool animated: true
+
     property real shown: Math.max(0, Math.min(1, value))
-    Behavior on shown { EffectAnim { duration: Appearance.anim.slow } }
+    Behavior on shown {
+        enabled: root.animated
+        EffectAnim { duration: Appearance.anim.slow }
+    }
 
     Shape {
         anchors.fill: parent

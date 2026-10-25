@@ -19,11 +19,11 @@ ColumnLayout {
 
     function dayLabel(iso) {
         if (iso === todayIso)
-            return "Today";
+            return Translation.tr("Today");
         if (iso === tomorrowIso)
-            return "Tomorrow";
+            return Translation.tr("Tomorrow");
         const [y, m, d] = iso.split("-").map(Number);
-        return Qt.formatDate(new Date(y, m - 1, d), "dddd, d MMMM");
+        return new Date(y, m - 1, d).toLocaleDateString(Translation.locale, "dddd, d MMMM");
     }
 
     // Flat list of {header} and {event} rows.
@@ -61,7 +61,7 @@ ColumnLayout {
         Text {
             Layout.fillWidth: true
             Layout.leftMargin: 8
-            text: root.selectedDay !== "" ? "Day" : "Upcoming"
+            text: root.selectedDay !== "" ? Translation.tr("Day") : Translation.tr("Upcoming")
             font.family: Appearance.font.main
             font.pixelSize: 16
             font.weight: Font.Medium
@@ -147,18 +147,18 @@ ColumnLayout {
             color: Colors.m3onSurface
             text: {
                 if (Calendar.connecting)
-                    return "Finish signing in in your browser…";
+                    return Translation.tr("Finish signing in in your browser…");
                 switch (Calendar.status) {
                 case "idle":
-                    return "Loading events…";
+                    return Translation.tr("Loading events…");
                 case "ok":
-                    return root.selectedDay !== "" ? "Nothing scheduled" : "No upcoming events";
+                    return root.selectedDay !== "" ? Translation.tr("Nothing scheduled") : Translation.tr("No upcoming events");
                 case "needs_setup":
-                    return "Set up Google Calendar";
+                    return Translation.tr("Set up Google Calendar");
                 case "needs_auth":
-                    return "Connect your Google account";
+                    return Translation.tr("Connect your Google account");
                 default:
-                    return "Couldn't load events";
+                    return Translation.tr("Couldn't load events");
                 }
             }
         }
@@ -180,7 +180,7 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             visible: Calendar.status === "needs_auth" && !Calendar.connecting
             icon: "login"
-            text: "Connect Google Calendar"
+            text: Translation.tr("Connect Google Calendar")
             onClicked: Calendar.connect()
         }
 
@@ -189,7 +189,7 @@ ColumnLayout {
             visible: Calendar.status === "error" || Calendar.status === "needs_setup"
             tonal: true
             icon: "refresh"
-            text: "Retry"
+            text: Translation.tr("Retry")
             enabled: !Calendar.loading
             onClicked: Calendar.refresh()
         }

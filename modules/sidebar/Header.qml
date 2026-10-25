@@ -55,7 +55,7 @@ RowLayout {
             font.weight: Font.Medium
         }
         StyledText {
-            text: `Up ${SystemStats.uptimeText}`
+            text: Translation.tr("Up %1").arg(SystemStats.uptimeText)
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }

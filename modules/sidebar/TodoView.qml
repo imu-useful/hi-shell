@@ -34,7 +34,7 @@ ColumnLayout {
             StyledText {
                 anchors.fill: parent
                 visible: input.text === ""
-                text: "Add a task"
+                text: Translation.tr("Add a task")
                 color: Colors.m3outline
             }
         }
@@ -64,7 +64,7 @@ ColumnLayout {
                 visible: Todo.items.length === 0
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 30
-                text: "No tasks"
+                text: Translation.tr("No tasks")
                 color: Colors.m3onSurfaceVariant
             }
 
@@ -113,7 +113,7 @@ ColumnLayout {
                 visible: Todo.items.some(i => i.done)
                 Layout.alignment: Qt.AlignRight
                 icon: "done_all"
-                text: "Clear completed"
+                text: Translation.tr("Clear completed")
                 onClicked: Todo.clearDone()
             }
         }

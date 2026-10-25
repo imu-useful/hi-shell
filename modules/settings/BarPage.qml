@@ -82,7 +82,7 @@ ColumnLayout {
                     required property string modelData
                     required property int index
                     icon: BarWidgets.icons[modelData] ?? "widgets"
-                    text: BarWidgets.names[modelData] ?? modelData
+                    text: Translation.tr(BarWidgets.names[modelData] ?? modelData)
                     selected: section.selected === index
                     closable: true
                     onClicked: section.selected = section.selected === index ? -1 : index
@@ -95,7 +95,7 @@ ColumnLayout {
 
             StyledText {
                 visible: section.items.length === 0
-                text: "Empty"
+                text: Translation.tr("Empty")
                 color: Colors.m3outline
             }
         }
@@ -112,7 +112,7 @@ ColumnLayout {
                 Chip {
                     required property string modelData
                     icon: "add"
-                    text: BarWidgets.names[modelData]
+                    text: Translation.tr(BarWidgets.names[modelData])
                     onClicked: section.write([...section.items, modelData])
                 }
             }
@@ -121,69 +121,69 @@ ColumnLayout {
 
     Section {
         icon: "view_week"
-        title: "Bar layout"
+        title: Translation.tr("Bar layout")
 
-        LayoutSection { key: "left"; label: "Left" }
-        LayoutSection { key: "center"; label: "Center" }
-        LayoutSection { key: "right"; label: "Right" }
+        LayoutSection { key: "left"; label: Translation.tr("Left") }
+        LayoutSection { key: "center"; label: Translation.tr("Center") }
+        LayoutSection { key: "right"; label: Translation.tr("Right") }
     }
 
     Section {
         icon: "tune"
-        title: "Positioning & style"
+        title: Translation.tr("Positioning & style")
 
         ChoiceRow {
             icon: "open_with"
-            title: "Position"
+            title: Translation.tr("Position")
             value: root.bar.position
             options: [
-                { value: "top", text: "Top", icon: "arrow_upward" },
-                { value: "left", text: "Left", icon: "arrow_back" },
-                { value: "bottom", text: "Bottom", icon: "arrow_downward" },
-                { value: "right", text: "Right", icon: "arrow_forward" }
+                { value: "top", text: Translation.tr("Top"), icon: "arrow_upward" },
+                { value: "left", text: Translation.tr("Left"), icon: "arrow_back" },
+                { value: "bottom", text: Translation.tr("Bottom"), icon: "arrow_downward" },
+                { value: "right", text: Translation.tr("Right"), icon: "arrow_forward" }
             ]
             onSelected: value => root.bar.position = value
         }
         ChoiceRow {
             icon: "style"
-            title: "Style"
+            title: Translation.tr("Style")
             value: root.bar.style
             options: [
-                { value: "hug", text: "Hug" },
-                { value: "float", text: "Float" },
-                { value: "islands", text: "Islands" },
+                { value: "hug", text: Translation.tr("Hug") },
+                { value: "float", text: Translation.tr("Float") },
+                { value: "islands", text: Translation.tr("Islands") },
                 { value: "m3", text: "M3" }
             ]
             onSelected: value => root.bar.style = value
         }
         SliderRow {
             icon: "height"
-            title: "Thickness"
+            title: Translation.tr("Thickness")
             value: root.bar.height
             from: 32
             to: 60
-            suffix: " px"
+            suffix: Translation.tr(" px")
             onMoved: value => root.bar.height = value
         }
         SliderRow {
             icon: "padding"
-            title: "Gap to the screen edge"
-            subtitle: "Float and Islands styles"
+            title: Translation.tr("Gap to the screen edge")
+            subtitle: Translation.tr("Float and Islands styles")
             value: root.bar.margin
             from: 0
             to: 20
-            suffix: " px"
+            suffix: Translation.tr(" px")
             onMoved: value => root.bar.margin = value
         }
     }
 
     Section {
         icon: "widgets"
-        title: "Widgets"
+        title: Translation.tr("Widgets")
 
         StepperRow {
             icon: "grid_view"
-            title: "Workspaces shown"
+            title: Translation.tr("Workspaces shown")
             value: root.bar.workspaces.shown
             from: 3
             to: 20
@@ -191,27 +191,27 @@ ColumnLayout {
         }
         SwitchRow {
             icon: "pin"
-            title: "Workspace numbers"
+            title: Translation.tr("Workspace numbers")
             checked: root.bar.workspaces.numbers
             onToggled: checked => root.bar.workspaces.numbers = checked
         }
         SwitchRow {
             icon: "apps"
-            title: "App icons on workspaces"
+            title: Translation.tr("App icons on workspaces")
             checked: root.bar.workspaces.appIcons
             onToggled: checked => root.bar.workspaces.appIcons = checked
         }
         TextRow {
             icon: "schedule"
-            title: "Time format"
-            subtitle: "Qt format, e.g. HH:mm or h:mm AP"
+            title: Translation.tr("Time format")
+            subtitle: Translation.tr("Qt format, e.g. HH:mm or h:mm AP")
             value: root.bar.clock.timeFormat
             fieldWidth: 160
             onEdited: text => root.bar.clock.timeFormat = text || "HH:mm"
         }
         TextRow {
             icon: "calendar_today"
-            title: "Date format"
+            title: Translation.tr("Date format")
             subtitle: "e.g. ddd, dd/MM or d MMMM"
             value: root.bar.clock.dateFormat
             fieldWidth: 160
@@ -220,7 +220,7 @@ ColumnLayout {
         ListRow {
             Layout.fillWidth: true
             icon: "memory"
-            title: "Resources"
+            title: Translation.tr("Resources")
             Repeater {
                 model: ["cpu", "ram", "swap", "gpu", "disk"]
                 Chip {
@@ -234,7 +234,7 @@ ColumnLayout {
         ListRow {
             Layout.fillWidth: true
             icon: "build"
-            title: "Util buttons"
+            title: Translation.tr("Util buttons")
             Repeater {
                 model: [["screenshot", "screenshot_region"], ["colorPicker", "colorize"], ["wallpaper", "wallpaper"], ["darkMode", "dark_mode"], ["mic", "mic"]]
                 Chip {
@@ -248,17 +248,24 @@ ColumnLayout {
         }
         SliderRow {
             icon: "music_note"
-            title: "Media width"
+            title: Translation.tr("Media width")
             value: root.bar.media.maxWidth
             from: 120
             to: 400
             step: 10
-            suffix: " px"
+            suffix: Translation.tr(" px")
             onMoved: value => root.bar.media.maxWidth = value
         }
         SwitchRow {
+            icon: "album"
+            title: Translation.tr("Spin cover art while playing")
+            subtitle: Translation.tr("Redraws the bar every frame, uses more CPU")
+            checked: root.bar.media.spinArt
+            onToggled: checked => root.bar.media.spinArt = checked
+        }
+        SwitchRow {
             icon: "system_update_alt"
-            title: "Hide updates when there are none"
+            title: Translation.tr("Hide updates when there are none")
             checked: root.bar.updates.hideWhenNone
             onToggled: checked => root.bar.updates.hideWhenNone = checked
         }

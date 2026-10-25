@@ -30,20 +30,20 @@ ColumnLayout {
 
         StyledText {
             Layout.fillWidth: true
-            text: Notifications.list.length === 0 ? "" : `${Notifications.list.length} notification${Notifications.list.length === 1 ? "" : "s"}`
+            text: Notifications.list.length === 0 ? "" : Translation.trn("%1 notification", "%1 notifications", Notifications.list.length)
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }
         Chip {
             icon: Notifications.dnd ? "notifications_off" : "do_not_disturb_on"
-            text: "Do not disturb"
+            text: Translation.tr("Do not disturb")
             selected: Notifications.dnd
             onClicked: Notifications.dnd = !Notifications.dnd
         }
         Chip {
             visible: Notifications.list.length > 0
             icon: "clear_all"
-            text: "Clear"
+            text: Translation.tr("Clear")
             onClicked: Notifications.clear()
         }
     }
@@ -73,7 +73,7 @@ ColumnLayout {
                 }
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Nothing new"
+                    text: Translation.tr("Nothing new")
                     color: Colors.m3onSurfaceVariant
                 }
             }
@@ -108,7 +108,7 @@ ColumnLayout {
                         Chip {
                             visible: group.collapsible
                             implicitHeight: 26
-                            text: group.expanded ? "Show less" : `+${group.modelData.items.length - 2}`
+                            text: group.expanded ? Translation.tr("Show less") : `+${group.modelData.items.length - 2}`
                             onClicked: {
                                 const next = Object.assign({}, root.expandedApps);
                                 next[group.modelData.app] = !group.expanded;

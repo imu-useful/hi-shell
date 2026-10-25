@@ -14,7 +14,7 @@ ColumnLayout {
     signal daySelected(string day)
 
     readonly property var month: Calendar.viewMonth
-    readonly property var locale: Qt.locale()
+    readonly property var locale: Translation.locale
     // Qt.DayOfWeek is 1 = Monday .. 7 = Sunday; JS getDay() is 0 = Sunday.
     readonly property int firstDay: locale.firstDayOfWeek % 7
     readonly property var gridStart: new Date(month.getFullYear(), month.getMonth(), 1 - (month.getDay() - firstDay + 7) % 7)

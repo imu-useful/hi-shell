@@ -73,8 +73,8 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 text: {
-                    const time = root.event.allDay ? "All day" : `${Qt.formatTime(root.start, "HH:mm")} – ${Qt.formatTime(root.end, "HH:mm")}`;
-                    return [root.ongoing ? "Now" : "", time, root.event.location].filter(s => s).join(" · ");
+                    const time = root.event.allDay ? Translation.tr("All day") : `${Qt.formatTime(root.start, "HH:mm")} – ${Qt.formatTime(root.end, "HH:mm")}`;
+                    return [root.ongoing ? Translation.tr("Now") : "", time, root.event.location].filter(s => s).join(" · ");
                 }
                 elide: Text.ElideRight
                 font.family: Appearance.font.main

@@ -91,14 +91,14 @@ Scope {
                             color: Colors.m3primary
                         }
                         StyledText {
-                            text: "Wallpapers"
+                            text: Translation.tr("Wallpapers")
                             font.pixelSize: Appearance.font.size.titleLarge
                         }
 
                         Item { Layout.fillWidth: true }
 
                         SegmentedButton {
-                            model: [{ text: "Local", icon: "folder" }, { text: "Online", icon: "public" }]
+                            model: [{ text: Translation.tr("Local"), icon: "folder" }, { text: Translation.tr("Online"), icon: "public" }]
                             currentIndex: root.onlineTab ? 1 : 0
                             onSelected: index => {
                                 root.onlineTab = index === 1;
@@ -109,7 +109,7 @@ Scope {
                         M3Button {
                             tonal: true
                             icon: "shuffle"
-                            text: "Random"
+                            text: Translation.tr("Random")
                             onClicked: Wallpapers.random()
                         }
 
@@ -153,7 +153,7 @@ Scope {
                                 StyledText {
                                     anchors.fill: parent
                                     visible: search.text === ""
-                                    text: root.onlineTab ? `Search ${Wallpapers.provider === "unsplash" ? "Unsplash" : "Wallhaven"}…` : `Filter ${Wallpapers.local.length} wallpapers`
+                                    text: root.onlineTab ? Translation.tr("Search %1…").arg(Wallpapers.provider === "unsplash" ? "Unsplash" : "Wallhaven") : Translation.trn("Filter %1 wallpaper", "Filter %1 wallpapers", Wallpapers.local.length)
                                     color: Colors.m3outline
                                 }
                             }
@@ -311,7 +311,7 @@ Scope {
                         StyledText {
                             anchors.centerIn: parent
                             visible: grid.count === 0
-                            text: root.onlineTab ? (Wallpapers.searching ? "Searching…" : "Nothing found") : Wallpapers.scanning ? "Making thumbnails…" : `No images in ${Config.options.wallpapers.directories.join(", ")}`
+                            text: root.onlineTab ? (Wallpapers.searching ? Translation.tr("Searching…") : Translation.tr("Nothing found")) : Wallpapers.scanning ? Translation.tr("Making thumbnails…") : Translation.tr("No images in %1").arg(Config.options.wallpapers.directories.join(", "))
                             color: Colors.m3outline
                         }
                     }
@@ -332,7 +332,7 @@ Scope {
                             rowSpacing: 8
 
                             StyledText {
-                                text: "Scheme"
+                                text: Translation.tr("Scheme")
                                 font.pixelSize: Appearance.font.size.labelMedium
                                 color: Colors.m3onSurfaceVariant
                             }
@@ -352,14 +352,14 @@ Scope {
                             }
 
                             StyledText {
-                                text: "Mode"
+                                text: Translation.tr("Mode")
                                 font.pixelSize: Appearance.font.size.labelMedium
                                 color: Colors.m3onSurfaceVariant
                             }
                             RowLayout {
                                 spacing: 12
                                 SegmentedButton {
-                                    model: [{ text: "Light", icon: "light_mode" }, { text: "Dark", icon: "dark_mode" }, { text: "Auto", icon: "brightness_auto" }]
+                                    model: [{ text: Translation.tr("Light"), icon: "light_mode" }, { text: Translation.tr("Dark"), icon: "dark_mode" }, { text: Translation.tr("Auto"), icon: "brightness_auto" }]
                                     currentIndex: Config.options.appearance.autoMode ? 2 : Colors.dark ? 1 : 0
                                     onSelected: index => {
                                         Config.options.appearance.autoMode = index === 2;
@@ -371,7 +371,7 @@ Scope {
                                     spacing: 8
                                     StyledText {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: "Transparency"
+                                        text: Translation.tr("Transparency")
                                     }
                                     M3Switch {
                                         checked: Config.options.appearance.transparency
@@ -387,7 +387,7 @@ Scope {
                             }
 
                             StyledText {
-                                text: "Frame"
+                                text: Translation.tr("Frame")
                                 font.pixelSize: Appearance.font.size.labelMedium
                                 color: Colors.m3onSurfaceVariant
                             }

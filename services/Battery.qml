@@ -38,7 +38,7 @@ Singleton {
 
     function formatDuration(seconds) {
         const h = Math.floor(seconds / 3600), m = Math.round(seconds % 3600 / 60);
-        return h > 0 ? `${h} h ${m} min` : `${m} min`;
+        return h > 0 ? Translation.tr("%1 h %2 min").arg(h).arg(m) : Translation.tr("%1 min").arg(m);
     }
 
     function warn(urgency, title) {
@@ -46,6 +46,6 @@ Singleton {
             Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-u", urgency, "-i", "battery-caution", title, `${percent}% remaining${timeLeftText ? ", " + timeLeftText : ""}`]);
     }
 
-    onLowChanged: if (low && !critical) warn("normal", "Battery low")
-    onCriticalChanged: if (critical) warn("critical", "Battery critical")
+    onLowChanged: if (low && !critical) warn("normal", Translation.tr("Battery low"))
+    onCriticalChanged: if (critical) warn("critical", Translation.tr("Battery critical"))
 }

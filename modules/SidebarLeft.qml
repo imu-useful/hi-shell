@@ -98,10 +98,10 @@ Scope {
                     SegmentedButton {
                         Layout.fillWidth: true
                         model: [
-                            { icon: "home", text: "Home" },
-                            { icon: "auto_awesome", text: "Claude" },
-                            { icon: "translate", text: "Translate" },
-                            { icon: "content_paste", text: "Clipboard" }
+                            { icon: "home", text: Translation.tr("Home") },
+                            { icon: "auto_awesome", text: Translation.tr("Claude") },
+                            { icon: "translate", text: Translation.tr("Translate") },
+                            { icon: "content_paste", text: Translation.tr("Clipboard") }
                         ]
                         currentIndex: Math.max(0, root.tabs.indexOf(ShellState.sidebarLeftTab))
                         onSelected: index => ShellState.sidebarLeftTab = root.tabs[index]

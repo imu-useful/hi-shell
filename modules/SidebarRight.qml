@@ -158,7 +158,7 @@ Scope {
                         }
                         StyledText {
                             Layout.fillWidth: true
-                            text: root.page === "wifi" ? "Wi-Fi" : root.page === "bluetooth" ? "Bluetooth" : "Sound"
+                            text: root.page === "wifi" ? Translation.tr("Wi-Fi") : root.page === "bluetooth" ? Translation.tr("Bluetooth") : Translation.tr("Sound")
                             font.pixelSize: Appearance.font.size.titleLarge
                         }
                     }

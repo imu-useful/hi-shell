@@ -4,6 +4,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -55,7 +56,16 @@ Scope {
             id: window
 
             required property ShellScreen modelData
-            readonly property bool hasWidgets: root.options.widgets && (root.options.monitor ? modelData.name === root.options.monitor : modelData === Quickshell.screens[0])
+            readonly property bool hasWidgets: root.options.widgets && (root.options.monitor ? modelData?.name === root.options.monitor : modelData === Quickshell.screens[0])
+            readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
+            readonly property bool covered: !root.editing && Hyprland.toplevels.values.some(t => t.workspace?.id === monitor?.activeWorkspace?.id)
+
+            Binding {
+                when: window.hasWidgets
+                target: ShellState
+                property: "desktopCovered"
+                value: window.covered
+            }
 
             screen: modelData
             anchors.top: true
@@ -165,7 +175,7 @@ Scope {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: 180
-                visible: root.options.visualizer && window.hasWidgets && Mpris.playing
+                visible: root.options.visualizer && window.hasWidgets && Mpris.playing && !window.covered
 
                 readonly property int bars: 64
                 property list<real> levels: []
@@ -299,15 +309,15 @@ Scope {
                         }
                         StyledText {
                             Layout.fillWidth: true
-                            text: "Drag widgets to move them · tap a chip to show or hide"
+                            text: Translation.tr("Drag widgets to move them · tap a chip to show or hide")
                         }
                         M3Button {
                             tonal: true
-                            text: "Reset"
+                            text: Translation.tr("Reset")
                             onClicked: root.options.layout = {}
                         }
                         M3Button {
-                            text: "Done"
+                            text: Translation.tr("Done")
                             icon: "check"
                             onClicked: root.setEditing(false)
                         }
@@ -320,7 +330,7 @@ Scope {
                             model: DesktopLayout.ids
                             Chip {
                                 required property string modelData
-                                text: DesktopLayout.names[modelData]
+                                text: Translation.tr(DesktopLayout.names[modelData])
                                 selected: DesktopLayout.entry(root.options.layout, modelData).enabled
                                 onClicked: root.setEnabled(modelData, !selected)
                             }

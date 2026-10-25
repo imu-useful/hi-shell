@@ -15,7 +15,7 @@ Singleton {
     readonly property bool enabled: options.enabled
     readonly property bool imperial: options.imperial
     readonly property string tempUnit: imperial ? "°F" : "°C"
-    readonly property string windUnit: imperial ? "mph" : "m/s"
+    readonly property string windUnit: imperial ? Translation.tr("mph") : Translation.tr("m/s")
 
     property bool loading: false
     property string error: ""
@@ -55,7 +55,7 @@ Singleton {
             get(`https://geocoding-api.open-meteo.com/v1/search?count=1&name=${encodeURIComponent(options.city.trim())}`, data => {
                 const r = data.results?.[0];
                 if (!r)
-                    return fail(`City "${options.city}" not found`);
+                    return fail(Translation.tr("City “%1” not found").arg(options.city));
                 done(r.latitude, r.longitude, r.name);
             });
         } else if (options.latitude !== 0 || options.longitude !== 0) {
@@ -64,7 +64,7 @@ Singleton {
             get("https://ipinfo.io/json", data => {
                 const [lat, lon] = (data.loc ?? "").split(",").map(Number);
                 if (isNaN(lat) || isNaN(lon))
-                    return fail("Could not determine location");
+                    return fail(Translation.tr("Could not determine location"));
                 done(lat, lon, data.city ?? "");
             });
         }
@@ -145,22 +145,22 @@ Singleton {
 
     // WMO weather interpretation codes.
     function describe(code) {
-        if (code === 0) return "Clear sky";
-        if (code === 1) return "Mainly clear";
-        if (code === 2) return "Partly cloudy";
-        if (code === 3) return "Overcast";
-        if (code === 45 || code === 48) return "Fog";
-        if (code >= 51 && code <= 55) return "Drizzle";
-        if (code === 56 || code === 57) return "Freezing drizzle";
-        if (code === 61 || code === 80) return "Light rain";
-        if (code === 63 || code === 81) return "Rain";
-        if (code === 65 || code === 82) return "Heavy rain";
-        if (code === 66 || code === 67) return "Freezing rain";
-        if (code >= 71 && code <= 77) return "Snow";
-        if (code === 85 || code === 86) return "Snow showers";
-        if (code === 95) return "Thunderstorm";
-        if (code === 96 || code === 99) return "Thunderstorm with hail";
-        return "Unknown";
+        if (code === 0) return Translation.tr("Clear sky");
+        if (code === 1) return Translation.tr("Mainly clear");
+        if (code === 2) return Translation.tr("Partly cloudy");
+        if (code === 3) return Translation.tr("Overcast");
+        if (code === 45 || code === 48) return Translation.tr("Fog");
+        if (code >= 51 && code <= 55) return Translation.tr("Drizzle");
+        if (code === 56 || code === 57) return Translation.tr("Freezing drizzle");
+        if (code === 61 || code === 80) return Translation.tr("Light rain");
+        if (code === 63 || code === 81) return Translation.tr("Rain");
+        if (code === 65 || code === 82) return Translation.tr("Heavy rain");
+        if (code === 66 || code === 67) return Translation.tr("Freezing rain");
+        if (code >= 71 && code <= 77) return Translation.tr("Snow");
+        if (code === 85 || code === 86) return Translation.tr("Snow showers");
+        if (code === 95) return Translation.tr("Thunderstorm");
+        if (code === 96 || code === 99) return Translation.tr("Thunderstorm with hail");
+        return Translation.tr("Unknown");
     }
 
     // Material Symbols name for a weather code.

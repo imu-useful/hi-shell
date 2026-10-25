@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import qs.common
 
 // Focus (pomodoro), stopwatch and countdown timers. Times are in seconds.
 Singleton {
@@ -90,7 +91,7 @@ Singleton {
                 if (root.countdownLeft === 0) {
                     root.countdownRunning = false;
                     root.countdownTotal = 0;
-                    root.notify("Timer finished", "Countdown is over");
+                    root.notify(Translation.tr("Timer finished"), Translation.tr("Countdown is over"));
                 }
             }
 
@@ -99,8 +100,8 @@ Singleton {
                 if (root.focusLeft <= 0) {
                     root.onBreak = !root.onBreak;
                     root.focusLeft = (root.onBreak ? root.breakMinutes : root.focusMinutes) * 60;
-                    root.notify(root.onBreak ? "Time for a break" : "Back to focus",
-                                root.onBreak ? `${root.breakMinutes} minute break` : `${root.focusMinutes} minutes of focus`);
+                    root.notify(root.onBreak ? Translation.tr("Time for a break") : Translation.tr("Back to focus"),
+                                root.onBreak ? Translation.trn("%1 minute break", "%1 minute break", root.breakMinutes) : Translation.trn("%1 minute of focus", "%1 minutes of focus", root.focusMinutes));
                 }
             }
         }

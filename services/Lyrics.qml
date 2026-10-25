@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import qs.services
+import qs.common
 
 // Synced lyrics for the current track from LRCLIB (lrclib.net, no key).
 // `lines` is [{ time (s, -1 if unsynced), text }]; `index` is the line playing now.

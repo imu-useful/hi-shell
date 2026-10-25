@@ -5,6 +5,7 @@ import Quickshell.Io
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
+import qs.services
 
 // Version, components, links.
 ColumnLayout {
@@ -53,11 +54,11 @@ ColumnLayout {
                 font.weight: Font.Medium
             }
             StyledText {
-                text: "A Material 3 Expressive desktop shell for Hyprland"
+                text: Translation.tr("A Material 3 Expressive desktop shell for Hyprland")
                 color: Colors.m3onSurfaceVariant
             }
             StyledText {
-                text: root.revision ? `Version ${root.revision}` : ""
+                text: root.revision ? Translation.tr("Version %1").arg(root.revision) : ""
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3outline
             }
@@ -65,22 +66,93 @@ ColumnLayout {
     }
 
     Section {
+        id: presets
+        icon: "inventory_2"
+        title: Translation.tr("Presets")
+
+        property string name: ""
+        property string importPath: ""
+
+        Component.onCompleted: Presets.refresh()
+
+        TextRow {
+            icon: "save"
+            title: Translation.tr("Save current setup")
+            subtitle: Translation.tr("Config, wallpaper and colors; API keys, location and monitors stay out")
+            placeholder: Translation.tr("Name")
+            fieldWidth: 180
+            onEdited: text => presets.name = text
+            M3Button {
+                text: Translation.tr("Save")
+                enabled: !Presets.busy
+                onClicked: Presets.exportPreset(presets.name)
+            }
+        }
+        Repeater {
+            model: Presets.list
+            ListRow {
+                required property var modelData
+                Layout.fillWidth: true
+                icon: "style"
+                title: modelData.name
+                subtitle: [modelData.created.replace("T", " ").slice(0, 16), modelData.wallpaper].filter(s => s).join(" · ")
+                M3Button {
+                    tonal: true
+                    text: Translation.tr("Apply")
+                    enabled: !Presets.busy
+                    onClicked: Presets.importPreset(modelData.path)
+                }
+                IconButton {
+                    icon: "delete"
+                    tooltip: Translation.tr("Delete")
+                    onClicked: Presets.remove(modelData.path)
+                }
+            }
+        }
+        TextRow {
+            icon: "upload_file"
+            title: Translation.tr("Apply from a file")
+            subtitle: Presets.error || Translation.tr("A .tar.gz preset someone shared")
+            placeholder: "~/Downloads/preset.tar.gz"
+            fieldWidth: 220
+            onEdited: text => presets.importPath = text.trim()
+            M3Button {
+                tonal: true
+                text: Translation.tr("Apply")
+                enabled: presets.importPath !== "" && !Presets.busy
+                onClicked: Presets.importPreset(presets.importPath)
+            }
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "folder_open"
+            title: Translation.tr("Open presets folder")
+            subtitle: Presets.dir.replace(Paths.home, "~")
+            clickable: true
+            onClicked: {
+                Quickshell.execDetached(["mkdir", "-p", Presets.dir]);
+                Qt.openUrlExternally(`file://${Presets.dir}`);
+            }
+        }
+    }
+
+    Section {
         icon: "info"
-        title: "Components"
+        title: Translation.tr("Components")
 
         ListRow { Layout.fillWidth: true; icon: "deployed_code"; title: "Quickshell"; subtitle: root.quickshell }
-        ListRow { Layout.fillWidth: true; icon: "palette"; title: "matugen"; subtitle: "Material 3 colors from the wallpaper" }
-        ListRow { Layout.fillWidth: true; icon: "settings"; title: "Config"; subtitle: Config.path.replace(Paths.home, "~") }
+        ListRow { Layout.fillWidth: true; icon: "palette"; title: "matugen"; subtitle: Translation.tr("Material 3 colors from the wallpaper") }
+        ListRow { Layout.fillWidth: true; icon: "settings"; title: Translation.tr("Config"); subtitle: Config.path.replace(Paths.home, "~") }
     }
 
     Section {
         icon: "link"
-        title: "Links"
+        title: Translation.tr("Links")
 
         ListRow {
             Layout.fillWidth: true
             icon: "code"
-            title: "Source"
+            title: Translation.tr("Source")
             subtitle: "github.com/imu-useful/hi-shell"
             clickable: true
             onClicked: Qt.openUrlExternally("https://github.com/imu-useful/hi-shell")
@@ -88,7 +160,7 @@ ColumnLayout {
         ListRow {
             Layout.fillWidth: true
             icon: "favorite"
-            title: "Inspired by end4-pC and illogical-impulse"
+            title: Translation.tr("Inspired by end4-pC and illogical-impulse")
             subtitle: "github.com/pctrade/end4-pC · github.com/end-4/dots-hyprland"
             clickable: true
             onClicked: Qt.openUrlExternally("https://github.com/pctrade/end4-pC")

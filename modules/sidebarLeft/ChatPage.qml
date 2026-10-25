@@ -54,7 +54,7 @@ ColumnLayout {
     StyledText {
         Layout.fillWidth: true
         visible: Claude.inputTokens + Claude.outputTokens > 0 && !root.showHistory
-        text: `${Claude.formatTokens(Claude.inputTokens)} in · ${Claude.formatTokens(Claude.outputTokens)} out${Claude.costUsd > 0 ? " · $" + Claude.costUsd.toFixed(3) : ""}`
+        text: Translation.tr("%1 in · %2 out").arg(Claude.formatTokens(Claude.inputTokens)).arg(Claude.formatTokens(Claude.outputTokens)) + (Claude.costUsd > 0 ? " · $" + Claude.costUsd.toFixed(3) : "")
         font.pixelSize: Appearance.font.size.labelSmall
         color: Colors.m3outline
     }
@@ -75,7 +75,7 @@ ColumnLayout {
                 visible: Claude.chats.length === 0
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 30
-                text: "No saved chats yet"
+                text: Translation.tr("No saved chats yet")
                 color: Colors.m3onSurfaceVariant
             }
 
@@ -87,7 +87,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     icon: "chat"
                     title: modelData.title
-                    subtitle: `${Notifications.relativeTime(modelData.updated)} · ${Math.ceil(modelData.messages.length / 2)} messages${modelData.model ? " · " + modelData.model : ""}`
+                    subtitle: `${Notifications.relativeTime(modelData.updated)} · ${Translation.trn("%1 message", "%1 messages", Math.ceil(modelData.messages.length / 2))}${modelData.model ? " · " + modelData.model : ""}`
                     clickable: true
                     color: modelData.id === Claude.chatId ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
@@ -141,7 +141,7 @@ ColumnLayout {
         }
         StyledText {
             Layout.alignment: Qt.AlignHCenter
-            text: "Ask Claude anything"
+            text: Translation.tr("Ask Claude anything")
             font.pixelSize: Appearance.font.size.titleMedium
         }
         Flow {
@@ -151,7 +151,7 @@ ColumnLayout {
             spacing: 6
 
             Repeater {
-                model: ["Explain a Linux command", "Write a bash one-liner", "Summarize text from my clipboard", "Translate and fix grammar"]
+                model: [Translation.tr("Explain a Linux command"), Translation.tr("Write a bash one-liner"), Translation.tr("Summarize text from my clipboard"), Translation.tr("Translate and fix grammar")]
 
                 Chip {
                     required property string modelData
@@ -223,7 +223,7 @@ ColumnLayout {
 
                 StyledText {
                     visible: input.text === ""
-                    text: Claude.messages.count > 0 ? "Ask a follow-up…" : "Message Claude…"
+                    text: Claude.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Message Claude…")
                     color: Colors.m3outline
                 }
             }

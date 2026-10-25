@@ -47,11 +47,11 @@ BarWidget {
         ColumnLayout {
             spacing: 6
             StyledText {
-                text: "Network"
+                text: Translation.tr("Network")
                 font.weight: Font.Medium
             }
             StyledText {
-                text: `Downloaded ${root.bytes(NetworkSpeed.totalDownload)} · Uploaded ${root.bytes(NetworkSpeed.totalUpload)}`
+                text: Translation.tr("Downloaded %1 · Uploaded %2").arg(root.bytes(NetworkSpeed.totalDownload)).arg(root.bytes(NetworkSpeed.totalUpload))
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3onSurfaceVariant
             }

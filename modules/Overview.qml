@@ -210,7 +210,7 @@ Scope {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: grid.bottom
                 anchors.topMargin: 24
-                text: "Click a window to focus it · drag it to another workspace · Esc to close"
+                text: Translation.tr("Click a window to focus it · drag it to another workspace · Esc to close")
                 color: Colors.m3onSurfaceVariant
             }
 

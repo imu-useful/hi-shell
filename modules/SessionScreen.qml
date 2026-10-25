@@ -18,11 +18,11 @@ Scope {
     property int current: 0
 
     readonly property var actions: [
-        { icon: "lock", text: "Lock", shape: "cookie9", run: () => Session.lock() },
-        { icon: "logout", text: "Log out", shape: "clover4", run: () => Session.logout() },
-        { icon: "bedtime", text: "Suspend", shape: "sunny", run: () => Session.suspend() },
-        { icon: "restart_alt", text: "Reboot", shape: "flower", run: () => Session.reboot() },
-        { icon: "power_settings_new", text: "Power off", shape: "cookie12", run: () => Session.poweroff() }
+        { icon: "lock", text: Translation.tr("Lock"), shape: "cookie9", run: () => Session.lock() },
+        { icon: "logout", text: Translation.tr("Log out"), shape: "clover4", run: () => Session.logout() },
+        { icon: "bedtime", text: Translation.tr("Suspend"), shape: "sunny", run: () => Session.suspend() },
+        { icon: "restart_alt", text: Translation.tr("Reboot"), shape: "flower", run: () => Session.reboot() },
+        { icon: "power_settings_new", text: Translation.tr("Power off"), shape: "cookie12", run: () => Session.poweroff() }
     ]
 
     function close() {
@@ -98,13 +98,13 @@ Scope {
                     spacing: 4
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: `Goodbye, ${Quickshell.env("USER")}?`
+                        text: Translation.tr("Goodbye, %1?").arg(Quickshell.env("USER"))
                         font.pixelSize: Appearance.font.size.headlineMedium
                         font.weight: Font.Medium
                     }
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: `Up ${SystemStats.uptimeText}`
+                        text: Translation.tr("Up %1").arg(SystemStats.uptimeText)
                         color: Colors.m3onSurfaceVariant
                     }
                 }

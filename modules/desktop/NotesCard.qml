@@ -23,7 +23,7 @@ DesktopCard {
             Layout.fillWidth: true
             StyledText {
                 Layout.fillWidth: true
-                text: "Notes"
+                text: Translation.tr("Notes")
                 font.pixelSize: Appearance.font.size.titleLarge
                 font.weight: Font.Medium
             }

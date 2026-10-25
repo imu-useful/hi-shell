@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.common
 
 // CPU, RAM, swap, disk, GPU load and temperatures, polled from /proc and /sys.
 // Values that the hardware doesn't expose stay at -1.
@@ -35,7 +36,7 @@ Singleton {
 
     readonly property string uptimeText: {
         const d = Math.floor(uptime / 86400), h = Math.floor(uptime % 86400 / 3600), m = Math.floor(uptime % 3600 / 60);
-        return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+        return d > 0 ? Translation.tr("%1d %2h").arg(d).arg(h) : h > 0 ? Translation.tr("%1h %2m").arg(h).arg(m) : Translation.tr("%1m").arg(m);
     }
 
     function parseCpu(text) {

@@ -13,8 +13,18 @@ DesktopCard {
     implicitWidth: 380
     implicitHeight: content.implicitHeight + 28
 
-    Component.onCompleted: Lyrics.users++
-    Component.onDestruction: Lyrics.users--
+    // Lyrics only tick while someone can see them.
+    readonly property bool lyricsShown: visible && !ShellState.desktopCovered
+    property bool counted: false
+    function syncLyrics() {
+        if (lyricsShown !== counted) {
+            Lyrics.users += lyricsShown ? 1 : -1;
+            counted = lyricsShown;
+        }
+    }
+    onLyricsShownChanged: syncLyrics()
+    Component.onCompleted: syncLyrics()
+    Component.onDestruction: if (counted) Lyrics.users--
 
     ColumnLayout {
         id: content

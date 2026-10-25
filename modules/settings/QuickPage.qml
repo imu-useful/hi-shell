@@ -10,7 +10,7 @@ ColumnLayout {
 
     Section {
         icon: "palette"
-        title: "Wallpaper & colors"
+        title: Translation.tr("Wallpaper & colors")
 
         RowLayout {
             Layout.fillWidth: true
@@ -37,19 +37,19 @@ ColumnLayout {
                 spacing: 8
                 StyledText {
                     Layout.fillWidth: true
-                    text: Wallpapers.current.split("/").pop() || "No wallpaper"
+                    text: Wallpapers.current.split("/").pop() || Translation.tr("No wallpaper")
                     font.weight: Font.Medium
                 }
                 RowLayout {
                     M3Button {
                         icon: "wallpaper"
-                        text: "Change"
+                        text: Translation.tr("Change")
                         onClicked: ShellState.wallpaperSelectorOpen = true
                     }
                     M3Button {
                         tonal: true
                         icon: "shuffle"
-                        text: "Random"
+                        text: Translation.tr("Random")
                         onClicked: Wallpapers.local.length ? Wallpapers.random() : Wallpapers.scan()
                     }
                 }
@@ -75,7 +75,7 @@ ColumnLayout {
         ListRow {
             Layout.fillWidth: true
             icon: "format_paint"
-            title: "Scheme"
+            title: Translation.tr("Scheme")
         }
         Flow {
             Layout.fillWidth: true
@@ -95,13 +95,13 @@ ColumnLayout {
         }
         ChoiceRow {
             icon: "contrast"
-            title: "Mode"
-            subtitle: Config.options.appearance.autoMode ? "Light from sunrise to sunset" : ""
+            title: Translation.tr("Mode")
+            subtitle: Config.options.appearance.autoMode ? Translation.tr("Light from sunrise to sunset") : ""
             value: Config.options.appearance.autoMode ? "auto" : Colors.mode
             options: [
-                { value: "light", text: "Light", icon: "light_mode" },
-                { value: "dark", text: "Dark", icon: "dark_mode" },
-                { value: "auto", text: "Auto", icon: "brightness_auto" }
+                { value: "light", text: Translation.tr("Light"), icon: "light_mode" },
+                { value: "dark", text: Translation.tr("Dark"), icon: "dark_mode" },
+                { value: "auto", text: Translation.tr("Auto"), icon: "brightness_auto" }
             ]
             onSelected: value => {
                 Config.options.appearance.autoMode = value === "auto";
@@ -111,8 +111,8 @@ ColumnLayout {
         }
         SwitchRow {
             icon: "blur_on"
-            title: "Transparency"
-            subtitle: "Translucent panels and widgets"
+            title: Translation.tr("Transparency")
+            subtitle: Translation.tr("Translucent panels and widgets")
             checked: Config.options.appearance.transparency
             onToggled: checked => Config.options.appearance.transparency = checked
         }

@@ -43,7 +43,7 @@ DesktopCard {
                     font.weight: Font.Medium
                 }
                 StyledText {
-                    text: `Up · ${SystemStats.uptimeText}`
+                    text: Translation.tr("Up %1").arg(SystemStats.uptimeText)
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant
                 }
@@ -68,7 +68,7 @@ DesktopCard {
                 Layout.fillWidth: true
                 tonal: true
                 icon: "lock"
-                text: "Lock"
+                text: Translation.tr("Lock")
                 onClicked: Session.lock()
             }
             IconButton {
@@ -88,9 +88,9 @@ DesktopCard {
             spacing: 6
             Repeater {
                 model: [
-                    { icon: "bedtime", text: "Sleep", run: () => Session.suspend() },
-                    { icon: "restart_alt", text: "Reboot", run: () => Session.reboot() },
-                    { icon: "power_settings_new", text: "Off", run: () => Session.poweroff() }
+                    { icon: "bedtime", text: Translation.tr("Sleep"), run: () => Session.suspend() },
+                    { icon: "restart_alt", text: Translation.tr("Reboot"), run: () => Session.reboot() },
+                    { icon: "power_settings_new", text: Translation.tr("Off"), run: () => Session.poweroff() }
                 ]
                 Chip {
                     required property var modelData

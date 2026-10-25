@@ -95,12 +95,12 @@ Scope {
 
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: "Authentication required"
+                        text: Translation.tr("Authentication required")
                         font.pixelSize: Appearance.font.size.headlineSmall
                     }
                     StyledText {
                         Layout.fillWidth: true
-                        text: root.flow?.message || "An application wants to make changes that need administrator rights."
+                        text: root.flow?.message || Translation.tr("An application wants to make changes that need administrator rights.")
                         wrapMode: Text.Wrap
                         horizontalAlignment: Text.AlignHCenter
                         color: Colors.m3onSurfaceVariant
@@ -145,7 +145,7 @@ Scope {
                             StyledText {
                                 anchors.fill: parent
                                 visible: password.text === ""
-                                text: (root.flow?.inputPrompt || "Password").replace(/:\s*$/, "")
+                                text: (root.flow?.inputPrompt || Translation.tr("Password")).replace(/:\s*$/, "")
                                 color: Colors.m3outline
                             }
                         }
@@ -165,11 +165,11 @@ Scope {
                         spacing: 8
                         M3Button {
                             tonal: true
-                            text: "Cancel"
+                            text: Translation.tr("Cancel")
                             onClicked: window.cancel()
                         }
                         M3Button {
-                            text: "Authenticate"
+                            text: Translation.tr("Authenticate")
                             enabled: root.flow?.isResponseRequired ?? false
                             onClicked: window.submit()
                         }

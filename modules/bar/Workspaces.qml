@@ -34,13 +34,17 @@ BarWidget {
         return Hyprland.workspaces.values.find(ws => ws.id === id) ?? null;
     }
 
-    function appIcon(ws) {
-        const top = ws?.toplevels.values[0];
-        const appId = top?.wayland?.appId ?? "";
+    // appId -> icon path. heuristicLookup is a fuzzy search over every desktop
+    // entry, too slow to repeat on each window change (titles update often).
+    property var iconCache: ({})
+    function appIcon(appId) {
         if (!appId)
             return "";
-        const entry = DesktopEntries.heuristicLookup(appId);
-        return Quickshell.iconPath(entry?.icon ?? appId, true);
+        if (!(appId in iconCache)) {
+            const entry = DesktopEntries.heuristicLookup(appId);
+            iconCache[appId] = Quickshell.iconPath(entry?.icon ?? appId, true);
+        }
+        return iconCache[appId];
     }
 
     // Active indicator, slides between slots.
@@ -72,7 +76,9 @@ BarWidget {
                 readonly property var ws: root.workspace(wsId)
                 readonly property bool occupied: (ws?.toplevels.values.length ?? 0) > 0
                 readonly property bool isActive: wsId === root.activeId
-                readonly property string icon: root.options.appIcons && occupied ? root.appIcon(ws) : ""
+                // A string, so the icon only updates when the app changes, not on every title change.
+                readonly property string appId: occupied ? (ws.toplevels.values[0]?.wayland?.appId ?? "") : ""
+                readonly property string icon: root.options.appIcons ? root.appIcon(appId) : ""
 
                 width: root.slot
                 height: root.slot

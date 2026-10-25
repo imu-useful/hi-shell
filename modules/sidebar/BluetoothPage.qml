@@ -40,8 +40,8 @@ StyledFlickable {
         ListRow {
             Layout.fillWidth: true
             icon: "bluetooth"
-            title: "Bluetooth"
-            subtitle: !root.adapter ? "No adapter" : root.adapter.discovering ? "Searching for devices…" : root.adapter.name
+            title: Translation.tr("Bluetooth")
+            subtitle: !root.adapter ? Translation.tr("No adapter") : root.adapter.discovering ? Translation.tr("Searching for devices…") : root.adapter.name
             M3Switch {
                 checked: root.adapter?.enabled ?? false
                 enabled: root.adapter !== null
@@ -77,10 +77,10 @@ StyledFlickable {
                     Layout.fillWidth: true
                     icon: root.deviceIcon(entry.modelData)
                     title: entry.modelData.name || entry.modelData.address
-                    subtitle: entry.modelData.pairing ? "Pairing…"
-                        : entry.modelData.state === BluetoothDeviceState.Connecting ? "Connecting…"
-                        : entry.modelData.connected ? `Connected${entry.modelData.batteryAvailable ? " · " + Math.round(entry.modelData.battery * 100) + "%" : ""}`
-                        : entry.modelData.paired ? "Paired" : "Available"
+                    subtitle: entry.modelData.pairing ? Translation.tr("Pairing…")
+                        : entry.modelData.state === BluetoothDeviceState.Connecting ? Translation.tr("Connecting…")
+                        : entry.modelData.connected ? Translation.tr("Connected") + (entry.modelData.batteryAvailable ? " · " + Math.round(entry.modelData.battery * 100) + "%" : "")
+                        : entry.modelData.paired ? Translation.tr("Paired") : Translation.tr("Available")
                     clickable: true
                     color: entry.modelData.connected ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
@@ -101,13 +101,13 @@ StyledFlickable {
 
                     Item { Layout.fillWidth: true }
                     M3Button {
-                        text: entry.modelData.connected ? "Disconnect" : "Connect"
+                        text: entry.modelData.connected ? Translation.tr("Disconnect") : Translation.tr("Connect")
                         tonal: entry.modelData.connected
                         onClicked: entry.modelData.connected ? entry.modelData.disconnect() : entry.modelData.connect()
                     }
                     M3Button {
                         tonal: true
-                        text: "Forget"
+                        text: Translation.tr("Forget")
                         onClicked: {
                             entry.modelData.forget();
                             root.expanded = null;

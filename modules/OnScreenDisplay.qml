@@ -38,7 +38,7 @@ Scope {
         if (!a)
             return;
         const icon = a.muted ? "volume_off" : a.volume < 0.01 ? "volume_mute" : a.volume < 0.5 ? "volume_down" : "volume_up";
-        show(icon, a.muted ? "Muted" : `${Math.round(a.volume * 100)}%`, a.muted ? 0 : Math.min(1, a.volume));
+        show(icon, a.muted ? Translation.tr("Muted") : `${Math.round(a.volume * 100)}%`, a.muted ? 0 : Math.min(1, a.volume));
     }
 
     function rearm() {
@@ -76,7 +76,7 @@ Scope {
         target: root.source?.audio ?? null
         function onMutedChanged() {
             const muted = root.source.audio.muted;
-            root.show(muted ? "mic_off" : "mic", muted ? "Microphone muted" : "Microphone on", -1);
+            root.show(muted ? "mic_off" : "mic", muted ? Translation.tr("Microphone muted") : Translation.tr("Microphone on"), -1);
         }
     }
 

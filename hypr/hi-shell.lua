@@ -5,29 +5,45 @@
 -- Keybinds go through IPC rather than Hyprland global shortcuts: Quickshell
 -- (0.3.2) segfaults on exit while destroying GlobalShortcut objects.
 
+-- hi-shell owns its keys: drop other binds on the same keys first (e.g. a previous
+-- shell's binds that would also fire), then bind the IPC call.
+local function bind(keys, call, description)
+    if hl.unbind then
+        hl.unbind(keys)
+    end
+    hl.bind(keys, hl.dsp.exec_cmd("qs -c hi-shell ipc call " .. call), { description = "hi-shell: " .. description })
+end
+
 -- Start the shell with Hyprland
 hl.on("hyprland.start", function()
     hl.exec_cmd("qs -c hi-shell")
 end)
 
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher toggle"), { description = "hi-shell: Toggle app launcher" })
+bind("SUPER + Space", "launcher toggle", "Toggle app launcher")
 
 -- Blur behind the translucent launcher card
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, ignore_alpha = 0.3 })
 
 -- Claude AI palette (Super+A / Super+C are commonly taken; Super+Y is free by default)
-hl.bind("SUPER + Y", hl.dsp.exec_cmd("qs -c hi-shell ipc call ai toggle"), { description = "hi-shell: Toggle Claude AI palette" })
+bind("SUPER + Y", "ai toggle", "Toggle Claude AI palette")
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 
 -- Left sidebar: home / Claude chat / translator / clipboard
-hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarLeft toggle"), { description = "hi-shell: Toggle left sidebar" })
+bind("SUPER + Z", "sidebarLeft toggle", "Toggle left sidebar")
+
+-- Launcher modes: clipboard history and emoji (Enter copies)
+bind("SUPER + V", "launcher search ';'", "Clipboard history")
+bind("SUPER + Period", "launcher search ':'", "Emoji")
 
 -- Workspace overview, session menu, region capture
-hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs -c hi-shell ipc call overview toggle"), { description = "hi-shell: Workspace overview" })
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("qs -c hi-shell ipc call region screenshot"), { description = "hi-shell: Screenshot / OCR / record a region" })
+bind("SUPER + Tab", "overview toggle", "Workspace overview")
+bind("CTRL + ALT + Delete", "session toggleScreen", "Session menu")
+bind("SUPER + SHIFT + S", "region screenshot", "Screenshot / OCR / record a region")
+bind("SUPER + SHIFT + X", "region ocr", "Copy text from a region (OCR)")
+bind("SUPER + SHIFT + R", "region record", "Record a region (again to stop)")
 hl.layer_rule({ match = { namespace = "hi-shell-overview" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-overview" }, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "hi-shell-session" }, blur = true })
@@ -39,17 +55,17 @@ hl.layer_rule({ match = { namespace = "hi-shell-dock" }, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "hi-shell-region" }, no_anim = true })
 
 -- Settings
-hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call settings toggle"), { description = "hi-shell: Settings" })
+bind("SUPER + Escape", "settings toggle", "Settings")
 hl.layer_rule({ match = { namespace = "hi-shell-settings" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-settings" }, ignore_alpha = 0.3 })
 
 -- Wallpaper picker (local + online, color scheme, frame)
-hl.bind("SUPER + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call wallpaper toggleSelector"), { description = "hi-shell: Wallpaper picker" })
+bind("SUPER + R", "wallpaper toggleSelector", "Wallpaper picker")
 hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, ignore_alpha = 0.3 })
 
 -- Right sidebar (also opens from the system icons on the bar)
-hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggle"), { description = "hi-shell: Toggle right sidebar" })
+bind("SUPER + U", "sidebarRight toggle", "Toggle right sidebar")
 hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, ignore_alpha = 0.3 })
 

@@ -124,7 +124,8 @@ Singleton {
             required property ShellScreen modelData
             screen: modelData
             backlight: root.backlight
-            ddcBus: root.ddcBuses[modelData.name] ?? -1
+            // modelData is briefly null while a screen is being removed.
+            ddcBus: root.ddcBuses[modelData?.name] ?? -1
         }
     }
 

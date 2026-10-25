@@ -52,10 +52,10 @@ Scope {
 
         if (mode === "screenshot") {
             const file = `${Paths.home}/Pictures/Screenshots/${stamp}.png`;
-            run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy < "$3" && notify-send -a hi-shell -i "$3" "Screenshot copied" "Saved to $3"', frozen, crop, file]);
+            run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy < "$3" && notify-send -a hi-shell -i "$3" "$4" "$5"', frozen, crop, file, Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").arg(file)]);
         } else if (mode === "ocr") {
             const lang = Config.options.capture.ocrLanguages;
-            run(['t=$(magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null); if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "Text copied" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "No text found"; fi', frozen, crop, lang]);
+            run(['t=$(magick "$1" -crop "$2" +repage png:- | tesseract stdin - -l "$3" 2>/dev/null); if [ -n "$(printf %s "$t" | tr -d "[:space:]")" ]; then printf %s "$t" | wl-copy; notify-send -a hi-shell -i edit-copy "$4" "$(printf %s "$t" | head -c 200)"; else notify-send -a hi-shell "$5"; fi', frozen, crop, lang, Translation.tr("Text copied"), Translation.tr("No text found")]);
         } else {
             // wf-recorder takes global logical coordinates.
             recordFile = `${Paths.home}/Videos/Recordings/${stamp}.mp4`;
@@ -131,7 +131,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         id: recorder
         onExited: {
             if (root.recordFile)
-                Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-i", "video-x-generic", "Recording saved", root.recordFile]);
+                Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-i", "video-x-generic", Translation.tr("Recording saved"), root.recordFile]);
         }
     }
 
@@ -144,8 +144,12 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         function ocr(): void {
             root.start("ocr");
         }
+        // Starts a region recording, or stops the one running.
         function record(): void {
-            root.start("record");
+            if (root.recording)
+                root.stopRecording();
+            else
+                root.start("record");
         }
         function stop(): void {
             root.stopRecording();
@@ -155,7 +159,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         }
         // Whole focused screen straight to clipboard + file, no selection.
         function fullscreen(): void {
-            Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy < "$f" && notify-send -a hi-shell -i "$f" "Screenshot copied" "Saved to $f"']);
+            Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy < "$f" && notify-send -a hi-shell -i "$f" "$1" "$(printf "$2" "$f")"', "sh", Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").replace("%1", "%s")]);
         }
     }
 
@@ -272,7 +276,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 SegmentedButton {
                     id: modes
                     anchors.centerIn: parent
-                    model: [{ text: "Screenshot", icon: "screenshot_region" }, { text: "Text (OCR)", icon: "document_scanner" }, { text: "Record", icon: "videocam" }]
+                    model: [{ text: Translation.tr("Screenshot"), icon: "screenshot_region" }, { text: Translation.tr("Text (OCR)"), icon: "document_scanner" }, { text: Translation.tr("Record"), icon: "videocam" }]
                     currentIndex: ["screenshot", "ocr", "record"].indexOf(root.mode)
                     onSelected: index => root.mode = ["screenshot", "ocr", "record"][index]
                 }
@@ -282,7 +286,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 32
-                text: "Drag to select · click a window · Esc or right click to cancel"
+                text: Translation.tr("Drag to select · click a window · Esc or right click to cancel")
                 color: "white"
                 style: Text.Outline
                 styleColor: Qt.alpha("black", 0.6)

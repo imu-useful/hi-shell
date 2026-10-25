@@ -134,7 +134,7 @@ Scope {
 
                         Text {
                             Layout.fillWidth: true
-                            text: "Claude"
+                            text: Translation.tr("Claude")
                             font.family: Appearance.font.main
                             font.pixelSize: 16
                             font.weight: Font.Medium
@@ -185,7 +185,7 @@ Scope {
                         Layout.fillWidth: true
                         Layout.margins: 8
                         visible: session.messages.count === 0
-                        text: "Ask Claude anything.  Enter to send · Esc to close · Ctrl+N for a new chat"
+                        text: Translation.tr("Ask Claude anything.  Enter to send · Esc to close · Ctrl+N for a new chat")
                         wrapMode: Text.Wrap
                         font.family: Appearance.font.main
                         font.pixelSize: 12
@@ -230,7 +230,7 @@ Scope {
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: input.text === ""
-                                    text: session.messages.count > 0 ? "Ask a follow-up…" : "Ask Claude…"
+                                    text: session.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Ask Claude…")
                                     font: input.font
                                     color: Colors.m3onSurfaceVariant
                                 }

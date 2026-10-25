@@ -40,8 +40,8 @@ ColumnLayout {
     readonly property var toggles: ({
         wifi: {
             icon: !Networking.wifiEnabled ? "wifi_off" : wifiNetwork ? "wifi" : "wifi_find",
-            label: "Wi-Fi",
-            subtitle: !Networking.wifiHardwareEnabled ? "Blocked" : !Networking.wifiEnabled ? "Off" : wifiNetwork?.name ?? "Not connected",
+            label: Translation.tr("Wi-Fi"),
+            subtitle: !Networking.wifiHardwareEnabled ? Translation.tr("Blocked") : !Networking.wifiEnabled ? Translation.tr("Off") : wifiNetwork?.name ?? Translation.tr("Not connected"),
             active: Networking.wifiEnabled,
             available: wifiDevice !== null,
             toggle: () => Networking.wifiEnabled = !Networking.wifiEnabled,
@@ -49,8 +49,8 @@ ColumnLayout {
         },
         bluetooth: {
             icon: !bt?.enabled ? "bluetooth_disabled" : btConnected.length ? "bluetooth_connected" : "bluetooth",
-            label: "Bluetooth",
-            subtitle: !bt ? "Unavailable" : !bt.enabled ? "Off" : btConnected.length ? btConnected.map(d => d.name).join(", ") : "On",
+            label: Translation.tr("Bluetooth"),
+            subtitle: !bt ? Translation.tr("Unavailable") : !bt.enabled ? Translation.tr("Off") : btConnected.length ? btConnected.map(d => d.name).join(", ") : Translation.tr("On"),
             active: bt?.enabled ?? false,
             available: bt !== null,
             toggle: () => bt.enabled = !bt.enabled,
@@ -58,72 +58,72 @@ ColumnLayout {
         },
         darkMode: {
             icon: Colors.dark ? "dark_mode" : "light_mode",
-            label: "Dark mode",
-            subtitle: Theme.busy ? "Applying…" : Colors.dark ? "On" : "Off",
+            label: Translation.tr("Dark mode"),
+            subtitle: Theme.busy ? Translation.tr("Applying…") : Colors.dark ? Translation.tr("On") : Translation.tr("Off"),
             active: Colors.dark,
             available: true,
             toggle: () => Theme.toggleMode()
         },
         nightLight: {
             icon: "nightlight",
-            label: "Night light",
-            subtitle: Toggles.nightLight ? `${Toggles.daemon ? Toggles.temperature : Config.options.sidebar.nightLightTemperature} K` : "Off",
+            label: Translation.tr("Night light"),
+            subtitle: Toggles.nightLight ? `${Toggles.daemon ? Toggles.temperature : Config.options.sidebar.nightLightTemperature} K` : Translation.tr("Off"),
             active: Toggles.nightLight,
             available: true,
             toggle: () => Toggles.setNightLight(!Toggles.nightLight)
         },
         dnd: {
             icon: Notifications.dnd ? "do_not_disturb_on" : "do_not_disturb_off",
-            label: "Do not disturb",
-            subtitle: Notifications.dnd ? "On" : "Off",
+            label: Translation.tr("Do not disturb"),
+            subtitle: Notifications.dnd ? Translation.tr("On") : Translation.tr("Off"),
             active: Notifications.dnd,
             available: true,
             toggle: () => Notifications.dnd = !Notifications.dnd
         },
         keepAwake: {
             icon: "coffee",
-            label: "Keep awake",
-            subtitle: Toggles.keepAwake ? "Screen stays on" : "Off",
+            label: Translation.tr("Keep awake"),
+            subtitle: Toggles.keepAwake ? Translation.tr("Screen stays on") : Translation.tr("Off"),
             active: Toggles.keepAwake,
             available: true,
             toggle: () => Toggles.setKeepAwake(!Toggles.keepAwake)
         },
         mic: {
             icon: source?.audio?.muted ? "mic_off" : "mic",
-            label: "Microphone",
-            subtitle: source?.audio?.muted ? "Muted" : "On",
+            label: Translation.tr("Microphone"),
+            subtitle: source?.audio?.muted ? Translation.tr("Muted") : Translation.tr("On"),
             active: !(source?.audio?.muted ?? true),
             available: source?.audio !== undefined && source?.audio !== null,
             toggle: () => source.audio.muted = !source.audio.muted
         },
         gameMode: {
             icon: "sports_esports",
-            label: "Game mode",
-            subtitle: Toggles.gameMode ? "Effects off" : "Off",
+            label: Translation.tr("Game mode"),
+            subtitle: Toggles.gameMode ? Translation.tr("Effects off") : Translation.tr("Off"),
             active: Toggles.gameMode,
             available: true,
             toggle: () => Toggles.setGameMode(!Toggles.gameMode)
         },
         vpn: {
             icon: "vpn_key",
-            label: "VPN",
-            subtitle: Toggles.vpns.find(v => v.active)?.name ?? "Off",
+            label: Translation.tr("VPN"),
+            subtitle: Toggles.vpns.find(v => v.active)?.name ?? Translation.tr("Off"),
             active: Toggles.vpnActive,
             available: Toggles.vpnAvailable,
             toggle: () => Toggles.setVpn(!Toggles.vpnActive)
         },
         colorPicker: {
             icon: "colorize",
-            label: "Color picker",
-            subtitle: "Copy a color",
+            label: Translation.tr("Color picker"),
+            subtitle: Translation.tr("Copy a color"),
             active: false,
             available: true,
             toggle: () => root.runAfterClose(["hyprpicker", "-a"])
         },
         screenshot: {
             icon: "screenshot_region",
-            label: "Screenshot",
-            subtitle: "Region, text or video",
+            label: Translation.tr("Screenshot"),
+            subtitle: Translation.tr("Region, text or video"),
             active: false,
             available: true,
             toggle: () => { root.closeRequested(); ShellState.captureRequest = "screenshot"; }
@@ -157,12 +157,12 @@ ColumnLayout {
 
         StyledText {
             Layout.fillWidth: true
-            text: "Tap to add or remove"
+            text: Translation.tr("Tap to add or remove")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }
         SegmentedButton {
-            model: [{ text: "Android", icon: "view_agenda" }, { text: "Classic", icon: "apps" }]
+            model: [{ text: Translation.tr("Android"), icon: "view_agenda" }, { text: Translation.tr("Classic"), icon: "apps" }]
             currentIndex: root.android ? 0 : 1
             onSelected: index => root.options.style = index === 0 ? "android" : "classic"
         }

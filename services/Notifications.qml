@@ -159,10 +159,10 @@ Singleton {
         if (s < 60)
             return "now";
         if (s < 3600)
-            return `${Math.floor(s / 60)}m`;
+            return Translation.tr("%1m").arg(Math.floor(s / 60));
         if (s < 86400)
-            return `${Math.floor(s / 3600)}h`;
-        return new Date(time).toLocaleDateString(Qt.locale(), "ddd");
+            return Translation.tr("%1h").arg(Math.floor(s / 3600));
+        return new Date(time).toLocaleDateString(Translation.locale, "ddd");
     }
 
     function save() {

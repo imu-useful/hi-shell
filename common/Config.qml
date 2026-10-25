@@ -43,6 +43,9 @@ Singleton {
         JsonAdapter {
             id: adapter
 
+            // Interface language: auto (from $LANG), en, ru
+            property string language: "auto"
+
             property JsonObject appearance: JsonObject {
                 // Translucent surfaces (the compositor blurs what's behind them).
                 property bool transparency: true
@@ -91,6 +94,8 @@ Singleton {
                 }
                 property JsonObject media: JsonObject {
                     property int maxWidth: 220
+                    // Spin the cover art while playing (redraws the bar every frame).
+                    property bool spinArt: false
                 }
                 property JsonObject resources: JsonObject {
                     // cpu, ram, swap, gpu, disk

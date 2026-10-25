@@ -23,8 +23,25 @@ Variants {
         readonly property int iconSize: options.iconSize
         readonly property bool shown: !options.autoHide || hover.hovered || ShellState.overviewOpen
 
-        // Pinned ids first, then running apps that aren't pinned.
-        readonly property var apps: {
+        // Which windows exist (app id + address) and the pins. A string, so it only
+        // changes when the dock's contents do, not on every window title update.
+        readonly property string appsKey: options.pinned.join(",") + "|"
+            + Hyprland.toplevels.values.map(t => `${t.wayland?.appId ?? ""}@${t.address}`).join(",")
+
+        // Pinned ids first, then running apps that aren't pinned. Rebuilt only when
+        // appsKey changes, so the icons aren't recreated all the time.
+        property var apps: []
+        onAppsKeyChanged: apps = buildApps()
+        Component.onCompleted: apps = buildApps()
+
+        property var entryCache: ({})
+        function entryFor(id) {
+            if (!(id in entryCache))
+                entryCache[id] = DesktopEntries.heuristicLookup(id);
+            return entryCache[id];
+        }
+
+        function buildApps() {
             const running = new Map();
             for (const t of Hyprland.toplevels.values) {
                 const id = (t.wayland?.appId ?? "").toLowerCase();
@@ -36,7 +53,7 @@ Variants {
             }
             const pinned = options.pinned.map(id => id.toLowerCase());
             const ids = [...pinned, ...[...running.keys()].filter(id => !pinned.includes(id))];
-            return ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: DesktopEntries.heuristicLookup(id) }));
+            return ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
         }
 
         screen: modelData
@@ -169,7 +186,7 @@ Variants {
                             openDelay: 400
                             padding: 10
                             StyledText {
-                                text: `${item.modelData.entry?.name ?? item.modelData.id}${item.modelData.pinned ? "" : " · right click to pin"}`
+                                text: (item.modelData.entry?.name ?? item.modelData.id) + (item.modelData.pinned ? "" : " · " + Translation.tr("right click to pin"))
                             }
                         }
                     }

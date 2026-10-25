@@ -10,10 +10,14 @@ Item {
 
     required property string widgetId
     property bool editing: false
-    default property alias content: holder.data
+    // Created only while the widget is enabled and its screen shows widgets;
+    // hidden widgets would otherwise keep updating in the background.
+    default property Component content
 
     readonly property var entry: DesktopLayout.entry(Config.options.desktop.layout, widgetId)
     readonly property int grid: 16
+
+    readonly property bool live: entry.enabled && (parent?.visible ?? false)
 
     visible: entry.enabled
     width: holder.childrenRect.width
@@ -35,6 +39,11 @@ Item {
 
     Item {
         id: holder
+
+        Loader {
+            active: root.live
+            sourceComponent: root.content
+        }
     }
 
     // Edit mode: outline, name and drag anywhere on the widget.
@@ -58,7 +67,7 @@ Item {
             StyledText {
                 id: label
                 anchors.centerIn: parent
-                text: DesktopLayout.names[root.widgetId]
+                text: Translation.tr(DesktopLayout.names[root.widgetId])
                 font.pixelSize: Appearance.font.size.labelSmall
                 color: Colors.m3onPrimary
             }

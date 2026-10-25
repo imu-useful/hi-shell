@@ -118,13 +118,13 @@ Singleton {
                 return;
             searching = false;
             if (xhr.status !== 200) {
-                onlineError = xhr.status === 401 ? "Invalid API key" : xhr.status === 429 ? "Rate limited, try again in a minute" : `Couldn't search (HTTP ${xhr.status || "error"})`;
+                onlineError = xhr.status === 401 ? Translation.tr("Invalid API key") : xhr.status === 429 ? Translation.tr("Rate limited, try again in a minute") : Translation.tr("Couldn't search (HTTP %1)").arg(xhr.status || "error");
                 return;
             }
             try {
                 onData(JSON.parse(xhr.responseText));
             } catch (e) {
-                onlineError = "Unexpected response";
+                onlineError = Translation.tr("Unexpected response");
             }
         };
         xhr.open("GET", url);
@@ -154,7 +154,7 @@ Singleton {
                 root.set(target);
                 root.scan();
             } else {
-                root.onlineError = "Download failed";
+                root.onlineError = Translation.tr("Download failed");
             }
         }
     }

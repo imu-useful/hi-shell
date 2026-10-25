@@ -23,7 +23,7 @@ DesktopCard {
             Layout.fillWidth: true
             StyledText {
                 Layout.fillWidth: true
-                text: "To-Do"
+                text: Translation.tr("To-Do")
                 font.pixelSize: Appearance.font.size.titleLarge
                 font.weight: Font.Medium
             }
@@ -96,7 +96,7 @@ DesktopCard {
 
         StyledText {
             visible: Todo.pending === 0 && !root.adding
-            text: "All done"
+            text: Translation.tr("All done")
             color: Colors.m3onSurfaceVariant
         }
     }

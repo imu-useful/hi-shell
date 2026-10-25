@@ -28,7 +28,7 @@ DesktopCard {
             }
             StyledText {
                 Layout.fillWidth: true
-                text: Weather.city || "Local time"
+                text: Weather.city || Translation.tr("Local time")
                 color: Colors.m3onSurfaceVariant
             }
         }
@@ -39,7 +39,7 @@ DesktopCard {
             font.weight: Font.Bold
         }
         StyledText {
-            text: Qt.formatDate(clock.date, "dddd, d MMMM yyyy")
+            text: clock.date.toLocaleDateString(Translation.locale, "dddd, d MMMM yyyy")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }

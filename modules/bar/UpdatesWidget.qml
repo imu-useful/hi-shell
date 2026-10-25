@@ -43,7 +43,7 @@ BarWidget {
             spacing: 4
 
             StyledText {
-                text: Updates.count === 1 ? "1 update" : `${Updates.count} updates`
+                text: Translation.trn("%1 update", "%1 updates", Updates.count)
                 font.pixelSize: Appearance.font.size.titleMedium
                 font.weight: Font.Medium
             }
@@ -52,7 +52,7 @@ BarWidget {
 
                 StyledText {
                     required property var modelData
-                    text: `${modelData.name}  ${modelData.from} → ${modelData.to}${modelData.aur ? "  (AUR)" : ""}`
+                    text: `${modelData.name}  ${modelData.from} → ${modelData.to}${modelData.aur ? Translation.tr("  (AUR)") : ""}`
                     font.pixelSize: Appearance.font.size.labelMedium
                     font.family: Appearance.font.mono
                     color: Colors.m3onSurfaceVariant
@@ -60,12 +60,12 @@ BarWidget {
             }
             StyledText {
                 visible: Updates.count > 15
-                text: `and ${Updates.count - 15} more`
+                text: Translation.tr("and %1 more").arg(Updates.count - 15)
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3outline
             }
             StyledText {
-                text: "Click to upgrade"
+                text: Translation.tr("Click to upgrade")
                 font.pixelSize: Appearance.font.size.labelSmall
                 color: Colors.m3primary
             }

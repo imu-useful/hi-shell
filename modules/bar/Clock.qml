@@ -31,7 +31,7 @@ BarWidget {
 
         StyledText {
             Layout.leftMargin: 6
-            text: Qt.formatDateTime(clock.date, root.options.dateFormat)
+            text: clock.date.toLocaleString(Translation.locale, root.options.dateFormat)
             font.pixelSize: Appearance.font.size.normal
         }
 

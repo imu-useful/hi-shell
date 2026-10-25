@@ -16,7 +16,8 @@ BarWidget {
         gpu: { icon: "developer_board", value: Math.max(0, SystemStats.gpuUsage) },
         disk: { icon: "hard_drive", value: SystemStats.diskUsage }
     })
-    readonly property var items: Config.options.bar.resources.shown.filter(k => all[k]).map(k => all[k])
+    // Keys only: a model holding the values would recreate the rings on every update.
+    readonly property var keys: Config.options.bar.resources.shown.filter(k => ["cpu", "ram", "swap", "gpu", "disk"].includes(k))
 
     padding: 8
     contentWidth: grid.implicitWidth
@@ -25,14 +26,16 @@ BarWidget {
     Grid {
         id: grid
         anchors.centerIn: parent
-        columns: root.vertical ? 1 : root.items.length
+        columns: root.vertical ? 1 : root.keys.length
         spacing: root.vertical ? 6 : 10
 
         Repeater {
-            model: root.items
+            model: root.keys
 
             Grid {
-                required property var modelData
+                id: item
+                required property string modelData
+                readonly property var info: root.all[modelData]
                 columns: root.vertical ? 1 : 2
                 spacing: 4
                 horizontalItemAlignment: Grid.AlignHCenter
@@ -41,12 +44,13 @@ BarWidget {
                 CircularProgress {
                     implicitWidth: 20
                     implicitHeight: 20
-                    value: modelData.value
-                    color: modelData.value > 0.9 ? Colors.m3error : Colors.m3primary
+                    value: item.info.value
+                    animated: false
+                    color: item.info.value > 0.9 ? Colors.m3error : Colors.m3primary
 
                     MaterialIcon {
                         anchors.centerIn: parent
-                        icon: modelData.icon
+                        icon: item.info.icon
                         iconSize: 12
                         fill: 1
                         color: Colors.m3onSurface
@@ -54,7 +58,7 @@ BarWidget {
                 }
 
                 StyledText {
-                    text: Math.round(modelData.value * 100)
+                    text: Math.round(item.info.value * 100)
                     font.pixelSize: Appearance.font.size.labelMedium
                     font.features: { "tnum": 1 }
                 }
@@ -122,32 +126,32 @@ BarWidget {
             spacing: 12
 
             StyledText {
-                text: SystemStats.cpuModel || "System"
+                text: SystemStats.cpuModel || Translation.tr("System")
                 font.pixelSize: Appearance.font.size.titleMedium
                 font.weight: Font.Medium
             }
             StatRow {
                 icon: "memory"
-                label: `CPU${SystemStats.cpuCores ? " · " + SystemStats.cpuCores + " threads" : ""}`
+                label: "CPU" + (SystemStats.cpuCores ? " · " + Translation.trn("%1 thread", "%1 threads", SystemStats.cpuCores) : "")
                 value: `${Math.round(SystemStats.cpuUsage * 100)}%${root.temp(SystemStats.cpuTemp)}`
                 fraction: SystemStats.cpuUsage
             }
             StatRow {
                 icon: "memory_alt"
-                label: "Memory"
+                label: Translation.tr("Memory")
                 value: `${SystemStats.memUsedGiB.toFixed(1)} / ${SystemStats.memTotalGiB.toFixed(1)} GiB`
                 fraction: SystemStats.memUsage
             }
             StatRow {
                 visible: SystemStats.swapTotalGiB > 0
                 icon: "swap_horiz"
-                label: "Swap"
+                label: Translation.tr("Swap")
                 value: `${SystemStats.swapUsedGiB.toFixed(1)} / ${SystemStats.swapTotalGiB.toFixed(1)} GiB`
                 fraction: SystemStats.swapUsage
             }
             StatRow {
                 icon: "hard_drive"
-                label: "Disk ( / )"
+                label: Translation.tr("Disk ( / )")
                 value: `${Math.round(SystemStats.diskUsedGiB)} / ${Math.round(SystemStats.diskTotalGiB)} GiB`
                 fraction: SystemStats.diskUsage
             }
@@ -160,7 +164,7 @@ BarWidget {
             }
             StatRow {
                 icon: "schedule"
-                label: "Uptime"
+                label: Translation.tr("Uptime")
                 value: SystemStats.uptimeText
             }
         }

@@ -28,7 +28,7 @@ ColumnLayout {
         }
         IconButton {
             icon: "tune"
-            tooltip: "Apps and devices"
+            tooltip: Translation.tr("Apps and devices")
             onClicked: root.openPage("audio")
         }
     }

@@ -19,7 +19,7 @@ BarWidget {
         return iso.slice(11, 16);
     }
     function weekday(date) {
-        return new Date(date + "T12:00").toLocaleDateString(Qt.locale(), "ddd");
+        return new Date(date + "T12:00").toLocaleDateString(Translation.locale, "ddd");
     }
 
     RowLayout {
@@ -107,7 +107,7 @@ BarWidget {
                         text: Weather.description
                     }
                     StyledText {
-                        text: Weather.city || "Unknown location"
+                        text: Weather.city || Translation.tr("Unknown location")
                         font.pixelSize: Appearance.font.size.labelMedium
                         color: Colors.m3onSurfaceVariant
                     }
@@ -137,7 +137,7 @@ BarWidget {
 
                 Stat {
                     icon: "thermostat"
-                    text: Weather.ready ? `Feels like ${Math.round(Weather.current.feelsLike)}${Weather.tempUnit}` : ""
+                    text: Weather.ready ? Translation.tr("Feels like %1").arg(Math.round(Weather.current.feelsLike) + Weather.tempUnit) : ""
                 }
                 Stat {
                     icon: "humidity_percentage"
@@ -149,7 +149,7 @@ BarWidget {
                 }
                 Stat {
                     icon: "visibility"
-                    text: Weather.ready ? `${(Weather.current.visibility / 1000).toFixed(1)} km` : ""
+                    text: Weather.ready ? Translation.tr("%1 km").arg((Weather.current.visibility / 1000).toFixed(1)) : ""
                 }
                 Stat {
                     icon: "wb_twilight"
@@ -222,7 +222,7 @@ BarWidget {
 
                         StyledText {
                             Layout.preferredWidth: 48
-                            text: index === 0 ? "Today" : root.weekday(modelData.date)
+                            text: index === 0 ? Translation.tr("Today") : root.weekday(modelData.date)
                             font.pixelSize: Appearance.font.size.labelMedium + 1
                         }
                         MaterialIcon {

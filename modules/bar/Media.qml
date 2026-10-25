@@ -33,11 +33,12 @@ BarWidget {
         source: Mpris.artUrl
 
         RotationAnimation on rotation {
-            running: Mpris.playing && Appearance.anim.speed > 0
+            running: Config.options.bar.media.spinArt && Mpris.playing && Appearance.anim.speed > 0
             loops: Animation.Infinite
             from: 0
             to: 360
             duration: 20000
+            onRunningChanged: if (!running) art.rotation = 0
         }
     }
 
@@ -188,7 +189,7 @@ BarWidget {
                 }
                 Chip {
                     icon: "swap_horiz"
-                    text: "Switch player"
+                    text: Translation.tr("Switch player")
                     onClicked: Mpris.cyclePlayer()
                 }
             }

@@ -19,8 +19,8 @@ BarWidget {
     readonly property string appId: hasWindow ? (toplevel.wayland?.appId ?? "") : ""
     readonly property var entry: appId ? DesktopEntries.heuristicLookup(appId) : null
 
-    readonly property string appName: !hasWindow ? "Desktop" : entry?.name || appId || "Window"
-    readonly property string title: !hasWindow ? `Workspace ${monitor?.activeWorkspace?.id ?? ""}` : toplevel.title || appName
+    readonly property string appName: !hasWindow ? Translation.tr("Desktop") : entry?.name || appId || Translation.tr("Window")
+    readonly property string title: !hasWindow ? Translation.tr("Workspace %1").arg(monitor?.activeWorkspace?.id ?? "") : toplevel.title || appName
 
     pill: false
     padding: 6

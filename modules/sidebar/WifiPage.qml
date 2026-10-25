@@ -32,8 +32,8 @@ StyledFlickable {
         ListRow {
             Layout.fillWidth: true
             icon: "wifi"
-            title: "Wi-Fi"
-            subtitle: !Networking.wifiHardwareEnabled ? "Blocked by hardware switch" : root.device?.scannerEnabled ? "Scanning…" : ""
+            title: Translation.tr("Wi-Fi")
+            subtitle: !Networking.wifiHardwareEnabled ? Translation.tr("Blocked by hardware switch") : root.device?.scannerEnabled ? Translation.tr("Scanning…") : ""
             M3Switch {
                 checked: Networking.wifiEnabled
                 enabled: Networking.wifiHardwareEnabled
@@ -52,7 +52,7 @@ StyledFlickable {
         StyledText {
             visible: Networking.wifiEnabled && root.networks.length === 0
             Layout.leftMargin: 16
-            text: "Looking for networks…"
+            text: Translation.tr("Looking for networks…")
             color: Colors.m3onSurfaceVariant
         }
 
@@ -73,7 +73,7 @@ StyledFlickable {
                 Connections {
                     target: entry.modelData
                     function onConnectionFailed(reason) {
-                        entry.failure = reason === ConnectionFailReason.NoSecrets || reason === ConnectionFailReason.WifiAuthTimeout ? "Wrong password?" : "Couldn't connect";
+                        entry.failure = reason === ConnectionFailReason.NoSecrets || reason === ConnectionFailReason.WifiAuthTimeout ? Translation.tr("Wrong password?") : Translation.tr("Couldn't connect");
                         root.expanded = entry.modelData;
                     }
                     function onConnectedChanged() {
@@ -89,7 +89,7 @@ StyledFlickable {
                     Layout.fillWidth: true
                     icon: root.signalIcon(entry.modelData.signalStrength)
                     title: entry.modelData.name
-                    subtitle: entry.modelData.stateChanging ? "Connecting…" : entry.modelData.connected ? "Connected" : entry.failure || (entry.modelData.known ? "Saved" : entry.secured ? "Secured" : "Open")
+                    subtitle: entry.modelData.stateChanging ? Translation.tr("Connecting…") : entry.modelData.connected ? Translation.tr("Connected") : entry.failure || (entry.modelData.known ? Translation.tr("Saved") : entry.secured ? Translation.tr("Secured") : Translation.tr("Open"))
                     clickable: true
                     color: entry.modelData.connected ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
@@ -147,14 +147,14 @@ StyledFlickable {
                             StyledText {
                                 anchors.fill: parent
                                 visible: password.text === ""
-                                text: "Password"
+                                text: Translation.tr("Password")
                                 color: Colors.m3outline
                             }
                         }
                     }
                     M3Button {
                         visible: !entry.modelData.connected && (!entry.modelData.known || entry.failure !== "")
-                        text: "Connect"
+                        text: Translation.tr("Connect")
                         onClicked: password.accepted()
                     }
                     Item {
@@ -164,13 +164,13 @@ StyledFlickable {
                     M3Button {
                         visible: entry.modelData.connected
                         tonal: true
-                        text: "Disconnect"
+                        text: Translation.tr("Disconnect")
                         onClicked: entry.modelData.disconnect()
                     }
                     M3Button {
                         visible: entry.modelData.known
                         tonal: true
-                        text: "Forget"
+                        text: Translation.tr("Forget")
                         onClicked: {
                             entry.modelData.forget();
                             root.expanded = null;

@@ -10,18 +10,20 @@ Row {
     spacing: 10
 
     Repeater {
-        model: [
-            { icon: "memory", label: "CPU", value: SystemStats.cpuUsage, shape: "cookie9", tone: 0 },
-            { icon: "memory_alt", label: "RAM", value: SystemStats.memUsage, shape: "clover4", tone: 1 },
-            Battery.available
-                ? { icon: Battery.icon, label: "Battery", value: Battery.percentage, shape: "flower", tone: 2 }
-                : { icon: "hard_drive", label: "Disk", value: SystemStats.diskUsage, shape: "flower", tone: 2 }
-        ]
+        // Keys only: a model holding the values would recreate the tiles on every update.
+        model: ["cpu", "ram", Battery.available ? "battery" : "disk"]
 
         DesktopCard {
-            required property var modelData
-            readonly property color accent: [Colors.m3primaryContainer, Colors.m3secondaryContainer, Colors.m3tertiaryContainer][modelData.tone]
-            readonly property color ink: [Colors.m3onPrimaryContainer, Colors.m3onSecondaryContainer, Colors.m3onTertiaryContainer][modelData.tone]
+            id: tile
+            required property string modelData
+            readonly property var info: ({
+                cpu: { icon: "memory", label: Translation.tr("CPU"), value: SystemStats.cpuUsage, shape: "cookie9", tone: 0 },
+                ram: { icon: "memory_alt", label: Translation.tr("RAM"), value: SystemStats.memUsage, shape: "clover4", tone: 1 },
+                battery: { icon: Battery.icon, label: Translation.tr("Battery"), value: Battery.percentage, shape: "flower", tone: 2 },
+                disk: { icon: "hard_drive", label: Translation.tr("Disk"), value: SystemStats.diskUsage, shape: "flower", tone: 2 }
+            })[modelData]
+            readonly property color accent: [Colors.m3primaryContainer, Colors.m3secondaryContainer, Colors.m3tertiaryContainer][tile.info.tone]
+            readonly property color ink: [Colors.m3onPrimaryContainer, Colors.m3onSecondaryContainer, Colors.m3onTertiaryContainer][tile.info.tone]
 
             width: 116
             height: 116
@@ -35,12 +37,12 @@ Row {
                 height: 36
                 MaterialShape {
                     anchors.fill: parent
-                    shape: modelData.shape
+                    shape: tile.info.shape
                     color: ink
                 }
                 MaterialIcon {
                     anchors.centerIn: parent
-                    icon: modelData.icon
+                    icon: tile.info.icon
                     fill: 1
                     iconSize: 18
                     color: accent
@@ -53,14 +55,14 @@ Row {
                 anchors.margins: 14
                 spacing: -2
                 StyledText {
-                    text: `${Math.round(modelData.value * 100)}%`
+                    text: `${Math.round(tile.info.value * 100)}%`
                     font.family: Appearance.font.title
                     font.pixelSize: 28
                     font.weight: Font.DemiBold
                     color: ink
                 }
                 StyledText {
-                    text: modelData.label
+                    text: tile.info.label
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Qt.alpha(ink, 0.8)
                 }

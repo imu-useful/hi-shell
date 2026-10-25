@@ -74,7 +74,7 @@ Item {
                     color: Colors.m3primary
                 }
                 StyledText {
-                    text: "Claude is thinking…"
+                    text: Translation.tr("Claude is thinking…")
                     font.pixelSize: Appearance.font.size.normal
                     color: Colors.m3onSurfaceVariant
                 }

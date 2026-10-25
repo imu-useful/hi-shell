@@ -21,6 +21,9 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
 - **Wallpapers & theming** — wallpaper picker (local folders, Wallhaven / Unsplash), matugen scheme variants,
   light / dark / auto, shaped wallpaper frame; Material 3 palette from the wallpaper, reloaded live
 - **Google Calendar** — month view with event dots and an agenda (optional)
+- **English and Russian** — the whole interface, dates and plural forms; follows `$LANG` or the setting
+- **First-run welcome** — language, wallpaper, mode, bar style and the main shortcuts; lists missing programs
+- **Presets** — save your config, wallpaper and colors to one file, restore it later or share it
 
 ## Requirements
 
@@ -88,6 +91,11 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | Workspace overview |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Region screenshot / OCR / recording (also the bar's screenshot button) |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Copy text from a region (OCR) |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> | Record a region (press again to stop) |
+| <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history (Enter copies) |
+| <kbd>Super</kbd>+<kbd>.</kbd> | Emoji picker |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Session screen |
 | bar power button | Session screen (lock, log out, suspend, reboot, power off) |
 | <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
@@ -118,6 +126,8 @@ qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
 qs -c hi-shell ipc call weather refresh
 qs -c hi-shell ipc call updates refresh       # count
 qs -c hi-shell ipc call tray list             # item ids for tray.hidden
+qs -c hi-shell ipc call presets save "Autumn"         # load <path>, list
+qs -c hi-shell ipc call welcome open                  # the first-run welcome again
 ```
 
 ## Configuration
@@ -127,13 +137,15 @@ the defaults on first start; edits apply live). The Hyprland page applies change
 `~/.config/hi-shell/hyprland.lua`, which `hypr/hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
 Sections:
 
+- `language`: `auto` (from `$LANG`), `en` or `ru`
 - `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`
 - `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
   `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
-  `bar.resources`, `bar.utilButtons`, `bar.updates`
+  `bar.resources`, `bar.utilButtons`, `bar.updates`; `bar.media.spinArt` spins the cover art while playing (off by default,
+  it redraws the bar every frame)
 - `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
   in the sidebar), night light temperature
 - `desktop`: draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
@@ -208,6 +220,26 @@ To avoid that, click **Publish app** under **Audience**. Google then shows an "u
 
 Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
+## Language
+
+The interface is in English or Russian: Settings → General → Language, or `"language"` in the config.
+`auto` picks Russian when `$LANG` starts with `ru`. Dates, month and day names follow the chosen language too.
+
+Translations live in `translations/<code>.json`, keyed by the English text. Plural forms are arrays
+(`["%1 задача", "%1 задачи", "%1 задач"]`). To add a language, copy `ru.json`, translate the values and add the
+code to `available` in `common/Translation.qml`.
+
+## Welcome & presets
+
+On the first start a short welcome sets the language, wallpaper, light / dark mode and bar style, shows the main
+shortcuts and lists optional programs that are missing. It won't show again (the marker is
+`~/.local/state/hi-shell/welcome-done`); reopen it with `qs -c hi-shell ipc call welcome open`.
+
+A preset is one `.tar.gz` with your config, wallpaper and color scheme. Save and apply them in Settings → About;
+they're kept in `~/.local/share/hi-shell/presets`. Presets leave out API keys, your location and the monitor layout,
+and applying one keeps yours. The wallpaper is copied to `~/Pictures/Wallpapers/presets` unless you already have
+the same file.
+
 ## Troubleshooting
 
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
@@ -227,13 +259,15 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, Settings, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
-common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
+modules/             Bar, Desktop, Settings, Welcome, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+common/              singletons (Config, Appearance, Colors, Theme, ShellState, Translation, Paths)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)
 common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
-                     Updates, SystemStats, Calendar) and scripts: theme_updater.py (matugen), gcal.py
+                     Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), gcal.py,
+                     presets.py
+translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 ```
 

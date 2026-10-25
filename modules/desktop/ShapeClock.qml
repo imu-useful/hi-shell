@@ -18,7 +18,8 @@ Item {
 
     SystemClock {
         id: clock
-        precision: SystemClock.Seconds
+        // The seconds dot only matters while the desktop is in view.
+        precision: ShellState.desktopCovered ? SystemClock.Minutes : SystemClock.Seconds
     }
 
     MaterialShape {

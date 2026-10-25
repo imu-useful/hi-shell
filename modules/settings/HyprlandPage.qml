@@ -19,7 +19,7 @@ ColumnLayout {
 
     Section {
         icon: "monitor"
-        title: "Displays"
+        title: Translation.tr("Displays")
 
         // Arrangement preview, scaled to fit.
         Item {
@@ -96,7 +96,7 @@ ColumnLayout {
         ListRow {
             Layout.fillWidth: true
             icon: "aspect_ratio"
-            title: "Resolution & refresh rate"
+            title: Translation.tr("Resolution & refresh rate")
             visible: root.selected !== null
         }
         Flow {
@@ -115,7 +115,7 @@ ColumnLayout {
                     required property string modelData
                     readonly property string mode: modelData.replace("Hz", "")
                     readonly property bool active: root.selected && mode === `${root.selected.width}x${root.selected.height}@${root.selected.refreshRate.toFixed(2)}`
-                    text: mode.replace("@", " · ") + " Hz"
+                    text: mode.replace("@", " · ") + " " + Translation.tr("Hz")
                     selected: active
                     onClicked: HyprlandSettings.setMonitor(root.selected.name, { mode })
                 }
@@ -125,10 +125,10 @@ ColumnLayout {
         ChoiceRow {
             visible: root.selected !== null
             icon: "screen_rotation"
-            title: "Orientation"
+            title: Translation.tr("Orientation")
             value: root.selected?.transform ?? 0
             options: [
-                { value: 0, text: "Normal" }, { value: 1, text: "90°" },
+                { value: 0, text: Translation.tr("Normal") }, { value: 1, text: "90°" },
                 { value: 2, text: "180°" }, { value: 3, text: "270°" }
             ]
             onSelected: value => HyprlandSettings.setMonitor(root.selected.name, { transform: value })
@@ -136,7 +136,7 @@ ColumnLayout {
         StepperRow {
             visible: root.selected !== null
             icon: "zoom_in"
-            title: "Scale"
+            title: Translation.tr("Scale")
             value: root.selected?.scale ?? 1
             step: 0.25
             from: 0.5
@@ -147,8 +147,8 @@ ColumnLayout {
         TextRow {
             visible: root.selected !== null
             icon: "open_with"
-            title: "Position"
-            subtitle: "Top-left corner in the layout, e.g. 1920x0"
+            title: Translation.tr("Position")
+            subtitle: Translation.tr("Top-left corner in the layout, e.g. 1920x0")
             value: root.selected ? `${root.selected.x}x${root.selected.y}` : ""
             fieldWidth: 140
             onEdited: text => {
@@ -160,46 +160,46 @@ ColumnLayout {
 
     Section {
         icon: "rounded_corner"
-        title: "Look & feel"
+        title: Translation.tr("Look & feel")
 
         SliderRow {
             icon: "border_inner"
-            title: "Gaps between windows"
+            title: Translation.tr("Gaps between windows")
             value: root.v["general.gaps_in"] ?? 0
-            from: 0; to: 30; suffix: " px"
+            from: 0; to: 30; suffix: Translation.tr(" px")
             onMoved: value => HyprlandSettings.setOption("general.gaps_in", value)
         }
         SliderRow {
             icon: "border_outer"
-            title: "Gaps to the screen edge"
+            title: Translation.tr("Gaps to the screen edge")
             value: root.v["general.gaps_out"] ?? 0
-            from: 0; to: 60; suffix: " px"
+            from: 0; to: 60; suffix: Translation.tr(" px")
             onMoved: value => HyprlandSettings.setOption("general.gaps_out", value)
         }
         SliderRow {
             icon: "border_style"
-            title: "Border size"
+            title: Translation.tr("Border size")
             value: root.v["general.border_size"] ?? 0
-            from: 0; to: 6; suffix: " px"
+            from: 0; to: 6; suffix: Translation.tr(" px")
             onMoved: value => HyprlandSettings.setOption("general.border_size", value)
         }
         SliderRow {
             icon: "rounded_corner"
-            title: "Window rounding"
+            title: Translation.tr("Window rounding")
             value: root.v["decoration.rounding"] ?? 0
-            from: 0; to: 30; suffix: " px"
+            from: 0; to: 30; suffix: Translation.tr(" px")
             onMoved: value => HyprlandSettings.setOption("decoration.rounding", value)
         }
         SwitchRow {
             icon: "blur_on"
-            title: "Blur"
+            title: Translation.tr("Blur")
             checked: root.v["decoration.blur.enabled"] ?? false
             onToggled: checked => HyprlandSettings.setOption("decoration.blur.enabled", checked)
         }
         SliderRow {
             visible: root.v["decoration.blur.enabled"] ?? false
             icon: "blur_medium"
-            title: "Blur size"
+            title: Translation.tr("Blur size")
             value: root.v["decoration.blur.size"] ?? 0
             from: 1; to: 20
             onMoved: value => HyprlandSettings.setOption("decoration.blur.size", value)
@@ -207,20 +207,20 @@ ColumnLayout {
         SliderRow {
             visible: root.v["decoration.blur.enabled"] ?? false
             icon: "layers"
-            title: "Blur passes"
+            title: Translation.tr("Blur passes")
             value: root.v["decoration.blur.passes"] ?? 0
             from: 1; to: 6
             onMoved: value => HyprlandSettings.setOption("decoration.blur.passes", value)
         }
         SwitchRow {
             icon: "shadow"
-            title: "Shadows"
+            title: Translation.tr("Shadows")
             checked: root.v["decoration.shadow.enabled"] ?? false
             onToggled: checked => HyprlandSettings.setOption("decoration.shadow.enabled", checked)
         }
         SwitchRow {
             icon: "animation"
-            title: "Animations"
+            title: Translation.tr("Animations")
             checked: root.v["animations.enabled"] ?? false
             onToggled: checked => HyprlandSettings.setOption("animations.enabled", checked)
         }
@@ -228,24 +228,24 @@ ColumnLayout {
 
     Section {
         icon: "mouse"
-        title: "Input"
+        title: Translation.tr("Input")
 
         SliderRow {
             icon: "speed"
-            title: "Pointer sensitivity"
+            title: Translation.tr("Pointer sensitivity")
             value: root.v["input.sensitivity"] ?? 0
             from: -1; to: 1; step: 0.05; decimals: 2
             onMoved: value => HyprlandSettings.setOption("input.sensitivity", value)
         }
         SwitchRow {
             icon: "swipe_vertical"
-            title: "Natural scrolling (touchpad)"
+            title: Translation.tr("Natural scrolling (touchpad)")
             checked: root.v["input.touchpad.natural_scroll"] ?? false
             onToggled: checked => HyprlandSettings.setOption("input.touchpad.natural_scroll", checked)
         }
         SwitchRow {
             icon: "ads_click"
-            title: "Focus follows mouse"
+            title: Translation.tr("Focus follows mouse")
             checked: (root.v["input.follow_mouse"] ?? 1) === 1
             onToggled: checked => HyprlandSettings.setOption("input.follow_mouse", checked ? 1 : 0)
         }
@@ -255,14 +255,14 @@ ColumnLayout {
         Layout.fillWidth: true
         StyledText {
             Layout.fillWidth: true
-            text: `Saved in ${HyprlandSettings.luaFile.replace(Paths.home, "~")}`
+            text: Translation.tr("Saved in %1").arg(HyprlandSettings.luaFile.replace(Paths.home, "~"))
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3outline
         }
         M3Button {
             tonal: true
             icon: "restart_alt"
-            text: "Reset Hyprland overrides"
+            text: Translation.tr("Reset Hyprland overrides")
             onClicked: HyprlandSettings.resetAll()
         }
     }

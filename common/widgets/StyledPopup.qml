@@ -9,6 +9,8 @@ import qs.common
 //
 //   Item { id: w; HoverHandler { id: hover }
 //          StyledPopup { target: w; hovered: hover.hovered; StyledText { text: "..." } } }
+//
+// The content is a single item (wrap several in a layout); it's created when the popup opens.
 PopupWindow {
     id: root
 
@@ -22,7 +24,9 @@ PopupWindow {
     property int padding: 16
     property int openDelay: 200
     property int closeDelay: 250
-    default property alias content: contentArea.data
+    // Created only while the popup is visible: hidden popups would otherwise keep
+    // updating their contents (stats, forecasts, ...) in the background.
+    default property Component content
 
     readonly property int shadowPad: 14
     readonly property bool wanted: pinned || hovered || popupHover.hovered
@@ -112,6 +116,11 @@ PopupWindow {
                 id: contentArea
                 x: root.padding
                 y: root.padding
+
+                Loader {
+                    active: root.visible
+                    sourceComponent: root.content
+                }
             }
         }
     }

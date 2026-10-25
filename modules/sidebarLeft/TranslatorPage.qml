@@ -98,7 +98,7 @@ ColumnLayout {
 
     TextCard {
         id: sourceCard
-        placeholder: "Type or paste text"
+        placeholder: Translation.tr("Type or paste text")
 
         IconButton {
             icon: "content_paste"
@@ -125,7 +125,7 @@ ColumnLayout {
             anchors.centerIn: parent
             filled: true
             icon: "swap_vert"
-            tooltip: "Translate the result back"
+            tooltip: Translation.tr("Translate the result back")
             onClicked: {
                 if (root.result !== "")
                     sourceCard.edit.text = root.result;
@@ -177,9 +177,9 @@ ColumnLayout {
         }
         onExited: code => {
             if (code === 127)
-                root.error = "translate-shell (trans) is not installed";
+                root.error = Translation.tr("translate-shell (trans) is not installed");
             else if (code !== 0)
-                root.error = "Translation failed (network?)";
+                root.error = Translation.tr("Translation failed (network?)");
         }
     }
 }

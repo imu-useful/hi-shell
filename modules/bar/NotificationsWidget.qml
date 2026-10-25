@@ -57,7 +57,7 @@ BarWidget {
             spacing: 10
 
             StyledText {
-                text: Notifications.list.length === 0 ? "No notifications" : Notifications.unread > 0 ? `${Notifications.unread} unread` : "Notifications"
+                text: Notifications.list.length === 0 ? Translation.tr("No notifications") : Notifications.unread > 0 ? Translation.tr("%1 unread").arg(Notifications.unread) : Translation.tr("Notifications")
                 font.pixelSize: Appearance.font.size.titleMedium
                 font.weight: Font.Medium
             }
@@ -88,14 +88,14 @@ BarWidget {
                 spacing: 6
                 Chip {
                     icon: Notifications.dnd ? "notifications_off" : "do_not_disturb_on"
-                    text: "Do not disturb"
+                    text: Translation.tr("Do not disturb")
                     selected: Notifications.dnd
                     onClicked: Notifications.dnd = !Notifications.dnd
                 }
                 Chip {
                     visible: Notifications.list.length > 0
                     icon: "clear_all"
-                    text: "Clear"
+                    text: Translation.tr("Clear")
                     onClicked: Notifications.clear()
                 }
             }

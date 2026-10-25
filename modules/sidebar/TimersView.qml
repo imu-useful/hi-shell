@@ -91,30 +91,30 @@ StyledFlickable {
 
         TimerCard {
             icon: Timers.onBreak ? "coffee" : "self_improvement"
-            title: Timers.onBreak ? `Break · ${Timers.breakMinutes} min` : `Focus · ${Timers.focusMinutes} min`
+            title: (Timers.onBreak ? Translation.tr("Break") : Translation.tr("Focus")) + " · " + Translation.tr("%1 min").arg(Timers.onBreak ? Timers.breakMinutes : Timers.focusMinutes)
             time: Timers.format(Timers.focusLeft)
             progress: 1 - Timers.focusLeft / ((Timers.onBreak ? Timers.breakMinutes : Timers.focusMinutes) * 60)
             running: Timers.focusRunning
             onToggle: Timers.toggleFocus()
 
-            Chip { text: "Reset"; implicitHeight: 26; onClicked: Timers.resetFocus() }
+            Chip { text: Translation.tr("Reset"); implicitHeight: 26; onClicked: Timers.resetFocus() }
         }
 
         TimerCard {
             icon: "timer"
-            title: Timers.laps.length ? `Stopwatch · lap ${Timers.laps.length}: ${Timers.format(Timers.laps[0])}` : "Stopwatch"
+            title: Timers.laps.length ? Translation.tr("Stopwatch · lap %1: %2").arg(Timers.laps.length).arg(Timers.format(Timers.laps[0])) : Translation.tr("Stopwatch")
             time: Timers.format(Timers.stopwatchElapsed)
             progress: (Timers.stopwatchElapsed % 60) / 60
             running: Timers.stopwatchRunning
             onToggle: Timers.toggleStopwatch()
 
-            Chip { text: "Lap"; implicitHeight: 26; enabled: Timers.stopwatchRunning; onClicked: Timers.lap() }
-            Chip { text: "Reset"; implicitHeight: 26; onClicked: Timers.resetStopwatch() }
+            Chip { text: Translation.tr("Lap"); implicitHeight: 26; enabled: Timers.stopwatchRunning; onClicked: Timers.lap() }
+            Chip { text: Translation.tr("Reset"); implicitHeight: 26; onClicked: Timers.resetStopwatch() }
         }
 
         TimerCard {
             icon: "hourglass_top"
-            title: "Countdown"
+            title: Translation.tr("Countdown")
             time: Timers.format(Timers.countdownLeft)
             progress: Timers.countdownTotal > 0 ? 1 - Timers.countdownLeft / Timers.countdownTotal : 0
             running: Timers.countdownRunning
@@ -122,7 +122,7 @@ StyledFlickable {
 
             Chip { text: "+1 m"; implicitHeight: 26; onClicked: Timers.addCountdown(60) }
             Chip { text: "+5 m"; implicitHeight: 26; onClicked: Timers.addCountdown(300) }
-            Chip { text: "Reset"; implicitHeight: 26; onClicked: Timers.resetCountdown() }
+            Chip { text: Translation.tr("Reset"); implicitHeight: 26; onClicked: Timers.resetCountdown() }
         }
     }
 }

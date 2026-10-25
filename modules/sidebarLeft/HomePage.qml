@@ -42,13 +42,13 @@ ColumnLayout {
                 StyledText {
                     Layout.fillWidth: true
                     readonly property int hour: clock.date.getHours()
-                    text: `${hour < 5 ? "Good night" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"}, ${Quickshell.env("USER")}!`
+                    text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Quickshell.env("USER")}!`
                     font.pixelSize: Appearance.font.size.titleLarge
                     font.weight: Font.Medium
                 }
                 StyledText {
                     Layout.fillWidth: true
-                    text: Qt.formatDate(clock.date, "dddd, d MMMM") + (Todo.pending ? ` · ${Todo.pending} task${Todo.pending === 1 ? "" : "s"}` : "")
+                    text: clock.date.toLocaleDateString(Translation.locale, "dddd, d MMMM") + (Todo.pending ? " · " + Translation.trn("%1 task", "%1 tasks", Todo.pending) : "")
                     color: Colors.m3onSurfaceVariant
                 }
             }
@@ -193,7 +193,7 @@ ColumnLayout {
                 StyledText {
                     anchors.centerIn: parent
                     visible: Lyrics.lines.length === 0
-                    text: Lyrics.loading ? "Looking for lyrics…" : Lyrics.status === "error" ? "Couldn't load lyrics" : "No lyrics found"
+                    text: Lyrics.loading ? Translation.tr("Looking for lyrics…") : Lyrics.status === "error" ? Translation.tr("Couldn't load lyrics") : Translation.tr("No lyrics found")
                     color: Colors.m3outline
                 }
             }
@@ -235,7 +235,7 @@ ColumnLayout {
                 }
                 StyledText {
                     Layout.fillWidth: true
-                    text: Weather.ready ? `${Weather.city} · feels like ${Math.round(Weather.current.feelsLike)}° · ${Weather.current.humidity}% humidity` : ""
+                    text: Weather.ready ? Translation.tr("%1 · feels like %2° · %3% humidity").arg(Weather.city).arg(Math.round(Weather.current.feelsLike)).arg(Weather.current.humidity) : ""
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant
                 }

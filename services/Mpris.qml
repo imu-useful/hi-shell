@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import qs.common
 
 // Media players (MPRIS). `active` is the player the UI controls: the one that
 // most recently started playing, else any playing one, else the first.
@@ -27,7 +28,7 @@ Singleton {
     readonly property bool hasPlayer: active !== null
     readonly property bool playing: active?.isPlaying ?? false
 
-    readonly property string title: active?.trackTitle || "No media"
+    readonly property string title: active?.trackTitle || Translation.tr("No media")
     readonly property string artist: active?.trackArtist ?? ""
     readonly property string album: active?.trackAlbum ?? ""
     readonly property string artUrl: active?.trackArtUrl ?? ""

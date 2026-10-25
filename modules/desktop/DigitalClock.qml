@@ -10,7 +10,8 @@ ColumnLayout {
 
     SystemClock {
         id: clock
-        precision: SystemClock.Seconds
+        // The colon blinks with the seconds; minutes are enough while windows cover it.
+        precision: ShellState.desktopCovered ? SystemClock.Minutes : SystemClock.Seconds
     }
 
     Row {
@@ -33,8 +34,8 @@ ColumnLayout {
         Digits {
             text: ":"
             color: Colors.m3onSurface
+            // No fade: an animation every second would keep redrawing the desktop.
             opacity: clock.date.getSeconds() % 2 ? 0.25 : 0.9
-            Behavior on opacity { EffectAnim {} }
         }
         Digits {
             text: Qt.formatTime(clock.date, "mm")
@@ -44,7 +45,7 @@ ColumnLayout {
 
     StyledText {
         Layout.alignment: Qt.AlignHCenter
-        text: Qt.formatDate(clock.date, "dddd, d MMMM")
+        text: clock.date.toLocaleDateString(Translation.locale, "dddd, d MMMM")
         font.pixelSize: Appearance.font.size.titleLarge
         font.weight: Font.Medium
         color: Colors.m3onSurface

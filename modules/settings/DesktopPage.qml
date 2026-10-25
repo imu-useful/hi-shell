@@ -21,26 +21,26 @@ ColumnLayout {
 
     Section {
         icon: "desktop_windows"
-        title: "Desktop"
+        title: Translation.tr("Desktop")
 
-        SwitchRow { icon: "wallpaper"; title: "Draw the wallpaper"; subtitle: "Turn off if another tool (swww, hyprpaper) draws it"; checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
-        SwitchRow { icon: "widgets"; title: "Widgets"; checked: root.d.widgets; onToggled: checked => root.d.widgets = checked }
-        SwitchRow { icon: "graphic_eq"; title: "Visualizer while music plays"; subtitle: "Needs cava"; checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
+        SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
+        SwitchRow { icon: "widgets"; title: Translation.tr("Widgets"); checked: root.d.widgets; onToggled: checked => root.d.widgets = checked }
+        SwitchRow { icon: "graphic_eq"; title: Translation.tr("Visualizer while music plays"); subtitle: Translation.tr("Needs cava"); checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
         ChoiceRow {
             icon: "monitor"
-            title: "Widgets on"
+            title: Translation.tr("Widgets on")
             value: root.d.monitor
-            options: [{ value: "", text: "First screen" }, ...Quickshell.screens.map(s => ({ value: s.name, text: s.name }))]
+            options: [{ value: "", text: Translation.tr("First screen") }, ...Quickshell.screens.map(s => ({ value: s.name, text: s.name }))]
             onSelected: value => root.d.monitor = value
         }
         ListRow {
             Layout.fillWidth: true
             icon: "dashboard_customize"
-            title: "Arrange widgets"
-            subtitle: "Or right-click the desktop"
+            title: Translation.tr("Arrange widgets")
+            subtitle: Translation.tr("Or right-click the desktop")
             M3Button {
                 tonal: true
-                text: "Edit layout"
+                text: Translation.tr("Edit layout")
                 onClicked: {
                     ShellState.settingsOpen = false;
                     ShellState.desktopEditing = true;
@@ -55,7 +55,7 @@ ColumnLayout {
                 model: DesktopLayout.ids
                 Chip {
                     required property string modelData
-                    text: DesktopLayout.names[modelData]
+                    text: Translation.tr(DesktopLayout.names[modelData])
                     selected: DesktopLayout.entry(root.d.layout, modelData).enabled
                     onClicked: root.setEnabled(modelData, !selected)
                 }
@@ -65,17 +65,17 @@ ColumnLayout {
 
     Section {
         icon: "dock_to_bottom"
-        title: "Dock"
+        title: Translation.tr("Dock")
 
-        SwitchRow { icon: "dock_to_bottom"; title: "Dock"; checked: Config.options.dock.enabled; onToggled: checked => Config.options.dock.enabled = checked }
-        SwitchRow { icon: "visibility_off"; title: "Hide until the pointer reaches the bottom edge"; checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
-        SwitchRow { icon: "zoom_in"; title: "Magnify on hover"; checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }
-        SliderRow { icon: "photo_size_select_large"; title: "Icon size"; value: Config.options.dock.iconSize; from: 28; to: 72; suffix: " px"; onMoved: value => Config.options.dock.iconSize = value }
+        SwitchRow { icon: "dock_to_bottom"; title: Translation.tr("Dock"); checked: Config.options.dock.enabled; onToggled: checked => Config.options.dock.enabled = checked }
+        SwitchRow { icon: "visibility_off"; title: Translation.tr("Hide until the pointer reaches the bottom edge"); checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
+        SwitchRow { icon: "zoom_in"; title: Translation.tr("Magnify on hover"); checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }
+        SliderRow { icon: "photo_size_select_large"; title: Translation.tr("Icon size"); value: Config.options.dock.iconSize; from: 28; to: 72; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.iconSize = value }
     }
 
     Section {
         icon: "crop_free"
-        title: "Wallpaper frame"
+        title: Translation.tr("Wallpaper frame")
 
         Flow {
             Layout.fillWidth: true
@@ -93,8 +93,8 @@ ColumnLayout {
         }
         TextRow {
             icon: "image"
-            title: "Image frame widget picture"
-            subtitle: "Empty = the wallpaper"
+            title: Translation.tr("Image frame widget picture")
+            subtitle: Translation.tr("Empty = the wallpaper")
             value: root.d.image
             fieldWidth: 300
             placeholder: "~/Pictures/photo.jpg"
@@ -104,12 +104,12 @@ ColumnLayout {
 
     Section {
         icon: "public"
-        title: "World clock"
+        title: Translation.tr("World clock")
 
         TextRow {
             icon: "schedule"
-            title: "Time zones"
-            subtitle: "IANA names, comma separated"
+            title: Translation.tr("Time zones")
+            subtitle: Translation.tr("IANA names, comma separated")
             value: root.d.worldClocks.join(", ")
             fieldWidth: 380
             onEdited: text => root.d.worldClocks = text.split(",").map(z => z.trim()).filter(z => z)

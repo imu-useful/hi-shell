@@ -29,7 +29,7 @@ Singleton {
     // "" = the CLI's default, or an alias the CLI accepts (opus, sonnet, haiku).
     property string model: Config.options.ai.model
     readonly property var models: [
-        { id: "", name: "Default" },
+        { id: "", name: Translation.tr("Default") },
         { id: "opus", name: "Opus" },
         { id: "sonnet", name: "Sonnet" },
         { id: "haiku", name: "Haiku" }
@@ -185,7 +185,7 @@ Singleton {
             outputTokens += u.output_tokens ?? 0;
             costUsd += ev.total_cost_usd ?? 0;
             if (ev.is_error)
-                finish("error", ev.result || `Claude returned an error (${ev.subtype}).`);
+                finish("error", ev.result || Translation.tr("Claude returned an error (%1).").arg(ev.subtype));
             else if (current().text === "")
                 finish(undefined, ev.result || "");
             else
@@ -243,11 +243,11 @@ Singleton {
                 return;
             const cur = root.current();
             if (root.cancelled)
-                root.finish(undefined, cur.text === "" ? "_Stopped._" : cur.text + "\n\n_Stopped._");
+                root.finish(undefined, cur.text === "" ? Translation.tr("_Stopped._") : cur.text + "\n\n_Stopped._");
             else if (exitCode === 127)
-                root.finish("error", "The `claude` CLI was not found. Install Claude Code and make sure `claude` is on PATH.");
+                root.finish("error", Translation.tr("The `claude` CLI was not found. Install Claude Code and make sure `claude` is on PATH."));
             else
-                root.finish("error", stderr.text.trim() || `claude exited with code ${exitCode}.`);
+                root.finish("error", stderr.text.trim() || Translation.tr("claude exited with code %1.").arg(exitCode));
         }
     }
 }

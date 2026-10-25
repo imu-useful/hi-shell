@@ -55,14 +55,14 @@ ColumnLayout {
 
                 StyledText {
                     visible: search.text === ""
-                    text: `Search ${Clipboard.entries.length} items`
+                    text: Translation.trn("Search %1 item", "Search %1 items", Clipboard.entries.length)
                     color: Colors.m3outline
                 }
             }
         }
         IconButton {
             icon: "delete_sweep"
-            tooltip: "Clear history"
+            tooltip: Translation.tr("Clear history")
             enabled: Clipboard.entries.length > 0
             onClicked: Clipboard.wipe()
         }
@@ -141,7 +141,7 @@ ColumnLayout {
         StyledText {
             anchors.centerIn: parent
             visible: list.count === 0
-            text: Clipboard.entries.length === 0 ? "Clipboard history is empty" : "Nothing matches"
+            text: Clipboard.entries.length === 0 ? Translation.tr("Clipboard history is empty") : Translation.tr("Nothing matches")
             color: Colors.m3outline
         }
     }

@@ -4,19 +4,33 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// Apps, Claude, translator, clipboard.
+// Language, apps, Claude, translator, clipboard.
 ColumnLayout {
     readonly property var o: Config.options
     spacing: 24
 
     Section {
+        icon: "language"
+        title: Translation.tr("Language")
+
+        ChoiceRow {
+            icon: "translate"
+            title: Translation.tr("Interface language")
+            subtitle: o.language === "auto" ? Translation.tr("Auto follows $LANG") : ""
+            value: o.language
+            options: [{ value: "auto", text: Translation.tr("Auto") }, ...Translation.available.map(l => ({ value: l.code, text: l.name }))]
+            onSelected: value => o.language = value
+        }
+    }
+
+    Section {
         icon: "apps"
-        title: "Apps"
+        title: Translation.tr("Apps")
 
         TextRow {
             icon: "terminal"
-            title: "Terminal"
-            subtitle: "For terminal apps and system upgrades"
+            title: Translation.tr("Terminal")
+            subtitle: Translation.tr("For terminal apps and system upgrades")
             value: o.apps.terminal
             onEdited: text => o.apps.terminal = text.trim() || "kitty"
         }
@@ -24,12 +38,12 @@ ColumnLayout {
 
     Section {
         icon: "auto_awesome"
-        title: "Claude"
+        title: Translation.tr("Claude")
 
         ChoiceRow {
             icon: "neurology"
-            title: "Model"
-            subtitle: "Used by the palette and the sidebar chat"
+            title: Translation.tr("Model")
+            subtitle: Translation.tr("Used by the palette and the sidebar chat")
             value: Claude.model
             options: Claude.models.map(m => ({ value: m.id, text: m.name }))
             onSelected: value => Claude.model = value
@@ -38,12 +52,12 @@ ColumnLayout {
 
     Section {
         icon: "translate"
-        title: "Translator"
+        title: Translation.tr("Translator")
 
         TextRow {
             icon: "language"
-            title: "Languages"
-            subtitle: "Quick picks, comma separated codes"
+            title: Translation.tr("Languages")
+            subtitle: Translation.tr("Quick picks, comma separated codes")
             value: o.translator.languages.join(", ")
             onEdited: text => o.translator.languages = text.split(",").map(l => l.trim().toLowerCase()).filter(l => l)
         }
@@ -51,12 +65,12 @@ ColumnLayout {
 
     Section {
         icon: "content_paste"
-        title: "Clipboard"
+        title: Translation.tr("Clipboard")
 
         SwitchRow {
             icon: "history"
-            title: "Keep clipboard history"
-            subtitle: "Starts wl-paste --watch cliphist store with the shell"
+            title: Translation.tr("Keep clipboard history")
+            subtitle: Translation.tr("Starts wl-paste --watch cliphist store with the shell")
             checked: o.clipboard.watch
             onToggled: checked => o.clipboard.watch = checked
         }

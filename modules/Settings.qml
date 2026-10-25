@@ -116,7 +116,7 @@ Scope {
                                     font.weight: Font.Medium
                                 }
                                 StyledText {
-                                    text: "Arch Linux · Hyprland"
+                                    text: Translation.tr("Arch Linux · Hyprland")
                                     font.pixelSize: Appearance.font.size.labelSmall
                                     color: Colors.m3onSurfaceVariant
                                 }
@@ -127,7 +127,7 @@ Scope {
                             Layout.margins: 6
                             tonal: true
                             icon: "edit"
-                            text: "Config file"
+                            text: Translation.tr("Config file")
                             onClicked: {
                                 root.setOpen(false);
                                 Qt.openUrlExternally(`file://${Config.path}`);
@@ -161,7 +161,7 @@ Scope {
                                     }
                                     StyledText {
                                         Layout.fillWidth: true
-                                        text: modelData.title
+                                        text: Translation.tr(modelData.title)
                                         font.weight: active ? Font.Medium : Font.Normal
                                         color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
                                     }

@@ -21,12 +21,12 @@ Scope {
     property string query: ""
 
     readonly property var prefixes: [
-        { key: "=", icon: "calculate", name: "Calculator" },
-        { key: ">", icon: "terminal", name: "Run command" },
-        { key: "<", icon: "keyboard", name: "Keybinds" },
-        { key: ":", icon: "mood", name: "Emoji" },
-        { key: ";", icon: "content_paste", name: "Clipboard" },
-        { key: "/", icon: "settings", name: "Settings" }
+        { key: "=", icon: "calculate", name: Translation.tr("Calculator") },
+        { key: ">", icon: "terminal", name: Translation.tr("Run command") },
+        { key: "<", icon: "keyboard", name: Translation.tr("Keybinds") },
+        { key: ":", icon: "mood", name: Translation.tr("Emoji") },
+        { key: ";", icon: "content_paste", name: Translation.tr("Clipboard") },
+        { key: "/", icon: "settings", name: Translation.tr("Settings") }
     ]
     readonly property string mode: prefixes.some(p => p.key === query[0]) ? query[0] : ""
     readonly property string term: mode ? query.slice(1).trim() : query.trim()
@@ -41,14 +41,14 @@ Scope {
         case "=":
             return term === "" ? [] : [{
                 name: calcResult || "…",
-                comment: calcResult ? "Enter copies the result" : term,
+                comment: calcResult ? Translation.tr("Enter copies the result") : term,
                 materialIcon: "calculate",
                 run: () => Quickshell.clipboardText = calcResult.replace(/^[≈=]\s*/, "")
             }];
         case ">":
             return term === "" ? [] : [
-                { name: term, comment: "Run", materialIcon: "terminal", run: () => Quickshell.execDetached(["sh", "-c", term]) },
-                { name: term, comment: "Run in a terminal", materialIcon: "keyboard_command_key",
+                { name: term, comment: Translation.tr("Run"), materialIcon: "terminal", run: () => Quickshell.execDetached(["sh", "-c", term]) },
+                { name: term, comment: Translation.tr("Run in a terminal"), materialIcon: "keyboard_command_key",
                   run: () => Quickshell.execDetached([Config.options.apps.terminal, "-e", "sh", "-c", `${term}; exec $SHELL`]) }
             ];
         case "<":
@@ -56,12 +56,12 @@ Scope {
                 .map(b => ({ name: b.label, comment: b.keys, materialIcon: "keyboard", run: () => {} }));
         case ":":
             return term === "" ? [] : emoji.filter(e => e[1].includes(term.toLowerCase())).slice(0, 40)
-                .map(e => ({ name: e[1], comment: "Enter copies it", glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
+                .map(e => ({ name: e[1], comment: Translation.tr("Enter copies it"), glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
         case ";":
             return Clipboard.entries.filter(e => !e.image && e.text.toLowerCase().includes(term.toLowerCase())).slice(0, 40)
-                .map(e => ({ name: e.text.replace(/\s+/g, " "), comment: "Copy", materialIcon: "content_paste", run: () => Clipboard.copy(e) }));
+                .map(e => ({ name: e.text.replace(/\s+/g, " "), comment: Translation.tr("Copy"), materialIcon: "content_paste", run: () => Clipboard.copy(e) }));
         case "/":
-            return (term ? Pages.search(term) : Pages.pages).map(settingsItem);
+            return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
             return [...settingsMatches(term), ...filterApps(term)];
         }
@@ -69,8 +69,8 @@ Scope {
 
     function settingsItem(p) {
         return {
-            name: `Settings › ${p.title}`,
-            comment: p.keywords.split(" ").slice(0, 8).join(", ") + "…",
+            name: `${Translation.tr("Settings")} › ${Translation.tr(p.title)}`,
+            comment: Translation.tr(p.keywords).split(" ").slice(0, 8).join(", ") + "…",
             materialIcon: p.icon,
             run: () => {
                 ShellState.settingsPage = p.id;
@@ -80,7 +80,7 @@ Scope {
     }
 
     function settingsMatches(text) {
-        return text.length < 2 ? [] : Pages.search(text).slice(0, 3).map(settingsItem);
+        return text.length < 2 ? [] : Pages.search(text, Translation.tr).slice(0, 3).map(settingsItem);
     }
 
     function toggle() {
@@ -337,7 +337,7 @@ Scope {
                                 StyledText {
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: search.text === ""
-                                    text: "Search apps, or type = > < : ; /"
+                                    text: Translation.tr("Search apps, or type = > < : ; /")
                                     font: search.font
                                     color: Colors.m3onSurfaceVariant
                                 }
@@ -388,7 +388,7 @@ Scope {
                         Layout.fillWidth: true
                         Layout.margins: 12
                         visible: list.count === 0 && search.text !== ""
-                        text: root.mode === "" ? `No apps match “${root.query}”` : root.mode === ":" && root.emoji.length === 0 ? "Loading emoji…" : root.term === "" ? "Type to search" : "Nothing found"
+                        text: root.mode === "" ? Translation.tr("No apps match “%1”").arg(root.query) : root.mode === ":" && root.emoji.length === 0 ? Translation.tr("Loading emoji…") : root.term === "" ? Translation.tr("Type to search") : Translation.tr("Nothing found")
                         horizontalAlignment: Text.AlignHCenter
                         font.pixelSize: 13
                         color: Colors.m3onSurfaceVariant

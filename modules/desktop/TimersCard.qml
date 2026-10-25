@@ -59,21 +59,21 @@ Row {
 
     Tile {
         icon: Timers.onBreak ? "coffee" : "self_improvement"
-        label: Timers.onBreak ? "Break" : "Focus"
+        label: Timers.onBreak ? Translation.tr("Break") : Translation.tr("Focus")
         time: Timers.format(Timers.focusLeft)
         running: Timers.focusRunning
         onToggle: Timers.toggleFocus()
     }
     Tile {
         icon: "timer"
-        label: "Stopwatch"
+        label: Translation.tr("Stopwatch")
         time: Timers.format(Timers.stopwatchElapsed)
         running: Timers.stopwatchRunning
         onToggle: Timers.toggleStopwatch()
     }
     Tile {
         icon: "hourglass_top"
-        label: "Countdown"
+        label: Translation.tr("Countdown")
         time: Timers.format(Timers.countdownLeft)
         running: Timers.countdownRunning
         onToggle: Timers.toggleCountdown()

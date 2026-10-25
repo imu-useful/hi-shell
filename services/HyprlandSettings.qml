@@ -75,6 +75,14 @@ Singleton {
         refreshLater.restart();
     }
 
+    // Re-apply everything in Config hyprland.* (e.g. after a preset import).
+    function applyOverrides() {
+        if (Object.keys(overrides.options).length)
+            apply(`hl.config(${lua(nest(overrides.options))})`);
+        writeLua();
+        refreshLater.restart();
+    }
+
     function apply(code) {
         Quickshell.execDetached(["hyprctl", "eval", code]);
     }

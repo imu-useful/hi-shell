@@ -85,25 +85,25 @@ BarWidget {
             spacing: 4
 
             StyledText {
-                text: `Battery ${Battery.percent}%`
+                text: Translation.tr("Battery %1%").arg(Battery.percent)
                 font.pixelSize: Appearance.font.size.titleMedium
                 font.weight: Font.Medium
             }
             StyledText {
-                text: Battery.full ? "Fully charged" : Battery.charging
-                    ? `Charging${Battery.timeLeftText ? " · full in " + Battery.timeLeftText : ""}`
-                    : `On battery${Battery.timeLeftText ? " · " + Battery.timeLeftText + " left" : ""}`
+                text: Battery.full ? Translation.tr("Fully charged") : Battery.charging
+                    ? (Battery.timeLeftText ? Translation.tr("Charging · full in %1").arg(Battery.timeLeftText) : Translation.tr("Charging"))
+                    : (Battery.timeLeftText ? Translation.tr("On battery · %1 left").arg(Battery.timeLeftText) : Translation.tr("On battery"))
                 color: Colors.m3onSurfaceVariant
             }
             StyledText {
                 visible: Battery.watts > 0
-                text: `${Battery.watts.toFixed(1)} W`
+                text: Translation.tr("%1 W").arg(Battery.watts.toFixed(1))
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3onSurfaceVariant
             }
             StyledText {
                 visible: Battery.health >= 0
-                text: `Health ${Math.round(Battery.health)}%`
+                text: Translation.tr("Health %1%").arg(Math.round(Battery.health))
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3onSurfaceVariant
             }

@@ -8,7 +8,7 @@ import qs.common.widgets
 DesktopCard {
     id: root
 
-    readonly property var locale: Qt.locale()
+    readonly property var locale: Translation.locale
     readonly property var today: clock.date
     readonly property var weekStart: {
         const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());

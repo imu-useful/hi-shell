@@ -13,7 +13,7 @@ ShellRoot {
 
     // Singletons load lazily; create the background services (and their IPC
     // handlers) at startup: palette, notification daemon, battery warnings, ...
-    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session]
+    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets]
 
     Desktop {}
 
@@ -52,4 +52,6 @@ ShellRoot {
     NotificationPopups {}
 
     OnScreenDisplay {}
+
+    Welcome {}
 }

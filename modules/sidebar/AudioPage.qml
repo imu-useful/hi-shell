@@ -65,10 +65,10 @@ StyledFlickable {
         width: root.width
         spacing: 4
 
-        Section { text: "Apps" }
+        Section { text: Translation.tr("Apps") }
         StyledText {
             visible: root.streams.length === 0
-            text: "No apps are playing audio"
+            text: Translation.tr("No apps are playing audio")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }
@@ -85,14 +85,14 @@ StyledFlickable {
             }
         }
 
-        Section { text: "Output" }
+        Section { text: Translation.tr("Output") }
         DeviceList {
             devices: root.sinks
             current: Pipewire.defaultAudioSink
             onPicked: node => Pipewire.preferredDefaultAudioSink = node
         }
 
-        Section { text: "Input" }
+        Section { text: Translation.tr("Input") }
         DeviceList {
             devices: root.sources
             current: Pipewire.defaultAudioSource

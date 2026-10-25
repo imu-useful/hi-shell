@@ -13,6 +13,9 @@ Singleton {
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
     property bool desktopEditing: false
+    // Windows cover the desktop widgets (their screen's workspace has windows):
+    // second-by-second clocks, lyrics and the visualizer pause.
+    property bool desktopCovered: false
     property bool wallpaperSelectorOpen: false
     property bool settingsOpen: false
     property bool sessionOpen: false
