@@ -34,3 +34,9 @@ hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, ignore_alpha = 0.3 
 -- Bar (translucent styles blur what's behind; ignore_alpha keeps fully transparent parts unblurred)
 hl.layer_rule({ match = { namespace = "hi-shell-bar" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-bar" }, ignore_alpha = 0.3 })
+
+-- Notification popups and on-screen indicators
+hl.layer_rule({ match = { namespace = "hi-shell-notifications" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-notifications" }, ignore_alpha = 0.3 })
+hl.layer_rule({ match = { namespace = "hi-shell-osd" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-osd" }, ignore_alpha = 0.3 })

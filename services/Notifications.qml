@@ -9,7 +9,7 @@ import qs.common
 // Notification daemon (org.freedesktop.Notifications): popups, history kept
 // across restarts, do-not-disturb. Only one daemon can own the bus name; if
 // another one (mako, dunst, illogical-impulse) runs, hi-shell gets nothing.
-// IPC: `qs -c hi-shell ipc call notifications toggleDnd` (clear).
+// IPC: `qs -c hi-shell ipc call notifications toggleDnd` (clear, list, dismiss <uid>).
 Singleton {
     id: root
 
@@ -43,10 +43,20 @@ Singleton {
 
         readonly property bool critical: urgency === NotificationUrgency.Critical
 
+        // Popup countdown; pauses while the pointer is over the popup.
+        property bool paused: false
+        property real elapsed: 0
+        readonly property real remaining: timeout > 0 ? Math.max(0, 1 - elapsed / timeout) : 1 // 1..0
+
         property Timer expiry: Timer {
-            interval: notif.timeout
-            running: notif.popup && notif.timeout > 0
-            onTriggered: notif.popup = false
+            interval: 50
+            repeat: true
+            running: notif.popup && notif.timeout > 0 && !notif.paused
+            onTriggered: {
+                notif.elapsed += interval;
+                if (notif.elapsed >= notif.timeout)
+                    notif.popup = false;
+            }
         }
 
         property Connections source: Connections {
@@ -82,6 +92,7 @@ Singleton {
         item.timeout = n.urgency === NotificationUrgency.Critical || n.expireTimeout === 0 ? 0
                      : n.expireTimeout > 0 ? n.expireTimeout : options.defaultTimeout;
         item.read = false;
+        item.elapsed = 0;
         item.popup = !dnd || item.critical;
         if (!existing)
             list = [item, ...list].slice(0, Math.max(1, options.historyLimit));
@@ -217,6 +228,13 @@ Singleton {
         }
         function clear(): void {
             root.clear();
+        }
+        // One "uid<TAB>app<TAB>summary" line per notification, newest first.
+        function list(): string {
+            return root.list.map(n => `${n.uid}\t${n.appName}\t${n.summary}`).join("\n");
+        }
+        function dismiss(uid: int): void {
+            root.dismiss(uid);
         }
     }
 }

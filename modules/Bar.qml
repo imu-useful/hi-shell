@@ -49,6 +49,7 @@ PanelWindow {
         updates: updates,
         keyboardLayout: keyboardLayout,
         power: power,
+        notifications: notifications,
         visualizer: visualizer,
         divider: divider
     })
@@ -68,6 +69,7 @@ PanelWindow {
     Component { id: updates; UpdatesWidget {} }
     Component { id: keyboardLayout; KeyboardLayout {} }
     Component { id: power; PowerButton {} }
+    Component { id: notifications; NotificationsWidget {} }
     Component { id: visualizer; Visualizer {} }
     Component { id: divider; Divider {} }
 

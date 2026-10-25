@@ -77,7 +77,7 @@ Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC
 qs -c hi-shell ipc call launcher toggle       # also: ai, controlcenter, calendar
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
-qs -c hi-shell ipc call notifications toggleDnd   # clear
+qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
 qs -c hi-shell ipc call weather refresh
 qs -c hi-shell ipc call updates refresh       # count
 qs -c hi-shell ipc call tray list             # item ids for tray.hidden
@@ -91,7 +91,7 @@ Edits apply live, no restart needed. Sections:
 - `appearance`: fonts, transparency, animation speed (`0` disables animations)
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
-  `weather`, `tray`, `systemIcons`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
+  `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
   `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
   `bar.resources`, `bar.utilButtons`, `bar.updates`
 - `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval
@@ -106,6 +106,14 @@ Edits apply live, no restart needed. Sections:
 hi-shell is a notification daemon. Only one daemon can run at a time: while another one
 (illogical-impulse's `qs -c ii`, mako, dunst, ...) is running, hi-shell waits and takes over once it exits.
 History is kept in `~/.local/state/hi-shell/notifications.json`.
+
+Popups appear in the corner next to the bar: click a popup for the app's default action (or to expand it),
+use its buttons or inline reply, swipe it sideways or press × to dismiss. Hovering pauses its timeout.
+The bell in the bar shows the unread count: left click marks all read, right click toggles do not disturb
+(critical notifications still show).
+
+Volume, mic mute, brightness and keyboard layout changes show a short indicator under the bar, whatever
+made the change (keys, `wpctl`, `brightnessctl`, ...).
 
 ## Theming
 

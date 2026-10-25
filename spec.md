@@ -71,9 +71,9 @@ screen translator, translations other than en/ru.
 - [x] Bar cava visualizer (optional, `cava`).
 
 ## Stage 10: Notifications & OSD
-- [ ] Notification popups (stacked, actions, inline reply, images, grouping by app, timeout progress).
-- [ ] Do-not-disturb, unread count on the bar.
-- [ ] OSD for volume / brightness / mic mute / keyboard layout.
+- [x] Notification popups (stacked, actions, inline reply, images, timeout progress, swipe to dismiss).
+- [x] Do-not-disturb, unread count on the bar.
+- [x] OSD for volume / brightness / mic mute / keyboard layout.
 
 ## Stage 11: Right sidebar (replaces Control Center)
 - [ ] Header: avatar, uptime, edit / reload / settings / power buttons.
@@ -81,7 +81,7 @@ screen translator, translations other than en/ru.
       night light (hyprsunset), idle inhibitor, DND, mic, game mode, VPN, color picker, screenshot.
 - [ ] Quick sliders: volume, brightness, mic; per-app volume and output device picker.
 - [ ] Wi-Fi and Bluetooth sub-pages (scan, connect, password prompt).
-- [ ] Bottom group: notification center, calendar (reuse the clock popup), to-do, timers.
+- [ ] Bottom group: notification center (grouped by app), calendar (reuse the clock popup), to-do, timers.
 
 ## Stage 12: Left sidebar
 - [ ] Home page: greeting card, media player with synced lyrics (LRCLIB), weather.

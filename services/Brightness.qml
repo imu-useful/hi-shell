@@ -98,10 +98,10 @@ Singleton {
             }
         }
 
-        // Pick up changes made elsewhere (brightness keys, other tools). DDC is slow, so rarely.
+        // Fallback for missed changes; DDC is slow, so rarely.
         property Timer poll: Timer {
             running: monitor.available
-            interval: monitor.internal ? 3000 : 30000
+            interval: monitor.internal ? 10000 : 30000
             repeat: true
             onTriggered: monitor.refresh()
         }
@@ -116,6 +116,18 @@ Singleton {
             screen: modelData
             backlight: root.backlight
             ddcBus: root.ddcBuses[modelData.name] ?? -1
+        }
+    }
+
+    // Backlight changes from elsewhere (brightness keys, brightnessctl) arrive as udev events.
+    Process {
+        running: root.backlight !== ""
+        command: ["udevadm", "monitor", "--udev", "--subsystem-match=backlight"]
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.includes("(backlight)"))
+                    root.monitors.filter(m => m.internal).forEach(m => m.refresh());
+            }
         }
     }
 

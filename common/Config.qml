@@ -66,10 +66,10 @@ Singleton {
                 property int height: 40
                 property int margin: 6
                 // Widget ids: launcher, workspaces, activeWindow, media, resources, clock, weather, tray,
-                // systemIcons, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
+                // systemIcons, notifications, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
                 property list<string> left: ["launcher", "activeWindow"]
                 property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
-                property list<string> right: ["tray", "keyboardLayout", "battery", "systemIcons", "power"]
+                property list<string> right: ["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]
 
                 property JsonObject workspaces: JsonObject {
                     property int shown: 10
