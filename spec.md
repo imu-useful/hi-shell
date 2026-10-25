@@ -56,11 +56,11 @@ screen translator, translations other than en/ru.
 - [x] `PanelLoader`: lazy-load panels so closed panels cost nothing.
 
 ## Stage 8: Core services
-- [ ] `services/Mpris.qml`: active player, controls, position (Quickshell.Services.Mpris).
-- [ ] `services/Weather.qml`: Open-Meteo (no API key), location from config or IP, cached.
-- [ ] `services/Battery.qml` (UPower), `services/Brightness.qml` (brightnessctl/ddcutil), `services/NetworkSpeed.qml` (`/proc/net/dev`).
-- [ ] `services/Notifications.qml`: notification server (Quickshell.Services.Notifications), history persisted to state.
-- [ ] `services/Tray.qml`, `services/Updates.qml` (`checkupdates`), resource usage extended with disk/GPU/temps.
+- [x] `services/Mpris.qml`: active player, controls, position (Quickshell.Services.Mpris).
+- [x] `services/Weather.qml`: Open-Meteo (no API key), location from config or IP, cached.
+- [x] `services/Battery.qml` (UPower), `services/Brightness.qml` (brightnessctl/ddcutil), `services/NetworkSpeed.qml` (`/proc/net/dev`).
+- [x] `services/Notifications.qml`: notification server (Quickshell.Services.Notifications), history persisted to state.
+- [x] `services/Tray.qml`, `services/Updates.qml` (`checkupdates`), resource usage extended with disk/GPU/temps.
 
 ## Stage 9: Bar v2
 - [ ] Configurable layout: `bar.left/center/right` lists of widget ids, edited from settings (Stage 14).

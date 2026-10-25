@@ -7,6 +7,7 @@ import Quickshell.Wayland
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import qs.common
+import qs.services
 import qs.common.widgets
 import qs.modules.controlcenter
 

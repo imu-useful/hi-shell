@@ -15,6 +15,7 @@ Singleton {
 
     readonly property alias options: adapter
     readonly property bool ready: file.loaded
+    property bool filledIn: false
 
     FileView {
         id: file
@@ -24,6 +25,13 @@ Singleton {
         printErrors: false
         onFileChanged: reload()
         onAdapterUpdated: writeTimer.restart()
+        // Write back once per start so options added in newer versions show up in the file.
+        onLoaded: {
+            if (!root.filledIn) {
+                root.filledIn = true;
+                writeTimer.restart();
+            }
+        }
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound) {
                 mkdir.running = true;
@@ -52,6 +60,40 @@ Singleton {
             property JsonObject bar: JsonObject {
                 property int height: 40
                 property int margin: 6
+            }
+
+            property JsonObject weather: JsonObject {
+                property bool enabled: true
+                // Empty city and 0/0 coordinates = locate by IP address.
+                property string city: ""
+                property real latitude: 0
+                property real longitude: 0
+                property bool imperial: false
+                property int refreshMinutes: 15
+            }
+
+            property JsonObject battery: JsonObject {
+                property int low: 20
+                property int critical: 10
+                property bool warnings: true
+            }
+
+            property JsonObject notifications: JsonObject {
+                // Popup timeout (ms) when the app doesn't set one.
+                property int defaultTimeout: 6000
+                property int historyLimit: 100
+            }
+
+            property JsonObject updates: JsonObject {
+                property bool enabled: true
+                property int intervalMinutes: 60
+                // Also count AUR updates (needs yay or paru).
+                property bool aur: true
+            }
+
+            property JsonObject tray: JsonObject {
+                // Item ids (see `qs -c hi-shell ipc call tray list`) to leave out of the bar.
+                property list<string> hidden: []
             }
 
             property JsonObject apps: JsonObject {

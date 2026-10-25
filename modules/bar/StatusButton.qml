@@ -4,6 +4,7 @@ import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import qs.common
+import qs.services
 
 // Right side of the bar: CPU/RAM and network/bluetooth/volume status.
 // Clicking toggles the control center.

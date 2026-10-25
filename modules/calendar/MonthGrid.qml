@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.services
 import qs.common.widgets
 
 // Month view: header with navigation, weekday row, 6x7 day grid.

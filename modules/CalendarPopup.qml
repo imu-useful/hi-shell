@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
+import qs.services
 import qs.common.widgets
 import qs.modules.calendar
 

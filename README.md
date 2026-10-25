@@ -22,6 +22,10 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `pipewire`, `wireplumber` | volume control |
 | `networkmanager` | Wi-Fi toggle |
 | `bluez` | Bluetooth toggle |
+| `upower` | battery status |
+| `brightnessctl`, `ddcutil` (optional) | brightness of the built-in panel / external monitors |
+| `pacman-contrib`, `yay` or `paru` (optional) | update count |
+| `libnotify` | battery warnings (`notify-send`) |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
 ```sh
@@ -67,13 +71,33 @@ Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC
 
 ```sh
 qs -c hi-shell ipc call launcher toggle       # also: ai, controlcenter, calendar
+qs -c hi-shell ipc call mpris playPause       # next, previous
+qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
+qs -c hi-shell ipc call notifications toggleDnd   # clear
+qs -c hi-shell ipc call weather refresh
+qs -c hi-shell ipc call updates refresh       # count
+qs -c hi-shell ipc call tray list             # item ids for tray.hidden
 ```
 
 ## Configuration
 
 Settings live in `~/.config/hi-shell/config.json`, created with the defaults on first start.
-Edits apply live, no restart needed. Currently: fonts, transparency, animation speed (`0` disables animations),
-bar height/margin and the terminal used for terminal apps.
+Edits apply live, no restart needed. Sections:
+
+- `appearance`: fonts, transparency, animation speed (`0` disables animations)
+- `bar`: height, margin
+- `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval
+- `battery`: low / critical thresholds and warning notifications
+- `notifications`: default popup timeout, history size
+- `updates`: check interval, include AUR (via `yay` or `paru`)
+- `tray.hidden`: tray item ids to hide
+- `apps.terminal`: terminal for terminal apps and the system upgrade
+
+## Notifications
+
+hi-shell is a notification daemon. Only one daemon can run at a time: while another one
+(illogical-impulse's `qs -c ii`, mako, dunst, ...) is running, hi-shell waits and takes over once it exits.
+History is kept in `~/.local/state/hi-shell/notifications.json`.
 
 ## Theming
 
@@ -129,7 +153,8 @@ common/              singletons (Config, Appearance, Colors, Theme, ShellState, 
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)
 common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
-services/            theme_updater.py (matugen), gcal.py (Google Calendar)
+services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
+                     Updates, SystemStats, Calendar) and scripts: theme_updater.py (matugen), gcal.py
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 ```
 

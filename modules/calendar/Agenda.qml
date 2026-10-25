@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.services
 import qs.common.widgets
 
 // Event list: upcoming events grouped by day, or a single selected day.
