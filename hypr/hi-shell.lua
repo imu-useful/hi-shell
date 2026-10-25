@@ -22,6 +22,18 @@ end)
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
 bind("SUPER + Space", "launcher toggle", "Toggle app launcher")
 
+-- Tap Super alone for the launcher too. The release bind only fires when Super was the
+-- last key pressed (so Super+1 etc. don't open it); the launcher also ignores holds
+-- longer than half a second (Super + mouse to move or resize a window).
+for _, key in ipairs({ "SUPER + Super_L", "SUPER + Super_R" }) do
+    if hl.unbind then
+        hl.unbind(key)
+    end
+    hl.bind(key, hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher superDown"), { transparent = true })
+    hl.bind(key, hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher superUp"),
+        { release = true, transparent = true, description = "hi-shell: App launcher (tap Super)" })
+end
+
 -- Blur behind the translucent launcher card
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-launcher" }, ignore_alpha = 0.3 })

@@ -30,7 +30,7 @@ Scope {
     ]
 
     readonly property var shortcuts: [
-        ["Super + Space", "App launcher"], ["Super + Y", "Claude AI palette"], ["Super + Z", "Left sidebar"],
+        ["Super", "App launcher"], ["Super + Y", "Claude AI palette"], ["Super + Z", "Left sidebar"],
         ["Super + U", "Right sidebar"], ["Super + Tab", "Workspace overview"], ["Super + R", "Wallpaper picker"],
         ["Super + Shift + S", "Screenshot / OCR / record"], ["Super + V", "Clipboard history"],
         ["Super + Escape", "Settings"]

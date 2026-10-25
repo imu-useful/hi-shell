@@ -160,7 +160,7 @@ if $START && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     qs -c hi-shell -d &>/dev/null
     errors=$(hyprctl configerrors 2>/dev/null | grep -v '^$' || true)
     [[ -n "$errors" ]] && warn "hyprctl configerrors:"$'\n'"$errors"
-    echo "hi-shell is running. Press Super+Space for the launcher, Super+Escape for settings."
+    echo "hi-shell is running. Tap Super for the launcher, Super+Escape for settings."
 else
     echo "Done. hi-shell starts with Hyprland (or run: qs -c hi-shell -d)."
 fi

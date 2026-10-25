@@ -94,7 +94,7 @@ The installer:
    `~/.config/hypr/hyprland.lua` otherwise (one marked line, with a backup of the file)
 4. starts the shell and warns about other bars or notification daemons that are still running
 
-Options: `--yes` (don't ask), `--no-deps`, `--no-start`. Then press <kbd>Super</kbd>+<kbd>Space</kbd>.
+Options: `--yes` (don't ask), `--no-deps`, `--no-start`. Then tap <kbd>Super</kbd>.
 
 ### Update
 
@@ -138,7 +138,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
    hyprctl reload && qs -c hi-shell -d
    ```
 
-3. Check `hyprctl configerrors` is empty and press <kbd>Super</kbd>+<kbd>Space</kbd>.
+3. Check `hyprctl configerrors` is empty and tap <kbd>Super</kbd>.
 
 </details>
 
@@ -146,7 +146,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 
 | Shortcut | Action |
 | --- | --- |
-| <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
+| <kbd>Super</kbd> (tap) or <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
