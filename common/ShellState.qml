@@ -7,4 +7,5 @@ import Quickshell
 Singleton {
     property bool controlCenterOpen: false
     property bool calendarOpen: false
+    property bool launcherOpen: false
 }

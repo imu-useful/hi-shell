@@ -58,8 +58,43 @@ Singleton {
             }
 
             property JsonObject bar: JsonObject {
+                // top | bottom | left | right
+                property string position: "top"
+                // hug: edge to edge | float: detached, rounded | islands: one pill per section | m3: edge to edge, tonal groups
+                property string style: "float"
+                // Bar thickness (height, or width for a vertical bar) and gap to the screen edge.
                 property int height: 40
                 property int margin: 6
+                // Widget ids: launcher, workspaces, activeWindow, media, resources, clock, weather, tray,
+                // systemIcons, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
+                property list<string> left: ["launcher", "activeWindow"]
+                property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
+                property list<string> right: ["tray", "keyboardLayout", "battery", "systemIcons", "power"]
+
+                property JsonObject workspaces: JsonObject {
+                    property int shown: 10
+                    property bool numbers: false
+                    property bool appIcons: true
+                }
+                property JsonObject clock: JsonObject {
+                    // Qt date format strings
+                    property string timeFormat: "HH:mm"
+                    property string dateFormat: "ddd, dd/MM"
+                }
+                property JsonObject media: JsonObject {
+                    property int maxWidth: 220
+                }
+                property JsonObject resources: JsonObject {
+                    // cpu, ram, swap, gpu, disk
+                    property list<string> shown: ["cpu", "ram"]
+                }
+                property JsonObject utilButtons: JsonObject {
+                    // screenshot, colorPicker, darkMode, mic
+                    property list<string> shown: ["screenshot", "colorPicker", "darkMode"]
+                }
+                property JsonObject updates: JsonObject {
+                    property bool hideWhenNone: true
+                }
             }
 
             property JsonObject weather: JsonObject {

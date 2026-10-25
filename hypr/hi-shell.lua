@@ -27,3 +27,7 @@ hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, ignore_alpha =
 -- Calendar popup (opens from the bar clock)
 hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, ignore_alpha = 0.3 })
+
+-- Bar (translucent styles blur what's behind; ignore_alpha keeps fully transparent parts unblurred)
+hl.layer_rule({ match = { namespace = "hi-shell-bar" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-bar" }, ignore_alpha = 0.3 })

@@ -58,9 +58,13 @@ Scope {
 
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-            anchors.top: true
+            // Open next to the bar: from the bottom when the bar is at the bottom.
+            readonly property bool atBottom: Config.options.bar.position === "bottom"
+            anchors.top: !atBottom
+            anchors.bottom: atBottom
             exclusiveZone: 0
             margins.top: Appearance.sizes.barMargin
+            margins.bottom: Appearance.sizes.barMargin
             implicitWidth: 720
             implicitHeight: 400
             color: "transparent"
@@ -91,7 +95,7 @@ Scope {
 
                 opacity: loader.revealed ? 1 : 0
                 scale: loader.revealed ? 1 : 0.95
-                transformOrigin: Item.Top
+                transformOrigin: window.atBottom ? Item.Bottom : Item.Top
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { EffectAnim {} }
 

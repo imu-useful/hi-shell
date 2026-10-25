@@ -60,11 +60,15 @@ Scope {
 
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-            anchors.top: true
+            // Open next to the bar: from the bottom when the bar is at the bottom.
+            readonly property bool atBottom: Config.options.bar.position === "bottom"
+            anchors.top: !atBottom
+            anchors.bottom: atBottom
             anchors.right: true
             // Sit below the bars (respect their exclusive zones) without reserving space.
             exclusiveZone: 0
             margins.top: Appearance.sizes.barMargin
+            margins.bottom: Appearance.sizes.barMargin
             implicitWidth: 400 + Appearance.sizes.barMargin
             implicitHeight: panel.implicitHeight
             color: "transparent"

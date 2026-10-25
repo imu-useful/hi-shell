@@ -2,7 +2,8 @@
 
 A Quickshell-based desktop shell for Hyprland with Material 3 design and a built-in Claude AI palette.
 
-- **Bar** — Hyprland workspaces, active window title, clock with a calendar popup, status button
+- **Bar** — configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles,
+  hover popups for media, resources, weather, battery and updates
 - **App launcher** — fuzzy search over desktop entries
 - **Claude AI palette** — type a prompt, the `claude` CLI answers in a Material 3 card (streamed, non-blocking)
 - **Control center** — Wi-Fi, Bluetooth, dark/light mode, volume slider, CPU/RAM stats
@@ -26,6 +27,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `brightnessctl`, `ddcutil` (optional) | brightness of the built-in panel / external monitors |
 | `pacman-contrib`, `yay` or `paru` (optional) | update count |
 | `libnotify` | battery warnings (`notify-send`) |
+| `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
 ```sh
@@ -66,6 +68,8 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Control center (also the status button on the bar) |
 | click the clock | Calendar popup |
+| click the system icons | Control center (scroll there to change the volume) |
+| hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 
 Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 
@@ -85,7 +89,11 @@ Settings live in `~/.config/hi-shell/config.json`, created with the defaults on 
 Edits apply live, no restart needed. Sections:
 
 - `appearance`: fonts, transparency, animation speed (`0` disables animations)
-- `bar`: height, margin
+- `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
+  lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
+  `weather`, `tray`, `systemIcons`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
+  `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
+  `bar.resources`, `bar.utilButtons`, `bar.updates`
 - `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval
 - `battery`: low / critical thresholds and warning notifications
 - `notifications`: default popup timeout, history size

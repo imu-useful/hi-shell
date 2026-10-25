@@ -14,17 +14,17 @@ import qs.modules.launcher
 Scope {
     id: root
 
-    property bool open: false
+    readonly property bool open: ShellState.launcherOpen
     property string query: ""
 
     readonly property var results: filterApps(query)
 
     function toggle() {
-        open = !open;
+        ShellState.launcherOpen = !open;
     }
 
     function close() {
-        open = false;
+        ShellState.launcherOpen = false;
     }
 
     // Lower score = better match; -1 = no match.
@@ -77,7 +77,7 @@ Scope {
             root.toggle();
         }
         function open(): void {
-            root.open = true;
+            ShellState.launcherOpen = true;
         }
         function close(): void {
             root.close();

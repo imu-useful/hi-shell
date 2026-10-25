@@ -63,12 +63,12 @@ screen translator, translations other than en/ru.
 - [x] `services/Tray.qml`, `services/Updates.qml` (`checkupdates`), resource usage extended with disk/GPU/temps.
 
 ## Stage 9: Bar v2
-- [ ] Configurable layout: `bar.left/center/right` lists of widget ids, edited from settings (Stage 14).
-- [ ] Position top/bottom/left/right (vertical bar variant) and styles **Hug / Float / Islands / M3**.
-- [ ] Widgets: workspaces (dots + app icons), active window, media, resources, weather, clock/date, tray, system icons,
-      util buttons (screenshot, color picker, wallpaper), network speed, battery, updates, keyboard layout, power, divider.
-- [ ] Hover/click popups per widget (resources, weather, battery, clock → existing calendar, media).
-- [ ] Bar cava visualizer (optional, `cava`).
+- [x] Configurable layout: `bar.left/center/right` lists of widget ids in config.json (UI editor in Stage 15).
+- [x] Position top/bottom/left/right (vertical bar variant) and styles **Hug / Float / Islands / M3**.
+- [x] Widgets: workspaces (dots + app icons), active window, media, resources, weather, clock/date, tray, system icons,
+      util buttons (screenshot, color picker, dark mode, mic; wallpaper picker comes with Stage 14), network speed, battery, updates, keyboard layout, power, divider.
+- [x] Hover/click popups per widget (resources, weather, battery, clock → existing calendar, media).
+- [x] Bar cava visualizer (optional, `cava`).
 
 ## Stage 10: Notifications & OSD
 - [ ] Notification popups (stacked, actions, inline reply, images, grouping by app, timeout progress).
