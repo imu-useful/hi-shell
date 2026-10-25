@@ -164,7 +164,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
 | click the system icons | Right sidebar (scroll there to change the volume) |
-| right click the desktop | Edit desktop widgets (drag them, toggle them in the toolbar; Esc or Done to finish) |
+| right click the desktop | Edit desktop widgets: drag them (edges and centers snap to other widgets and the screen, with guide lines), toggle them in the toolbar; Esc or Done to finish |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 
 Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:

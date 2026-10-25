@@ -174,6 +174,27 @@ Scope {
                 anchors.fill: parent
                 visible: window.hasWidgets
 
+                // Alignment guides while a widget is dragged (-1 = none); set by DesktopWidget.
+                property real guideX: -1
+                property real guideY: -1
+
+                Rectangle {
+                    visible: widgets.guideX >= 0
+                    x: Math.round(widgets.guideX) - 1
+                    width: 2
+                    height: parent.height
+                    color: Colors.m3tertiary
+                    z: 10
+                }
+                Rectangle {
+                    visible: widgets.guideY >= 0
+                    y: Math.round(widgets.guideY) - 1
+                    height: 2
+                    width: parent.width
+                    color: Colors.m3tertiary
+                    z: 10
+                }
+
                 DesktopWidget {
                     widgetId: "shapeClock"
                     editing: root.editing
