@@ -9,7 +9,7 @@ import qs.modules
 ShellRoot {
     // Singletons load lazily; create the background services (and their IPC
     // handlers) at startup: palette, notification daemon, battery warnings, ...
-    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb]
+    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers]
 
     Variants {
         model: Quickshell.screens
@@ -21,7 +21,7 @@ ShellRoot {
 
     AIWidget {}
 
-    ControlCenter {}
+    SidebarRight {}
 
     CalendarPopup {}
 

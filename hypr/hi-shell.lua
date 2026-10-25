@@ -22,10 +22,10 @@ hl.bind("SUPER + Y", hl.dsp.exec_cmd("qs -c hi-shell ipc call ai toggle"), { des
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 
--- Control center (also opens from the status button on the right of the bar)
-hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call controlcenter toggle"), { description = "hi-shell: Toggle control center" })
-hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, blur = true })
-hl.layer_rule({ match = { namespace = "hi-shell-controlcenter" }, ignore_alpha = 0.3 })
+-- Right sidebar (also opens from the system icons on the bar)
+hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggle"), { description = "hi-shell: Toggle right sidebar" })
+hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-sidebar" }, ignore_alpha = 0.3 })
 
 -- Calendar popup (opens from the bar clock)
 hl.layer_rule({ match = { namespace = "hi-shell-calendar" }, blur = true })

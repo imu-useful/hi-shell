@@ -97,6 +97,18 @@ Singleton {
                 }
             }
 
+            property JsonObject sidebar: JsonObject {
+                property JsonObject quickToggles: JsonObject {
+                    // android: two-column pills with labels | classic: round icon buttons
+                    property string style: "android"
+                    // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
+                    // gameMode, vpn, colorPicker, screenshot
+                    property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "colorPicker", "screenshot"]
+                }
+                // Night light color temperature (K) for hyprsunset.
+                property int nightLightTemperature: 4500
+            }
+
             property JsonObject weather: JsonObject {
                 property bool enabled: true
                 // Empty city and 0/0 coordinates = locate by IP address.

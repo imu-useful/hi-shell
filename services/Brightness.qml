@@ -33,6 +33,7 @@ Singleton {
         readonly property bool available: internal ? backlight !== "" : ddcBus >= 0
         property real brightness: 0 // 0..1
         property real maxRaw: 1
+        property real raw: -1
         property real queued: -1
 
         function set(value) {
@@ -79,11 +80,19 @@ Singleton {
 
         property FileView max: FileView {
             path: monitor.internal && monitor.backlight ? `/sys/class/backlight/${monitor.backlight}/max_brightness` : ""
-            onLoaded: monitor.maxRaw = Math.max(1, Number(text()))
+            onLoaded: {
+                monitor.maxRaw = Math.max(1, Number(text()));
+                if (monitor.raw >= 0)
+                    monitor.brightness = monitor.raw / monitor.maxRaw;
+            }
         }
         property FileView current: FileView {
             path: monitor.internal && monitor.backlight ? `/sys/class/backlight/${monitor.backlight}/brightness` : ""
-            onLoaded: monitor.brightness = Number(text()) / monitor.maxRaw
+            // The max file may load after this one; it re-applies the ratio then.
+            onLoaded: {
+                monitor.raw = Number(text());
+                monitor.brightness = monitor.raw / monitor.maxRaw;
+            }
         }
 
         // "VCP 10 C 50 100" (feature, type, current, max)

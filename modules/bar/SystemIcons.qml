@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.services
 
 // Network / Bluetooth / volume status (+ mic muted, do not disturb).
-// Click toggles the control center; scroll changes the volume.
+// Click toggles the right sidebar; scroll changes the volume.
 BarWidget {
     id: root
 
@@ -44,12 +44,12 @@ BarWidget {
 
     clickable: true
     scrollable: true
-    active: ShellState.controlCenterOpen
+    active: ShellState.sidebarRightOpen
     padding: 10
     contentWidth: grid.implicitWidth
     contentHeight: grid.implicitHeight
 
-    onClicked: ShellState.controlCenterOpen = !ShellState.controlCenterOpen
+    onClicked: ShellState.sidebarRightOpen = !ShellState.sidebarRightOpen
     onWheel: event => {
         if (audioReady)
             sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + (event.angleDelta.y > 0 ? 0.05 : -0.05)));

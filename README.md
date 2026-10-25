@@ -6,7 +6,8 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
   hover popups for media, resources, weather, battery and updates
 - **App launcher** — fuzzy search over desktop entries
 - **Claude AI palette** — type a prompt, the `claude` CLI answers in a Material 3 card (streamed, non-blocking)
-- **Control center** — Wi-Fi, Bluetooth, dark/light mode, volume slider, CPU/RAM stats
+- **Right sidebar** — quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic sliders,
+  Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
 - **Theming** — Material 3 palette generated from the wallpaper with matugen, reloaded live
 - **Google Calendar** — month view with event dots and an agenda (optional)
 
@@ -27,6 +28,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `brightnessctl`, `ddcutil` (optional) | brightness of the built-in panel / external monitors |
 | `pacman-contrib`, `yay` or `paru` (optional) | update count |
 | `libnotify` | battery warnings (`notify-send`) |
+| `hyprsunset` | night light (uses a running hyprsunset daemon, or starts one) |
 | `grim`, `slurp`, `wl-clipboard`, `hyprpicker`, `cava` (optional) | bar utility buttons and visualizer |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
 
@@ -66,15 +68,18 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | --- | --- |
 | <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
-| <kbd>Super</kbd>+<kbd>U</kbd> | Control center (also the status button on the bar) |
+| <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | click the clock | Calendar popup |
-| click the system icons | Control center (scroll there to change the volume) |
+| click the system icons | Right sidebar (scroll there to change the volume) |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 
 Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 
 ```sh
-qs -c hi-shell ipc call launcher toggle       # also: ai, controlcenter, calendar
+qs -c hi-shell ipc call launcher toggle       # also: ai, sidebarRight, calendar
+qs -c hi-shell ipc call sidebarRight openTab todo     # notifications, calendar, todo, timers
+qs -c hi-shell ipc call sidebarRight openPage wifi    # bluetooth, audio
+qs -c hi-shell ipc call todo add "Buy milk"           # list
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
@@ -94,6 +99,8 @@ Edits apply live, no restart needed. Sections:
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
   `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
   `bar.resources`, `bar.utilButtons`, `bar.updates`
+- `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
+  in the sidebar), night light temperature
 - `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval
 - `battery`: low / critical thresholds and warning notifications
 - `notifications`: default popup timeout, history size
@@ -118,7 +125,7 @@ made the change (keys, `wpctl`, `brightnessctl`, ...).
 ## Theming
 
 `common/Theme.qml` runs `services/theme_updater.py` at startup, whenever the wallpaper changes and when you switch dark/light
-mode in the control center. The palette is written to `~/.local/state/hi-shell/colors.json` and picked up by
+mode in the right sidebar. The palette is written to `~/.local/state/hi-shell/colors.json` and picked up by
 `common/Colors.qml` without restarting the shell. Only matugen's JSON output is used, so your other matugen templates are untouched.
 
 The wallpaper is detected from illogical-impulse's state file, hyprpaper or swww. Hyprland has no wallpaper-change event,
@@ -164,7 +171,7 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Launcher, AIWidget, ControlCenter, CalendarPopup (+ subcomponents)
+modules/             Bar, Launcher, AIWidget, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)

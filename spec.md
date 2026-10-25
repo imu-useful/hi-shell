@@ -76,12 +76,12 @@ screen translator, translations other than en/ru.
 - [x] OSD for volume / brightness / mic mute / keyboard layout.
 
 ## Stage 11: Right sidebar (replaces Control Center)
-- [ ] Header: avatar, uptime, edit / reload / settings / power buttons.
-- [ ] Quick toggles in two styles (Android-style pills and classic tiles), editable order: Wi-Fi, Bluetooth, dark mode,
+- [x] Header: avatar, uptime, edit / reload / settings / power buttons.
+- [x] Quick toggles in two styles (Android-style pills and classic tiles), editable order: Wi-Fi, Bluetooth, dark mode,
       night light (hyprsunset), idle inhibitor, DND, mic, game mode, VPN, color picker, screenshot.
-- [ ] Quick sliders: volume, brightness, mic; per-app volume and output device picker.
-- [ ] Wi-Fi and Bluetooth sub-pages (scan, connect, password prompt).
-- [ ] Bottom group: notification center (grouped by app), calendar (reuse the clock popup), to-do, timers.
+- [x] Quick sliders: volume, brightness, mic; per-app volume and output device picker.
+- [x] Wi-Fi and Bluetooth sub-pages (scan, connect, password prompt).
+- [x] Bottom group: notification center (grouped by app), calendar (reuse the clock popup), to-do, timers.
 
 ## Stage 12: Left sidebar
 - [ ] Home page: greeting card, media player with synced lyrics (LRCLIB), weather.
