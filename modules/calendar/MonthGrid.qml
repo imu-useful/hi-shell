@@ -14,6 +14,11 @@ ColumnLayout {
     signal daySelected(string day)
 
     readonly property var month: Calendar.viewMonth
+
+    // Scroll through months.
+    WheelSteps {
+        onStepped: steps => Calendar.shiftMonth(-steps)
+    }
     readonly property var locale: Translation.locale
     // Qt.DayOfWeek is 1 = Monday .. 7 = Sunday; JS getDay() is 0 = Sunday.
     readonly property int firstDay: locale.firstDayOfWeek % 7

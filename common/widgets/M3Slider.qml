@@ -60,7 +60,7 @@ Item {
         onPositionChanged: mouse => root.moveTo(mouse.x)
     }
 
-    WheelHandler {
-        onWheel: event => root.moved(Math.max(0, Math.min(1, root.clamped + (event.angleDelta.y > 0 ? root.step : -root.step))))
+    WheelSteps {
+        onStepped: steps => root.moved(Math.max(0, Math.min(1, root.clamped + steps * root.step)))
     }
 }

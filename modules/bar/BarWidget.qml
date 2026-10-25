@@ -31,7 +31,8 @@ Item {
     default property alias content: container.data
 
     signal clicked(var mouse)
-    signal wheel(var event)
+    // Scrolling over the widget (with scrollable), in whole steps; up / right positive.
+    signal scrolled(int steps)
 
     implicitWidth: vertical ? thickness : contentWidth + padding * 2
     implicitHeight: vertical ? contentHeight + padding * 2 : thickness
@@ -64,10 +65,9 @@ Item {
         }
     }
 
-    WheelHandler {
+    WheelSteps {
         enabled: root.scrollable
-        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-        onWheel: event => root.wheel(event)
+        onStepped: steps => root.scrolled(steps)
     }
 
     Item {

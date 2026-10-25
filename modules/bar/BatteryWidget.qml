@@ -8,6 +8,11 @@ import qs.services
 BarWidget {
     id: root
 
+    // Scroll for the screen brightness (the bar's screen).
+    readonly property QtObject brightness: Brightness.forScreen(bar?.screen ?? null)
+    scrollable: brightness?.available ?? false
+    onScrolled: steps => brightness.set(brightness.brightness + steps * 0.05)
+
     readonly property color levelColor: Battery.critical ? Colors.m3error : Battery.charging ? Colors.m3tertiary : Colors.m3onSurface
 
     shown: Battery.available

@@ -13,6 +13,9 @@ BarWidget {
     contentWidth: label.implicitWidth
     contentHeight: label.implicitHeight
     onClicked: HyprlandXkb.next()
+    // Scroll to switch too.
+    scrollable: true
+    onScrolled: HyprlandXkb.next()
 
     StyledText {
         id: label

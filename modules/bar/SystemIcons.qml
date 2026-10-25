@@ -50,9 +50,9 @@ BarWidget {
     contentHeight: grid.implicitHeight
 
     onClicked: ShellState.sidebarRightOpen = !ShellState.sidebarRightOpen
-    onWheel: event => {
+    onScrolled: steps => {
         if (audioReady)
-            sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + (event.angleDelta.y > 0 ? 0.05 : -0.05)));
+            sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + steps * 0.05));
     }
 
     PwObjectTracker {

@@ -168,6 +168,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | click the system icons | Right sidebar (scroll there to change the volume) |
 | right click the desktop | Edit desktop widgets: drag them (edges and centers snap to other widgets and the screen, with guide lines), toggle them in the toolbar; Esc or Done to finish |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
+| scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 
 Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 

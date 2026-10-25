@@ -28,7 +28,7 @@ BarWidget {
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify(target)} })`);
     }
 
-    onWheel: event => focusWorkspace(event.angleDelta.y > 0 ? "m-1" : "m+1")
+    onScrolled: steps => focusWorkspace(steps > 0 ? "m-1" : "m+1")
 
     function workspace(id) {
         return Hyprland.workspaces.values.find(ws => ws.id === id) ?? null;

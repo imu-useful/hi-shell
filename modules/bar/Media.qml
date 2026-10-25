@@ -22,6 +22,9 @@ BarWidget {
 
     clickable: true
     onClicked: mouse => mouse.button === Qt.MiddleButton ? Mpris.next() : Mpris.togglePlaying()
+    // Scroll for the player's volume (when it has one).
+    scrollable: Mpris.active?.volumeSupported ?? false
+    onScrolled: steps => Mpris.active.volume = Math.max(0, Math.min(1, Mpris.active.volume + steps * 0.05))
 
     ShapeImage {
         id: art
