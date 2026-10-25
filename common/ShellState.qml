@@ -14,5 +14,8 @@ Singleton {
     property bool calendarOpen: false
     property bool desktopEditing: false
     property bool wallpaperSelectorOpen: false
+    property bool settingsOpen: false
+    // quick | general | bar | desktop | interface | services | hyprland | about
+    property string settingsPage: "quick"
     property bool launcherOpen: false
 }

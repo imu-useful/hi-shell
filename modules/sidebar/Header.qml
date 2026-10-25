@@ -72,7 +72,7 @@ RowLayout {
         ] : [
             { icon: "edit", active: root.editing, run: () => root.editing = !root.editing },
             { icon: "refresh", run: () => Quickshell.reload(false) },
-            { icon: "settings", run: () => { root.closeRequested(); Qt.openUrlExternally(`file://${Config.path}`); } }
+            { icon: "settings", run: () => { root.closeRequested(); ShellState.settingsOpen = true; } }
         ]
 
         IconButton {

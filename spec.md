@@ -104,10 +104,10 @@ screen translator, translations other than en/ru.
       transparency toggle; GTK color-scheme follows dark / light.
 
 ## Stage 15: Settings app
-- [ ] Overlay panel (Super+Escape) with pages: Quick, General, Bar, Desktop, Interface, Services, Hyprland, About.
-- [ ] Bar layout editor (chips per section, add/remove/reorder), positioning & styles.
-- [ ] Hyprland page: displays (resolution, refresh, scale, rotation, position via `hyprctl`), input, gaps/rounding/blur.
-- [ ] "Config file" button, settings search from the launcher (type `wallpaper`, `bar`, ...).
+- [x] Overlay panel (Super+Escape) with pages: Quick, General, Bar, Desktop, Interface, Services, Hyprland, About.
+- [x] Bar layout editor (chips per section, add/remove/reorder), positioning & styles.
+- [x] Hyprland page: displays (resolution, refresh, scale, rotation, position), input, gaps/rounding/blur; applied via `hyprctl eval`, kept in a generated Lua file.
+- [x] "Config file" button, settings search from the launcher (type `wallpaper`, `bar`, ...).
 
 ## Stage 16: Launcher v2 & system overlays
 - [ ] Launcher prefixes: `<` keybinds list, `:` emoji, `=` calculator, `>` commands, `/` settings, clipboard.

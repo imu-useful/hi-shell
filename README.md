@@ -13,6 +13,8 @@ A Quickshell-based desktop shell for Hyprland with Material 3 design and a built
   Wi-Fi and Bluetooth pages, per-app volume and device picker, notification center, calendar, to-do, focus / stopwatch / countdown timers
 - **Desktop** — wallpaper plus widgets: shape clock, big clock, weather, resource tiles, week calendar, media with lyrics,
   greeting, to-do, notes, world clock, timers, user card, image frame; full-width visualizer; drag-to-place edit mode
+- **Settings** — Quick, General, Bar (layout editor), Desktop, Interface, Services, Hyprland (displays, gaps, rounding,
+  blur, input), About; also searchable from the launcher (type `blur`, `wallpaper`, `bar`, ...)
 - **Wallpapers & theming** — wallpaper picker (local folders, Wallhaven / Unsplash), matugen scheme variants,
   light / dark / auto, shaped wallpaper frame; Material 3 palette from the wallpaper, reloaded live
 - **Google Calendar** — month view with event dots and an agenda (optional)
@@ -77,6 +79,7 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 | <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
 | <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
+| <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
 | click the clock | Calendar popup |
@@ -95,6 +98,7 @@ qs -c hi-shell ipc call sidebarLeft openTab claude    # home, claude, translator
 qs -c hi-shell ipc call ai ask "What's a good name for a cat?"
 qs -c hi-shell ipc call claude chats                 # deleteChat <id>, newChat
 qs -c hi-shell ipc call desktop toggleEdit            # edit, done, resetLayout
+qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>
@@ -105,8 +109,10 @@ qs -c hi-shell ipc call tray list             # item ids for tray.hidden
 
 ## Configuration
 
-Settings live in `~/.config/hi-shell/config.json`, created with the defaults on first start.
-Edits apply live, no restart needed. Sections:
+Use the settings panel (<kbd>Super</kbd>+<kbd>Escape</kbd>), or edit `~/.config/hi-shell/config.json` (created with
+the defaults on first start; edits apply live). The Hyprland page applies changes at once and keeps them in
+`~/.config/hi-shell/hyprland.lua`, which `hypr/hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
+Sections:
 
 - `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`
 - `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape
@@ -202,7 +208,7 @@ Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, Settings, WallpaperSelector, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Calendar, SystemStats)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, animations, buttons, slider)

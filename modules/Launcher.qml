@@ -7,6 +7,7 @@ import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
 import qs.modules.launcher
+import "settings/Pages.js" as Pages
 
 // Spotlight-style app launcher.
 // Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call launcher toggle`.
@@ -16,7 +17,19 @@ Scope {
     readonly property bool open: ShellState.launcherOpen
     property string query: ""
 
-    readonly property var results: filterApps(query)
+    // Settings pages matching the query come first, then apps.
+    readonly property var results: [...settingsMatches(query), ...filterApps(query)]
+
+    function settingsMatches(text) {
+        if (text.trim().length < 2)
+            return [];
+        return Pages.search(text).slice(0, 3).map(p => ({
+            settingsPage: p.id,
+            name: `Settings › ${p.title}`,
+            comment: p.keywords.split(" ").slice(0, 8).join(", ") + "…",
+            materialIcon: p.icon
+        }));
+    }
 
     function toggle() {
         ShellState.launcherOpen = !open;
@@ -55,6 +68,12 @@ Scope {
     function launch(app) {
         if (!app)
             return;
+        if (app.settingsPage) {
+            ShellState.settingsPage = app.settingsPage;
+            ShellState.settingsOpen = true;
+            close();
+            return;
+        }
         if (app.runInTerminal)
             Quickshell.execDetached([Config.options.apps.terminal, "-e", ...app.command]);
         else

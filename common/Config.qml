@@ -193,6 +193,14 @@ Singleton {
                 property list<string> hidden: []
             }
 
+            // Written by the settings app's Hyprland page (see services/HyprlandSettings.qml).
+            property JsonObject hyprland: JsonObject {
+                // output name -> { mode, position, scale, transform }
+                property var monitors: ({})
+                // option path ("general.gaps_in") -> value
+                property var options: ({})
+            }
+
             property JsonObject apps: JsonObject {
                 // Used for desktop entries with Terminal=true
                 property string terminal: "kitty"

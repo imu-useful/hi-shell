@@ -73,7 +73,7 @@ DesktopCard {
             }
             IconButton {
                 icon: "settings"
-                onClicked: ShellState.sidebarRightOpen = true
+                onClicked: ShellState.settingsOpen = true
             }
             IconButton {
                 icon: root.powerMenu ? "close" : "power_settings_new"

@@ -25,6 +25,11 @@ hl.layer_rule({ match = { namespace = "hi-shell-ai" }, ignore_alpha = 0.3 })
 -- Left sidebar: home / Claude chat / translator / clipboard
 hl.bind("SUPER + Z", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarLeft toggle"), { description = "hi-shell: Toggle left sidebar" })
 
+-- Settings
+hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call settings toggle"), { description = "hi-shell: Settings" })
+hl.layer_rule({ match = { namespace = "hi-shell-settings" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-settings" }, ignore_alpha = 0.3 })
+
 -- Wallpaper picker (local + online, color scheme, frame)
 hl.bind("SUPER + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call wallpaper toggleSelector"), { description = "hi-shell: Wallpaper picker" })
 hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, blur = true })
@@ -49,3 +54,11 @@ hl.layer_rule({ match = { namespace = "hi-shell-notifications" }, ignore_alpha =
 hl.layer_rule({ match = { namespace = "hi-shell-osd" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-osd" }, ignore_alpha = 0.3 })
 
+
+-- Monitor and look & feel overrides made in hi-shell's settings app (generated file).
+local overrides = os.getenv("HOME") .. "/.config/hi-shell/hyprland.lua"
+local f = io.open(overrides, "r")
+if f then
+    f:close()
+    dofile(overrides)
+end
