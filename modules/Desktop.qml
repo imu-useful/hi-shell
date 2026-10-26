@@ -117,10 +117,13 @@ Scope {
                 // A cover is small, so it stays blurred behind windows too.
                 readonly property real blurAmount: CoverMode.active ? 1 : window.reveal
                 layer.enabled: (root.frame !== "" || CoverMode.active) && blurAmount > 0
+                // Blurred anyway: half the resolution looks the same at a quarter of the memory.
+                layer.textureSize: Qt.size(width / 2, height / 2)
+                layer.smooth: true
                 layer.effect: MultiEffect {
                     blurEnabled: true
                     blur: wallpaper.blurAmount
-                    blurMax: 64
+                    blurMax: 32
                     brightness: -0.25 * wallpaper.blurAmount
                     saturation: -0.2 * wallpaper.blurAmount
                 }
@@ -134,6 +137,14 @@ Scope {
                 onSourceChanged: {
                     flip = !flip;
                     (flip ? b : a).source = source;
+                    unloadOld.restart();
+                }
+                // Once the cross-fade is over, the old picture goes (a full-screen image
+                // each, kept for nothing otherwise).
+                Timer {
+                    id: unloadOld
+                    interval: Appearance.anim.slow * 2 + 300
+                    onTriggered: (wallpaper.flip ? a : b).source = ""
                 }
 
                 Image {
@@ -142,6 +153,8 @@ Scope {
                     onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
+                    // Not in the image cache: a wallpaper is shown once, then replaced.
+                    cache: false
                     sourceSize: Qt.size(window.width, window.height)
                     opacity: !parent.flip && status === Image.Ready ? 1 : 0
                     Behavior on opacity { EffectAnim { duration: Appearance.anim.slow * 2 } }
@@ -152,6 +165,8 @@ Scope {
                     onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
+                    // Not in the image cache: a wallpaper is shown once, then replaced.
+                    cache: false
                     sourceSize: Qt.size(window.width, window.height)
                     opacity: parent.flip && status === Image.Ready ? 1 : 0
                     Behavior on opacity { EffectAnim { duration: Appearance.anim.slow * 2 } }

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Window
 import qs.common
 
 // Image clipped to a Material shape (avatars, album art, wallpaper frame).
@@ -24,7 +25,8 @@ Item {
         visible: false
         asynchronous: true
         fillMode: Image.PreserveAspectCrop
-        sourceSize: Qt.size(root.width * 2, root.height * 2)
+        // Decoded at the screen's pixel density, not more (a full-size picture each).
+        sourceSize: Qt.size(Math.ceil(root.width * Screen.devicePixelRatio), Math.ceil(root.height * Screen.devicePixelRatio))
     }
 
     Item {

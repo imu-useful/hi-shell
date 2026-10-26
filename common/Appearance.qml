@@ -27,7 +27,8 @@ Singleton {
         readonly property string main: root.options.fonts.main
         readonly property string title: root.options.fonts.title
         readonly property string mono: root.options.fonts.mono
-        readonly property string icon: root.options.fonts.icon
+        // The shell's own cut-down copy when it's there (IconFont).
+        readonly property string icon: IconFont.name || root.options.fonts.icon
 
         // M3 type scale (px); `normal` is the bar's compact body size.
         readonly property QtObject size: QtObject {

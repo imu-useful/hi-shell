@@ -65,6 +65,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `quickshell-git` (AUR) | the shell itself (0.3+, with the Hyprland, Pipewire, Bluetooth and Networking modules) |
 | `matugen` | Material 3 colors from the wallpaper |
 | `python` | `services/theme_updater.py` and the other helper scripts (stdlib only, no pip packages) |
+| `python-fonttools` (optional) | a ~160 KB copy of the icon font with just the icons the shell uses (`services/icon_font.py`), instead of the full 15 MB one in memory |
 | `ttf-material-symbols-variable-git` (AUR) | icons (`Material Symbols Rounded`) |
 | `pipewire`, `wireplumber` | volume control |
 | `networkmanager` | Wi-Fi toggle |
