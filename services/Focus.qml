@@ -8,8 +8,8 @@ import qs.common
 // Focus Mode settings: profiles and session tasks in ~/.config/hi-shell/focus_profiles.json
 // (see SPEC_FOCUS.md). A profile holds the Pomodoro timer, the wallpaper, the block /
 // allow lists and the exit condition; selecting one makes it the active profile, and
-// edits go to the active profile. Built-in profiles (Study, Work, Custom) can be edited
-// and reset; others can be added, renamed and deleted. Tasks are the shell's to-do list
+// edits go to the active profile. Built-in profiles (Study, Work) can be edited and
+// reset; your own ones get a name and an icon of their choice and can be deleted. Tasks are the shell's to-do list
 // (services/Todo.qml); this file only keeps which of them are picked for the session.
 // The settings window (modules/focus/FocusSettingsWindow.qml) can't be opened while a
 // session is running (`active`, driven by the session logic of the later stages).
@@ -32,7 +32,22 @@ Singleton {
     readonly property var profileIds: Object.keys(profiles).sort((a, b) => order(a) - order(b))
 
     function order(id) {
-        return ["study", "work", "custom"].indexOf(id) >= 0 ? ["study", "work", "custom"].indexOf(id) : 10;
+        return id === "study" ? 0 : id === "work" ? 1 : 10;
+    }
+
+    // Icons to choose from for your own profiles.
+    readonly property var icons: ["bookmark", "edit_note", "code", "science", "translate", "calculate",
+        "brush", "music_note", "fitness_center", "menu_book", "draw", "terminal", "design_services",
+        "rocket_launch", "spa", "local_cafe", "lightbulb", "favorite"]
+
+    // Starting point for a new profile.
+    function blank() {
+        return {
+            timer: { focus: 25, shortBreak: 5, longBreak: 15, cycles: 4 },
+            wallpaper: "",
+            lists: { mode: "blacklist", blacklist: { apps: [], sites: [] }, whitelist: { apps: [], sites: [] } },
+            exit: "manual"
+        };
     }
 
     function defaults() {
@@ -57,13 +72,6 @@ Singleton {
                 lists: lists(["steam", "osu!"],
                              ["youtube.com", "tiktok.com", "instagram.com", "reddit.com", "twitch.tv"]),
                 exit: "tasks"
-            },
-            custom: {
-                name: "Custom", icon: "tune", builtin: true,
-                timer: { focus: 25, shortBreak: 5, longBreak: 15, cycles: 4 },
-                wallpaper: "",
-                lists: lists([], []),
-                exit: "manual"
             }
         };
     }
@@ -89,12 +97,12 @@ Singleton {
         save();
     }
 
-    // A new profile from the active one; returns its id.
-    function add(name) {
-        let id = "profile-" + Date.now().toString(36);
-        const p = JSON.parse(JSON.stringify(profile));
-        p.name = name || Translation.tr("New profile");
-        p.icon = "bookmark";
+    // A new profile of your own, blank or a copy of the active one; returns its id.
+    function add(name, icon, copy) {
+        const id = "profile-" + Date.now().toString(36);
+        const p = JSON.parse(JSON.stringify(copy ? profile : blank()));
+        p.name = name.trim() || Translation.tr("New profile");
+        p.icon = icon || "bookmark";
         p.builtin = false;
         const all = Object.assign({}, profiles);
         all[id] = p;
@@ -104,11 +112,14 @@ Singleton {
         return id;
     }
 
-    function rename(id, name) {
-        if (!profiles[id] || !name.trim())
+    // Name and icon of your own profiles: update(id, { name, icon })
+    function update(id, changes) {
+        if (!profiles[id] || profiles[id].builtin || changes.name?.trim() === "")
             return;
+        if (changes.name)
+            changes.name = changes.name.trim();
         const all = Object.assign({}, profiles);
-        all[id] = Object.assign({}, all[id], { name: name.trim() });
+        all[id] = Object.assign({}, all[id], changes);
         profiles = all;
         save();
     }
@@ -185,10 +196,14 @@ Singleton {
 
     function apply(data) {
         const d = defaults();
-        // Keep the built-in ones even if the file lost them; fill in missing keys.
+        // Keep the built-in ones even if the file lost them; fill in missing keys. A
+        // built-in profile that isn't one anymore (the old "custom") is dropped.
         const merged = Object.assign({}, d);
         for (const id in data.profiles ?? {}) {
-            const base = d[id] ?? d.custom, p = data.profiles[id];
+            const p = data.profiles[id];
+            if (p.builtin && !d[id])
+                continue;
+            const base = d[id] ?? blank();
             const lists = Object.assign({}, base.lists, p.lists);
             for (const mode of ["blacklist", "whitelist"])
                 lists[mode] = Object.assign({ apps: [], sites: [] }, lists[mode]);
@@ -242,9 +257,13 @@ Singleton {
         function closeSettings(): void {
             root.settingsOpen = false;
         }
-        // study, work, custom or a profile id
+        // study, work or a profile id
         function profile(id: string): void {
             root.select(id);
+        }
+        // A blank profile of your own (icon: a Material Symbols name, empty for the default)
+        function addProfile(name: string, icon: string): string {
+            return root.add(name, icon, false);
         }
         function current(): string {
             return `${root.activeId}\t${root.profile.name}`;

@@ -152,6 +152,11 @@ Scope {
                                 onClicked: Focus.select(modelData)
                             }
                         }
+                        Chip {
+                            icon: "add"
+                            text: Translation.tr("New profile")
+                            onClicked: Focus.settingsTab = "profiles"
+                        }
                     }
 
                     StyledFlickable {

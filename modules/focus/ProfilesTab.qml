@@ -5,10 +5,13 @@ import qs.common.widgets
 import qs.services
 import qs.modules.settings
 
-// Profiles: pick one to edit and use it (the other tabs show the active profile), make a
-// new one from it, rename, delete your own or reset a built-in one.
+// Profiles: pick one to edit and use it (the other tabs show the active profile). Study
+// and Work are built in and can be reset; your own ones get a name and an icon, start
+// blank or as a copy of the active one, and can be changed or deleted.
 ColumnLayout {
     id: root
+
+    property string newIcon: Focus.icons[0]
 
     readonly property var exitNames: ({
         manual: Translation.tr("Manual exit"),
@@ -102,23 +105,50 @@ ColumnLayout {
     }
 
     Section {
+        icon: "add_circle"
+        title: Translation.tr("New profile")
+
+        AddField {
+            Layout.margins: 6
+            placeholder: Translation.tr("Name, e.g. Exams")
+            onAdded: text => Focus.add(text, root.newIcon, copy.checked)
+        }
+        IconPicker {
+            current: root.newIcon
+            onPicked: icon => root.newIcon = icon
+        }
+        SwitchRow {
+            id: copy
+            icon: "content_copy"
+            title: Translation.tr("Copy the active profile")
+            subtitle: checked ? Translation.tr("Starts with the settings of “%1”").arg(root.displayName(Focus.profile))
+                              : Translation.tr("Starts blank: 25/5/15 min × 4, empty lists, manual exit")
+            onToggled: checked => copy.checked = checked
+        }
+    }
+
+    Section {
         icon: "edit"
-        title: Translation.tr("Active profile")
+        title: Translation.tr("Active profile: %1").arg(root.displayName(Focus.profile))
 
         TextRow {
             visible: !Focus.profile.builtin
             icon: "badge"
             title: Translation.tr("Name")
             value: Focus.profile.name
-            onEdited: text => Focus.rename(Focus.activeId, text)
+            onEdited: text => Focus.update(Focus.activeId, { name: text })
         }
         ListRow {
             Layout.fillWidth: true
-            icon: "add"
-            title: Translation.tr("New profile from this one")
-            subtitle: Translation.tr("Copies the timer, wallpaper, lists and exit condition")
-            clickable: true
-            onClicked: Focus.add(Translation.tr("%1 copy").arg(root.displayName(Focus.profile)))
+            visible: !Focus.profile.builtin
+            icon: Focus.profile.icon
+            title: Translation.tr("Icon")
+        }
+        IconPicker {
+            visible: !Focus.profile.builtin
+            Layout.topMargin: 0
+            current: Focus.profile.icon
+            onPicked: icon => Focus.update(Focus.activeId, { icon: icon })
         }
         ListRow {
             Layout.fillWidth: true

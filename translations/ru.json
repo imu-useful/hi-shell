@@ -608,9 +608,6 @@
     ],
     "Profiles": "Профили",
     "Active profile": "Активный профиль",
-    "New profile from this one": "Новый профиль на основе этого",
-    "Copies the timer, wallpaper, lists and exit condition": "Копирует таймер, обои, списки и условие выхода",
-    "%1 copy": "%1 (копия)",
     "Reset to defaults": "Сбросить по умолчанию",
     "Built-in profiles can't be deleted, only reset": "Встроенные профили нельзя удалить, только сбросить",
     "Delete profile": "Удалить профиль",
@@ -620,5 +617,10 @@
     "Exit": "Выход",
     "Study": "Учёба",
     "Work": "Работа",
-    "Custom": "Свой"
+    "Name, e.g. Exams": "Название, например Экзамены",
+    "Copy the active profile": "Скопировать активный профиль",
+    "Starts with the settings of “%1”": "Начнётся с настроек «%1»",
+    "Starts blank: 25/5/15 min × 4, empty lists, manual exit": "С чистого листа: 25/5/15 мин × 4, пустые списки, выход вручную",
+    "Active profile: %1": "Активный профиль: %1",
+    "Icon": "Иконка"
 }
