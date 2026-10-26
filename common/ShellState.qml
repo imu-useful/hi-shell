@@ -28,6 +28,8 @@ Singleton {
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "quick"
     property bool launcherOpen: false
+    // Display mode picker (the display key, the quick toggle, Settings).
+    property bool displayModeOpen: false
     // Bar hidden on every screen (`qs -c hi-shell ipc call bar toggle`).
     property bool barHidden: false
     // Text for the translator to take (region "translate"); consumed by the page.

@@ -115,7 +115,7 @@ Singleton {
                     // android: two-column pills with labels | classic: round icon buttons
                     property string style: "android"
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
-                    // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode
+                    // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode, displayMode
                     property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "colorPicker", "screenshot"]
                 }
                 // Night light color temperature (K) for hyprsunset.

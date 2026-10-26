@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -111,6 +111,14 @@ ColumnLayout {
             active: Toggles.vpnActive,
             available: Toggles.vpnAvailable,
             toggle: () => Toggles.setVpn(!Toggles.vpnActive)
+        },
+        displayMode: {
+            icon: "screenshot_monitor",
+            label: Translation.tr("Display mode"),
+            subtitle: Displays.hasExternal ? Displays.currentMode.title : Translation.tr("One screen"),
+            active: Displays.hasExternal && Displays.current !== "internal",
+            available: true,
+            toggle: () => { root.closeRequested(); Displays.refresh(); ShellState.displayModeOpen = true; }
         },
         focusMode: {
             icon: "center_focus_strong",

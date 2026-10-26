@@ -21,6 +21,33 @@ ColumnLayout {
         icon: "monitor"
         title: Translation.tr("Displays")
 
+        // Display mode with a second screen (also on the display key and in the right sidebar).
+        ListRow {
+            Layout.fillWidth: true
+            icon: "screenshot_monitor"
+            title: Translation.tr("Display mode")
+            subtitle: Displays.hasExternal ? Displays.currentMode.title : Translation.tr("No second screen connected")
+        }
+        Flow {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            Layout.bottomMargin: 6
+            spacing: 6
+            Repeater {
+                model: Displays.modes
+                Chip {
+                    required property var modelData
+                    icon: modelData.icon
+                    text: modelData.title
+                    selected: Displays.current === modelData.id
+                    enabled: Displays.hasExternal || modelData.id === "internal"
+                    opacity: enabled ? 1 : 0.38
+                    onClicked: Displays.apply(modelData.id)
+                }
+            }
+        }
+
         // Arrangement preview, scaled to fit.
         Item {
             id: arrangement

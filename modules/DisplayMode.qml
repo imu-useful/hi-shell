@@ -18,52 +18,30 @@ import qs.services
 Scope {
     id: root
 
-    property bool open: false
+    readonly property bool open: ShellState.displayModeOpen
     property int index: 0
     // Moved by the user since opening (else the highlight follows the current mode).
     property bool moved: false
 
-    readonly property var modes: [
-        { id: "internal", icon: "laptop", title: Translation.tr("This screen only") },
-        { id: "mirror", icon: "screen_share", title: Translation.tr("Duplicate") },
-        { id: "left", icon: "keyboard_double_arrow_left", title: Translation.tr("Extend left") },
-        { id: "right", icon: "keyboard_double_arrow_right", title: Translation.tr("Extend right") },
-        { id: "external", icon: "desktop_windows", title: Translation.tr("Second screen only") }
-    ]
-
-    // From `hyprctl monitors all -j` (includes disabled ones).
-    readonly property var monitors: HyprlandSettings.monitors
-    readonly property var internal: monitors.find(m => /^(eDP|LVDS|DSI)/.test(m.name)) ?? monitors[0] ?? null
-    readonly property var external: monitors.find(m => m !== internal) ?? null
-    readonly property bool hasExternal: external !== null
-
-    // The layout in effect now.
-    readonly property string current: {
-        if (!internal || !external || external.disabled)
-            return "internal";
-        if (internal.disabled)
-            return "external";
-        if (external.mirrorOf && external.mirrorOf !== "none")
-            return "mirror";
-        return external.x >= internal.x + internal.width / internal.scale ? "right" : "left";
-    }
-
     function show() {
-        HyprlandSettings.refresh();
+        Displays.refresh();
         moved = false;
-        index = Math.max(0, modes.findIndex(m => m.id === current));
-        open = true;
+        index = Math.max(0, Displays.modes.findIndex(m => m.id === Displays.current));
+        ShellState.displayModeOpen = true;
     }
+    function close() {
+        ShellState.displayModeOpen = false;
+    }
+    onOpenChanged: if (open && !moved) index = Math.max(0, Displays.modes.findIndex(m => m.id === Displays.current))
 
     // The monitor list arrives asynchronously: start on the mode in effect.
     Connections {
-        target: HyprlandSettings
-        function onMonitorsChanged() {
+        target: Displays
+        function onCurrentChanged() {
             if (root.open && !root.moved)
-                root.index = Math.max(0, root.modes.findIndex(m => m.id === root.current));
+                root.index = Math.max(0, Displays.modes.findIndex(m => m.id === Displays.current));
         }
     }
-    Component.onCompleted: HyprlandSettings.refresh()
 
     function next() {
         if (!open) {
@@ -71,85 +49,22 @@ Scope {
             return;
         }
         // Without a second screen there's only one mode to pick.
-        if (hasExternal) {
-            index = (index + 1) % modes.length;
+        if (Displays.hasExternal) {
+            index = (index + 1) % Displays.modes.length;
             moved = true;
         }
     }
 
-    function modeOf(m) {
-        return `${m.width}x${m.height}@${m.refreshRate.toFixed(2)}`;
-    }
-
-    // An enabled output; `mirror: ""` clears a previous duplicate (rules keep it otherwise).
-    function rule(m, extra) {
-        return Object.assign({ mode: m === internal ? modeOf(m) : "preferred", scale: m.scale || 1, disabled: false, mirror: "" }, extra);
-    }
-
     function apply(id) {
-        open = false;
-        if (!internal)
-            return;
-        if (!external) {
-            id = "internal";
-            if (!internal.disabled)
-                return;
-        }
-        const i = internal.name, e = external?.name;
-        // [output, rule, keep in the saved overrides]
-        const rules = {
-            internal: [[i, rule(internal, { position: "0x0" }), true], [e, { disabled: true }, true]],
-            mirror: [[i, rule(internal, { position: "0x0" }), true], [e, rule(external, { position: "auto", mirror: i }), true]],
-            right: [[i, rule(internal, { position: "0x0" }), true], [e, rule(external, { position: "auto-right" }), true]],
-            left: [[i, rule(internal, { position: "0x0" }), true], [e, rule(external, { position: "auto-left" }), true]],
-            // The panel stays on in the saved rules, so a boot without the cable has a screen.
-            external: [[e, rule(external, { position: "0x0" }), true], [i, { disabled: true }, false]]
-        }[id].filter(r => r[0]);
-
-        const saved = Object.assign({}, HyprlandSettings.overrides.monitors);
-        for (const [output, r, keep] of rules) {
-            HyprlandSettings.apply(`hl.monitor(${HyprlandSettings.lua(Object.assign({ output }, r))})`);
-            if (keep)
-                saved[output] = r;
-            else
-                saved[output] = rule(internal, { position: "0x0" });
-        }
-        HyprlandSettings.overrides.monitors = saved;
-        HyprlandSettings.writeLua();
-        refreshLater.restart();
-    }
-
-    Timer {
-        id: refreshLater
-        interval: 800
-        onTriggered: HyprlandSettings.refresh()
-    }
-
-    // Safety net: no screen left (e.g. the external one unplugged while the panel was
-    // off) turns the panel back on.
-    Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            if (Quickshell.screens.length === 0)
-                rescue.restart();
-        }
-    }
-    Timer {
-        id: rescue
-        interval: 500
-        onTriggered: {
-            if (Quickshell.screens.length > 0)
-                return;
-            const name = root.internal?.name ?? "eDP-1";
-            HyprlandSettings.apply(`hl.monitor({ output = "${name}", mode = "preferred", position = "auto", scale = 1, disabled = false })`);
-        }
+        close();
+        Displays.apply(id);
     }
 
     IpcHandler {
         target: "display"
 
         function toggle(): void {
-            root.open ? (root.open = false) : root.show();
+            root.open ? root.close() : root.show();
         }
         // What the display key does: open, then step through the modes.
         function next(): void {
@@ -157,7 +72,7 @@ Scope {
         }
         // internal, mirror, left, right, external
         function set(mode: string): void {
-            HyprlandSettings.refresh();
+            Displays.refresh();
             applyLater.mode = mode;
             applyLater.restart();
         }
@@ -166,7 +81,7 @@ Scope {
         id: applyLater
         property string mode
         interval: 400 // after the refresh above
-        onTriggered: root.apply(mode)
+        onTriggered: Displays.apply(mode)
     }
 
     PanelLoader {
@@ -190,7 +105,7 @@ Scope {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.open = false
+                onClicked: root.close()
             }
 
             Item {
@@ -198,13 +113,13 @@ Scope {
                 focus: true
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape)
-                        root.open = false;
+                        root.close();
                     else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)
-                        root.apply(root.modes[root.index].id);
+                        root.apply(Displays.modes[root.index].id);
                     else if (event.key === Qt.Key_Right || event.key === Qt.Key_Down || event.key === Qt.Key_Tab)
                         root.next();
-                    else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Up) && root.hasExternal) {
-                        root.index = (root.index + root.modes.length - 1) % root.modes.length;
+                    else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Up) && Displays.hasExternal) {
+                        root.index = (root.index + Displays.modes.length - 1) % Displays.modes.length;
                         root.moved = true;
                     }
                     else
@@ -251,7 +166,7 @@ Scope {
                         }
                         Item { Layout.fillWidth: true }
                         StyledText {
-                            text: root.hasExternal ? `${root.internal?.name ?? ""} · ${root.external.name} ${root.external.width}×${root.external.height}`
+                            text: Displays.hasExternal ? `${Displays.internal?.name ?? ""} · ${Displays.external.name} ${Displays.external.width}×${Displays.external.height}`
                                                    : Translation.tr("No second screen connected")
                             font.pixelSize: Appearance.font.size.labelMedium
                             color: Colors.m3onSurfaceVariant
@@ -262,15 +177,15 @@ Scope {
                         spacing: 10
 
                         Repeater {
-                            model: root.modes
+                            model: Displays.modes
 
                             Rectangle {
                                 id: tile
                                 required property var modelData
                                 required property int index
                                 readonly property bool selected: index === root.index
-                                readonly property bool active: modelData.id === root.current
-                                readonly property bool usable: root.hasExternal || modelData.id === "internal"
+                                readonly property bool active: modelData.id === Displays.current
+                                readonly property bool usable: Displays.hasExternal || modelData.id === "internal"
 
                                 width: 128
                                 height: 128
