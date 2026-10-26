@@ -622,5 +622,11 @@
     "Starts with the settings of “%1”": "Начнётся с настроек «%1»",
     "Starts blank: 25/5/15 min × 4, empty lists, manual exit": "С чистого листа: 25/5/15 мин × 4, пустые списки, выход вручную",
     "Active profile: %1": "Активный профиль: %1",
-    "Icon": "Иконка"
+    "Icon": "Иконка",
+    "Stop Focus Mode": "Остановить режим фокуса",
+    "Focus Mode: %1": "Режим фокуса: %1",
+    "Focus Mode is over": "Режим фокуса завершён",
+    "Locked during Focus Mode": "Недоступно в режиме фокуса",
+    "Start: %1": "Начать: %1",
+    "Focus Mode session with this profile": "Сессия режима фокуса с этим профилем"
 }

@@ -90,6 +90,11 @@ Scope {
         if (q.length < 2 || Focus.active || !words.some(w => w.startsWith(q)))
             return [];
         return [{
+            name: Translation.tr("Start: %1").arg(Focus.profileName(Focus.profile)),
+            comment: Translation.tr("Focus Mode session with this profile"),
+            materialIcon: "play_arrow",
+            run: () => Focus.start()
+        }, {
             name: Translation.tr("Focus Mode"),
             comment: Translation.tr("Pomodoro, profiles, blocked apps and sites"),
             materialIcon: "center_focus_strong",

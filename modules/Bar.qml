@@ -51,8 +51,28 @@ PanelWindow {
         power: power,
         notifications: notifications,
         visualizer: visualizer,
-        divider: divider
+        divider: divider,
+        focus: focus
     })
+
+    // Focus Mode keeps only workspaces, system icons and the clock, with the session's
+    // timer next to the clock (or in the middle if the bar has no clock).
+    readonly property var zenWidgets: ["workspaces", "systemIcons", "clock"]
+    readonly property bool hasClock: [...options.left, ...options.center, ...options.right].includes("clock")
+    function section(widgets, middle) {
+        if (!ShellState.zen)
+            return widgets;
+        const out = [];
+        for (const w of widgets) {
+            if (zenWidgets.includes(w))
+                out.push(w);
+            if (w === "clock")
+                out.push("focus");
+        }
+        if (middle && !hasClock)
+            out.push("focus");
+        return out;
+    }
 
     Component { id: launcher; LauncherButton {} }
     Component { id: workspaces; Workspaces {} }
@@ -72,6 +92,7 @@ PanelWindow {
     Component { id: notifications; NotificationsWidget {} }
     Component { id: visualizer; Visualizer {} }
     Component { id: divider; Divider {} }
+    Component { id: focus; FocusWidget {} }
 
     anchors.top: position !== "bottom"
     anchors.bottom: position !== "top"
@@ -141,7 +162,7 @@ PanelWindow {
                 BarSection {
                     id: left
                     bar: root.context
-                    widgets: root.options.left
+                    widgets: root.section(root.options.left, false)
                     registry: root.registry
                     // Fill up to the centered section; elidable widgets shrink.
                     width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.centerStart - 12))
@@ -151,7 +172,7 @@ PanelWindow {
                 BarSection {
                     id: center
                     bar: root.context
-                    widgets: root.options.center
+                    widgets: root.section(root.options.center, true)
                     registry: root.registry
                     x: root.vertical ? 0 : (content.width - width) / 2
                     y: root.vertical ? (content.height - height) / 2 : 0
@@ -162,7 +183,7 @@ PanelWindow {
                 BarSection {
                     id: right
                     bar: root.context
-                    widgets: root.options.right
+                    widgets: root.section(root.options.right, false)
                     registry: root.registry
                     width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.length - content.centerEnd - 12))
                     height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.length - content.centerEnd - 12)) : content.height

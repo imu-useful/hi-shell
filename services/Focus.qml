@@ -9,17 +9,26 @@ import qs.common
 // (see SPEC_FOCUS.md). A profile holds the Pomodoro timer, the wallpaper, the block /
 // allow lists and the exit condition; selecting one makes it the active profile, and
 // edits go to the active profile. Built-in profiles (Study, Work) can be edited and
-// reset; your own ones get a name and an icon of their choice and can be deleted. Tasks are the shell's to-do list
-// (services/Todo.qml); this file only keeps which of them are picked for the session.
-// The settings window (modules/focus/FocusSettingsWindow.qml) can't be opened while a
-// session is running (`active`, driven by the session logic of the later stages).
+// reset; your own ones get a name and an icon of their choice and can be deleted. Tasks
+// are the shell's to-do list (services/Todo.qml); this file only keeps which of them are
+// picked for the session.
+//
+// A session (start / stop) puts the shell in Zen mode (ShellState.zen): a minimal bar,
+// no desktop widgets, no animations, blur or cover mode, the profile's wallpaper, and
+// Settings, the left sidebar, the wallpaper picker and the Focus settings window locked.
+// What it changes is kept in ~/.local/state/hi-shell/focus_session.json, so a restart
+// of the shell stays in the session and stopping puts everything back.
 Singleton {
     id: root
 
     readonly property string path: `${Config.dir}/focus_profiles.json`
 
-    // Session state (later stages); the settings window stays closed while it's true.
+    // A session runs; the settings window stays closed while it's true.
     property bool active: false
+    property real startedAt: 0
+    property var sessionProfile: ({}) // the profile as it was when the session started
+    // Values to put back on stop: { wallpaper, blur, animations }
+    property var restore: ({})
     property bool settingsOpen: false
     property string settingsTab: "timer" // timer, wallpaper, lists, profiles, todo, exit
 
@@ -194,6 +203,141 @@ Singleton {
         }, null, 2) + "\n")
     }
 
+    // --- Session ---
+    function start() {
+        if (active || !loaded)
+            return;
+        active = true;
+        startedAt = Date.now();
+        sessionProfile = JSON.parse(JSON.stringify(profile));
+        restore = { wallpaper: Wallpapers.current };
+        settingsOpen = false;
+        ShellState.settingsOpen = ShellState.sidebarLeftOpen = ShellState.wallpaperSelectorOpen = false;
+        ShellState.desktopEditing = false;
+        ShellState.zen = true;
+        // Hyprland's values first, to put them back afterwards; then turn them off.
+        hyprQuery.running = true;
+        if (sessionProfile.wallpaper && sessionProfile.wallpaper !== Wallpapers.current)
+            Wallpapers.set(sessionProfile.wallpaper);
+        writeSession();
+        ShellState.osdMessage(sessionProfile.icon, Translation.tr("Focus Mode: %1").arg(profileName(sessionProfile)));
+    }
+
+    function stop() {
+        if (!active)
+            return;
+        // Only if it's still the focus wallpaper (not changed some other way since).
+        if (restore.wallpaper && sessionProfile.wallpaper && Wallpapers.current === sessionProfile.wallpaper)
+            Wallpapers.set(restore.wallpaper);
+        hyprOff(false);
+        active = false;
+        ShellState.zen = false;
+        sessionFile.setText("{}\n");
+        ShellState.osdMessage("check_circle", Translation.tr("Focus Mode is over"));
+    }
+
+    function profileName(p) {
+        return p.builtin ? Translation.tr(p.name) : p.name;
+    }
+
+    // Blur and animations off (or back to what they were).
+    function hyprOff(off) {
+        const blur = off ? false : (restore.blur ?? true);
+        const animations = off ? false : (restore.animations ?? true);
+        HyprlandSettings.apply(`hl.config({ decoration = { blur = { enabled = ${blur} } }, animations = { enabled = ${animations} } })`);
+    }
+
+    function writeSession() {
+        sessionFile.setText(JSON.stringify({
+            active: true,
+            startedAt: startedAt,
+            profileId: activeId,
+            profile: sessionProfile,
+            restore: restore
+        }, null, 2) + "\n");
+    }
+
+    Process {
+        id: hyprQuery
+        command: ["sh", "-c", "hyprctl getoption decoration:blur:enabled -j; hyprctl getoption animations:enabled -j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const r = Object.assign({}, root.restore);
+                for (const line of text.split("\n").filter(l => l.trim())) {
+                    try {
+                        const o = JSON.parse(line);
+                        const v = o.bool ?? !!o.int;
+                        if (o.option === "decoration:blur:enabled")
+                            r.blur = v;
+                        else if (o.option === "animations:enabled")
+                            r.animations = v;
+                    } catch (e) {}
+                }
+                root.restore = r;
+                if (root.active) {
+                    root.hyprOff(true);
+                    root.writeSession();
+                }
+            }
+        }
+    }
+
+    // Back in the session after a shell restart.
+    FileView {
+        id: sessionFile
+        path: `${Paths.state}/focus_session.json`
+        atomicWrites: true
+        printErrors: false
+        onLoaded: {
+            try {
+                const d = JSON.parse(text());
+                if (!d.active)
+                    return;
+                root.startedAt = d.startedAt;
+                root.sessionProfile = d.profile;
+                root.restore = d.restore ?? {};
+                root.active = true;
+                ShellState.zen = true;
+                // Hyprland may have been reloaded meanwhile.
+                root.hyprOff(true);
+            } catch (e) {
+                console.warn("Focus: bad session file", e);
+            }
+        }
+    }
+
+    // Locked while a session runs: opening any of these just says so.
+    Connections {
+        target: ShellState
+        function locked() {
+            ShellState.osdMessage("lock", Translation.tr("Locked during Focus Mode"));
+        }
+        function onSettingsOpenChanged() {
+            if (ShellState.zen && ShellState.settingsOpen) {
+                ShellState.settingsOpen = false;
+                locked();
+            }
+        }
+        function onSidebarLeftOpenChanged() {
+            if (ShellState.zen && ShellState.sidebarLeftOpen) {
+                ShellState.sidebarLeftOpen = false;
+                locked();
+            }
+        }
+        function onWallpaperSelectorOpenChanged() {
+            if (ShellState.zen && ShellState.wallpaperSelectorOpen) {
+                ShellState.wallpaperSelectorOpen = false;
+                locked();
+            }
+        }
+    }
+    onSettingsOpenChanged: {
+        if (active && settingsOpen) {
+            settingsOpen = false;
+            ShellState.osdMessage("lock", Translation.tr("Locked during Focus Mode"));
+        }
+    }
+
     function apply(data) {
         const d = defaults();
         // Keep the built-in ones even if the file lost them; fill in missing keys. A
@@ -246,8 +390,17 @@ Singleton {
 
         // Focus Mode settings window (not while a session runs).
         function settings(): void {
-            if (!root.active)
-                root.settingsOpen = true;
+            root.settingsOpen = true;
+        }
+        // A session with the active profile; stop puts everything back.
+        function start(): void {
+            root.start();
+        }
+        function stop(): void {
+            root.stop();
+        }
+        function status(): string {
+            return root.active ? `active\t${root.sessionProfile.name}\t${Math.round((Date.now() - root.startedAt) / 1000)}s` : "inactive";
         }
         // A tab of it: timer, wallpaper, lists, profiles, todo, exit
         function openTab(tab: string): void {

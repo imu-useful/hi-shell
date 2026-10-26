@@ -56,4 +56,12 @@ Singleton {
     }
     // Text to start the launcher with (IPC launcher search), consumed on open.
     property string launcherQuery: ""
+
+    // A Focus Mode session runs (services/Focus.qml): the bar keeps only workspaces,
+    // system icons and the clock / timer, desktop widgets hide, animations, blur and
+    // cover mode are off, and Settings, the left sidebar and the wallpaper picker stay
+    // closed.
+    property bool zen: false
+    // A short message on the on-screen display (e.g. "locked during Focus Mode").
+    signal osdMessage(string icon, string label)
 }

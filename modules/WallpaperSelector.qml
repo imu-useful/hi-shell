@@ -14,7 +14,7 @@ import qs.services
 Scope {
     id: root
 
-    readonly property bool open: ShellState.wallpaperSelectorOpen
+    readonly property bool open: ShellState.wallpaperSelectorOpen && !ShellState.zen
     property bool onlineTab: false
     property string filter: ""
 

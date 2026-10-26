@@ -16,7 +16,7 @@ import qs.modules.sidebarLeft
 Scope {
     id: root
 
-    readonly property bool open: ShellState.sidebarLeftOpen
+    readonly property bool open: ShellState.sidebarLeftOpen && !ShellState.zen
     readonly property list<string> tabs: ["home", "claude", "translator", "clipboard"]
 
     function setOpen(value) {

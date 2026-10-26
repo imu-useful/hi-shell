@@ -13,7 +13,8 @@ import qs.common
 Singleton {
     id: root
 
-    readonly property bool enabled: Config.options.desktop.coverMode
+    // Off during Focus Mode (it has a wallpaper of its own); back on after it.
+    readonly property bool enabled: Config.options.desktop.coverMode && !ShellState.zen
     readonly property string art: Mpris.artUrl
     // The desktop draws the cover while this is true.
     readonly property bool active: enabled && Mpris.hasPlayer && art !== ""

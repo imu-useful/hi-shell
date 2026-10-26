@@ -208,6 +208,7 @@ qs -c hi-shell ipc call bar toggle                   # show, hide
 qs -c hi-shell ipc call display set mirror           # internal, left, right, external; toggle, next (the display key)
 qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
 qs -c hi-shell ipc call focus settings               # Focus Mode settings window; openTab timer|wallpaper|lists|profiles|todo|exit, profile <id>, current
+qs -c hi-shell ipc call focus start                  # Focus Mode session with the active profile (Zen bar, locks); stop, status
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>

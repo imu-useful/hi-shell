@@ -89,6 +89,11 @@ Scope {
     }
 
     Connections {
+        target: ShellState
+        function onOsdMessage(icon, label) { root.show(icon, label, -1); }
+    }
+
+    Connections {
         target: HyprlandXkb
         function onLayoutChanged() { root.show("keyboard", HyprlandXkb.layout, -1); }
     }

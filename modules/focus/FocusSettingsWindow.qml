@@ -7,8 +7,8 @@ import qs.services
 
 // Focus Mode settings: a regular window (Hyprland manages it like any app), opened with
 // `qs -c hi-shell ipc call focus settings` or from the launcher. The tabs edit the
-// active profile; the chips at the top switch it. Closed and unavailable while a
-// session runs. Everything is saved to ~/.config/hi-shell/focus_profiles.json.
+// active profile; the chips at the top switch it, and Start begins a session with it.
+// Closed and unavailable while a session runs. Everything is saved to ~/.config/hi-shell/focus_profiles.json.
 Scope {
     id: root
 
@@ -129,6 +129,16 @@ Scope {
                     }
 
                     Item { Layout.fillHeight: true }
+
+                    // Starts a session with the active profile (this window closes).
+                    M3Button {
+                        Layout.fillWidth: true
+                        Layout.margins: 6
+                        implicitHeight: 52
+                        icon: "play_arrow"
+                        text: Translation.tr("Start: %1").arg(Focus.profileName(Focus.profile))
+                        onClicked: Focus.start()
+                    }
                 }
 
                 // --- Page ---

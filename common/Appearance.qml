@@ -51,7 +51,7 @@ Singleton {
     // curves don't; use spatial for position/size and effects for opacity/color.
     // Durations are scaled by Config appearance.animationSpeed.
     readonly property QtObject anim: QtObject {
-        readonly property real speed: Math.max(0, root.options.animationSpeed)
+        readonly property real speed: ShellState.zen ? 0 : Math.max(0, root.options.animationSpeed)
 
         readonly property list<real> spatialFast: [0.42, 1.67, 0.21, 0.90, 1, 1]
         readonly property list<real> spatialDefault: [0.38, 1.21, 0.22, 1.00, 1, 1]
@@ -76,7 +76,8 @@ Singleton {
     // Surface color for panels/cards: translucent when transparency is on,
     // so the compositor blur shows through.
     function translucent(color, level) {
-        if (!options.transparency)
+        // Focus Mode turns blur off, so nothing shows through either.
+        if (!options.transparency || ShellState.zen)
             return color;
         return Qt.alpha(color, 1 - (level ?? options.transparencyLevel));
     }

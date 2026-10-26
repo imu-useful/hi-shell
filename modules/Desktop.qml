@@ -20,7 +20,7 @@ Scope {
 
     readonly property var options: Config.options.desktop
     readonly property string frame: Config.options.wallpapers.frame
-    readonly property bool editing: ShellState.desktopEditing
+    readonly property bool editing: ShellState.desktopEditing && !ShellState.zen
 
     function setEditing(value) {
         ShellState.desktopEditing = value;
@@ -246,7 +246,8 @@ Scope {
             Item {
                 id: widgets
                 anchors.fill: parent
-                visible: window.hasWidgets
+                // Gone during Focus Mode (still loaded, so they keep their state).
+                visible: window.hasWidgets && !ShellState.zen
                 // Hidden (not unloaded) behind windows, so widgets keep their state.
                 opacity: window.reveal
                 scale: 0.97 + 0.03 * window.reveal

@@ -16,7 +16,7 @@ import "settings/Pages.js" as Pages
 Scope {
     id: root
 
-    readonly property bool open: ShellState.settingsOpen
+    readonly property bool open: ShellState.settingsOpen && !ShellState.zen
 
     function setOpen(value) {
         ShellState.settingsOpen = value;
