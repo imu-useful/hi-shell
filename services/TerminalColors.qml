@@ -122,8 +122,11 @@ mark1_foreground ${h(Colors.m3onTertiaryContainer)}
             printf %s "$4" > "$1/kitty-theme.conf.tmp" && mv "$1/kitty-theme.conf.tmp" "$1/kitty-theme.conf"
             # kitty reloads its config (and so the theme) on SIGUSR1.
             pkill -USR1 -x kitty 2>/dev/null
-            # Recolor the terminals already open (each one's tty), like a fresh start would.
-            for t in /dev/pts/[0-9]*; do
+            # Recolor the terminals already open, like a fresh start would: only ttys with a
+            # shell in them. Other ptys aren't terminals someone looks at; KDE's kwrited, for
+            # one, turns whatever is written to its pty into a notification.
+            for tty in $(ps -eo tty=,comm= | awk '$1 ~ /^pts\// && $2 ~ /^(fish|zsh|bash|nu|sh|dash|ksh|tcsh|xonsh)$/ {print $1}' | sort -u); do
+                t=/dev/$tty
                 [ -O "$t" ] && [ -w "$t" ] && printf %s "$2" > "$t" 2>/dev/null
             done
         `, "sh", dir, sequences, fish, kitty];
