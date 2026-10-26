@@ -153,6 +153,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                     root.selecting = true;
                 } catch (e) {
                     console.warn("Region: could not capture the screen", e);
+                    Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-i", "dialog-error", Translation.tr("Couldn't capture the screen"), Translation.tr("The focused screen isn't available to screenshot tools; try again in a moment")]);
                 }
             }
         }

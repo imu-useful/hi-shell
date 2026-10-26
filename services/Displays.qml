@@ -98,6 +98,8 @@ Singleton {
         function onScreensChanged() {
             if (Quickshell.screens.length === 0)
                 rescue.restart();
+            // Hotplug: re-read Hyprland's monitors (and heal what the shell can't see).
+            refreshLater.restart();
         }
     }
     Timer {
@@ -111,5 +113,56 @@ Singleton {
         }
     }
 
+    // Hyprland sometimes turns an output back on without announcing it to clients: it's
+    // "on" but the shell (and grim) can't see it, so it has no bar or desktop. When the
+    // shell is missing a screen Hyprland has on, switch that output off and on once.
+    property var healed: ({}) // output -> time of the last attempt
+    function heal() {
+        for (const m of monitors) {
+            if (m.disabled || Quickshell.screens.some(s => s.name === m.name))
+                continue;
+            const last = healed[m.name] ?? 0;
+            if (Date.now() - last < 20000)
+                continue;
+            healed[m.name] = Date.now();
+            console.info("Displays: re-announcing", m.name);
+            const r = HyprlandSettings.overrides.monitors[m.name] ?? rule(m, { position: "auto" });
+            HyprlandSettings.apply(`hl.monitor(${HyprlandSettings.lua({ output: m.name, disabled: true })})`);
+            reenable.pending.push(HyprlandSettings.lua(Object.assign({ output: m.name }, r, { disabled: false })));
+            reenable.restart();
+        }
+    }
+    Timer {
+        id: reenable
+        property var pending: []
+        interval: 700
+        onTriggered: {
+            for (const r of pending)
+                HyprlandSettings.apply(`hl.monitor(${r})`);
+            pending = [];
+            refreshLater.restart();
+        }
+    }
+    // Check once the screen list has settled after Hyprland's monitors change.
+    Connections {
+        target: HyprlandSettings
+        function onMonitorsChanged() {
+            healCheck.restart();
+        }
+    }
+    Timer {
+        id: healCheck
+        interval: 1500
+        onTriggered: root.heal()
+    }
     Component.onCompleted: HyprlandSettings.refresh()
+
+    IpcHandler {
+        target: "displays"
+
+        // Screens the shell has windows for (Quickshell's view), one per line.
+        function screens(): string {
+            return Quickshell.screens.map(s => `${s.name} ${s.width}x${s.height}+${s.x}+${s.y}`).join("\n");
+        }
+    }
 }

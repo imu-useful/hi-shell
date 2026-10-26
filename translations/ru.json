@@ -536,5 +536,7 @@
     "Display mode": "Режим экрана",
     "No second screen connected": "Второй экран не подключён",
     "Press the key again or use the arrows · Enter to apply · Esc to close": "Нажмите клавишу ещё раз или стрелки · Enter — применить · Esc — закрыть",
-    "One screen": "Один экран"
+    "One screen": "Один экран",
+    "Couldn't capture the screen": "Не удалось сделать снимок экрана",
+    "The focused screen isn't available to screenshot tools; try again in a moment": "Активный экран недоступен для снимков; попробуйте ещё раз через пару секунд"
 }
