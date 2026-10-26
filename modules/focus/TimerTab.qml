@@ -126,8 +126,12 @@ ColumnLayout {
                     }
                 }
                 Item { Layout.fillWidth: true }
+                // A Timer session ends with the last focus period; the others start over
+                // after the long break.
                 StyledText {
-                    text: Translation.tr("%1 focused · %2 in total").arg(root.duration(root.timer.focus * root.timer.cycles)).arg(root.duration(root.total))
+                    text: Focus.profile.exit === "timer"
+                        ? Translation.tr("%1 focused · the session lasts %2").arg(root.duration(root.timer.focus * root.timer.cycles)).arg(root.duration(root.total - root.timer.longBreak))
+                        : Translation.tr("%1 focused · %2 per round, then again").arg(root.duration(root.timer.focus * root.timer.cycles)).arg(root.duration(root.total))
                     font.weight: Font.Medium
                 }
             }

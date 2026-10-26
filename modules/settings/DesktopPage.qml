@@ -25,8 +25,8 @@ ColumnLayout {
 
         SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
         SwitchRow {
-            icon: "center_focus_strong"
-            title: Translation.tr("Focus mode")
+            icon: "layers_clear"
+            title: Translation.tr("Clean desktop")
             subtitle: Translation.tr("With windows open: sharp wallpaper, widgets and frame hidden")
             checked: root.d.focusMode
             onToggled: checked => root.d.focusMode = checked

@@ -116,7 +116,7 @@ Singleton {
                     property string style: "android"
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
                     // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode, displayMode
-                    property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "colorPicker", "screenshot"]
+                    property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]
                 }
                 // Night light color temperature (K) for hyprsunset.
                 property int nightLightTemperature: 4500

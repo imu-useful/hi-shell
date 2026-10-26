@@ -204,13 +204,24 @@ Singleton {
     }
 
     // --- Session ---
+    // Starting fails (with a message) in Tasks mode without a task picked for it.
     function start() {
         if (active || !loaded)
             return;
-        active = true;
+        const tasks = Todo.items.filter(i => isSessionTask(i) && !i.done).map(i => i.time);
+        if (profile.exit === "tasks" && tasks.length === 0) {
+            ShellState.osdMessage("checklist", Translation.tr("Pick tasks for the session first"));
+            settingsTab = "todo";
+            settingsOpen = true;
+            return;
+        }
         startedAt = Date.now();
+        now = startedAt;
         sessionProfile = JSON.parse(JSON.stringify(profile));
+        sessionTaskIds = tasks;
         restore = { wallpaper: Wallpapers.current };
+        phaseKey = "";
+        active = true;
         settingsOpen = false;
         ShellState.settingsOpen = ShellState.sidebarLeftOpen = ShellState.wallpaperSelectorOpen = false;
         ShellState.desktopEditing = false;
@@ -223,9 +234,21 @@ Singleton {
         ShellState.osdMessage(sessionProfile.icon, Translation.tr("Focus Mode: %1").arg(profileName(sessionProfile)));
     }
 
+    // The Stop button: only in Manual mode. Timer and Tasks sessions end by themselves.
+    readonly property bool canStop: active && sessionProfile.exit === "manual"
     function stop() {
+        if (canStop)
+            finish();
+        else if (active)
+            ShellState.osdMessage("lock", sessionProfile.exit === "tasks" ? Translation.tr("Ends when the session's tasks are done")
+                                                                          : Translation.tr("Ends when the timer runs out"));
+    }
+
+    // Ends the session whatever the exit condition (stop, the timer, the tasks, `abort`).
+    function finish() {
         if (!active)
             return;
+        const focused = focusedMinutes(Date.now());
         // Only if it's still the focus wallpaper (not changed some other way since).
         if (restore.wallpaper && sessionProfile.wallpaper && Wallpapers.current === sessionProfile.wallpaper)
             Wallpapers.set(restore.wallpaper);
@@ -234,6 +257,113 @@ Singleton {
         ShellState.zen = false;
         sessionFile.setText("{}\n");
         ShellState.osdMessage("check_circle", Translation.tr("Focus Mode is over"));
+        notify(Translation.tr("Focus Mode is over"), Translation.trn("%1 minute of focus. Well done!", "%1 minutes of focus. Well done!", focused));
+    }
+
+    // --- Pomodoro ---
+    // The phase comes from the time since the start, so a restart lands in the same place.
+    // Focus and short breaks alternate, with a long break after the last cycle; then it
+    // starts over. In Timer mode the session ends with the last focus period instead.
+    property real now: Date.now()
+    Timer {
+        running: root.active
+        interval: 1000
+        repeat: true
+        onTriggered: root.now = Date.now()
+    }
+
+    function segments(p) {
+        const t = p.timer, out = [];
+        for (let i = 0; i < t.cycles; i++) {
+            out.push({ kind: "focus", cycle: i + 1, minutes: t.focus });
+            if (i < t.cycles - 1)
+                out.push({ kind: "short", cycle: i + 1, minutes: t.shortBreak });
+            else if (p.exit !== "timer")
+                out.push({ kind: "long", cycle: i + 1, minutes: t.longBreak });
+        }
+        return out;
+    }
+
+    // { kind: focus | short | long | done, cycle, round, start, end } (times in ms)
+    function phaseAt(time) {
+        if (!active)
+            return { kind: "none", cycle: 0, round: 0, start: 0, end: 0 };
+        const segs = segments(sessionProfile);
+        const length = segs.reduce((sum, s) => sum + s.minutes, 0) * 60000;
+        const elapsed = Math.max(0, time - startedAt);
+        if (sessionProfile.exit === "timer" && elapsed >= length)
+            return { kind: "done", cycle: sessionProfile.timer.cycles, round: 0, start: startedAt + length, end: startedAt + length };
+        const round = Math.floor(elapsed / length);
+        let t = startedAt + round * length;
+        for (const s of segs) {
+            const end = t + s.minutes * 60000;
+            if (time < end)
+                return { kind: s.kind, cycle: s.cycle, round: round, start: t, end: end };
+            t = end;
+        }
+        return { kind: "focus", cycle: 1, round: round + 1, start: t, end: t };
+    }
+
+    function focusedMinutes(time) {
+        const segs = segments(sessionProfile);
+        let total = 0, t = startedAt;
+        while (t < time) {
+            for (const s of segs) {
+                const end = t + s.minutes * 60000;
+                if (s.kind === "focus")
+                    total += Math.max(0, Math.min(end, time) - t);
+                t = end;
+                if (t >= time)
+                    break;
+            }
+            if (sessionProfile.exit === "timer")
+                break;
+        }
+        return Math.round(total / 60000);
+    }
+
+    readonly property var phase: phaseAt(now)
+    readonly property int remaining: Math.max(0, Math.ceil((phase.end - now) / 1000)) // seconds
+    // Blocking (later stages) applies during focus periods only; breaks are free.
+    readonly property bool restricted: active && phase.kind === "focus"
+
+    // Phase changes: a notification, and the end of a Timer session.
+    property string phaseKey: ""
+    onPhaseChanged: {
+        if (!active)
+            return;
+        const key = `${phase.kind}-${phase.round}-${phase.cycle}`;
+        if (key === phaseKey)
+            return;
+        const first = phaseKey === "";
+        phaseKey = key;
+        if (phase.kind === "done") {
+            // Not from inside the binding that just changed.
+            Qt.callLater(finish);
+            return;
+        }
+        if (first)
+            return;
+        const t = sessionProfile.timer;
+        if (phase.kind === "focus")
+            notify(Translation.tr("Focus · cycle %1 of %2").arg(phase.cycle).arg(t.cycles),
+                   Translation.trn("%1 minute. Back to work!", "%1 minutes. Back to work!", t.focus));
+        else if (phase.kind === "short")
+            notify(Translation.tr("Short break"), Translation.trn("%1 minute. Stand up, look away from the screen.", "%1 minutes. Stand up, look away from the screen.", t.shortBreak));
+        else
+            notify(Translation.tr("Long break"), Translation.trn("%1 minute. You've earned it.", "%1 minutes. You've earned it.", t.longBreak));
+    }
+
+    function notify(title, body) {
+        Quickshell.execDetached(["notify-send", "-a", Translation.tr("Focus Mode"), "-i", "alarm-symbolic", title, body]);
+    }
+
+    // --- Tasks exit: the session's tasks (fixed at the start) all done or gone ---
+    property var sessionTaskIds: []
+    readonly property int tasksLeft: Todo.items.filter(i => sessionTaskIds.includes(i.time) && !i.done).length
+    onTasksLeftChanged: {
+        if (active && sessionProfile.exit === "tasks" && tasksLeft === 0)
+            Qt.callLater(finish);
     }
 
     function profileName(p) {
@@ -253,6 +383,7 @@ Singleton {
             startedAt: startedAt,
             profileId: activeId,
             profile: sessionProfile,
+            tasks: sessionTaskIds,
             restore: restore
         }, null, 2) + "\n");
     }
@@ -295,7 +426,10 @@ Singleton {
                     return;
                 root.startedAt = d.startedAt;
                 root.sessionProfile = d.profile;
+                root.sessionTaskIds = d.tasks ?? [];
                 root.restore = d.restore ?? {};
+                root.now = Date.now();
+                root.phaseKey = "";
                 root.active = true;
                 ShellState.zen = true;
                 // Hyprland may have been reloaded meanwhile.
@@ -396,11 +530,16 @@ Singleton {
         function start(): void {
             root.start();
         }
+        // Only in Manual mode, like the Stop button.
         function stop(): void {
             root.stop();
         }
+        // Emergency exit whatever the exit condition.
+        function abort(): void {
+            root.finish();
+        }
         function status(): string {
-            return root.active ? `active\t${root.sessionProfile.name}\t${Math.round((Date.now() - root.startedAt) / 1000)}s` : "inactive";
+            return root.active ? `active\t${root.sessionProfile.name}\t${root.phase.kind} ${root.phase.cycle}/${root.sessionProfile.timer.cycles}\t${root.remaining}s left` : "inactive";
         }
         // A tab of it: timer, wallpaper, lists, profiles, todo, exit
         function openTab(tab: string): void {
@@ -413,6 +552,10 @@ Singleton {
         // study, work or a profile id
         function profile(id: string): void {
             root.select(id);
+        }
+        // A to-do task picked for the session
+        function addTask(text: string): void {
+            root.addTask(text);
         }
         // A blank profile of your own (icon: a Material Symbols name, empty for the default)
         function addProfile(name: string, icon: string): string {

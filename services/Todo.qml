@@ -56,6 +56,10 @@ Singleton {
         function add(text: string): void {
             root.add(text);
         }
+        // Done / not done, by its number in `list` (from 1)
+        function toggle(number: int): void {
+            root.toggle(number - 1);
+        }
         function list(): string {
             return root.items.map(i => `${i.done ? "[x]" : "[ ]"} ${i.text}`).join("\n");
         }

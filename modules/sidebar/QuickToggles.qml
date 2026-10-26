@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -36,7 +36,7 @@ ColumnLayout {
         objects: [root.source]
     }
 
-    // id -> { icon, label, subtitle, active, available, toggle(), page }
+    // id -> { icon, label, subtitle, active, available, toggle(), page or more() }
     readonly property var toggles: ({
         wifi: {
             icon: !Networking.wifiEnabled ? "wifi_off" : wifiNetwork ? "wifi" : "wifi_find",
@@ -120,9 +120,21 @@ ColumnLayout {
             available: true,
             toggle: () => { root.closeRequested(); Displays.refresh(); ShellState.displayModeOpen = true; }
         },
+        // Focus Mode session: starts one with the active profile; while it runs, shows the
+        // phase and time left, and stops it in Manual mode. The arrow opens its settings.
+        focusSession: {
+            icon: Focus.active ? (Focus.phase.kind === "focus" ? "psychology" : "coffee") : "center_focus_strong",
+            label: Translation.tr("Focus Mode"),
+            subtitle: !Focus.active ? Focus.profileName(Focus.profile)
+                    : `${Focus.phase.kind === "focus" ? Translation.tr("Focus") : Translation.tr("Break")} · ${Translation.tr("%1 min").arg(Math.ceil(Focus.remaining / 60))}`,
+            active: Focus.active,
+            available: true,
+            toggle: () => Focus.active ? Focus.stop() : Focus.start(),
+            more: () => { root.closeRequested(); Focus.settingsOpen = true; }
+        },
         focusMode: {
-            icon: "center_focus_strong",
-            label: Translation.tr("Focus mode"),
+            icon: "layers_clear",
+            label: Translation.tr("Clean desktop"),
             subtitle: Config.options.desktop.focusMode ? Translation.tr("Clean desktop behind windows") : Translation.tr("Off"),
             active: Config.options.desktop.focusMode,
             available: true,
@@ -263,7 +275,7 @@ ColumnLayout {
                             }
                         }
                         MaterialIcon {
-                            visible: !!tile.t.page && !root.editing
+                            visible: (!!tile.t.page || !!tile.t.more) && !root.editing
                             icon: "chevron_right"
                             iconSize: 18
                             color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
@@ -286,8 +298,8 @@ ColumnLayout {
                         onClicked: mouse => {
                             if (root.editing)
                                 root.setShown(tile.modelData, !tile.included);
-                            else if (tile.t.page && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 44)))
-                                root.openPage(tile.t.page);
+                            else if ((tile.t.page || tile.t.more) && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 44)))
+                                tile.t.more ? tile.t.more() : root.openPage(tile.t.page);
                             else
                                 tile.t.toggle();
                         }

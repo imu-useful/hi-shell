@@ -582,7 +582,6 @@
     "Cycles": "Циклы",
     "Focus periods before the long break": "Периодов фокуса до длинного перерыва",
     "Session": "Сессия",
-    "%1 focused · %2 in total": "%1 фокуса · всего %2",
     "Focus Mode · hi-shell": "Режим фокуса · hi-shell",
     "Focus Mode": "Режим фокуса",
     "Wallpaper": "Обои",
@@ -628,5 +627,32 @@
     "Focus Mode is over": "Режим фокуса завершён",
     "Locked during Focus Mode": "Недоступно в режиме фокуса",
     "Start: %1": "Начать: %1",
-    "Focus Mode session with this profile": "Сессия режима фокуса с этим профилем"
+    "Focus Mode session with this profile": "Сессия режима фокуса с этим профилем",
+    "Pick tasks for the session first": "Сначала выберите задачи для сессии",
+    "Ends when the session's tasks are done": "Закончится, когда будут выполнены задачи сессии",
+    "Ends when the timer runs out": "Закончится, когда выйдет время",
+    "%1 minutes of focus. Well done!": [
+        "%1 минута фокуса. Отличная работа!",
+        "%1 минуты фокуса. Отличная работа!",
+        "%1 минут фокуса. Отличная работа!"
+    ],
+    "Focus · cycle %1 of %2": "Фокус · цикл %1 из %2",
+    "%1 minutes. Back to work!": [
+        "%1 минута. За работу!",
+        "%1 минуты. За работу!",
+        "%1 минут. За работу!"
+    ],
+    "%1 minutes. Stand up, look away from the screen.": [
+        "%1 минута. Встаньте, отведите взгляд от экрана.",
+        "%1 минуты. Встаньте, отведите взгляд от экрана.",
+        "%1 минут. Встаньте, отведите взгляд от экрана."
+    ],
+    "%1 minutes. You've earned it.": [
+        "%1 минута. Вы это заслужили.",
+        "%1 минуты. Вы это заслужили.",
+        "%1 минут. Вы это заслужили."
+    ],
+    "Clean desktop": "Чистый стол",
+    "%1 focused · the session lasts %2": "%1 фокуса · сессия длится %2",
+    "%1 focused · %2 per round, then again": "%1 фокуса · %2 за круг, потом заново"
 }
