@@ -13,6 +13,17 @@ if status is-interactive
         test -f $hs/colors.fish; and source $hs/colors.fish
     end
 
+    # --- Greeting: system info when a terminal window opens (fish started by the
+    # terminal itself, so not in nested shells, scripts or ssh). Turn it off with:
+    #   set -U hi_greeting off ---
+    if test "$hi_greeting" != off; and not set -q SSH_TTY; and type -q fastfetch
+        set -l ppid (string split ' ' </proc/$fish_pid/stat)[4]
+        read -l parent </proc/$ppid/comm
+        if contains -- $parent kitty foot alacritty wezterm-gui ghostty konsole gnome-terminal- xfce4-terminal
+            fastfetch
+        end
+    end
+
     # --- Prompt ---
     if type -q starship; and test "$TERM" != linux
         # Past prompts collapse to a single character.

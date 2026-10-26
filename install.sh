@@ -175,6 +175,7 @@ if $DOTS; then
     step "Terminal configs"
     install_dot fish fish/config.fish "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
     install_dot kitty kitty/kitty.conf "${XDG_CONFIG_HOME:-$HOME/.config}/kitty/kitty.conf"
+    install_dot fastfetch fastfetch/config.jsonc "${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc"
 fi
 
 command -v claude >/dev/null || warn "Claude Code isn't installed: the AI palette and chat need it (npm install -g @anthropic-ai/claude-code, then run claude once)"

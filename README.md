@@ -241,10 +241,14 @@ Sections:
 - **fish** (`dots/fish/config.fish`): no greeting, starship prompt with transient past prompts, zoxide as `cd`,
   fzf (Ctrl+R history, Ctrl+T files, Alt+C directories), eza for `ls` / `ll` / `la` / `lt`, bat for `cat`,
   git abbreviations (`gs`, `ga`, `gc`, `gp`, `gd`, `gl`), `up` to update the system, `hs` for `qs -c hi-shell`,
-  `mkcd` and `extract`. Each tool is optional.
+  `mkcd` and `extract`, fastfetch when a terminal window opens. Each tool is optional.
 - **kitty** (`dots/kitty/kitty.conf`): JetBrainsMono Nerd Font, padding, slight transparency (Hyprland blurs behind),
   beam cursor with a trail, fish as the shell, rounded tabs on top, Ctrl+C copies a selection (else interrupts),
   Ctrl+F searches the scrollback, Ctrl+Shift+Enter / \\ / - split, Ctrl+plus / minus / 0 zoom.
+- **fastfetch** (`dots/fastfetch/config.jsonc`): the Arch logo and system / hardware info grouped with Nerd icons
+  (OS, kernel, packages, Hyprland, the hi-shell version, terminal, font, CPU, GPU, memory and disk bars, battery,
+  display, uptime). The fish config shows it when a terminal window opens (not in nested shells or over ssh);
+  `set -U hi_greeting off` turns that off.
 
 Terminal colors follow the wallpaper: `services/TerminalColors.qml` writes `~/.local/state/hi-shell/terminal/`
 (`sequences.txt` with the 16 ANSI colors, text, background and cursor, `colors.fish` for syntax highlighting and
@@ -376,7 +380,7 @@ translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
-dots/                terminal configs (fish, kitty, ...)
+dots/                terminal configs (fish, kitty, fastfetch)
 update.sh            pull and restart
 uninstall.sh         unhook and unlink (--purge: settings too)
 ```

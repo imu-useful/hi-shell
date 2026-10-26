@@ -1,0 +1,45 @@
+// fastfetch config from hi-shell (install.sh puts it in ~/.config/fastfetch; your
+// previous config.jsonc is kept next to it as config.jsonc.backup-<date>).
+// Colors are the terminal's ANSI colors, which hi-shell sets from the wallpaper.
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "arch_small",
+        "color": { "1": "blue", "2": "cyan" },
+        "padding": { "top": 1, "left": 2, "right": 3 }
+    },
+    "display": {
+        "separator": "  ",
+        "color": { "keys": "blue", "title": "cyan" },
+        "key": { "width": 14 },
+        "bar": { "char": { "elapsed": "■", "total": "·" }, "width": 12 },
+        "percent": { "type": 3 }
+    },
+    "modules": [
+        { "type": "title", "format": "{user-name-colored}{at-symbol-colored}{host-name-colored}" },
+        { "type": "custom", "format": "\u001b[90m╭──── \u001b[36msystem" },
+        { "type": "os", "key": "\u001b[90m│\u001b[34m 󰣇 os", "keyColor": "blue", "format": "{name} {arch}" },
+        { "type": "kernel", "key": "\u001b[90m│\u001b[34m  kernel", "keyColor": "blue" },
+        { "type": "packages", "key": "\u001b[90m│\u001b[34m 󰏗 packages", "keyColor": "blue" },
+        { "type": "wm", "key": "\u001b[90m│\u001b[34m  wm", "keyColor": "blue", "format": "{pretty-name} {version}" },
+        {
+            "type": "command",
+            "key": "\u001b[90m│\u001b[34m 󰖲 shell",
+            "keyColor": "blue",
+            "text": "echo \"hi-shell $(git -C ~/.config/quickshell/hi-shell log -1 --format=%h 2>/dev/null)\""
+        },
+        { "type": "terminal", "key": "\u001b[90m│\u001b[34m  terminal", "keyColor": "blue" },
+        { "type": "terminalfont", "key": "\u001b[90m│\u001b[34m  font", "keyColor": "blue" },
+        { "type": "custom", "format": "\u001b[90m├──── \u001b[36mhardware" },
+        { "type": "cpu", "key": "\u001b[90m│\u001b[34m 󰻠 cpu", "keyColor": "cyan", "format": "{name} ({cores-logical})" },
+        { "type": "gpu", "key": "\u001b[90m│\u001b[34m 󰢮 gpu", "keyColor": "cyan", "format": "{name}" },
+        { "type": "memory", "key": "\u001b[90m│\u001b[34m  memory", "keyColor": "cyan", "format": "{used} / {total} {percentage-bar}" },
+        { "type": "disk", "key": "\u001b[90m│\u001b[34m 󰋊 disk", "keyColor": "cyan", "folders": "/", "format": "{size-used} / {size-total} {size-percentage-bar}" },
+        { "type": "battery", "key": "\u001b[90m│\u001b[34m 󰁹 battery", "keyColor": "cyan", "format": "{capacity} {status}" },
+        { "type": "display", "key": "\u001b[90m│\u001b[34m 󰍹 display", "keyColor": "cyan", "format": "{width}×{height} @ {refresh-rate} Hz" },
+        { "type": "custom", "format": "\u001b[90m├────" },
+        { "type": "uptime", "key": "\u001b[90m│\u001b[34m 󰅐 uptime", "keyColor": "magenta" },
+        { "type": "custom", "format": "\u001b[90m╰────" },
+        { "type": "colors", "symbol": "circle", "paddingLeft": 2 }
+    ]
+}
