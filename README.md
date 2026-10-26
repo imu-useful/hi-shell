@@ -14,7 +14,11 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue?style=for-the-badge)](LICENSE)
 [![Telegram chat](https://img.shields.io/badge/Telegram-tux__empire-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/tux_empire)
 
-[Install](#installation) · [Shortcuts](#usage) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting) · [Community](#community)
+[Install](#installation) · [Screenshots](#screenshots) · [Shortcuts](#usage) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting) · [Community](#community)
+
+<br>
+
+<img src="docs/screenshots/desktop.webp" alt="hi-shell desktop: bar, widgets and the wallpaper in a Material shape" width="100%">
 
 </div>
 
@@ -39,6 +43,19 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 
 Animations run everywhere, yet the shell idles at about 1% CPU: hidden panels and disabled widgets aren't created,
 and the audio spectrum is drawn by a single shader.
+
+## Screenshots
+
+| | |
+| :---: | :---: |
+| <img src="docs/screenshots/launcher.webp" alt="App launcher"> | <img src="docs/screenshots/sidebar-right.webp" alt="Right sidebar"> |
+| **App launcher** — apps, settings, calculator, emoji, clipboard | **Right sidebar** — quick toggles, sliders, notifications |
+| <img src="docs/screenshots/settings.webp" alt="Settings"> | <img src="docs/screenshots/claude.webp" alt="Claude palette"> |
+| **Settings** — every option, searchable from the launcher | **Claude palette** — ask anything, answers stream in |
+| <img src="docs/screenshots/wallpapers.webp" alt="Wallpaper picker"> | <img src="docs/screenshots/display-mode.webp" alt="Display mode"> |
+| **Wallpapers** — local and online, scheme, mode, frame | **Display mode** — duplicate or extend to a second screen |
+| <img src="docs/screenshots/welcome.webp" alt="Welcome"> | <img src="docs/screenshots/session.webp" alt="Session screen"> |
+| **First-run welcome** — language, look and shortcuts | **Session screen** — lock, log out, suspend, reboot, power off |
 
 ## Requirements
 
