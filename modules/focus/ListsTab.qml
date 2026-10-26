@@ -69,7 +69,7 @@ ColumnLayout {
             Layout.rightMargin: 14
             wrapMode: Text.WordWrap
             text: root.whitelist ? Translation.tr("Sites can only be blocked by a blacklist: in whitelist mode they're not restricted.")
-                                 : Translation.tr("Blocked through /etc/hosts (asks for your password when a session starts). http:// sites show the Focus Mode page; https:// ones just don't open.")
+                                 : Translation.tr("Blocked through /etc/hosts (asks for your password when a session starts) and by closing browser tabs that open them, for browsers with their own DNS.")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }

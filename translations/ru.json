@@ -672,5 +672,5 @@
     "Focus on being productive instead of busy.": "Будьте продуктивны, а не просто заняты.",
     "The best time to start was yesterday. The next best time is now.": "Лучшее время начать было вчера. Следующее лучшее — сейчас.",
     "Sites can only be blocked by a blacklist: in whitelist mode they're not restricted.": "Сайты блокируются только чёрным списком: в режиме белого списка они не ограничиваются.",
-    "Blocked through /etc/hosts (asks for your password when a session starts). http:// sites show the Focus Mode page; https:// ones just don't open.": "Блокируются через /etc/hosts (при старте сессии спросит пароль). На http://-сайтах покажется страница режима фокуса, https://-сайты просто не откроются."
+    "Blocked through /etc/hosts (asks for your password when a session starts) and by closing browser tabs that open them, for browsers with their own DNS.": "Блокируются через /etc/hosts (при старте сессии спросит пароль) и закрытием вкладок браузера с ними — для браузеров со своим DNS."
 }

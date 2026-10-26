@@ -14,14 +14,18 @@ import qs.common
 // blocks nothing. The launcher and the dock don't start a blocked app at all. Each block
 // emits blocked(), which modules/focus/BlockedToast.qml shows.
 //
-// A list entry is a window class or a process name: "steam", "telegram-desktop", or a
-// word of the class ("telegram" for org.telegram.desktop).
+// A list entry is an app as you'd call it: a window class, a process or app name, or a
+// word the app's .desktop file goes by. It's matched through the installed apps, so
+// "telegram-desktop" also catches the Telegram process and the TelegramDesktop window,
+// and "discord" catches Vesktop (its keywords say discord).
 //
 // Sites (blacklist only: /etc/hosts can't allow just a few): services/focus_hosts.py,
 // started as root through pkexec when the session starts, sends them to 127.0.0.1 and
 // serves the Focus Mode page (services/focus_page.html) there; it takes the block out
 // for breaks and when the session ends, on our word through a FIFO. The page only shows
 // for http://; browsers can't show it for https:// sites and show an error instead.
+// Browsers with their own DNS over HTTPS skip /etc/hosts altogether, so browser windows
+// are watched too: a tab whose title names a blocked site is closed (Ctrl+W).
 Singleton {
     id: root
 
@@ -38,17 +42,50 @@ Singleton {
     // Never killed, whatever the blacklist says.
     readonly property var safeProcesses: ["quickshell", "qs", "hyprland", "systemd", "dbus-daemon", "dbus-broker",
         "pipewire", "wireplumber", "xwayland", "sddm", "login", "sudo", "pkexec", "polkitd"]
+    // Launchers in .desktop Exec lines: the app is what they run, not them.
+    readonly property var launchers: ["flatpak", "env", "sh", "bash", "zsh", "fish", "python", "python3", "java",
+        "electron", "wine", "gtk-launch", "xdg-open", "dbus-launch", "systemd-run", "uwsm", "app2unit",
+        "gamemoderun", "prime-run", "mangohud", "sudo", "pkexec"]
 
     // name: what was blocked (app name or class), icon: its icon name or "".
     signal blocked(string name, string icon)
 
-    // Is `name` (a class, app id or process name) on the list?
+    // "org.telegram.desktop" -> "orgtelegramdesktop"
+    function norm(name) {
+        return (name ?? "").toLowerCase().replace(/[.\-_ ]/g, "");
+    }
+    function execName(entry) {
+        const exec = entry.command?.[0] ?? "";
+        const name = exec.includes(":") ? "" : exec.split("/").pop();
+        return launchers.includes(name.toLowerCase()) ? "" : name;
+    }
+    function entryMatches(entry, item) {
+        const n = norm(item);
+        const names = [entry.id, entry.startupClass, entry.name, execName(entry)].map(norm).filter(x => x);
+        return names.some(x => x === n || (n.length >= 5 && x.includes(n)))
+            || (entry.keywords ?? []).some(k => k.toLowerCase() === item);
+    }
+
+    // Everything the listed apps go by (normalized): the entries themselves, plus the
+    // ids, window classes, names and programs of the installed apps they point at.
+    readonly property var targets: {
+        const out = new Set(apps.map(norm).filter(x => x));
+        if (!on)
+            return [...out];
+        for (const entry of DesktopEntries.applications.values) {
+            if (!apps.some(a => entryMatches(entry, a)))
+                continue;
+            for (const x of [entry.id, entry.startupClass, entry.name, execName(entry)].map(norm))
+                if (x.length >= 3)
+                    out.add(x);
+        }
+        return [...out];
+    }
+
+    // Is `name` (a class, app id or process name) one of the listed apps?
     function listed(name) {
-        const n = (name ?? "").toLowerCase();
-        if (!n)
-            return false;
-        const words = n.split(/[.\-_ ]/);
-        return apps.some(a => n === a || words.includes(a) || (a.length >= 5 && n.includes(a)));
+        const n = norm(name);
+        return n !== "" && targets.some(t => n === t || (t.length >= 5 && n.includes(t)));
     }
 
     // A window (class / initial class) that has to go.
@@ -64,8 +101,8 @@ Singleton {
     function blockedEntry(entry) {
         if (!blocking || !entry)
             return false;
-        const names = [entry.id, entry.startupClass, entry.name, (entry.command?.[0] ?? "").split("/").pop()];
-        return whitelist ? !names.some(n => listed(n)) : names.some(n => listed(n));
+        const hit = apps.some(a => entryMatches(entry, a)) || listed(entry.startupClass) || listed(entry.id);
+        return whitelist ? !hit : hit;
     }
 
     // Launch an app unless it's blocked (then say so); returns whether it started.
@@ -78,27 +115,34 @@ Singleton {
         return true;
     }
 
-    // --- Windows ---
+    // --- Windows (and browser tabs) ---
+    readonly property bool watching: blocking || tabsBlocking
     function checkWindows() {
-        if (blocking)
+        if (watching)
             clients.running = true;
     }
 
     Connections {
         target: Hyprland
         function onRawEvent(event) {
-            if (root.blocking && event.name === "openwindow")
+            if (!root.watching)
+                return;
+            if (event.name === "openwindow")
                 root.checkWindows();
+            else if (event.name === "windowtitlev2" && root.tabsBlocking)
+                titleCheck.restart();
         }
+    }
+    // Titles change in bursts while a page loads.
+    Timer {
+        id: titleCheck
+        interval: 250
+        onTriggered: root.checkWindows()
     }
 
     // When a focus period starts (and the session with it): what's open already.
-    onBlockingChanged: {
-        if (blocking) {
-            checkWindows();
-            processes.running = true;
-        }
-    }
+    onWatchingChanged: if (watching) checkWindows()
+    onBlockingChanged: if (blocking) processes.running = true
 
     Process {
         id: clients
@@ -113,21 +157,66 @@ Singleton {
                 }
                 const named = new Set();
                 for (const c of list) {
-                    if (!root.blockedWindow([c.class, c.initialClass]))
-                        continue;
-                    if (root.whitelist) {
-                        Hyprland.dispatch(`hl.dsp.window.close({ window = "address:${c.address}" })`);
-                    } else if (c.pid > 0) {
-                        Quickshell.execDetached(["kill", "-TERM", String(c.pid)]);
-                    }
-                    const id = c.class || c.initialClass;
-                    if (!named.has(id)) {
-                        named.add(id);
-                        root.notice(id);
+                    if (root.blockedWindow([c.class, c.initialClass])) {
+                        if (root.whitelist) {
+                            Hyprland.dispatch(`hl.dsp.window.close({ window = "address:${c.address}" })`);
+                        } else if (c.pid > 0) {
+                            Quickshell.execDetached(["kill", "-TERM", String(c.pid)]);
+                        }
+                        const id = c.class || c.initialClass;
+                        if (!named.has(id)) {
+                            named.add(id);
+                            root.notice(id);
+                        }
+                    } else {
+                        root.checkTab(c);
                     }
                 }
             }
         }
+    }
+
+    // --- Browser tabs: the title names a blocked site ---
+    readonly property bool tabsBlocking: on && sites.length > 0
+    readonly property var browsers: ["zen", "firefox", "librewolf", "floorp", "waterfox", "chrom", "brave", "vivaldi",
+        "yandex", "opera", "edge", "thorium", "mullvad", "tor-browser"]
+    // How sites show up in titles: their name ("youtube" for youtube.com, "m.youtube.com"
+    // too), and a few that title their pages differently.
+    readonly property var titleAliases: ({
+        "x.com": "/ x$", "twitter.com": "/ x$", "vk.com": "вконтакте|(^|[^a-zа-яё0-9])vk([^a-zа-яё0-9]|$)"
+    })
+    readonly property var siteMatchers: sites.map(site => {
+        const labels = site.split(".");
+        const name = labels.length >= 2 ? labels[labels.length - 2] : site;
+        const parts = [];
+        if (name.length >= 3)
+            parts.push(`(^|[^a-zа-яё0-9])${name.replace(/[^a-z0-9-]/g, "")}([^a-zа-яё0-9]|$)`);
+        if (titleAliases[site])
+            parts.push(titleAliases[site]);
+        return { site: site, re: parts.length ? new RegExp(parts.join("|"), "i") : null };
+    }).filter(m => m.re)
+
+    property var lastTabClose: ({}) // window address -> time
+    function checkTab(c) {
+        if (!tabsBlocking || !browsers.some(b => (c.class ?? "").toLowerCase().includes(b)))
+            return;
+        // Without the browser's name at the end ("… — Zen Browser").
+        const title = (c.title ?? "").replace(/\s[—–-]\s[^—–-]*$/, "");
+        const hit = siteMatchers.find(m => m.re.test(title));
+        if (!hit)
+            return;
+        // The title lags behind the closed tab for a moment; don't close a second one.
+        const now = Date.now();
+        if (now - (lastTabClose[c.address] ?? 0) < 1500)
+            return;
+        const all = Object.assign({}, lastTabClose);
+        all[c.address] = now;
+        lastTabClose = all;
+        Hyprland.dispatch(`hl.dsp.send_shortcut({ mods = "CTRL", key = "W", window = "address:${c.address}" })`);
+        const entry = DesktopEntries.heuristicLookup(c.class);
+        noticeAs(hit.site, entry?.icon ?? "");
+        // The next tab may be a blocked one too.
+        titleCheck.restart();
     }
 
     // --- Background processes (blacklist only) ---
@@ -146,19 +235,20 @@ Singleton {
                 if (!root.blocking || root.whitelist)
                     return;
                 // comm is cut at 15 characters.
-                const cut = root.apps.map(a => a.slice(0, 15));
+                const cut = root.targets.map(t => t.slice(0, 15));
                 const named = new Set();
                 for (const line of text.split("\n")) {
                     const m = line.trim().match(/^(\d+)\s+(.+)$/);
                     if (!m)
                         continue;
                     const comm = m[2].toLowerCase();
-                    if (!cut.includes(comm) || root.safeProcesses.includes(comm))
+                    const n = root.norm(comm);
+                    if (!cut.includes(n) || root.safeProcesses.includes(comm))
                         continue;
                     Quickshell.execDetached(["kill", "-TERM", m[1]]);
-                    if (!named.has(comm)) {
-                        named.add(comm);
-                        root.notice(root.apps[cut.indexOf(comm)]);
+                    if (!named.has(n)) {
+                        named.add(n);
+                        root.notice(comm);
                     }
                 }
             }
@@ -175,7 +265,16 @@ Singleton {
         all[id] = now;
         lastNotice = all;
         const entry = DesktopEntries.heuristicLookup(id);
-        blocked(entry?.name ?? id, entry?.icon ?? "");
+        noticeAs(entry?.name ?? id, entry?.icon ?? "");
+    }
+    function noticeAs(name, icon) {
+        const now = Date.now();
+        if (now - (lastNotice["@" + name] ?? 0) < 4000)
+            return;
+        const all = Object.assign({}, lastNotice);
+        all["@" + name] = now;
+        lastNotice = all;
+        blocked(name, icon);
     }
 
     // --- Sites ---
