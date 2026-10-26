@@ -233,6 +233,20 @@ Sections:
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
+## Terminal configs
+
+`install.sh` offers hi-shell's configs from `dots/` one by one (an existing file is kept as `<file>.backup-<date>`;
+`--no-dots` skips them):
+
+- **fish** (`dots/fish/config.fish`): no greeting, starship prompt with transient past prompts, zoxide as `cd`,
+  fzf (Ctrl+R history, Ctrl+T files, Alt+C directories), eza for `ls` / `ll` / `la` / `lt`, bat for `cat`,
+  git abbreviations (`gs`, `ga`, `gc`, `gp`, `gd`, `gl`), `up` to update the system, `hs` for `qs -c hi-shell`,
+  `mkcd` and `extract`. Each tool is optional.
+
+Terminal colors follow the wallpaper: `services/TerminalColors.qml` writes `~/.local/state/hi-shell/terminal/`
+(`sequences.txt` with the 16 ANSI colors, text, background and cursor, and `colors.fish` for syntax highlighting),
+and recolors the terminals already open when the palette changes.
+
 ## Lock screen
 
 hi-shell locks with hyprlock, using a lock screen it generates from its own look in
@@ -357,7 +371,8 @@ services/            QML services (Mpris, Weather, Battery, Brightness, NetworkS
 translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 run.sh               start the shell (Vulkan rendering when available)
-install.sh           install packages, link the repo, hook into Hyprland
+install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
+dots/                terminal configs (fish, ...)
 update.sh            pull and restart
 uninstall.sh         unhook and unlink (--purge: settings too)
 ```

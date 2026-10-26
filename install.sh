@@ -8,6 +8,7 @@
 #   --no-deps   don't install packages
 #   --yes       don't ask (install packages, edit the Hyprland config)
 #   --no-start  don't start the shell at the end
+#   --no-dots   don't offer hi-shell's terminal configs (fish, ...)
 #
 # What it does: installs the packages hi-shell uses, links the repo to
 # ~/.config/quickshell/hi-shell, loads hypr/hi-shell.lua from your Hyprland config
@@ -20,13 +21,14 @@ QS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell"
 HYPR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
 MARKER="-- hi-shell (added by install.sh)"
 
-DEPS=true YES=false START=true
+DEPS=true YES=false START=true DOTS=true
 NOCONFIRM=()
 for arg in "$@"; do
     case "$arg" in
         --no-deps) DEPS=false ;;
         --yes | -y) YES=true; NOCONFIRM=(--noconfirm) ;;
         --no-start) START=false ;;
+        --no-dots) DOTS=false ;;
         -h | --help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
     esac
@@ -149,6 +151,30 @@ for other in "qs -c ii" "caelestia" "waybar" "noctalia" "swaync" "mako" "dunst";
         warn "\"$other\" is running; stop it (and remove it from your Hyprland autostart) to use hi-shell alone"
     fi
 done
+
+# --- Terminal configs (dots/) ---
+# Each one is offered separately; an existing file is kept as <file>.backup-<date>.
+install_dot() { # install_dot <name> <file in dots/> <destination>
+    local src="$REPO/dots/$2" dst="$3"
+    [[ -f "$src" ]] || return 0
+    if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+        echo "$1: already installed"
+        return 0
+    fi
+    ask "Install hi-shell's $1 config ($dst)?" || return 0
+    mkdir -p "$(dirname "$dst")"
+    if [[ -e "$dst" ]]; then
+        local backup="$dst.backup-$(date +%Y%m%d-%H%M%S)"
+        cp -a "$dst" "$backup"
+        echo "$1: previous config kept as $backup"
+    fi
+    cp "$src" "$dst"
+    echo "$1: installed"
+}
+if $DOTS; then
+    step "Terminal configs"
+    install_dot fish fish/config.fish "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
+fi
 
 command -v claude >/dev/null || warn "Claude Code isn't installed: the AI palette and chat need it (npm install -g @anthropic-ai/claude-code, then run claude once)"
 
