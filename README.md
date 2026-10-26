@@ -242,10 +242,14 @@ Sections:
   fzf (Ctrl+R history, Ctrl+T files, Alt+C directories), eza for `ls` / `ll` / `la` / `lt`, bat for `cat`,
   git abbreviations (`gs`, `ga`, `gc`, `gp`, `gd`, `gl`), `up` to update the system, `hs` for `qs -c hi-shell`,
   `mkcd` and `extract`. Each tool is optional.
+- **kitty** (`dots/kitty/kitty.conf`): JetBrainsMono Nerd Font, padding, slight transparency (Hyprland blurs behind),
+  beam cursor with a trail, fish as the shell, rounded tabs on top, Ctrl+C copies a selection (else interrupts),
+  Ctrl+F searches the scrollback, Ctrl+Shift+Enter / \\ / - split, Ctrl+plus / minus / 0 zoom.
 
 Terminal colors follow the wallpaper: `services/TerminalColors.qml` writes `~/.local/state/hi-shell/terminal/`
-(`sequences.txt` with the 16 ANSI colors, text, background and cursor, and `colors.fish` for syntax highlighting),
-and recolors the terminals already open when the palette changes.
+(`sequences.txt` with the 16 ANSI colors, text, background and cursor, `colors.fish` for syntax highlighting and
+`kitty-theme.conf` with kitty's tab bar and borders too), recolors the terminals already open and reloads kitty when
+the palette changes.
 
 ## Lock screen
 
@@ -372,7 +376,7 @@ translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
-dots/                terminal configs (fish, ...)
+dots/                terminal configs (fish, kitty, ...)
 update.sh            pull and restart
 uninstall.sh         unhook and unlink (--purge: settings too)
 ```
