@@ -211,6 +211,7 @@ qs -c hi-shell ipc call focus settings               # Focus Mode settings windo
 qs -c hi-shell ipc call focus start                  # Focus Mode session with the active profile; stop (Manual mode only), abort (emergency), status, addTask <text>
 # Focus Mode blocks sites through /etc/hosts (services/focus_hosts.py via pkexec, backup in /etc/hosts.hi-shell.bak);
 # a leftover block after a crash is removed at the next start, or by hand: pkexec python3 services/focus_hosts.py restore
+qs -c hi-shell ipc call focusStats summary           # focus time, tasks, streak, achievements; resetTour (show the introduction again)
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
 qs -c hi-shell ipc call notifications toggleDnd   # clear, list, dismiss <uid>

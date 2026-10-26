@@ -8,7 +8,9 @@ import qs.services
 // Focus Mode settings: a regular window (Hyprland manages it like any app), opened with
 // `qs -c hi-shell ipc call focus settings` or from the launcher. The tabs edit the
 // active profile; the chips at the top switch it, and Start begins a session with it.
-// Closed and unavailable while a session runs. Everything is saved to ~/.config/hi-shell/focus_profiles.json.
+// Closed and unavailable while a session runs. Everything is saved to
+// ~/.config/hi-shell/focus_profiles.json. The first time, an introduction (FocusTour)
+// goes over it.
 Scope {
     id: root
 
@@ -18,7 +20,8 @@ Scope {
         { id: "lists", icon: "block", title: "Lists" },
         { id: "profiles", icon: "bookmarks", title: "Profiles" },
         { id: "todo", icon: "checklist", title: "To-Do" },
-        { id: "exit", icon: "logout", title: "Exit" }
+        { id: "exit", icon: "logout", title: "Exit" },
+        { id: "stats", icon: "insights", title: "Statistics" }
     ]
 
     Connections {
@@ -180,7 +183,7 @@ Scope {
                             width: flick.width - 12
                             sourceComponent: ({
                                 timer: timer, wallpaper: wallpaper, lists: lists,
-                                profiles: profiles, todo: todo, exit: exit
+                                profiles: profiles, todo: todo, exit: exit, stats: stats
                             })[Focus.settingsTab] ?? timer
                             onLoaded: {
                                 flick.targetY = 0;
@@ -194,8 +197,14 @@ Scope {
                         Component { id: profiles; ProfilesTab {} }
                         Component { id: todo; TodoTab {} }
                         Component { id: exit; ExitTab {} }
+                        Component { id: stats; StatsTab {} }
                     }
                 }
+            }
+
+            // First-run introduction, over the whole window.
+            FocusTour {
+                anchors.fill: parent
             }
         }
     }

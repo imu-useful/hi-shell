@@ -221,6 +221,7 @@ Singleton {
         now = startedAt;
         sessionProfile = JSON.parse(JSON.stringify(profile));
         sessionTaskIds = tasks;
+        doneAtStart = Todo.items.filter(i => i.done).map(i => i.time);
         restore = { wallpaper: Wallpapers.current };
         phaseKey = "";
         active = true;
@@ -233,7 +234,11 @@ Singleton {
         if (sessionProfile.wallpaper && sessionProfile.wallpaper !== Wallpapers.current)
             Wallpapers.set(sessionProfile.wallpaper);
         writeSession();
-        ShellState.osdMessage(sessionProfile.icon, Translation.tr("Focus Mode: %1").arg(profileName(sessionProfile)));
+        const lists = sessionProfile.lists;
+        if (lists.mode === "whitelist" && lists.whitelist.apps.length === 0)
+            ShellState.osdMessage("warning", Translation.tr("Whitelist with no apps: nothing is blocked"));
+        else
+            ShellState.osdMessage(sessionProfile.icon, Translation.tr("Focus Mode: %1").arg(profileName(sessionProfile)));
     }
 
     // The Stop button: only in Manual mode. Timer and Tasks sessions end by themselves.
@@ -250,7 +255,11 @@ Singleton {
     function finish() {
         if (!active)
             return;
-        const focused = focusedMinutes(Date.now());
+        const end = Date.now();
+        const focused = focusedMinutes(end);
+        const tasksDone = Todo.items.filter(i => i.done && !doneAtStart.includes(i.time)).length;
+        if (focused > 0 || tasksDone > 0)
+            FocusStats.record({ start: startedAt, end: end, profile: profileName(sessionProfile), focus: focused, tasks: tasksDone });
         // Only if it's still the focus wallpaper (not changed some other way since).
         if (restore.wallpaper && sessionProfile.wallpaper && Wallpapers.current === sessionProfile.wallpaper)
             Wallpapers.set(restore.wallpaper);
@@ -362,6 +371,8 @@ Singleton {
 
     // --- Tasks exit: the session's tasks (fixed at the start) all done or gone ---
     property var sessionTaskIds: []
+    // Tasks already done when the session started (the rest done since count for it).
+    property var doneAtStart: []
     readonly property int tasksLeft: Todo.items.filter(i => sessionTaskIds.includes(i.time) && !i.done).length
     onTasksLeftChanged: {
         if (active && sessionProfile.exit === "tasks" && tasksLeft === 0)
@@ -386,6 +397,7 @@ Singleton {
             profileId: activeId,
             profile: sessionProfile,
             tasks: sessionTaskIds,
+            doneAtStart: doneAtStart,
             restore: restore
         }, null, 2) + "\n");
     }
@@ -431,6 +443,7 @@ Singleton {
                 root.startedAt = d.startedAt;
                 root.sessionProfile = d.profile;
                 root.sessionTaskIds = d.tasks ?? [];
+                root.doneAtStart = d.doneAtStart ?? [];
                 root.restore = d.restore ?? {};
                 root.now = Date.now();
                 root.phaseKey = "";
