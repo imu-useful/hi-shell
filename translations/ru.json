@@ -527,5 +527,13 @@
     "Clean desktop behind windows": "Чистый стол под окнами",
     "With windows open: sharp wallpaper, widgets and frame hidden": "При открытых окнах: обои без размытия, виджеты и рамка скрыты",
     "Click the dino to play": "Нажми на динозаврика, чтобы сыграть",
-    "Space or click to try again": "Пробел или клик — ещё раз"
+    "Space or click to try again": "Пробел или клик — ещё раз",
+    "This screen only": "Только этот экран",
+    "Duplicate": "Повторить",
+    "Extend left": "Расширить влево",
+    "Extend right": "Расширить вправо",
+    "Second screen only": "Только второй экран",
+    "Display mode": "Режим экрана",
+    "No second screen connected": "Второй экран не подключён",
+    "Press the key again or use the arrows · Enter to apply · Esc to close": "Нажмите клавишу ещё раз или стрелки · Enter — применить · Esc — закрыть"
 }

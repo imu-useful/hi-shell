@@ -161,6 +161,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history (Enter copies) |
 | <kbd>Super</kbd>+<kbd>.</kbd> | Emoji picker |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Session screen |
+| Display key (<kbd>Fn</kbd>+<kbd>F10</kbd> on Lenovo, `XF86Display`) | Display mode: this screen only, duplicate, extend left / right, second screen only; press again for the next, Enter to apply |
 | bar power button | Session screen (lock, log out, suspend, reboot, power off) |
 | <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
 | <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
@@ -187,6 +188,7 @@ qs -c hi-shell ipc call session lock                  # logout, suspend, hiberna
 qs -c hi-shell ipc call overview toggle
 qs -c hi-shell ipc call switcher next                # prev, commit, cancel (Alt+Tab)
 qs -c hi-shell ipc call bar toggle                   # show, hide
+qs -c hi-shell ipc call display set mirror           # internal, left, right, external; toggle, next (the display key)
 qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
 qs -c hi-shell ipc call mpris playPause       # next, previous
 qs -c hi-shell ipc call brightness increment  # decrement, set <percent>
@@ -343,7 +345,7 @@ the same file.
 
 ```
 shell.qml            entry point
-modules/             Bar, Desktop, DesktopVisualizer, Settings, Welcome, WindowSwitcher, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
+modules/             Bar, Desktop, DesktopVisualizer, DisplayMode, Settings, Welcome, WindowSwitcher, WallpaperSelector, Overview, SessionScreen, PolkitDialog, RegionSelector, Dock, Launcher, AIWidget, SidebarLeft, SidebarRight, CalendarPopup, NotificationPopups, OnScreenDisplay (+ subcomponents)
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Translation, Paths)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, Spectrum, animations, buttons, slider)

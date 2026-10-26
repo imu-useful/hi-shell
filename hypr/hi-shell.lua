@@ -84,6 +84,10 @@ end
 hl.layer_rule({ match = { namespace = "hi-shell-switcher" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-switcher" }, ignore_alpha = 0.3 })
 bind("CTRL + ALT + Delete", "session toggleScreen", "Session menu")
+-- The laptop's display key (Fn+F10 on Lenovo): display mode picker, again for the next mode.
+bind("XF86Display", "display next", "Display mode")
+hl.layer_rule({ match = { namespace = "hi-shell-display" }, blur = true })
+hl.layer_rule({ match = { namespace = "hi-shell-display" }, ignore_alpha = 0.3 })
 bind("SUPER + SHIFT + S", "region screenshot", "Screenshot / OCR / record a region")
 -- Screenshots always go to ~/Pictures/Screenshots and the clipboard.
 bind("Print", "region fullscreen", "Screenshot of the screen (file + clipboard)")

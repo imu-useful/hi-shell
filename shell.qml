@@ -45,6 +45,8 @@ ShellRoot {
 
     WindowSwitcher {}
 
+    DisplayMode {}
+
     RegionSelector {}
 
     Dock {}
