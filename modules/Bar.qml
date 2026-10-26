@@ -106,77 +106,85 @@ PanelWindow {
         y: root.position === "bottom" ? parent.height - root.thickness - root.margin : root.margin
         width: root.vertical ? root.thickness : parent.width - root.margin * 2
         height: root.vertical ? parent.height - root.margin * 2 : root.thickness
-        opacity: root.intro
-        transform: Translate {
-            x: root.vertical ? root.introShift : 0
-            y: root.vertical ? 0 : root.introShift
-        }
 
-        Rectangle {
-            anchors.fill: parent
-            visible: root.style !== "islands"
-            radius: root.edgeToEdge ? 0 : Appearance.rounding.full
-            color: root.barColor
-        }
-
+        // Moved by the startup animation. The input mask follows barArea itself,
+        // which stays put: a transform on it isn't seen by the mask, which then
+        // stayed where the bar was at the start of the slide (off screen).
         Item {
-            id: content
-
+            id: barContent
             anchors.fill: parent
-            anchors.margins: 6
-            anchors.leftMargin: root.vertical ? 6 : 8
-            anchors.rightMargin: root.vertical ? 6 : 8
-
-            readonly property real centerStart: root.vertical ? center.y : center.x
-            readonly property real centerEnd: root.vertical ? center.y + center.height : center.x + center.width
-            readonly property real length: root.vertical ? height : width
-
-            BarSection {
-                id: left
-                bar: root.context
-                widgets: root.options.left
-                registry: root.registry
-                // Fill up to the centered section; elidable widgets shrink.
-                width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.centerStart - 12))
-                height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.centerStart - 12)) : content.height
+            opacity: root.intro
+            transform: Translate {
+                x: root.vertical ? root.introShift : 0
+                y: root.vertical ? 0 : root.introShift
             }
 
-            BarSection {
-                id: center
-                bar: root.context
-                widgets: root.options.center
-                registry: root.registry
-                x: root.vertical ? 0 : (content.width - width) / 2
-                y: root.vertical ? (content.height - height) / 2 : 0
-                width: root.vertical ? content.width : Math.min(implicitWidth, content.width)
-                height: root.vertical ? Math.min(implicitHeight, content.height) : content.height
+            Rectangle {
+                anchors.fill: parent
+                visible: root.style !== "islands"
+                radius: root.edgeToEdge ? 0 : Appearance.rounding.full
+                color: root.barColor
             }
 
-            BarSection {
-                id: right
-                bar: root.context
-                widgets: root.options.right
-                registry: root.registry
-                width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.length - content.centerEnd - 12))
-                height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.length - content.centerEnd - 12)) : content.height
-                x: root.vertical ? 0 : content.width - width
-                y: root.vertical ? content.height - height : 0
-            }
+            Item {
+                id: content
 
-            // Islands style: one pill behind each non-empty section.
-            Repeater {
-                model: root.style === "islands" ? [left, center, right] : []
+                anchors.fill: parent
+                anchors.margins: 6
+                anchors.leftMargin: root.vertical ? 6 : 8
+                anchors.rightMargin: root.vertical ? 6 : 8
 
-                Rectangle {
-                    required property var modelData
-                    visible: modelData.widgets.length > 0 && (root.vertical ? modelData.height : modelData.width) > 0
-                    x: modelData.x - 4
-                    y: modelData.y - 4
-                    width: modelData.width + 8
-                    height: modelData.height + 8
-                    z: -1
-                    radius: Appearance.rounding.full
-                    color: root.barColor
+                readonly property real centerStart: root.vertical ? center.y : center.x
+                readonly property real centerEnd: root.vertical ? center.y + center.height : center.x + center.width
+                readonly property real length: root.vertical ? height : width
+
+                BarSection {
+                    id: left
+                    bar: root.context
+                    widgets: root.options.left
+                    registry: root.registry
+                    // Fill up to the centered section; elidable widgets shrink.
+                    width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.centerStart - 12))
+                    height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.centerStart - 12)) : content.height
+                }
+
+                BarSection {
+                    id: center
+                    bar: root.context
+                    widgets: root.options.center
+                    registry: root.registry
+                    x: root.vertical ? 0 : (content.width - width) / 2
+                    y: root.vertical ? (content.height - height) / 2 : 0
+                    width: root.vertical ? content.width : Math.min(implicitWidth, content.width)
+                    height: root.vertical ? Math.min(implicitHeight, content.height) : content.height
+                }
+
+                BarSection {
+                    id: right
+                    bar: root.context
+                    widgets: root.options.right
+                    registry: root.registry
+                    width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.length - content.centerEnd - 12))
+                    height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.length - content.centerEnd - 12)) : content.height
+                    x: root.vertical ? 0 : content.width - width
+                    y: root.vertical ? content.height - height : 0
+                }
+
+                // Islands style: one pill behind each non-empty section.
+                Repeater {
+                    model: root.style === "islands" ? [left, center, right] : []
+
+                    Rectangle {
+                        required property var modelData
+                        visible: modelData.widgets.length > 0 && (root.vertical ? modelData.height : modelData.width) > 0
+                        x: modelData.x - 4
+                        y: modelData.y - 4
+                        width: modelData.width + 8
+                        height: modelData.height + 8
+                        z: -1
+                        radius: Appearance.rounding.full
+                        color: root.barColor
+                    }
                 }
             }
         }
