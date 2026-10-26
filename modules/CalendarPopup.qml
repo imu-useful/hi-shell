@@ -9,13 +9,12 @@ import qs.services
 import qs.common.widgets
 import qs.modules.calendar
 
-// Calendar popup under the bar clock: month grid + Google Calendar agenda.
+// Calendar popup under the bar clock: the month.
 // Toggle: click the clock, or `qs -c hi-shell ipc call calendar toggle`.
 Scope {
     id: root
 
     readonly property bool open: ShellState.calendarOpen
-    property string selectedDay: ""
 
     function setOpen(value) {
         ShellState.calendarOpen = value;
@@ -24,11 +23,8 @@ Scope {
     Connections {
         target: ShellState
         function onCalendarOpenChanged() {
-            if (ShellState.calendarOpen) {
-                root.selectedDay = "";
+            if (ShellState.calendarOpen)
                 Calendar.resetMonth();
-                Calendar.refresh();
-            }
         }
     }
 
@@ -43,9 +39,6 @@ Scope {
         }
         function close(): void {
             root.setOpen(false);
-        }
-        function refresh(): void {
-            Calendar.refresh();
         }
     }
 
@@ -65,8 +58,8 @@ Scope {
             exclusiveZone: 0
             margins.top: Appearance.sizes.barMargin
             margins.bottom: Appearance.sizes.barMargin
-            implicitWidth: 720
-            implicitHeight: 400
+            implicitWidth: 340
+            implicitHeight: 360
             color: "transparent"
 
             WlrLayershell.namespace: "hi-shell-calendar"
@@ -99,31 +92,9 @@ Scope {
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
 
-                RowLayout {
+                MonthGrid {
                     anchors.fill: parent
                     anchors.margins: 16
-                    spacing: 16
-
-                    MonthGrid {
-                        Layout.alignment: Qt.AlignTop
-                        Layout.preferredWidth: 300
-                        Layout.maximumWidth: 300
-                        selectedDay: root.selectedDay
-                        onDaySelected: day => root.selectedDay = day
-                    }
-
-                    Rectangle {
-                        Layout.fillHeight: true
-                        implicitWidth: 1
-                        color: Colors.m3outlineVariant
-                    }
-
-                    Agenda {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        Layout.fillHeight: true
-                        selectedDay: root.selectedDay
-                    }
                 }
             }
         }

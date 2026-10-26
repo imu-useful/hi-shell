@@ -39,7 +39,6 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | ⚙️ **Settings** | Every option in a settings app, Hyprland displays / gaps / blur / input included, searchable from the launcher |
 | 🌍 **Languages** | English and Russian: the whole interface, dates and plural forms |
 | 👋 **Welcome & presets** | A first-run setup, and presets that save your config, wallpaper and colors to one shareable file |
-| 📅 **Google Calendar** | Month view with event dots and an agenda (optional) |
 
 Animations run everywhere, yet the shell idles at about 1% CPU: hidden panels and disabled widgets aren't created,
 and the audio spectrum is drawn by a single shader.
@@ -65,7 +64,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | --- | --- |
 | `quickshell-git` (AUR) | the shell itself (0.3+, with the Hyprland, Pipewire, Bluetooth and Networking modules) |
 | `matugen` | Material 3 colors from the wallpaper |
-| `python` | `services/theme_updater.py`, `services/gcal.py` (stdlib only, no pip packages) |
+| `python` | `services/theme_updater.py` and the other helper scripts (stdlib only, no pip packages) |
 | `ttf-material-symbols-variable-git` (AUR) | icons (`Material Symbols Rounded`) |
 | `pipewire`, `wireplumber` | volume control |
 | `networkmanager` | Wi-Fi toggle |
@@ -327,27 +326,6 @@ qs -c hi-shell ipc call wallpaper set ~/Pictures/wall.png    # random, get, togg
 qs -c hi-shell ipc call theme setMode light                  # toggleMode, setScheme expressive, update
 ```
 
-## Google Calendar
-
-Click the clock in the bar to open the calendar popup (month view + upcoming events).
-hi-shell reads your calendars through the Google Calendar API (read-only). You need your own OAuth client once:
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/) and create a project (e.g. `hi-shell`).
-2. **APIs & Services → Library** → search **Google Calendar API** → **Enable**.
-3. **Google Auth Platform → Branding**: set an app name and your email (user type **External**).
-4. **Audience**: add your Google account under **Test users**.
-5. **Clients → Create client** → application type **Desktop app** → create, then **Download JSON**.
-6. Save the file as `~/.config/hi-shell/google-client.json`.
-7. Click the clock → **Connect Google Calendar** (or run `python3 services/gcal.py auth`) and allow access in the browser.
-
-The token is stored in `~/.local/state/hi-shell/google-token.json` (mode 600). Sign out with `python3 services/gcal.py logout`.
-
-**Weekly re-sign-in:** while the app's publishing status is *Testing*, Google expires the sign-in after 7 days and the popup asks you to reconnect.
-To avoid that, click **Publish app** under **Audience**. Google then shows an "unverified app" warning on sign-in
-(it's your own app; choose *Advanced → Go to hi-shell*).
-
-Try the UI without a Google account: `HI_SHELL_GCAL_DEMO=1 qs -c hi-shell`.
-
 ## Language
 
 The interface is in English or Russian: Settings → General → Language, or `"language"` in the config.
@@ -397,8 +375,7 @@ common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, Segmented
 common/widgets/shaders/  spectrum.frag (+ compiled .qsb) for the audio spectrum
 common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
-                     Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), gcal.py,
-                     presets.py
+                     Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), presets.py
 translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 run.sh               start the shell (Vulkan rendering when available)

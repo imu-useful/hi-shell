@@ -10,7 +10,6 @@ ColumnLayout {
     id: root
 
     readonly property list<string> tabs: ["notifications", "calendar", "todo", "timers"]
-    property string selectedDay: ""
 
     spacing: 10
 
@@ -47,24 +46,11 @@ ColumnLayout {
     Component {
         id: calendar
         StyledFlickable {
-            contentHeight: calColumn.implicitHeight
-            Component.onCompleted: Calendar.refresh()
+            contentHeight: month.implicitHeight
 
-            ColumnLayout {
-                id: calColumn
+            MonthGrid {
+                id: month
                 width: parent.width
-                spacing: 12
-
-                MonthGrid {
-                    Layout.fillWidth: true
-                    selectedDay: root.selectedDay
-                    onDaySelected: day => root.selectedDay = day
-                }
-                Agenda {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 260
-                    selectedDay: root.selectedDay
-                }
             }
         }
     }
