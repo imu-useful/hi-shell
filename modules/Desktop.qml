@@ -62,6 +62,26 @@ Scope {
             // 1 on the empty desktop, 0 with windows open (in focus mode): blur, frame and
             // widgets fade with it, so the wallpaper behind windows is sharp and uncluttered.
             property real reveal: covered && root.options.focusMode ? 0 : 1
+
+            // Startup: begins when the wallpaper is ready to show (a frame later).
+            Timer {
+                id: introStart
+                interval: 80
+                onTriggered: ShellState.started = true
+            }
+
+            // Startup: the wallpaper fades in, then the frame pops in.
+            property real intro: ShellState.started ? 1 : 0
+            Behavior on intro {
+                NumberAnimation { duration: Appearance.anim.slow * 1.75; easing.type: Easing.OutCubic }
+            }
+            property real frameIntro: ShellState.started ? 1 : 0
+            Behavior on frameIntro {
+                SequentialAnimation {
+                    PauseAnimation { duration: 200 }
+                    SpringAnim { duration: Appearance.anim.spatial * 1.4 }
+                }
+            }
             Behavior on reveal {
                 NumberAnimation { duration: Appearance.anim.slow * 1.5; easing.type: Easing.InOutCubic }
             }
@@ -91,6 +111,7 @@ Scope {
                 id: wallpaper
                 anchors.fill: parent
                 visible: root.options.wallpaper
+                opacity: window.intro
                 // With a frame shape the full-screen copy is blurred and dimmed behind it,
                 // on the empty desktop only; sharp again behind windows.
                 // A cover is small, so it stays blurred behind windows too.
@@ -105,7 +126,10 @@ Scope {
                 }
 
                 // The wallpaper, or the playing track's cover in cover mode.
-                property string source: CoverMode.active ? Mpris.artUrl : Wallpapers.current ? `file://${Wallpapers.current}` : ""
+                // (The cover from the local copy CoverMode downloads: quicker than fetching the
+                // player's URL again, and the same picture the palette came from.)
+                property string source: CoverMode.active ? (CoverMode.file ? `file://${CoverMode.file}` : Mpris.artUrl)
+                                                         : Wallpapers.current ? `file://${Wallpapers.current}` : ""
                 property bool flip: false
                 onSourceChanged: {
                     flip = !flip;
@@ -115,6 +139,7 @@ Scope {
                 Image {
                     id: a
                     anchors.fill: parent
+                    onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     sourceSize: Qt.size(window.width, window.height)
@@ -124,6 +149,7 @@ Scope {
                 Image {
                     id: b
                     anchors.fill: parent
+                    onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     sourceSize: Qt.size(window.width, window.height)
@@ -139,7 +165,7 @@ Scope {
                 // In cover mode the cover always gets a frame (a square one without a chosen shape).
                 readonly property string shape: root.frame || (CoverMode.active ? "square" : "")
                 visible: root.options.wallpaper && shape !== "" && window.reveal > 0
-                opacity: window.reveal
+                opacity: window.reveal * Math.min(1, window.frameIntro)
                 anchors.centerIn: parent
                 width: Math.min(parent.width, parent.height) * 0.62
                 height: width
@@ -169,7 +195,7 @@ Scope {
                 }
 
                 // Swell with the bass; ease back when the music stops. Grows in as it appears.
-                scale: (0.9 + 0.1 * window.reveal) * (dancing ? 1 + 0.07 * Beat.bass : 1)
+                scale: (0.6 + 0.4 * window.frameIntro) * (0.9 + 0.1 * window.reveal) * (dancing ? 1 + 0.07 * Beat.bass : 1)
                 Behavior on scale {
                     enabled: !frame.dancing
                     SpatialAnim { duration: Appearance.anim.spatial }

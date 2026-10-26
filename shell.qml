@@ -15,6 +15,14 @@ ShellRoot {
     // handlers) at startup: palette, notification daemon, battery warnings, ...
     readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets, LockScreen, CoverMode, Displays, TerminalColors]
 
+    // Startup animation: everything comes in once the wallpaper is on screen (Desktop
+    // starts it); this is the fallback when there's no wallpaper or it's slow to load.
+    Timer {
+        running: true
+        interval: 2500
+        onTriggered: ShellState.started = true
+    }
+
     Desktop {}
 
     DesktopVisualizer {}

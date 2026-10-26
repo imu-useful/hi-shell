@@ -28,6 +28,9 @@ Singleton {
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "quick"
     property bool launcherOpen: false
+    // Set shortly after startup: the bar, wallpaper, frame and widgets animate in.
+    property bool started: false
+
     // Open the first-run welcome again (five taps on the avatar in Settings).
     signal showWelcome()
 

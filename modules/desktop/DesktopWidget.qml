@@ -25,6 +25,17 @@ Item {
     readonly property bool live: entry.enabled && (parent?.visible ?? false)
 
     visible: entry.enabled
+
+    // Startup: widgets pop in one after another, a wave from the top left corner.
+    property real intro: ShellState.started ? 1 : 0
+    Behavior on intro {
+        SequentialAnimation {
+            PauseAnimation { duration: 350 + (root.entry.x + root.entry.y) * 450 }
+            SpringAnim { overshoot: 1.6 }
+        }
+    }
+    opacity: Math.min(1, intro)
+    scale: 0.6 + 0.4 * intro
     width: holder.childrenRect.width
     height: holder.childrenRect.height
     x: Math.round(entry.x * (parent?.width ?? 0))

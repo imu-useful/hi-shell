@@ -91,6 +91,13 @@ PanelWindow {
 
     readonly property color barColor: Appearance.translucent(style === "m3" ? Colors.m3surfaceContainer : Colors.m3surface)
 
+    // Startup: the bar slides in from its edge with a spring.
+    property real intro: ShellState.started ? 1 : 0
+    Behavior on intro {
+        SpringAnim { overshoot: 1.2; duration: Appearance.anim.spatial * 1.4 }
+    }
+    readonly property real introShift: (1 - intro) * (thickness + margin + 8) * (position === "top" || position === "left" ? -1 : 1)
+
     // Bar area: the strip along the edge, inset by the margin when floating.
     Item {
         id: barArea
@@ -99,6 +106,11 @@ PanelWindow {
         y: root.position === "bottom" ? parent.height - root.thickness - root.margin : root.margin
         width: root.vertical ? root.thickness : parent.width - root.margin * 2
         height: root.vertical ? parent.height - root.margin * 2 : root.thickness
+        opacity: root.intro
+        transform: Translate {
+            x: root.vertical ? root.introShift : 0
+            y: root.vertical ? 0 : root.introShift
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -183,6 +195,11 @@ PanelWindow {
             flipY: root.vertical ? second : root.position === "bottom"
             size: root.cornerSize
             color: root.barColor
+            opacity: root.intro
+            transform: Translate {
+                x: root.vertical ? root.introShift : 0
+                y: root.vertical ? 0 : root.introShift
+            }
         }
     }
 }
