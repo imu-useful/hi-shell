@@ -107,8 +107,9 @@ DesktopCard {
             }
         }
 
-        // Progress: players report the position about once a second; glide between
-        // reports, and move quickly (eased) on seeks and track changes.
+        // Progress: players report the position about once a second. Those small steps
+        // (a pixel or two) are set directly: gliding between them would redraw the whole
+        // desktop at 60 fps for as long as music plays. Seeks and track changes ease.
         Rectangle {
             id: track
             Layout.fillWidth: true
@@ -127,12 +128,15 @@ DesktopCard {
                     shown = to;
                     return;
                 }
-                // One position report while playing: keep moving at playback speed.
-                const tick = Mpris.playing && step >= 0 && step * Mpris.length < 2.5;
+                // One position report while playing.
+                if (Mpris.playing && step >= 0 && step * Mpris.length < 2.5) {
+                    shown = to;
+                    return;
+                }
                 glideAnim.from = shown;
                 glideAnim.to = to;
-                glideAnim.duration = tick ? 1000 : Appearance.anim.normal;
-                glideAnim.easing.type = tick ? Easing.Linear : Easing.OutCubic;
+                glideAnim.duration = Appearance.anim.normal;
+                glideAnim.easing.type = Easing.OutCubic;
                 glideAnim.start();
             }
 

@@ -16,7 +16,7 @@ end
 
 -- Start the shell with Hyprland
 hl.on("hyprland.start", function()
-    hl.exec_cmd("qs -c hi-shell")
+    hl.exec_cmd(os.getenv("HOME") .. "/.config/quickshell/hi-shell/run.sh")
 end)
 
 -- App launcher (Super+D is commonly bound to maximize, so Super+Space is the default)

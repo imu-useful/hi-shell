@@ -1,10 +1,10 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.common
+import qs.services
 
-// Audio spectrum from cava, drawn by one shader (shaders/spectrum.frag): the CPU only
-// hands over the levels, so it stays cheap at 60 fps. Runs cava while `active`.
+// Audio spectrum drawn by one shader (shaders/spectrum.frag): the CPU only hands over
+// the levels, from the shared cava in services/Beat while `active`.
 ShaderEffect {
     id: root
 
@@ -16,23 +16,35 @@ ShaderEffect {
     property string mode: "bottom"
     property real gap: 2
     property real minLength: 3
-    // cava smooths between frames; 30 keeps the motion fluid without redrawing
-    // the window at the full display rate for as long as music plays.
-    property int framerate: 30
-
-    property list<real> levels: []
-
-    // cava reads its config from a file; raw ASCII output, one frame per line ("12;40;7;...").
-    // The file is removed once cava has read it.
-    Process {
-        running: root.active && Appearance.anim.speed > 0
-        command: ["sh", "-c", 'cfg=$(mktemp); printf "%b" "$1" > "$cfg"; (sleep 2; rm -f "$cfg") & exec cava -p "$cfg"', "sh",
-            `[general]\nbars = ${Math.min(64, root.bars)}\nframerate = ${root.framerate}\n[input]\nmethod = pipewire\n[output]\nmethod = raw\nraw_target = /dev/stdout\ndata_format = ascii\nascii_max_range = 100\nbar_delimiter = 59\n[smoothing]\nmonstercat = 1\nnoise_reduction = 70\n`]
-        stdout: SplitParser {
-            onRead: line => root.levels = line.split(";").filter(v => v !== "").map(v => Number(v) / 100)
+    // Levels from the shared cava (services/Beat), averaged down to `bars`.
+    readonly property list<real> levels: {
+        const src = Beat.levels;
+        if (!src.length)
+            return [];
+        const n = Math.min(64, Math.round(bars)), out = [];
+        for (let i = 0; i < n; i++) {
+            const a = Math.floor(i * src.length / n), b = Math.max(a + 1, Math.floor((i + 1) * src.length / n));
+            let sum = 0;
+            for (let j = a; j < b; j++)
+                sum += src[j];
+            out.push(sum / (b - a));
         }
-        onRunningChanged: if (!running) root.levels = []
+        return out;
     }
+
+    // Count in with Beat while active.
+    property bool counted: false
+    function syncUse() {
+        const want = active && visible;
+        if (want !== counted) {
+            Beat.users += want ? 1 : -1;
+            counted = want;
+        }
+    }
+    onActiveChanged: syncUse()
+    onVisibleChanged: syncUse()
+    Component.onCompleted: syncUse()
+    Component.onDestruction: if (counted) Beat.users--
 
     // Shader inputs
     readonly property vector2d size: Qt.vector2d(width, height)

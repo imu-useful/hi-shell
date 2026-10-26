@@ -157,7 +157,7 @@ if $START && [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     step "Start"
     hyprctl reload >/dev/null || true
     qs -c hi-shell kill &>/dev/null || true
-    qs -c hi-shell -d &>/dev/null
+    "$REPO/run.sh" -d &>/dev/null
     errors=$(hyprctl configerrors 2>/dev/null | grep -v '^$' || true)
     [[ -n "$errors" ]] && warn "hyprctl configerrors:"$'\n'"$errors"
     echo "hi-shell is running. Tap Super for the launcher, Super+Escape for settings."

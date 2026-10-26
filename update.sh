@@ -44,6 +44,6 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     fi
     step "Restarting hi-shell"
     qs -c hi-shell kill &>/dev/null || true
-    qs -c hi-shell -d &>/dev/null
+    "$REPO/run.sh" -d &>/dev/null
 fi
 echo "Updated to $(git log -1 --format='%h %s')."

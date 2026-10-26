@@ -325,6 +325,8 @@ the same file.
 ## Troubleshooting
 
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
+- **Rendering:** `run.sh` (what Hyprland starts) uses Vulkan when a Vulkan driver is installed, which costs less CPU
+  per frame than OpenGL. To use OpenGL: `qs -c hi-shell kill; QSG_RHI_BACKEND=opengl ~/.config/quickshell/hi-shell/run.sh -d`.
 - **Developing:** start with `HI_SHELL_DEV=1 qs -c hi-shell` to reload on file changes (off by default: the current
   Quickshell build can crash while reloading).
 - **Screen doesn't lock on idle:** if your `hypridle.conf` came with illogical-impulse, its `lock_cmd`
@@ -352,6 +354,7 @@ services/            QML services (Mpris, Weather, Battery, Brightness, NetworkS
                      presets.py
 translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
+run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland
 update.sh            pull and restart
 uninstall.sh         unhook and unlink (--purge: settings too)

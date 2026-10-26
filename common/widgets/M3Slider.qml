@@ -9,8 +9,8 @@ Item {
 
     property real value: 0
     property real step: 0.05
-    // Track position of something playing: small forward steps (the player's
-    // once-a-second reports) glide at playback speed instead of easing.
+    // Track position of something playing: the player's once-a-second reports (small
+    // forward steps) are set directly instead of animating; seeks still ease.
     property bool playback: false
 
     signal moved(real value)
@@ -30,11 +30,14 @@ Item {
             return;
         }
         const step = clamped - shown;
-        const tick = playback && step >= 0 && step < 0.05;
+        if (playback && step >= 0 && step < 0.05) {
+            shown = clamped;
+            return;
+        }
         glideAnim.from = shown;
         glideAnim.to = clamped;
-        glideAnim.duration = tick ? 1000 : Appearance.anim.normal;
-        glideAnim.easing.type = tick ? Easing.Linear : Easing.OutCubic;
+        glideAnim.duration = Appearance.anim.normal;
+        glideAnim.easing.type = Easing.OutCubic;
         glideAnim.start();
     }
     onClampedChanged: glide()
