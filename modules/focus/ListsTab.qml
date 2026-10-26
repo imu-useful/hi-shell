@@ -62,6 +62,17 @@ ColumnLayout {
             emptyText: Translation.tr("No sites yet")
             onRemoved: value => Focus.removeListItem("sites", value)
         }
+        // /etc/hosts can only send listed sites away, not let only a few through.
+        StyledText {
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            Layout.rightMargin: 14
+            wrapMode: Text.WordWrap
+            text: root.whitelist ? Translation.tr("Sites can only be blocked by a blacklist: in whitelist mode they're not restricted.")
+                                 : Translation.tr("Blocked through /etc/hosts (asks for your password when a session starts). http:// sites show the Focus Mode page; https:// ones just don't open.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
         AddField {
             Layout.margins: 6
             placeholder: Translation.tr("Domain, e.g. youtube.com")

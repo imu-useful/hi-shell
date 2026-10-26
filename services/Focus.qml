@@ -29,6 +29,8 @@ Singleton {
     property var sessionProfile: ({}) // the profile as it was when the session started
     // Values to put back on stop: { wallpaper, blur, animations }
     property var restore: ({})
+    // The session file has been read (whether or not a session was in it).
+    property bool sessionChecked: false
     property bool settingsOpen: false
     property string settingsTab: "timer" // timer, wallpaper, lists, profiles, todo, exit
 
@@ -422,8 +424,10 @@ Singleton {
         onLoaded: {
             try {
                 const d = JSON.parse(text());
-                if (!d.active)
+                if (!d.active) {
+                    root.sessionChecked = true;
                     return;
+                }
                 root.startedAt = d.startedAt;
                 root.sessionProfile = d.profile;
                 root.sessionTaskIds = d.tasks ?? [];
@@ -437,7 +441,9 @@ Singleton {
             } catch (e) {
                 console.warn("Focus: bad session file", e);
             }
+            root.sessionChecked = true;
         }
+        onLoadFailed: root.sessionChecked = true
     }
 
     // Locked while a session runs: opening any of these just says so.
