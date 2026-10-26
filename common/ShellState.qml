@@ -28,6 +28,9 @@ Singleton {
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "quick"
     property bool launcherOpen: false
+    // Open the first-run welcome again (five taps on the avatar in Settings).
+    signal showWelcome()
+
     // Display mode picker (the display key, the quick toggle, Settings).
     property bool displayModeOpen: false
     // Bar hidden on every screen (`qs -c hi-shell ipc call bar toggle`).

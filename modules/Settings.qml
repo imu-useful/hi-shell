@@ -103,11 +103,42 @@ Scope {
                         RowLayout {
                             Layout.margins: 6
                             spacing: 10
+                            // Five quick taps on the avatar open the first-run welcome again
+                            // (for when it was skipped), like Android's developer options.
                             ShapeImage {
+                                id: avatar
                                 implicitWidth: 44
                                 implicitHeight: 44
                                 shape: "cookie9"
                                 source: `file://${Paths.home}/.face`
+
+                                property int taps: 0
+                                readonly property int needed: 5
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        avatar.taps++;
+                                        tapReset.restart();
+                                        bump.restart();
+                                        if (avatar.taps >= avatar.needed) {
+                                            avatar.taps = 0;
+                                            root.setOpen(false);
+                                            ShellState.showWelcome();
+                                        }
+                                    }
+                                }
+                                Timer {
+                                    id: tapReset
+                                    interval: 2000
+                                    onTriggered: avatar.taps = 0
+                                }
+                                SequentialAnimation {
+                                    id: bump
+                                    NumberAnimation { target: avatar; property: "scale"; to: 0.86; duration: 70; easing.type: Easing.OutQuad }
+                                    SpringAnim { target: avatar; property: "scale"; to: 1; duration: Appearance.anim.normal }
+                                }
                             }
                             ColumnLayout {
                                 spacing: 0
@@ -116,7 +147,9 @@ Scope {
                                     font.weight: Font.Medium
                                 }
                                 StyledText {
-                                    text: Translation.tr("Arch Linux · Hyprland")
+                                    // Counts down once the taps start.
+                                    text: avatar.taps >= 2 ? Translation.trn("%1 more tap…", "%1 more taps…", avatar.needed - avatar.taps)
+                                                           : Translation.tr("Arch Linux · Hyprland")
                                     font.pixelSize: Appearance.font.size.labelSmall
                                     color: Colors.m3onSurfaceVariant
                                 }

@@ -41,6 +41,14 @@ Scope {
         doneFile.setText(new Date().toISOString() + "\n");
     }
 
+    Connections {
+        target: ShellState
+        function onShowWelcome() {
+            root.step = 0;
+            root.open = true;
+        }
+    }
+
     IpcHandler {
         target: "welcome"
 

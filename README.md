@@ -339,7 +339,8 @@ code to `available` in `common/Translation.qml`.
 
 On the first start a short welcome sets the language, wallpaper, light / dark mode and bar style, shows the main
 shortcuts and lists optional programs that are missing. It won't show again (the marker is
-`~/.local/state/hi-shell/welcome-done`); reopen it with `qs -c hi-shell ipc call welcome open`.
+`~/.local/state/hi-shell/welcome-done`); to see it again, tap your avatar in Settings five times, or run
+`qs -c hi-shell ipc call welcome open`.
 
 A preset is one `.tar.gz` with your config, wallpaper and color scheme. Save and apply them in Settings → About;
 they're kept in `~/.local/share/hi-shell/presets`. Presets leave out API keys, your location and the monitor layout,
