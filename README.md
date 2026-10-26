@@ -12,7 +12,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 [![Material You](https://img.shields.io/badge/Material_3-Expressive-7F67BE?style=for-the-badge&logo=materialdesign&logoColor=white)](https://m3.material.io)
 <br>
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue?style=for-the-badge)](LICENSE)
-[![Telegram chat](https://img.shields.io/badge/Telegram-tux__empire-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/tux_empire)
+[![Telegram chat](https://img.shields.io/badge/Telegram-tux__emp-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/tux_emp)
 
 [Install](#installation) · [Screenshots](#screenshots) · [Shortcuts](#usage) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting) · [Community](#community)
 
@@ -406,7 +406,7 @@ uninstall.sh         unhook and unlink (--purge: settings too)
 ## Community
 
 Questions, screenshots of your setup, ideas and bug reports — join the Telegram chat:
-**[t.me/tux_empire](https://t.me/tux_empire)**
+**[t.me/tux_emp](https://t.me/tux_emp)**
 
 Bugs can also go to [GitHub issues](https://github.com/imu-useful/hi-shell/issues).
 
