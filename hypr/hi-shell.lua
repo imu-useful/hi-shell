@@ -110,6 +110,12 @@ bind("SUPER + Escape", "settings toggle", "Settings")
 hl.layer_rule({ match = { namespace = "hi-shell-settings" }, blur = true })
 hl.layer_rule({ match = { namespace = "hi-shell-settings" }, ignore_alpha = 0.3 })
 
+-- Focus Mode settings: a regular window (its title ends with "· hi-shell"), floating
+-- in the middle like a dialog.
+hl.window_rule({ match = { class = "^(org.quickshell)$", title = "^(.*) · hi-shell$" }, float = true })
+hl.window_rule({ match = { class = "^(org.quickshell)$", title = "^(.*) · hi-shell$" }, size = {920, 680} })
+hl.window_rule({ match = { class = "^(org.quickshell)$", title = "^(.*) · hi-shell$" }, center = true })
+
 -- Wallpaper picker (local + online, color scheme, frame)
 bind("SUPER + R", "wallpaper toggleSelector", "Wallpaper picker")
 hl.layer_rule({ match = { namespace = "hi-shell-wallpapers" }, blur = true })

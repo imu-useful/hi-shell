@@ -63,7 +63,7 @@ Scope {
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return [...settingsMatches(term), ...filterApps(term)];
+            return [...focusMatches(term), ...settingsMatches(term), ...filterApps(term)];
         }
     }
 
@@ -81,6 +81,20 @@ Scope {
 
     function settingsMatches(text) {
         return text.length < 2 ? [] : Pages.search(text, Translation.tr).slice(0, 3).map(settingsItem);
+    }
+
+    // Focus Mode settings (its own window, not a Settings page).
+    function focusMatches(text) {
+        const q = text.toLowerCase();
+        const words = `focus pomodoro ${Translation.tr("Focus Mode")} ${Translation.tr("Pomodoro")}`.toLowerCase().split(" ");
+        if (q.length < 2 || Focus.active || !words.some(w => w.startsWith(q)))
+            return [];
+        return [{
+            name: Translation.tr("Focus Mode"),
+            comment: Translation.tr("Pomodoro, profiles, blocked apps and sites"),
+            materialIcon: "center_focus_strong",
+            run: () => Focus.settingsOpen = true
+        }];
     }
 
     function toggle() {

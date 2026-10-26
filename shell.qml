@@ -5,6 +5,7 @@ import Quickshell
 import qs.common
 import qs.services
 import qs.modules
+import qs.modules.focus
 
 ShellRoot {
     // Reloading on file changes is for development (HI_SHELL_DEV=1): this Quickshell
@@ -13,7 +14,7 @@ ShellRoot {
 
     // Singletons load lazily; create the background services (and their IPC
     // handlers) at startup: palette, notification daemon, battery warnings, ...
-    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets, LockScreen, CoverMode, Displays, TerminalColors]
+    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets, LockScreen, CoverMode, Displays, TerminalColors, Focus]
 
     // Startup animation: everything comes in once the wallpaper is on screen (Desktop
     // starts it); this is the fallback when there's no wallpaper or it's slow to load.
@@ -68,4 +69,6 @@ ShellRoot {
     OnScreenDisplay {}
 
     Welcome {}
+
+    FocusSettingsWindow {}
 }
