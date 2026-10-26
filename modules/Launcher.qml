@@ -141,6 +141,9 @@ Scope {
             return;
         if (item.run) {
             item.run();
+        } else if (FocusBlocker.blockedEntry(item)) {
+            // Focus Mode: not now (the blocker says so).
+            FocusBlocker.launch(item);
         } else if (item.runInTerminal) {
             Quickshell.execDetached([Config.options.apps.terminal, "-e", ...item.command]);
         } else {
@@ -236,8 +239,9 @@ Scope {
         }
         // Open with text already typed, e.g. "<" for keybinds or "=" for the calculator.
         function search(text: string): void {
-            ShellState.launcherOpen = true;
+            // The text first: with animations off the window is made (and reads it) at once.
             ShellState.launcherQuery = text;
+            ShellState.launcherOpen = true;
         }
     }
 

@@ -654,5 +654,9 @@
     ],
     "Clean desktop": "Чистый стол",
     "%1 focused · the session lasts %2": "%1 фокуса · сессия длится %2",
-    "%1 focused · %2 per round, then again": "%1 фокуса · %2 за круг, потом заново"
+    "%1 focused · %2 per round, then again": "%1 фокуса · %2 за круг, потом заново",
+    "%1 is blocked": "%1 заблокировано",
+    "Available at the break, in %1": "Будет доступно в перерыв, через %1",
+    "Available when the session ends, in %1": "Будет доступно после сессии, через %1",
+    "No apps yet: none are blocked": "Приложений нет — ничего не блокируется"
 }

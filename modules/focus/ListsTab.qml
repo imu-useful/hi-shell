@@ -41,7 +41,8 @@ ColumnLayout {
         ChipList {
             items: root.apps
             icon: "apps"
-            emptyText: Translation.tr("No apps yet")
+            // An empty whitelist would close every window, so it blocks nothing instead.
+            emptyText: root.whitelist ? Translation.tr("No apps yet: none are blocked") : Translation.tr("No apps yet")
             onRemoved: value => Focus.removeListItem("apps", value)
         }
         AddField {

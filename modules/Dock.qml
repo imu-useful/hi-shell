@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
+import qs.services
 
 // Dock (Config dock.*): pinned and running apps with window dots and hover
 // magnification. Click = launch or focus (cycles windows), middle click = new
@@ -70,7 +71,8 @@ Variants {
 
         function activate(app) {
             if (app.windows.length === 0) {
-                app.entry?.execute();
+                if (app.entry)
+                    FocusBlocker.launch(app.entry);
                 return;
             }
             // Cycle through the app's windows, starting after the focused one.
@@ -172,8 +174,8 @@ Variants {
                             onClicked: mouse => {
                                 if (mouse.button === Qt.RightButton)
                                     window.togglePin(item.modelData);
-                                else if (mouse.button === Qt.MiddleButton)
-                                    item.modelData.entry?.execute();
+                                else if (mouse.button === Qt.MiddleButton && item.modelData.entry)
+                                    FocusBlocker.launch(item.modelData.entry);
                                 else
                                     window.activate(item.modelData);
                             }
