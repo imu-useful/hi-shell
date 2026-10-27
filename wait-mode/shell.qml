@@ -29,6 +29,66 @@ ShellRoot {
     // HI_WAIT_NO_MUSIC=1 shows the no-music cover even while something plays (to try it out).
     readonly property bool hasMusic: !Quickshell.env("HI_WAIT_NO_MUSIC") && player !== null && player.trackTitle !== ""
 
+    // --- The player's own controls (the cover's buttons) ---
+    readonly property bool shuffle: !!player?.shuffle
+    readonly property bool shuffleSupported: !!player?.shuffleSupported
+    readonly property bool loopSupported: !!player?.loopSupported
+    readonly property bool loopOff: (player?.loopState ?? MprisLoopState.None) === MprisLoopState.None
+    readonly property bool loopTrack: (player?.loopState ?? MprisLoopState.None) === MprisLoopState.Track
+
+    function toggleShuffle() {
+        if (player?.shuffleSupported)
+            player.shuffle = !player.shuffle;
+    }
+    // Off -> the whole playlist -> one track -> off.
+    function cycleLoop() {
+        if (!player?.loopSupported)
+            return;
+        const s = player.loopState;
+        player.loopState = s === MprisLoopState.None ? MprisLoopState.Playlist
+            : s === MprisLoopState.Playlist ? MprisLoopState.Track : MprisLoopState.None;
+    }
+
+    // --- Spotify's queue, from hi-shell's services/spotify.py (needs its sign-in) ---
+    readonly property bool isSpotify: !!player && player.dbusName.toLowerCase().includes("spotify")
+    property var queue: [] // [{ name, artists, art }]
+    function refreshQueue() {
+        if (isSpotify && hasMusic && !queueProc.running)
+            queueProc.running = true;
+    }
+    Process {
+        id: queueProc
+        command: ["python3", Quickshell.shellDir + "/../services/spotify.py", "queue"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const d = JSON.parse(text);
+                    root.queue = d.status === "ok" ? (d.queue ?? []).slice(0, 6) : [];
+                } catch (e) {
+                    root.queue = [];
+                }
+            }
+        }
+    }
+    onIsSpotifyChanged: isSpotify ? refreshQueue() : queue = []
+    Connections {
+        target: root.player
+        function onTrackTitleChanged() { queueLater.restart(); }
+    }
+    Timer {
+        id: queueLater
+        interval: 1500
+        onTriggered: root.refreshQueue()
+    }
+    // Also now and then: the queue changes when tracks are added elsewhere.
+    Timer {
+        running: root.isSpotify
+        interval: 30000
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: root.refreshQueue()
+    }
+
     function pressEsc() {
         escapes++;
         escTimer.restart();

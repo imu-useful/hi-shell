@@ -121,77 +121,178 @@ PanelWindow {
         }
     }
 
-    // --- Music: the cover, the title and artist, the progress ---
+    // --- Music: the cover, the title and artist, the progress and the buttons, the queue ---
     Component {
         id: music
 
         Item {
             readonly property var player: win.control.player
             readonly property real cover: win.unit * 0.42
+            readonly property bool hasQueue: win.control.queue.length > 0
 
-            ColumnLayout {
+            RowLayout {
                 anchors.centerIn: parent
-                spacing: win.unit * 0.025
+                spacing: win.unit * 0.08
 
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: Theme.tr("Wait Mode", "Режим ожидания")
-                    color: Theme.primary
-                    font.pixelSize: Math.max(14, win.unit * 0.02)
-                    font.weight: Font.Medium
-                    font.letterSpacing: 2
-                }
-                RoundedImage {
-                    Layout.alignment: Qt.AlignHCenter
-                    implicitWidth: cover
-                    implicitHeight: cover
-                    radius: cover * 0.08
-                    source: player?.trackArtUrl ?? ""
-                }
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.maximumWidth: win.width * 0.8
-                    text: player?.trackTitle ?? ""
-                    color: Theme.text
-                    elide: Text.ElideRight
-                    font.pixelSize: win.unit * 0.045
-                    font.weight: Font.DemiBold
-                }
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.maximumWidth: win.width * 0.8
-                    text: player?.trackArtist ?? ""
-                    color: Theme.muted
-                    elide: Text.ElideRight
-                    font.pixelSize: win.unit * 0.028
-                }
-                // Progress (shown, not to be moved).
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: cover
-                    visible: (player?.length ?? 0) > 0
-                    spacing: 12
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignVCenter
+                    spacing: win.unit * 0.025
+
                     Text {
-                        text: win.time(player?.position ?? 0)
-                        color: Theme.muted
-                        font.pixelSize: win.unit * 0.018
+                        Layout.alignment: Qt.AlignHCenter
+                        text: Theme.tr("Wait Mode", "Режим ожидания")
+                        color: Theme.primary
+                        font.pixelSize: Math.max(14, win.unit * 0.02)
+                        font.weight: Font.Medium
+                        font.letterSpacing: 2
                     }
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 6
-                        radius: 3
-                        color: Theme.surface
+                    RoundedImage {
+                        Layout.alignment: Qt.AlignHCenter
+                        implicitWidth: cover
+                        implicitHeight: cover
+                        radius: cover * 0.08
+                        source: player?.trackArtUrl ?? ""
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.maximumWidth: hasQueue ? cover * 1.2 : win.width * 0.8
+                        text: player?.trackTitle ?? ""
+                        color: Theme.text
+                        elide: Text.ElideRight
+                        font.pixelSize: win.unit * 0.045
+                        font.weight: Font.DemiBold
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.maximumWidth: hasQueue ? cover * 1.2 : win.width * 0.8
+                        text: player?.trackArtist ?? ""
+                        color: Theme.muted
+                        elide: Text.ElideRight
+                        font.pixelSize: win.unit * 0.028
+                    }
+
+                    // The song's bar: where it is, and how long it is.
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredWidth: cover * 1.1
+                        spacing: 12
+                        Text {
+                            text: win.time(player?.position ?? 0)
+                            color: Theme.muted
+                            font.pixelSize: win.unit * 0.02
+                            font.features: { "tnum": 1 }
+                        }
                         Rectangle {
-                            width: parent.width * Math.min(1, (player?.position ?? 0) / Math.max(1, player?.length ?? 1))
-                            height: parent.height
-                            radius: 3
-                            color: Theme.primary
+                            Layout.fillWidth: true
+                            implicitHeight: Math.max(8, win.unit * 0.01)
+                            radius: height / 2
+                            color: Qt.alpha(Theme.text, 0.22)
+                            Rectangle {
+                                width: parent.width * Math.min(1, (player?.position ?? 0) / Math.max(1, player?.length ?? 1))
+                                height: parent.height
+                                radius: height / 2
+                                color: Theme.primary
+                            }
+                        }
+                        Text {
+                            text: win.time(player?.length ?? 0)
+                            color: Theme.muted
+                            font.pixelSize: win.unit * 0.02
+                            font.features: { "tnum": 1 }
                         }
                     }
+
+                    // Shuffle and repeat: they work on the player (the only buttons the cover has).
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: win.unit * 0.04
+                        visible: win.control.shuffleSupported || win.control.loopSupported
+
+                        Repeater {
+                            model: [
+                                { kind: "shuffle", shown: win.control.shuffleSupported },
+                                { kind: "repeat", shown: win.control.loopSupported }
+                            ]
+
+                            Rectangle {
+                                id: btn
+                                required property var modelData
+                                readonly property bool on: modelData.kind === "shuffle" ? win.control.shuffle : !win.control.loopOff
+
+                                visible: modelData.shown
+                                implicitWidth: win.unit * 0.075
+                                implicitHeight: implicitWidth
+                                radius: width / 2
+                                color: on ? Theme.primary : (mouse.containsMouse ? Qt.alpha(Theme.text, 0.18) : Theme.surface)
+                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: btn.modelData.kind === "shuffle" ? "shuffle" : (win.control.loopTrack ? "repeat_one" : "repeat")
+                                    font.family: "Material Symbols Rounded"
+                                    font.pixelSize: win.unit * 0.04
+                                    color: btn.on ? Theme.onPrimary : Theme.text
+                                }
+                                MouseArea {
+                                    id: mouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: btn.modelData.kind === "shuffle" ? win.control.toggleShuffle() : win.control.cycleLoop()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // What plays next (Spotify; needs hi-shell's sign-in).
+                ColumnLayout {
+                    visible: hasQueue
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: win.unit * 0.5
+                    spacing: win.unit * 0.012
+
                     Text {
-                        text: win.time(player?.length ?? 0)
-                        color: Theme.muted
-                        font.pixelSize: win.unit * 0.018
+                        text: Theme.tr("Up next", "Дальше")
+                        color: Theme.primary
+                        font.pixelSize: Math.max(14, win.unit * 0.022)
+                        font.weight: Font.Medium
+                        font.letterSpacing: 2
+                    }
+                    Repeater {
+                        model: win.control.queue
+
+                        RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: 14
+
+                            RoundedImage {
+                                implicitWidth: win.unit * 0.07
+                                implicitHeight: win.unit * 0.07
+                                radius: win.unit * 0.012
+                                source: modelData.art ?? ""
+                            }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.name
+                                    color: Theme.text
+                                    elide: Text.ElideRight
+                                    font.pixelSize: win.unit * 0.026
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.artists
+                                    color: Theme.muted
+                                    elide: Text.ElideRight
+                                    font.pixelSize: win.unit * 0.02
+                                }
+                            }
+                        }
                     }
                 }
             }
