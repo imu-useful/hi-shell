@@ -29,7 +29,9 @@ PopupWindow {
     default property Component content
 
     readonly property int shadowPad: 14
-    readonly property bool wanted: pinned || hovered || popupHover.hovered
+    // Not under the calendar: its grab takes the pointer, so a hover never ends and the
+    // popup would stay open beneath it.
+    readonly property bool wanted: pinned || ((hovered || popupHover.hovered) && !ShellState.calendarOpen)
     property bool shown: false
 
     readonly property bool vertical: edge === Edges.Top || edge === Edges.Bottom
