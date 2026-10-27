@@ -1,15 +1,15 @@
 .pragma library
 
-// Default desktop widget layout: x / y are fractions of the screen (top-left corner).
+// Default desktop widget layout (all off; turned on in edit mode or Settings): x / y are fractions of the screen (top-left corner).
 const defaults = {
-    shapeClock: { enabled: true, x: 0.03, y: 0.07 },
-    greeting: { enabled: true, x: 0.03, y: 0.37 },
-    media: { enabled: true, x: 0.03, y: 0.49 },
-    digitalClock: { enabled: true, x: 0.39, y: 0.06 },
-    weather: { enabled: true, x: 0.75, y: 0.06 },
-    resources: { enabled: true, x: 0.75, y: 0.21 },
-    calendar: { enabled: true, x: 0.75, y: 0.36 },
-    todo: { enabled: true, x: 0.75, y: 0.56 },
+    shapeClock: { enabled: false, x: 0.03, y: 0.07 },
+    greeting: { enabled: false, x: 0.03, y: 0.37 },
+    media: { enabled: false, x: 0.03, y: 0.49 },
+    digitalClock: { enabled: false, x: 0.39, y: 0.06 },
+    weather: { enabled: false, x: 0.75, y: 0.06 },
+    resources: { enabled: false, x: 0.75, y: 0.21 },
+    calendar: { enabled: false, x: 0.75, y: 0.36 },
+    todo: { enabled: false, x: 0.75, y: 0.56 },
     worldClock: { enabled: false, x: 0.55, y: 0.30 },
     notes: { enabled: false, x: 0.55, y: 0.56 },
     timers: { enabled: false, x: 0.30, y: 0.76 },
