@@ -53,7 +53,9 @@ Scope {
             anchors.right: true
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
-            mask: Region { item: card }
+            // The window takes clicks a little beyond the card too, so one that lands on its
+            // edge isn't "outside" (which closes it, see the focus grab below).
+            mask: Region { item: edge }
 
             WlrLayershell.namespace: "hi-shell-settings"
             WlrLayershell.layer: WlrLayer.Overlay
@@ -68,6 +70,18 @@ Scope {
             Shortcut {
                 sequence: "Escape"
                 onActivated: root.setOpen(false)
+            }
+
+            Item {
+                id: edge
+                anchors.centerIn: parent
+                width: card.width + 24
+                height: card.height + 24
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                }
             }
 
             Rectangle {
