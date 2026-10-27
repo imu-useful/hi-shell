@@ -752,5 +752,7 @@
     "Add to the queue": "Добавить в очередь",
     "Added to the queue": "Добавлено в очередь",
     "The queue is empty": "Очередь пуста",
-    "Spotify sign-in failed": "Не удалось войти в Spotify"
+    "Spotify sign-in failed": "Не удалось войти в Spotify",
+    "Wait Mode": "Режим ожидания",
+    "Covers the screen": "Закрывает экран"
 }

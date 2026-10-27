@@ -338,9 +338,12 @@ Quickshell instance (`wait-mode/`) run as a systemd user unit, so restarting hi-
 ~/.config/quickshell/hi-shell/wait-mode/wait-mode.sh status    # locked / bypass, Esc presses, music, binds
 ```
 
-- **The cover:** the player that is playing (cover, title, artist, a progress bar, shuffle / back / forward /
-  repeat buttons, and Spotify's queue when hi-shell is signed in to Spotify), or the wallpaper in a frame with "Wait
-  Mode" when nothing plays. Those four are the only buttons that work on the cover. Colors, wallpaper and language come from
+From hi-shell: the **Wait Mode** tile of the right sidebar (hidden by default: open the sidebar's tile editor, the pencil,
+and add it) starts and stops it, and so does `qs -c hi-shell ipc call waitmode start|stop|toggle|status`.
+
+- **The cover:** the player that is playing (cover, title, artist, a progress bar, shuffle / back / play-pause /
+  forward / repeat buttons, and Spotify's queue when hi-shell is signed in to Spotify), or the wallpaper in a frame with
+  "Wait Mode" when nothing plays. Those five are the only buttons that work on the cover. Colors, wallpaper and language come from
   hi-shell.
 - **Shut out:** the overlay takes the keyboard and the pointer, and Hyprland's key binds are off (the empty `hi-wait`
   submap in `hypr/hi-shell.lua`, so reload Hyprland after updating: `update.sh` does). Not even a Super tap opens the

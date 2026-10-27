@@ -211,6 +211,7 @@ PanelWindow {
                             model: [
                                 { kind: "shuffle", shown: win.control.shuffleSupported },
                                 { kind: "previous", shown: win.control.canPrevious },
+                                { kind: "playpause", shown: win.control.canTogglePlaying },
                                 { kind: "next", shown: win.control.canNext },
                                 { kind: "repeat", shown: win.control.loopSupported }
                             ]
@@ -222,22 +223,26 @@ PanelWindow {
                                 readonly property bool on: modelData.kind === "shuffle" ? win.control.shuffle
                                     : modelData.kind === "repeat" ? !win.control.loopOff : false
 
+                                // Play / pause is the main button: bigger, always in the accent color.
+                                readonly property bool main: modelData.kind === "playpause"
+
                                 visible: modelData.shown
-                                implicitWidth: win.unit * 0.075
+                                implicitWidth: win.unit * (main ? 0.095 : 0.075)
                                 implicitHeight: implicitWidth
                                 radius: width / 2
-                                color: on ? Theme.primary : (mouse.containsMouse ? Qt.alpha(Theme.text, 0.18) : Theme.surface)
+                                color: on || main ? Theme.primary : (mouse.containsMouse ? Qt.alpha(Theme.text, 0.18) : Theme.surface)
                                 Behavior on color { ColorAnimation { duration: 120 } }
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: btn.modelData.kind === "shuffle" ? "shuffle"
+                                        : btn.modelData.kind === "playpause" ? (win.control.playing ? "pause" : "play_arrow")
                                         : btn.modelData.kind === "previous" ? "skip_previous"
                                         : btn.modelData.kind === "next" ? "skip_next"
                                         : (win.control.loopTrack ? "repeat_one" : "repeat")
                                     font.family: "Material Symbols Rounded"
-                                    font.pixelSize: win.unit * 0.04
-                                    color: btn.on ? Theme.onPrimary : Theme.text
+                                    font.pixelSize: win.unit * (btn.main ? 0.052 : 0.04)
+                                    color: btn.on || btn.main ? Theme.onPrimary : Theme.text
                                 }
                                 MouseArea {
                                     id: mouse
@@ -248,6 +253,8 @@ PanelWindow {
                                         const k = btn.modelData.kind;
                                         if (k === "shuffle")
                                             win.control.toggleShuffle();
+                                        else if (k === "playpause")
+                                            win.control.togglePlaying();
                                         else if (k === "previous")
                                             win.control.previous();
                                         else if (k === "next")

@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession", "waitMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -131,6 +131,23 @@ ColumnLayout {
             available: true,
             toggle: () => Focus.active ? Focus.stop() : Focus.start(),
             more: () => { root.closeRequested(); Focus.settingsOpen = true; }
+        },
+        // Wait Mode: covers the screens for the person while an AI works (wait-mode/). Hidden
+        // until it's added in the editor; the panel closes first, the cover takes over.
+        waitMode: {
+            icon: "hourglass_top",
+            label: Translation.tr("Wait Mode"),
+            subtitle: WaitMode.active ? Translation.tr("On") : Translation.tr("Covers the screen"),
+            active: WaitMode.active,
+            available: true,
+            toggle: () => {
+                if (WaitMode.active) {
+                    WaitMode.stop();
+                } else {
+                    root.closeRequested();
+                    WaitMode.start();
+                }
+            }
         },
         focusMode: {
             icon: "layers_clear",

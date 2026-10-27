@@ -36,6 +36,13 @@ ShellRoot {
     readonly property bool loopOff: (player?.loopState ?? MprisLoopState.None) === MprisLoopState.None
     readonly property bool loopTrack: (player?.loopState ?? MprisLoopState.None) === MprisLoopState.Track
 
+    readonly property bool playing: !!player?.isPlaying
+    readonly property bool canTogglePlaying: !!player?.canTogglePlaying
+    function togglePlaying() {
+        if (player?.canTogglePlaying)
+            player.togglePlaying();
+    }
+
     readonly property bool canPrevious: !!player?.canGoPrevious
     readonly property bool canNext: !!player?.canGoNext
     function previous() {
