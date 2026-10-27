@@ -52,7 +52,7 @@ command -v pacman >/dev/null || die "hi-shell targets Arch Linux (pacman not fou
 PACMAN_PKGS=(
     matugen python pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
     libnotify hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
-    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools
+    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools wtype
 )
 AUR_PKGS=(quickshell-git ttf-material-symbols-variable-git)
 

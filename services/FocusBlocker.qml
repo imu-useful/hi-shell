@@ -212,7 +212,8 @@ Singleton {
         const all = Object.assign({}, lastTabClose);
         all[c.address] = now;
         lastTabClose = all;
-        Hyprland.dispatch(`hl.dsp.send_shortcut({ mods = "CTRL", key = "W", window = "address:${c.address}" })`);
+        // Hyprland's send_shortcut doesn't reach Firefox: the script focuses the window and types Ctrl+W.
+        Quickshell.execDetached(["sh", Quickshell.shellDir + "/services/focus_close_tab.sh", c.address]);
         const entry = DesktopEntries.heuristicLookup(c.class);
         noticeAs(hit.site, entry?.icon ?? "");
         // The next tab may be a blocked one too.

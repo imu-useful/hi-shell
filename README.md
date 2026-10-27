@@ -69,6 +69,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `python` | `services/theme_updater.py` and the other helper scripts (stdlib only, no pip packages) |
 | `python-fonttools` (optional) | a ~160 KB copy of the icon font with just the icons the shell uses (`services/icon_font.py`), instead of the full 15 MB one in memory |
 | `polkit` | `pkexec`: asks for your password when a Focus Mode session starts blocking sites |
+| `wtype` | types Ctrl+W into a browser window to close a tab on a blocked site (Focus Mode) |
 | `ttf-material-symbols-variable-git` (AUR) | icons (`Material Symbols Rounded`) |
 | `pipewire`, `wireplumber` | volume control |
 | `networkmanager` | Wi-Fi toggle |
