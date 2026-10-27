@@ -202,22 +202,25 @@ PanelWindow {
                         }
                     }
 
-                    // Shuffle and repeat: they work on the player (the only buttons the cover has).
+                    // The player's buttons (the only ones the cover has): shuffle, back, forward, repeat.
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: win.unit * 0.04
-                        visible: win.control.shuffleSupported || win.control.loopSupported
+                        spacing: win.unit * 0.03
 
                         Repeater {
                             model: [
                                 { kind: "shuffle", shown: win.control.shuffleSupported },
+                                { kind: "previous", shown: win.control.canPrevious },
+                                { kind: "next", shown: win.control.canNext },
                                 { kind: "repeat", shown: win.control.loopSupported }
                             ]
 
                             Rectangle {
                                 id: btn
                                 required property var modelData
-                                readonly property bool on: modelData.kind === "shuffle" ? win.control.shuffle : !win.control.loopOff
+                                // Shuffle and repeat show whether they're on; back and forward are plain buttons.
+                                readonly property bool on: modelData.kind === "shuffle" ? win.control.shuffle
+                                    : modelData.kind === "repeat" ? !win.control.loopOff : false
 
                                 visible: modelData.shown
                                 implicitWidth: win.unit * 0.075
@@ -228,7 +231,10 @@ PanelWindow {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: btn.modelData.kind === "shuffle" ? "shuffle" : (win.control.loopTrack ? "repeat_one" : "repeat")
+                                    text: btn.modelData.kind === "shuffle" ? "shuffle"
+                                        : btn.modelData.kind === "previous" ? "skip_previous"
+                                        : btn.modelData.kind === "next" ? "skip_next"
+                                        : (win.control.loopTrack ? "repeat_one" : "repeat")
                                     font.family: "Material Symbols Rounded"
                                     font.pixelSize: win.unit * 0.04
                                     color: btn.on ? Theme.onPrimary : Theme.text
@@ -238,7 +244,17 @@ PanelWindow {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: btn.modelData.kind === "shuffle" ? win.control.toggleShuffle() : win.control.cycleLoop()
+                                    onClicked: {
+                                        const k = btn.modelData.kind;
+                                        if (k === "shuffle")
+                                            win.control.toggleShuffle();
+                                        else if (k === "previous")
+                                            win.control.previous();
+                                        else if (k === "next")
+                                            win.control.next();
+                                        else
+                                            win.control.cycleLoop();
+                                    }
                                 }
                             }
                         }
