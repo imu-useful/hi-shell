@@ -9,8 +9,10 @@ import qs.common.widgets
 import qs.services
 import qs.modules.launcher
 import "settings/Pages.js" as Pages
+import "launcher/Expression.js" as Expression
 
 // Spotlight-style launcher. Plain text searches apps (and settings pages);
+// a calculation typed as it is ("12*(3+4)") is answered above the apps, no prefix needed;
 // prefixes switch the source:  = calculator · > run a command · < keybinds ·
 // : emoji · ; clipboard · / settings.
 // Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call launcher toggle`.
@@ -32,6 +34,10 @@ Scope {
     readonly property string term: mode ? query.slice(1).trim() : query.trim()
 
     property string calcResult: ""
+    // Plain text that reads as a calculation, and its answer (for that very text).
+    readonly property bool mathLike: mode === "" && Expression.isMath(term)
+    property string inlineFor: ""
+    property string inlineResult: ""
     property var binds: []
     property var emoji: []
 
@@ -63,8 +69,19 @@ Scope {
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return [...focusMatches(term), ...settingsMatches(term), ...filterApps(term)];
+            return [...inlineMath(), ...focusMatches(term), ...settingsMatches(term), ...filterApps(term)];
         }
+    }
+
+    function inlineMath() {
+        if (!mathLike || inlineFor !== term || inlineResult === "")
+            return [];
+        return [{
+            name: `${term} = ${inlineResult}`,
+            comment: Translation.tr("Enter copies the result"),
+            materialIcon: "calculate",
+            run: () => Quickshell.clipboardText = inlineResult
+        }];
     }
 
     function settingsItem(p) {
@@ -153,20 +170,34 @@ Scope {
     }
 
     // Calculator: qalc, debounced.
-    onTermChanged: if (mode === "=") calcTimer.restart()
+    onTermChanged: if (mode === "=" || mathLike) calcTimer.restart()
     Timer {
         id: calcTimer
         interval: 150
         onTriggered: {
             calc.running = false;
+            calc.asked = root.term;
+            calc.inline = root.mode === "";
             calc.command = ["qalc", "-t", "--", root.term];
             calc.running = true;
         }
     }
     Process {
         id: calc
+        // What was asked, and whether it's the plain-text kind (answer shown over the apps).
+        property string asked: ""
+        property bool inline: false
         stdout: StdioCollector {
-            onStreamFinished: root.calcResult = text.trim()
+            onStreamFinished: {
+                const answer = text.trim();
+                if (calc.inline) {
+                    // qalc leaves 1/0 as it is; that isn't an answer.
+                    root.inlineResult = /\/\s*0$/.test(answer) ? "" : answer;
+                    root.inlineFor = calc.asked;
+                } else {
+                    root.calcResult = answer;
+                }
+            }
         }
         onExited: code => {
             if (code === 127)
