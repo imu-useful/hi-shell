@@ -61,13 +61,14 @@ ask() { # ask "Should I do x?" -> 0 for yes; "a" answers yes to this and every l
 # --- What to install ---
 # One line per part; the hi-shell files themselves (source and link) are always installed.
 APP_PARTS=(zen telegram vesktop osu steam spotify neovim)
-PARTS=(deps hypr fish kitty fastfetch "${APP_PARTS[@]}" start)
+PARTS=(deps hypr fish kitty fastfetch btop "${APP_PARTS[@]}" start)
 declare -A PART_NAME=(
     [deps]="Packages hi-shell needs (pacman and AUR)"
     [hypr]="Load hi-shell from your Hyprland config"
     [fish]="Terminal config: fish (prompt, aliases)"
     [kitty]="Terminal config: kitty (colors follow the wallpaper)"
     [fastfetch]="Terminal config: fastfetch"
+    [btop]="Terminal config: btop (colors follow the wallpaper)"
     [start]="Start hi-shell when done"
     [zen]="App: Zen Browser"
     [telegram]="App: Telegram"
@@ -82,7 +83,7 @@ declare -A APP_PKG=(
     [zen]="zen-browser-bin" [telegram]="telegram-desktop" [vesktop]="vesktop vesktop-bin"
     [osu]="osu-lazer-bin" [steam]="steam" [spotify]="spotify" [neovim]="neovim"
 )
-declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [start]=$START
+declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [btop]=$DOTS [start]=$START
     [zen]=$APPS [telegram]=$APPS [vesktop]=$APPS [osu]=$APPS [steam]=$APPS [spotify]=$APPS [neovim]=$APPS)
 choose_parts() {
     $YES && return
@@ -278,11 +279,12 @@ install_dot() { # install_dot <name> <file in dots/> <destination>
     cp "$src" "$dst"
     echo "$1: installed"
 }
-if [[ ${WANT[fish]} == true || ${WANT[kitty]} == true || ${WANT[fastfetch]} == true ]]; then
+if [[ ${WANT[fish]} == true || ${WANT[kitty]} == true || ${WANT[fastfetch]} == true || ${WANT[btop]} == true ]]; then
     step "Terminal configs"
     install_dot fish fish/config.fish "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
     install_dot kitty kitty/kitty.conf "${XDG_CONFIG_HOME:-$HOME/.config}/kitty/kitty.conf"
     install_dot fastfetch fastfetch/config.jsonc "${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc"
+    install_dot btop btop/btop.conf "${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf"
 fi
 
 command -v claude >/dev/null || warn "Claude Code isn't installed: the AI palette and chat need it (npm install -g @anthropic-ai/claude-code, then run claude once)"

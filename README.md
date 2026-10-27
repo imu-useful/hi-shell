@@ -112,7 +112,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main
 
 That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
-The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch configs, optional apps, starting the shell):
+The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch / btop configs, optional apps, starting the shell):
 type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
 `y` yes, `n` no, `a` yes for all the rest.
 
@@ -287,6 +287,10 @@ Sections:
   (OS, kernel, packages, Hyprland, the hi-shell version, terminal, font, CPU, GPU, memory and disk bars, battery,
   display, uptime). The fish config shows it when a terminal window opens (not in nested shells or over ssh);
   `set -U hi_greeting off` turns that off.
+- **btop** (`dots/btop/btop.conf`): the `hi-shell` theme, which follows the wallpaper like the terminal does:
+  `services/TerminalColors.qml` writes `~/.config/btop/themes/hi-shell.theme` (once `~/.config/btop` exists) and open
+  btops reload it. The terminal's own translucent background stays. To keep your own btop.conf, just set
+  `color_theme = "hi-shell"` in it.
 
 Terminal colors follow the wallpaper: `services/TerminalColors.qml` writes `~/.local/state/hi-shell/terminal/`
 (`sequences.txt` with the 16 ANSI colors, text, background and cursor, `colors.fish` for syntax highlighting and
@@ -505,7 +509,7 @@ translations/        interface translations (ru.json)
 hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
-dots/                terminal configs (fish, kitty, fastfetch)
+dots/                terminal configs (fish, kitty, fastfetch, btop)
 update.sh            pull and restart
 uninstall.sh         unhook and unlink (--purge: settings too)
 ```
