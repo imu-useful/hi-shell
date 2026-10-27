@@ -55,9 +55,11 @@ and the audio spectrum is drawn by a single shader.
 | <img src="docs/screenshots/settings.webp" alt="Settings"> | <img src="docs/screenshots/claude.webp" alt="Claude palette"> |
 | **Settings** — every option, searchable from the launcher | **Claude palette** — ask anything, answers stream in |
 | <img src="docs/screenshots/wallpapers.webp" alt="Wallpaper picker"> | <img src="docs/screenshots/display-mode.webp" alt="Display mode"> |
-| **Wallpapers** — local and online, scheme, mode, frame | **Display mode** — duplicate or extend to a second screen |
+| **Wallpapers** — local and online, scheme, mode, 28 frames | **Display mode** — duplicate or extend to a second screen |
 | <img src="docs/screenshots/welcome.webp" alt="Welcome"> | <img src="docs/screenshots/session.webp" alt="Session screen"> |
 | **First-run welcome** — language, look and shortcuts | **Session screen** — lock, log out, suspend, reboot, power off |
+| <img src="docs/screenshots/desktop-edit.webp" alt="Desktop edit mode"> | <img src="docs/screenshots/wait-mode.webp" alt="Wait Mode"> |
+| **Desktop edit mode** — drag, scale and stretch widgets | **Wait Mode** — a locked screen with the player and the queue |
 
 ## Requirements
 
