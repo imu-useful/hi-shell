@@ -160,6 +160,8 @@ Singleton {
                 property bool coverMode: false
                 // Full-width audio visualizer along the bottom while media plays (needs cava).
                 property bool visualizer: true
+                // The big digital clock also shows the seconds (HH:MM:SS).
+                property bool clockSeconds: false
             }
 
             // The lock screen (services/LockScreen.qml): what it shows and how it looks.

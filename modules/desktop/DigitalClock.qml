@@ -4,7 +4,7 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 
-// Big "HH:MM" with a blinking colon. A digit that changes fades out upwards while the new
+// Big "HH:MM" (optionally "HH:MM:SS", Config desktop.clockSeconds) with a blinking colon. A digit that changes fades out upwards while the new
 // one rises in from below.
 ColumnLayout {
     spacing: -10
@@ -33,6 +33,7 @@ ColumnLayout {
             id: roll
             property string value
             property color color
+            property int size: 132
             property string shown: value
             property string old: ""
             property real progress: 1
@@ -64,6 +65,7 @@ ColumnLayout {
             Digits {
                 visible: roll.progress < 1
                 text: roll.old
+                font.pixelSize: roll.size
                 color: roll.color
                 opacity: 1 - roll.progress
                 y: -roll.progress * roll.height * 0.35
@@ -71,6 +73,7 @@ ColumnLayout {
             Digits {
                 id: current
                 text: roll.shown
+                font.pixelSize: roll.size
                 color: roll.color
                 opacity: roll.progress
                 y: (1 - roll.progress) * roll.height * 0.35
@@ -90,9 +93,25 @@ ColumnLayout {
             Behavior on opacity { EffectAnim {} }
         }
         Row {
+            id: minutesRow
             spacing: 0
             Roll { value: Qt.formatTime(clock.date, "mm").charAt(0); color: Colors.m3tertiary }
             Roll { value: Qt.formatTime(clock.date, "mm").charAt(1); color: Colors.m3tertiary }
+        }
+
+        // Seconds: smaller, sitting on the same baseline.
+        Item {
+            visible: Config.options.desktop.clockSeconds
+            width: visible ? secondsRow.width : 0
+            height: minutesRow.height
+
+            Row {
+                id: secondsRow
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 14
+                Roll { size: 82; value: clock.date.getSeconds().toString().padStart(2, "0").charAt(0); color: Colors.m3secondary }
+                Roll { size: 82; value: clock.date.getSeconds().toString().padStart(2, "0").charAt(1); color: Colors.m3secondary }
+            }
         }
     }
 
