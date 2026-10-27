@@ -33,6 +33,8 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats |
 | 🪟 **Overlays** | Workspace overview with window previews (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording, optional dock, rounded screen corners |
 | ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics, weather, Claude chat, translator, clipboard history with image thumbnails |
+| 🎯 **Focus Mode** | Sessions with a minimal bar, Pomodoro cycles, blocked apps and sites, profiles, statistics and achievements |
+| 🔋 **Power saving** | One switch turns off animations, blur, transparency, the visualizer and the dancing frame, and puts them back when it's turned off |
 | ➡️ **Right sidebar** | Quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic, Wi-Fi and Bluetooth pages, per-app volume, notification center, calendar, to-do, focus / stopwatch / countdown timers |
 | 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics, greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
 | 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
@@ -66,6 +68,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `matugen` | Material 3 colors from the wallpaper |
 | `python` | `services/theme_updater.py` and the other helper scripts (stdlib only, no pip packages) |
 | `python-fonttools` (optional) | a ~160 KB copy of the icon font with just the icons the shell uses (`services/icon_font.py`), instead of the full 15 MB one in memory |
+| `polkit` | `pkexec`: asks for your password when a Focus Mode session starts blocking sites |
 | `ttf-material-symbols-variable-git` (AUR) | icons (`Material Symbols Rounded`) |
 | `pipewire`, `wireplumber` | volume control |
 | `networkmanager` | Wi-Fi toggle |
@@ -282,12 +285,62 @@ the palette changes.
 hi-shell locks with hyprlock, using a lock screen it generates from its own look in
 `~/.config/hi-shell/hyprlock.conf`: the current wallpaper blurred, a big clock in the palette's primary color, the date
 and a greeting in the interface language, your avatar (`~/.face`), a Material password field, now playing, battery and
-keyboard layout. It follows wallpaper, palette, font and language changes. Lock from the session menu or
-`qs -c hi-shell ipc call session lock`; for idle and suspend, point hypridle at it:
+keyboard layout. It follows wallpaper, palette, font and language changes.
+
+Settings › Lock screen chooses what shows: the clock, date, greeting, avatar, now playing, battery, keyboard layout and
+the Caps Lock hint can each be switched off. The clock has its own size and format (`date` syntax, e.g. `%I:%M %p`), and
+the wallpaper can be turned off, blurred and dimmed. The password field is always shown. Settings are in
+`~/.config/hi-shell/config.json` under `lock`.
+
+Lock from the session menu or `qs -c hi-shell ipc call session lock`; for idle and suspend, point hypridle at it:
 
 ```ini
 $lock_cmd = pidof hyprlock || hyprlock -c ~/.config/hi-shell/hyprlock.conf || hyprlock
 ```
+
+## Power saving
+
+Settings › Quick › **Power saving mode** turns off what costs the most CPU and GPU: animations, Hyprland's blur, panel
+transparency, the audio visualizer, the dancing wallpaper frame and cover mode. Weather is checked every hour instead of
+every few minutes. The values it changes are kept in `~/.config/hi-shell/config.json` (`powerSaving`), so turning the mode
+off restores them, also after a restart. It's switched on by hand only.
+
+## Focus Mode
+
+A focus session: a minimal bar, Pomodoro cycles, and the apps and sites that distract you blocked. Open the settings from
+the launcher (type `focus`) or from the arrow on the **Focus Mode** tile in the right sidebar. **Start** begins a session
+with the active profile; `qs -c hi-shell ipc call focus start` does the same.
+
+- **Profiles:** Study and Work are built in; add your own with a name and an icon. Each one keeps its Pomodoro timer,
+  its wallpaper, its block or allow lists and its exit condition. Tasks come from the shell's to-do list.
+- **Zen mode:** the bar keeps workspaces, system icons and the clock, with the session's timer next to the clock. Desktop
+  widgets, animations, blur and cover mode are off during a session. Settings, the left sidebar and the wallpaper picker
+  are locked; they say so instead of opening.
+- **Pomodoro:** focus periods, short breaks, and a long break after the last cycle. A notification marks each change.
+  Nothing is blocked during breaks.
+- **Exit:** *Manual* has a Stop button. *Timer* has none and ends after the last focus period. *Tasks* has none and ends
+  when the tasks picked for the session are done (a Tasks session can't start without one). From a terminal,
+  `qs -c hi-shell ipc call focus abort` ends any session.
+- **Apps:** blacklisted apps are closed as they open, with their background processes. A whitelist closes every other app.
+  The launcher and the dock don't start a blocked app. A blocked app is closed about a second or two after it opens, so
+  its window can flash for a moment; the launcher and dock are the only paths that stop it before it opens.
+- **Sites:** blacklisted sites go into `/etc/hosts` for the session. The first session that blocks sites asks for your
+  password (`pkexec`). A backup is kept in `/etc/hosts.hi-shell.bak`; the block is lifted at breaks and removed when the
+  session ends. A block left behind by a crash is removed at the next start, or by hand:
+  `pkexec python3 services/focus_hosts.py restore`.
+- **Statistics:** focus time and finished tasks per session, the streak, and achievements. The introduction can be shown
+  again from the Statistics tab.
+
+**Known limitations of site blocking:**
+
+- **HTTPS sites don't show the Focus Mode page.** Only plain `http://` visits get the page. For `https://` sites the
+  browser shows a connection error. The site is still blocked; the page would need a certificate for the site, and
+  hi-shell doesn't install one.
+- **Browsers with their own DNS over HTTPS skip `/etc/hosts`.** Firefox and Zen with DNS over HTTPS enabled resolve names
+  themselves. For those, hi-shell closes browser tabs whose title names a blocked site, so the block works, but a page
+  whose title mentions a blocked site can be closed too.
+- **Whitelist mode doesn't limit sites.** `/etc/hosts` can only block listed names, not allow a few. Sites are
+  unrestricted in whitelist mode; the Lists tab says so.
 
 ## Notifications
 
