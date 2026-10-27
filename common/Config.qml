@@ -43,7 +43,7 @@ Singleton {
         JsonAdapter {
             id: adapter
 
-            // Interface language: auto (from $LANG), en, ru
+            // Interface language: auto (from $LANG), en, ru, zh
             property string language: "auto"
 
             property JsonObject appearance: JsonObject {
