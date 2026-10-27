@@ -122,6 +122,11 @@ Singleton {
                 property int nightLightTemperature: 4500
             }
 
+            property JsonObject spotify: JsonObject {
+                // Client ID from developer.spotify.com/dashboard (not a secret: login uses PKCE).
+                property string clientId: ""
+            }
+
             property JsonObject wallpapers: JsonObject {
                 property list<string> directories: ["~/Pictures/Wallpapers"]
                 // Online pictures are saved here before being set.

@@ -87,4 +87,18 @@ ColumnLayout {
             }
         }
     }
+
+    Section {
+        icon: "music_note"
+        title: Translation.tr("Spotify")
+
+        TextRow {
+            icon: "key"
+            title: Translation.tr("Client ID")
+            subtitle: Translation.tr("From developer.spotify.com/dashboard; redirect URI http://127.0.0.1:8888/callback")
+            value: o.spotify.clientId
+            fieldWidth: 300
+            onEdited: text => o.spotify.clientId = text.trim()
+        }
+    }
 }
