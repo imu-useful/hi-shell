@@ -98,6 +98,29 @@ ColumnLayout {
             current: Config.options.wallpapers.frame
             onPicked: id => Config.options.wallpapers.frame = id
         }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "open_with"
+            title: Translation.tr("Move the frame")
+            subtitle: Translation.tr("Drag it on the desktop, in edit mode")
+            M3Button {
+                tonal: true
+                visible: Config.options.wallpapers.frameX !== 0.5 || Config.options.wallpapers.frameY !== 0.5
+                text: Translation.tr("Center")
+                onClicked: {
+                    Config.options.wallpapers.frameX = 0.5;
+                    Config.options.wallpapers.frameY = 0.5;
+                }
+            }
+            M3Button {
+                tonal: true
+                text: Translation.tr("Move")
+                onClicked: {
+                    ShellState.settingsOpen = false;
+                    ShellState.desktopEditing = true;
+                }
+            }
+        }
         SwitchRow {
             icon: "graphic_eq"
             title: Translation.tr("Move to the music")

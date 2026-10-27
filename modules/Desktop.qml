@@ -181,7 +181,10 @@ Scope {
                 readonly property string shape: root.frame || (CoverMode.active ? "square" : "")
                 visible: root.options.wallpaper && shape !== "" && window.reveal > 0
                 opacity: window.reveal * Math.min(1, window.frameIntro)
-                anchors.centerIn: parent
+                // Centered at (frameX, frameY) of the screen; `drag` is the offset while it's being moved.
+                property point drag: Qt.point(0, 0)
+                x: Config.options.wallpapers.frameX * parent.width - width / 2 + drag.x
+                y: Config.options.wallpapers.frameY * parent.height - height / 2 + drag.y
                 width: Math.min(parent.width, parent.height) * 0.62
                 height: width
 
@@ -256,6 +259,50 @@ Scope {
                 sequence: "Escape"
                 enabled: root.editing
                 onActivated: root.setEditing(false)
+            }
+
+            // Edit mode: the frame can be dragged (above the click-to-leave area, below the widgets).
+            Item {
+                id: frameGrip
+                visible: root.editing && window.hasWidgets && frame.visible
+                x: frame.x
+                y: frame.y
+                width: frame.width
+                height: frame.height
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: -4
+                    radius: Appearance.rounding.extraLarge
+                    color: frameDrag.active ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
+                    border.width: 2
+                    border.color: frameDrag.active ? Colors.m3primary : Qt.alpha(Colors.m3outline, 0.8)
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: frameDrag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                }
+                DragHandler {
+                    id: frameDrag
+                    target: null
+                    onTranslationChanged: {
+                        if (!active)
+                            return;
+                        // The center stays on the screen.
+                        const cx = Config.options.wallpapers.frameX * window.width + translation.x;
+                        const cy = Config.options.wallpapers.frameY * window.height + translation.y;
+                        frame.drag = Qt.point(Math.max(0, Math.min(window.width, cx)) - Config.options.wallpapers.frameX * window.width,
+                                              Math.max(0, Math.min(window.height, cy)) - Config.options.wallpapers.frameY * window.height);
+                    }
+                    onActiveChanged: {
+                        if (active)
+                            return;
+                        const w = Config.options.wallpapers;
+                        w.frameX = w.frameX + frame.drag.x / window.width;
+                        w.frameY = w.frameY + frame.drag.y / window.height;
+                        frame.drag = Qt.point(0, 0);
+                    }
+                }
             }
 
             // --- Widgets ---

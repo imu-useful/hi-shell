@@ -140,6 +140,10 @@ Singleton {
                 property string frame: ""
                 // The frame turns and pulses to the music while something plays.
                 property bool frameDance: true
+                // Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle).
+                // Moved by dragging it in the desktop's edit mode.
+                property real frameX: 0.5
+                property real frameY: 0.5
             }
 
             property JsonObject desktop: JsonObject {
