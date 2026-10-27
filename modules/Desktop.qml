@@ -379,7 +379,7 @@ Scope {
                         }
                         StyledText {
                             Layout.fillWidth: true
-                            text: Translation.tr("Drag widgets to move them · tap a chip to show or hide")
+                            text: Translation.tr("Drag widgets to move them, the corner to resize · tap a chip to show or hide")
                         }
                         M3Button {
                             tonal: true
