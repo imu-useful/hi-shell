@@ -35,12 +35,13 @@ Singleton {
     readonly property var apps: (lists[lists.mode]?.apps ?? []).map(a => a.toLowerCase())
     readonly property bool blocking: on && apps.length > 0
 
-    // Never closed in whitelist mode: the shell, portals, auth dialogs.
-    readonly property var safeWindows: ["org.quickshell", "xdg-desktop-portal-gtk", "xdg-desktop-portal-kde",
+    // Never closed, whatever the lists say: the shell, portals, auth dialogs, and Happ
+    // (the VPN client).
+    readonly property var safeWindows: ["happ", "org.quickshell", "xdg-desktop-portal-gtk", "xdg-desktop-portal-kde",
         "xdg-desktop-portal-hyprland", "hyprpolkitagent", "polkit-gnome-authentication-agent-1",
         "org.kde.polkit-kde-authentication-agent-1", "pinentry", "gcr-prompter"]
     // Never killed, whatever the blacklist says.
-    readonly property var safeProcesses: ["quickshell", "qs", "hyprland", "systemd", "dbus-daemon", "dbus-broker",
+    readonly property var safeProcesses: ["happ", "quickshell", "qs", "hyprland", "systemd", "dbus-daemon", "dbus-broker",
         "pipewire", "wireplumber", "xwayland", "sddm", "login", "sudo", "pkexec", "polkitd"]
     // Launchers in .desktop Exec lines: the app is what they run, not them.
     readonly property var launchers: ["flatpak", "env", "sh", "bash", "zsh", "fish", "python", "python3", "java",
@@ -92,8 +93,10 @@ Singleton {
     function blockedWindow(classes) {
         if (!blocking)
             return false;
+        if (classes.some(c => safeWindows.includes((c ?? "").toLowerCase())))
+            return false;
         if (whitelist)
-            return !classes.some(c => listed(c) || safeWindows.includes((c ?? "").toLowerCase()));
+            return !classes.some(c => listed(c));
         return classes.some(c => listed(c));
     }
 
