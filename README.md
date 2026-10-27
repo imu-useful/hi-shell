@@ -34,6 +34,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | 🪟 **Overlays** | Workspace overview with window previews (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording, optional dock, rounded screen corners |
 | ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics, weather, Claude chat, translator, clipboard history with image thumbnails |
 | 🎯 **Focus Mode** | Sessions with a minimal bar, Pomodoro cycles, blocked apps and sites, profiles, statistics and achievements |
+| ⏳ **Wait Mode** | A cover for the person while an AI works on the machine: a player or the wallpaper, keyboard and mouse shut out, no sleeping, Esc three times to exit; automation can still see and click what's underneath |
 | 🔋 **Power saving** | One switch turns off animations, blur, transparency, the visualizer and the dancing frame, and puts them back when it's turned off |
 | ➡️ **Right sidebar** | Quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic, Wi-Fi and Bluetooth pages, per-app volume, notification center, calendar, to-do, focus / stopwatch / countdown timers |
 | 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics, greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
@@ -324,6 +325,34 @@ The queue shows what is playing and what's next, with a search to add tracks. Th
 `~/.local/state/hi-shell/spotify-token.json` (mode 600); **Disconnect** deletes it. The Web API only lets you read and add
 to the queue, so tracks can't be removed or reordered here, managing the queue needs **Spotify Premium**, and there is no
 public API for Jam or DJ.
+
+## Wait Mode
+
+A screen for **you** while an AI (or any automation) works on the machine: it hides everything and shuts you out so you
+can't interrupt, while screenshots, `ydotool`, `wtype` and `hyprctl` keep working for the automation. It is a separate
+Quickshell instance (`wait-mode/`) run as a systemd user unit, so restarting hi-shell doesn't touch it.
+
+```sh
+~/.config/quickshell/hi-shell/wait-mode/wait-mode.sh start     # cover the screens
+~/.config/quickshell/hi-shell/wait-mode/wait-mode.sh stop      # end it
+~/.config/quickshell/hi-shell/wait-mode/wait-mode.sh status    # locked / bypass, Esc presses, music, binds
+```
+
+- **The cover:** the player that is playing (cover, title, artist, progress), or the wallpaper in a frame with "Wait
+  Mode" when nothing plays. Colors, wallpaper and language come from hi-shell.
+- **Shut out:** the overlay takes the keyboard and the pointer, and Hyprland's key binds are off (the empty `hi-wait`
+  submap in `hypr/hi-shell.lua`, so reload Hyprland after updating: `update.sh` does). Not even a Super tap opens the
+  launcher. The machine doesn't sleep or dim.
+- **Exit:** press **Esc three times** (within a few seconds of each other). If the cover itself ever fails,
+  **Ctrl+Alt+Shift+Esc** stops it, and so does `systemctl --user stop hi-wait-mode` from a terminal or another TTY.
+  However it ends, even a crash, systemd puts the key binds back.
+- **Notifications** show on top of the cover.
+- **For the AI:** the compositor can't tell a person's keyboard from `ydotool`'s virtual one, so the AI asks for a
+  bypass instead: `wait-mode.sh bypass on [seconds]` makes the cover invisible and click-through and gives the
+  keyboard back, so screenshots show the windows underneath and clicks and typing reach them. It comes back by itself
+  after the seconds (30 by default, at most 300) or with `bypass off`. Key binds stay off during a bypass.
+  (`qs -p wait-mode ipc call waitmode bypass true 60` does the same; `HI_WAIT_NO_MUSIC=1` shows the no-music cover while
+  music plays, to try it out.)
 
 ## Focus Mode
 

@@ -38,6 +38,11 @@ if hl.unbind then
     end
 end
 hl.on("input.keyboard.key", function(keycode, time, pressed)
+    -- Wait Mode (below) shuts the keyboard out: not even a Super tap opens the launcher.
+    if hl.get_current_submap and hl.get_current_submap() == "hi-wait" then
+        superTap = nil
+        return
+    end
     if SUPER_KEYS[keycode] then
         if pressed == 1 then
             superTap = snapshot()
@@ -148,3 +153,12 @@ if f then
     f:close()
     dofile(overrides)
 end
+
+-- Wait Mode (wait-mode/wait-mode.sh): while it covers the screens, this submap has no binds,
+-- so no key bind fires (a bind in the default submap isn't active inside another one).
+-- The one bind it has is the way out if the cover itself fails: Ctrl+Alt+Shift+Escape.
+hl.define_submap("hi-wait", function()
+    hl.bind("CTRL + ALT + SHIFT + Escape",
+        hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/quickshell/hi-shell/wait-mode/wait-mode.sh stop"),
+        { description = "Wait Mode: emergency exit" })
+end)
