@@ -42,6 +42,10 @@ Item {
     readonly property real sizeScale: dragScale > 0 ? dragScale : (entry.scale ?? 1)
     readonly property real minScale: 0.5
     readonly property real maxScale: 2.5
+    // Cards can also be made wider or narrower (layout `w`, px before scaling; 0 = their own width).
+    readonly property bool stretchable: ["greeting", "media", "weather", "calendar", "todo", "worldClock", "notes", "userCard", "imageFrame"].includes(widgetId)
+    property real dragWidth: -1
+    readonly property real customWidth: !stretchable ? 0 : dragWidth > 0 ? dragWidth : (entry.w ?? 0)
     width: holder.childrenRect.width * sizeScale
     height: holder.childrenRect.height * sizeScale
     x: Math.round(entry.x * (parent?.width ?? 0))
@@ -96,6 +100,12 @@ Item {
         Config.options.desktop.layout = layout;
     }
 
+    function saveWidth(value) {
+        const layout = Object.assign({}, Config.options.desktop.layout);
+        layout[widgetId] = Object.assign({}, entry, { w: value });
+        Config.options.desktop.layout = layout;
+    }
+
     function save() {
         const w = parent.width, h = parent.height;
         const nx = Math.max(0, Math.min(w - width, x));
@@ -114,8 +124,16 @@ Item {
         transformOrigin: Item.TopLeft
 
         Loader {
+            id: loader
             active: root.live
             sourceComponent: root.content
+        }
+        Binding {
+            target: loader.item
+            property: "width"
+            value: root.customWidth
+            when: root.customWidth > 0 && loader.item !== null
+            restoreMode: Binding.RestoreBindingOrValue
         }
     }
 
@@ -167,6 +185,50 @@ Item {
                 text: Math.round(root.sizeScale * 100) + "%"
                 font.pixelSize: Appearance.font.size.labelSmall
                 color: Colors.m3onSecondaryContainer
+            }
+        }
+
+        // Width only: drag the right edge (double click = the card's own width).
+        Rectangle {
+            visible: root.stretchable
+            anchors.horizontalCenter: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            implicitWidth: 12
+            implicitHeight: 36
+            radius: 6
+            color: stretch.pressed ? Colors.m3primary : Colors.m3secondaryContainer
+            border.width: 2
+            border.color: Colors.m3primary
+
+            MouseArea {
+                id: stretch
+                anchors.fill: parent
+                anchors.margins: -4
+                cursorShape: Qt.SizeHorCursor
+                preventStealing: true
+                property real startW: 1
+                property real startX: 0
+
+                onPressed: mouse => {
+                    startW = root.width / root.sizeScale;
+                    startX = mapToItem(root.parent, mouse.x, mouse.y).x;
+                    root.dragWidth = startW;
+                }
+                onPositionChanged: mouse => {
+                    if (!pressed)
+                        return;
+                    const dx = mapToItem(root.parent, mouse.x, mouse.y).x - startX;
+                    root.dragWidth = Math.max(160, Math.min(1400, Math.round((startW + dx / root.sizeScale) / 10) * 10));
+                }
+                onReleased: {
+                    const v = root.dragWidth;
+                    root.dragWidth = -1;
+                    root.saveWidth(v);
+                }
+                onDoubleClicked: {
+                    root.dragWidth = -1;
+                    root.saveWidth(0);
+                }
             }
         }
 
@@ -231,7 +293,7 @@ Item {
 
     DragHandler {
         id: drag
-        enabled: root.editing && !resize.pressed
+        enabled: root.editing && !resize.pressed && !stretch.pressed
         // Moved by hand (moveTo) so the position can snap while dragging.
         target: null
         property real startX: 0
