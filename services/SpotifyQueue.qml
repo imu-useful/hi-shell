@@ -79,6 +79,27 @@ Singleton {
         logout.running = true;
     }
 
+    // Jump to a track of the list (0 = playing, 1 = next, ...) by skipping forward that
+    // many times: the queue API can't start a queue entry, but the player's Next does.
+    property int skipsLeft: 0
+    function playAt(index) {
+        if (index < 1 || skipsLeft > 0)
+            return;
+        skipsLeft = index;
+        skipTimer.start();
+    }
+    Timer {
+        id: skipTimer
+        interval: 350
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            Mpris.next();
+            if (--root.skipsLeft <= 0)
+                stop();
+        }
+    }
+
     // One JSON object per command.
     function parse(text) {
         try {

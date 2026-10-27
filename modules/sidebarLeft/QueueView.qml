@@ -235,6 +235,12 @@ ColumnLayout {
                     onClicked: SpotifyQueue.add(row.modelData.uri)
                 }
             }
+
+            // A click on a queued track plays it (by skipping to it).
+            StateLayer {
+                visible: !root.searchingNow && !row.modelData.playing
+                onClicked: SpotifyQueue.playAt(row.index)
+            }
         }
 
         StyledText {
