@@ -177,6 +177,13 @@ Singleton {
                 property real brightness: 0.55
             }
 
+            // Power saving (services/PowerSaver.qml): turned on by hand. `saved` keeps the
+            // values it changed, to put back when it's turned off.
+            property JsonObject powerSaving: JsonObject {
+                property bool enabled: false
+                property var saved: ({})
+            }
+
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""

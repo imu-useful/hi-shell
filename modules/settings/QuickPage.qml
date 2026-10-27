@@ -117,4 +117,17 @@ ColumnLayout {
             onToggled: checked => Config.options.appearance.transparency = checked
         }
     }
+
+    Section {
+        icon: "battery_saver"
+        title: Translation.tr("Power saving")
+
+        SwitchRow {
+            icon: "battery_saver"
+            title: Translation.tr("Power saving mode")
+            subtitle: Translation.tr("Turns off animations, blur, transparency, the visualizer, the dancing frame and cover mode; the weather is checked less often. Turning it off puts everything back.")
+            checked: Config.options.powerSaving.enabled
+            onToggled: checked => PowerSaver.apply(checked)
+        }
+    }
 }
