@@ -77,7 +77,7 @@ Scope {
         if (!mathLike || inlineFor !== term || inlineResult === "")
             return [];
         return [{
-            name: `${term} = ${inlineResult}`,
+            name: `${Expression.strip(term)} = ${inlineResult}`,
             comment: Translation.tr("Enter copies the result"),
             materialIcon: "calculate",
             run: () => Quickshell.clipboardText = inlineResult
@@ -178,7 +178,7 @@ Scope {
             calc.running = false;
             calc.asked = root.term;
             calc.inline = root.mode === "";
-            calc.command = ["qalc", "-t", "--", root.term];
+            calc.command = ["qalc", "-t", "--", calc.inline ? Expression.strip(root.term) : root.term];
             calc.running = true;
         }
     }

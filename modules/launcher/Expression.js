@@ -3,9 +3,14 @@
 // Does the launcher text read as a calculation ("12*(3+4)", "2^10 / 4"), as opposed to an
 // app name ("7-zip", "p7zip")? Only digits, . + - * / ^ × ÷ % and parentheses count, the
 // expression has to be well formed (qalc would quietly make sense of "2+") and have at
-// least one operator between two operands.
+// least one operator between two operands. A closing = is allowed.
+// The expression without a closing "=" ("10+5=" asks for the answer, like on a calculator).
+function strip(text) {
+    return text.replace(/\s*=+\s*$/, "");
+}
+
 function isMath(text) {
-    const s = text.replace(/\s+/g, "");
+    const s = strip(text).replace(/\s+/g, "");
     if (!/^[\d.+\-*/^×÷%()]+$/.test(s) || !/\d/.test(s))
         return false;
     const tokens = s.match(/\d+(?:\.\d+)?|\.\d+|[+\-*/^×÷%()]/g) ?? [];
