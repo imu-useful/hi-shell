@@ -190,7 +190,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | Display key (<kbd>Fn</kbd>+<kbd>F10</kbd> on Lenovo, `XF86Display`) | Display mode: this screen only, duplicate, extend left / right, second screen only; press again for the next, Enter to apply |
 | bar power button | Session screen (lock, log out, suspend, reboot, power off) |
 | <kbd>Super</kbd>+<kbd>R</kbd> | Wallpaper picker |
-| <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also right click on the bar's ✦ button) |
+| <kbd>Super</kbd>+<kbd>Z</kbd> | Left sidebar (also left click on the bar's ✦ button; right click opens the launcher) |
 | click the clock | Calendar popup |
 | click the system icons | Right sidebar (scroll there to change the volume) |
 | right click the desktop | Edit desktop widgets: drag them (edges and centers snap to other widgets and the screen, with guide lines), resize them (corner = size, right edge = width), toggle them in the toolbar; Esc or Done to finish |
