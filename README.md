@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✦ hi-shell
+# 👋 hi-shell
 
 **A Material 3 Expressive desktop shell for Hyprland — with Claude AI built in.**
 
