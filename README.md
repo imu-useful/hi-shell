@@ -112,6 +112,10 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main
 
 That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
+The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch configs, starting the shell):
+type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
+`y` yes, `n` no, `a` yes for all the rest.
+
 The installer:
 
 1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
@@ -120,7 +124,7 @@ The installer:
    `~/.config/hypr/hyprland.lua` otherwise (one marked line, with a backup of the file)
 4. starts the shell and warns about other bars or notification daemons that are still running
 
-Options: `--yes` (don't ask), `--no-deps`, `--no-start`. Then tap <kbd>Super</kbd>.
+Options: `--yes` (no menu and no questions: installs everything), `--no-deps`, `--no-start`, `--no-dots`. Then tap <kbd>Super</kbd>.
 
 ### Update
 

@@ -4,9 +4,12 @@
 #   ./install.sh                 from a clone of the repo
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
 #
+# It first lets you choose what to install, then asks before each action:
+#   y = yes, n = no, a = yes for all the rest (Enter = yes)
+#
 # Options:
 #   --no-deps   don't install packages
-#   --yes       don't ask (install packages, edit the Hyprland config)
+#   --yes       don't ask: install everything that isn't switched off by another option
 #   --no-start  don't start the shell at the end
 #   --no-dots   don't offer hi-shell's terminal configs (fish, ...)
 #
@@ -29,7 +32,7 @@ for arg in "$@"; do
         --yes | -y) YES=true; NOCONFIRM=(--noconfirm) ;;
         --no-start) START=false ;;
         --no-dots) DOTS=false ;;
-        -h | --help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h | --help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
     esac
 done
@@ -38,15 +41,63 @@ bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 warn() { echo "${yellow}warning:${reset} $*" >&2; }
 die() { echo "${red}error:${reset} $*" >&2; exit 1; }
-ask() { # ask "Question?" -> 0 for yes
+ask() { # ask "Should I do x?" -> 0 for yes; "a" answers yes to this and every later question
     $YES && return 0
     local reply
-    read -r -p "$1 [Y/n] " reply </dev/tty || return 1
-    [[ -z "$reply" || "$reply" =~ ^[Yy] ]]
+    while true; do
+        read -r -p "$1 [Y/n/a = yes for all] " reply </dev/tty || return 1
+        case "${reply,,}" in
+            "" | y | yes) return 0 ;;
+            n | no) return 1 ;;
+            a | all | yesforall) YES=true; NOCONFIRM=(--noconfirm); return 0 ;;
+            *) echo "Answer y, n or a." ;;
+        esac
+    done
+}
+
+# --- What to install ---
+# One line per part; the hi-shell files themselves (source and link) are always installed.
+PARTS=(deps hypr fish kitty fastfetch start)
+declare -A PART_NAME=(
+    [deps]="Packages hi-shell needs (pacman and AUR)"
+    [hypr]="Load hi-shell from your Hyprland config"
+    [fish]="Terminal config: fish (prompt, aliases)"
+    [kitty]="Terminal config: kitty (colors follow the wallpaper)"
+    [fastfetch]="Terminal config: fastfetch"
+    [start]="Start hi-shell when done"
+)
+declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [start]=$START)
+choose_parts() {
+    $YES && return
+    [[ -r /dev/tty ]] || return
+    local reply i n
+    while true; do
+        step "What do you want to install?"
+        for i in "${!PARTS[@]}"; do
+            n=${PARTS[$i]}
+            printf '  %d) [%s] %s\n' $((i + 1)) "$([[ ${WANT[$n]} == true ]] && echo x || echo ' ')" "${PART_NAME[$n]}"
+        done
+        read -r -p "Numbers to switch on / off (e.g. 3 4), a = all, n = none, Enter = continue: " reply </dev/tty || return
+        case "${reply,,}" in
+            "") break ;;
+            a | all) for n in "${PARTS[@]}"; do WANT[$n]=true; done ;;
+            n | none) for n in "${PARTS[@]}"; do WANT[$n]=false; done ;;
+            *)
+                for i in $reply; do
+                    if [[ "$i" =~ ^[0-9]+$ ]] && ((i >= 1 && i <= ${#PARTS[@]})); then
+                        n=${PARTS[$((i - 1))]}
+                        [[ ${WANT[$n]} == true ]] && WANT[$n]=false || WANT[$n]=true
+                    fi
+                done
+                ;;
+        esac
+    done
+    DEPS=${WANT[deps]} START=${WANT[start]}
 }
 
 [[ $EUID -eq 0 ]] && die "run as your user, not root (sudo is used where needed)"
 command -v pacman >/dev/null || die "hi-shell targets Arch Linux (pacman not found)"
+choose_parts
 
 # --- Packages ---
 PACMAN_PKGS=(
@@ -62,7 +113,7 @@ if $DEPS; then
     for p in "${PACMAN_PKGS[@]}"; do pacman -Qq "$p" &>/dev/null || missing+=("$p"); done
     if ((${#missing[@]})); then
         echo "Missing: ${missing[*]}"
-        if ask "Install them with pacman?"; then
+        if ask "Should I install them with pacman?"; then
             sudo pacman -S --needed "${NOCONFIRM[@]}" "${missing[@]}"
         fi
     else
@@ -79,7 +130,7 @@ if $DEPS; then
         helper=$(command -v paru || command -v yay || true)
         if [[ -n "$helper" ]]; then
             echo "Missing from the AUR: ${aur_missing[*]}"
-            if ask "Install them with $(basename "$helper")?"; then
+            if ask "Should I install them with $(basename "$helper")?"; then
                 "$helper" -S --needed "${NOCONFIRM[@]}" "${aur_missing[@]}"
             fi
         else
@@ -132,12 +183,14 @@ else
     hypr_file=""
 fi
 
-if [[ -z "$hypr_file" ]]; then
+if [[ ${WANT[hypr]} != true ]]; then
+    echo "Skipped. Add this line to your Hyprland config yourself: $line"
+elif [[ -z "$hypr_file" ]]; then
     warn "no Lua Hyprland config found ($HYPR_DIR/hyprland.lua). hi-shell needs Hyprland 0.56+ with the Lua config;"
     warn "add this line to it yourself: $line"
 elif grep -qF "hi-shell/hypr/hi-shell.lua" "$hypr_file"; then
     echo "Already loaded from $hypr_file"
-elif ask "Load hi-shell from $hypr_file?"; then
+elif ask "Should I load hi-shell from $hypr_file (a backup is kept)?"; then
     cp "$hypr_file" "$hypr_file.backup-hi-shell"
     # Start on a new line; uninstall.sh removes exactly these two lines.
     [[ -s "$hypr_file" && -n "$(tail -c1 "$hypr_file")" ]] && echo >>"$hypr_file"
@@ -156,12 +209,12 @@ done
 # Each one is offered separately; an existing file is kept as <file>.backup-<date>.
 install_dot() { # install_dot <name> <file in dots/> <destination>
     local src="$REPO/dots/$2" dst="$3"
-    [[ -f "$src" ]] || return 0
+    [[ -f "$src" && ${WANT[$1]} == true ]] || return 0
     if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
         echo "$1: already installed"
         return 0
     fi
-    ask "Install hi-shell's $1 config ($dst)?" || return 0
+    ask "Should I install hi-shell's $1 config ($dst)?" || return 0
     mkdir -p "$(dirname "$dst")"
     if [[ -e "$dst" ]]; then
         local backup="$dst.backup-$(date +%Y%m%d-%H%M%S)"
@@ -171,7 +224,7 @@ install_dot() { # install_dot <name> <file in dots/> <destination>
     cp "$src" "$dst"
     echo "$1: installed"
 }
-if $DOTS; then
+if [[ ${WANT[fish]} == true || ${WANT[kitty]} == true || ${WANT[fastfetch]} == true ]]; then
     step "Terminal configs"
     install_dot fish fish/config.fish "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
     install_dot kitty kitty/kitty.conf "${XDG_CONFIG_HOME:-$HOME/.config}/kitty/kitty.conf"
