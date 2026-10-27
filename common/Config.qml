@@ -156,6 +156,27 @@ Singleton {
                 property bool visualizer: true
             }
 
+            // The lock screen (services/LockScreen.qml): what it shows and how it looks.
+            property JsonObject lock: JsonObject {
+                property bool clock: true
+                property bool date: true
+                property bool greeting: true
+                property bool avatar: true
+                property bool nowPlaying: true
+                property bool battery: true
+                property bool keyboardLayout: true
+                property bool capsLockHint: true
+                // Clock height in px, and its format for `date` (letters and % only).
+                property int clockSize: 120
+                property string clockFormat: "%H:%M"
+                // The wallpaper behind the lock screen (off: the plain surface color).
+                property bool wallpaper: true
+                property int blurPasses: 3
+                property int blurSize: 8
+                // 0..1, how much the picture is dimmed.
+                property real brightness: 0.55
+            }
+
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""

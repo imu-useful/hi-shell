@@ -717,5 +717,18 @@
     "You're doing better than you think.": "У вас выходит лучше, чем вы думаете.",
     "A good day deserves a good evening.": "Хороший день заслуживает хороший вечер.",
     "Wind down, you've earned it.": "Выдохните, вы заслужили.",
-    "Tomorrow is a new page.": "Завтра — новая страница."
+    "Tomorrow is a new page.": "Завтра — новая страница.",
+    "Lock screen": "Экран блокировки",
+    "Date": "Дата",
+    "Avatar": "Аватар",
+    "Now playing": "Сейчас играет",
+    "Caps Lock hint": "Подсказка Caps Lock",
+    "On the lock screen": "На экране блокировки",
+    "The password field is always shown.": "Поле пароля показывается всегда.",
+    "Clock size": "Размер часов",
+    "Clock format": "Формат часов",
+    "date format, e.g. %H:%M or %I:%M %p": "формат даты, например %H:%M или %I:%M %p",
+    "Background": "Фон",
+    "Off: a plain background in the surface color": "Выключено: простой фон цвета поверхности",
+    "Brightness": "Яркость"
 }
