@@ -733,5 +733,7 @@
     "Brightness": "Яркость",
     "Power saving": "Энергосбережение",
     "Power saving mode": "Режим энергосбережения",
-    "Turns off animations, blur, transparency, the visualizer, the dancing frame and cover mode; the weather is checked less often. Turning it off puts everything back.": "Отключает анимации, размытие, прозрачность, визуализатор, пульсацию рамки и обложку трека; погоду проверяет реже. При выключении всё возвращается."
+    "Turns off animations, blur, transparency, the visualizer, the dancing frame and cover mode; the weather is checked less often. Turning it off puts everything back.": "Отключает анимации, размытие, прозрачность, визуализатор, пульсацию рамки и обложку трека; погоду проверяет реже. При выключении всё возвращается.",
+    "Shuffle": "Перемешать",
+    "Repeat": "Повтор"
 }

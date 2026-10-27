@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Services.Mpris
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -112,6 +113,20 @@ ColumnLayout {
                         IconButton {
                             icon: "skip_next"
                             onClicked: Mpris.next()
+                        }
+                        IconButton {
+                            visible: Mpris.shuffleSupported
+                            icon: "shuffle"
+                            iconColor: Mpris.shuffle ? Colors.m3primary : Colors.m3onSurfaceVariant
+                            tooltip: Translation.tr("Shuffle")
+                            onClicked: Mpris.toggleShuffle()
+                        }
+                        IconButton {
+                            visible: Mpris.loopSupported
+                            icon: Mpris.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
+                            iconColor: Mpris.loopState === MprisLoopState.None ? Colors.m3onSurfaceVariant : Colors.m3primary
+                            tooltip: Translation.tr("Repeat")
+                            onClicked: Mpris.cycleLoop()
                         }
                         Item { Layout.fillWidth: true }
                         IconButton {

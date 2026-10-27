@@ -36,6 +36,12 @@ Singleton {
     readonly property real length: active?.length ?? 0
     readonly property real progress: length > 0 ? Math.min(1, position / length) : 0
 
+    // Shuffle and repeat, when the player supports them (Spotify does).
+    readonly property bool shuffleSupported: !!active?.shuffleSupported
+    readonly property bool shuffle: !!active?.shuffle
+    readonly property bool loopSupported: !!active?.loopSupported
+    readonly property int loopState: active?.loopState ?? MprisLoopState.None
+
     function togglePlaying() {
         if (active?.canTogglePlaying)
             active.togglePlaying();
@@ -47,6 +53,18 @@ Singleton {
     function previous() {
         if (active?.canGoPrevious)
             active.previous();
+    }
+    function toggleShuffle() {
+        if (active?.shuffleSupported)
+            active.shuffle = !active.shuffle;
+    }
+    // Off -> whole playlist -> one track -> off.
+    function cycleLoop() {
+        if (!active?.loopSupported)
+            return;
+        const s = active.loopState;
+        active.loopState = s === MprisLoopState.None ? MprisLoopState.Playlist
+            : s === MprisLoopState.Playlist ? MprisLoopState.Track : MprisLoopState.None;
     }
     // `fraction` is 0..1 of the track length.
     function seekTo(fraction) {
@@ -102,6 +120,13 @@ Singleton {
         }
         function previous(): void {
             root.previous();
+        }
+        function shuffle(): void {
+            root.toggleShuffle();
+        }
+        // off, playlist, track
+        function repeat(): void {
+            root.cycleLoop();
         }
     }
 }
