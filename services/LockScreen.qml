@@ -38,7 +38,7 @@ Singleton {
         const font = Appearance.font.main;
         const icons = Appearance.font.icon;
         const wallpaper = Wallpapers.current;
-        const lc = (Translation.code === "ru" ? "ru_RU" : Translation.code === "zh" ? "zh_CN" : "en_US") + ".UTF-8";
+        const lc = Translation.code === "ru" ? "ru_RU.UTF-8" : "en_US.UTF-8";
         const tr = s => sq(Translation.tr(s));
         const primary = rgba(Colors.m3primary);
         const onSurface = rgba(Colors.m3onSurface);

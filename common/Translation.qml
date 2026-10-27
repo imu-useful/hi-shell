@@ -12,8 +12,7 @@ Singleton {
 
     readonly property var available: [
         { code: "en", name: "English" },
-        { code: "ru", name: "Русский" },
-        { code: "zh", name: "中文" }
+        { code: "ru", name: "Русский" }
     ]
 
     // auto -> the first language of $LANG / $LC_MESSAGES we have, else English
@@ -25,7 +24,7 @@ Singleton {
         return available.some(l => l.code === env) ? env : "en";
     }
     // For dates, month and day names in the interface language.
-    readonly property var locale: Qt.locale(code === "ru" ? "ru_RU" : code === "zh" ? "zh_CN" : "en_GB")
+    readonly property var locale: Qt.locale(code === "ru" ? "ru_RU" : "en_GB")
 
     property var strings: ({})
 
