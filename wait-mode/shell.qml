@@ -131,13 +131,6 @@ ShellRoot {
         onTriggered: root.refreshQueue()
     }
 
-    // The beat (Beat.qml) is only listened to while the music plays under the cover.
-    Binding {
-        target: Beat
-        property: "playing"
-        value: root.playing && root.hasMusic && !root.bypass
-    }
-
     function pressEsc() {
         escapes++;
         escTimer.restart();

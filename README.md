@@ -346,8 +346,7 @@ and add it) starts and stops it, and so does `qs -c hi-shell ipc call waitmode s
 
 - **The cover:** the player that is playing (cover, title, artist, a progress bar, shuffle / back / play-pause /
   forward / repeat buttons, and Spotify's queue when hi-shell is signed in to Spotify), or the wallpaper in a frame with
-  "Wait Mode" when nothing plays. Those five are the only buttons that work on the cover. The cover jumps to the beat (it swells at once on each
-  kick and settles back slowly; needs `cava`, which listens only while the music plays under the cover). Colors, wallpaper and language come from
+  "Wait Mode" when nothing plays. Those five are the only buttons that work on the cover. Colors, wallpaper and language come from
   hi-shell.
 - **Shut out:** the overlay takes the keyboard and the pointer, and Hyprland's key binds are off (the empty `hi-wait`
   submap in `hypr/hi-shell.lua`, so reload Hyprland after updating: `update.sh` does). Not even a Super tap opens the
