@@ -112,7 +112,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main
 
 That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
-The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch / btop configs, optional apps, starting the shell):
+The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch / btop / Dolphin configs, optional apps, starting the shell):
 type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
 `y` yes, `n` no, `a` yes for all the rest.
 
@@ -291,6 +291,9 @@ Sections:
   `services/TerminalColors.qml` writes `~/.config/btop/themes/hi-shell.theme` (once `~/.config/btop` exists) and open
   btops reload it. The terminal's own translucent background stays. To keep your own btop.conf, just set
   `color_theme = "hi-shell"` in it.
+- **Dolphin**: the installer sets Google Sans Flex (the shell's font) as the file list font in all three view modes by
+  writing only those keys of `dolphinrc` (`kwriteconfig6`, the file is backed up first). The font has to be installed.
+  Menus and the sidebar use the Qt platform theme's font, which is global for Qt apps, so it isn't touched.
 
 Terminal colors follow the wallpaper: `services/TerminalColors.qml` writes `~/.local/state/hi-shell/terminal/`
 (`sequences.txt` with the 16 ANSI colors, text, background and cursor, `colors.fish` for syntax highlighting and

@@ -61,7 +61,7 @@ ask() { # ask "Should I do x?" -> 0 for yes; "a" answers yes to this and every l
 # --- What to install ---
 # One line per part; the hi-shell files themselves (source and link) are always installed.
 APP_PARTS=(zen telegram vesktop osu steam spotify neovim)
-PARTS=(deps hypr fish kitty fastfetch btop "${APP_PARTS[@]}" start)
+PARTS=(deps hypr fish kitty fastfetch btop dolphin "${APP_PARTS[@]}" start)
 declare -A PART_NAME=(
     [deps]="Packages hi-shell needs (pacman and AUR)"
     [hypr]="Load hi-shell from your Hyprland config"
@@ -69,6 +69,7 @@ declare -A PART_NAME=(
     [kitty]="Terminal config: kitty (colors follow the wallpaper)"
     [fastfetch]="Terminal config: fastfetch"
     [btop]="Terminal config: btop (colors follow the wallpaper)"
+    [dolphin]="Dolphin: Google Sans Flex as the file list font"
     [start]="Start hi-shell when done"
     [zen]="App: Zen Browser"
     [telegram]="App: Telegram"
@@ -83,7 +84,7 @@ declare -A APP_PKG=(
     [zen]="zen-browser-bin" [telegram]="telegram-desktop" [vesktop]="vesktop vesktop-bin"
     [osu]="osu-lazer-bin" [steam]="steam" [spotify]="spotify" [neovim]="neovim"
 )
-declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [btop]=$DOTS [start]=$START
+declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [btop]=$DOTS [dolphin]=$DOTS [start]=$START
     [zen]=$APPS [telegram]=$APPS [vesktop]=$APPS [osu]=$APPS [steam]=$APPS [spotify]=$APPS [neovim]=$APPS)
 choose_parts() {
     $YES && return
@@ -285,6 +286,24 @@ if [[ ${WANT[fish]} == true || ${WANT[kitty]} == true || ${WANT[fastfetch]} == t
     install_dot kitty kitty/kitty.conf "${XDG_CONFIG_HOME:-$HOME/.config}/kitty/kitty.conf"
     install_dot fastfetch fastfetch/config.jsonc "${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/config.jsonc"
     install_dot btop btop/btop.conf "${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf"
+fi
+
+# Dolphin: the file list in Google Sans Flex. Only the font keys of dolphinrc are written (through
+# kwriteconfig6), so the rest of your Dolphin settings stay; the file is kept as dolphinrc.backup-<date>.
+if [[ ${WANT[dolphin]} == true ]] && command -v dolphin >/dev/null && command -v kwriteconfig6 >/dev/null; then
+    step "Dolphin"
+    rc="${XDG_CONFIG_HOME:-$HOME/.config}/dolphinrc"
+    if [[ "$(kreadconfig6 --file dolphinrc --group DetailsMode --key FontFamily 2>/dev/null)" == "Google Sans Flex" ]]; then
+        echo "dolphin: already uses Google Sans Flex"
+    elif ask "Should I set Google Sans Flex as Dolphin's file list font ($rc)?"; then
+        [[ -f "$rc" ]] && cp -a "$rc" "$rc.backup-$(date +%Y%m%d-%H%M%S)"
+        for mode in IconsMode CompactMode DetailsMode; do
+            kwriteconfig6 --file dolphinrc --group "$mode" --key UseSystemFont false
+            kwriteconfig6 --file dolphinrc --group "$mode" --key FontFamily "Google Sans Flex"
+            kwriteconfig6 --file dolphinrc --group "$mode" --key FontSize 11
+        done
+        echo "dolphin: done (applies the next time Dolphin starts)"
+    fi
 fi
 
 command -v claude >/dev/null || warn "Claude Code isn't installed: the AI palette and chat need it (npm install -g @anthropic-ai/claude-code, then run claude once)"
