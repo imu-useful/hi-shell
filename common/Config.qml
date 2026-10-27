@@ -136,7 +136,7 @@ Singleton {
                 property string unsplashKey: ""
                 // Optional Wallhaven API key (only needed for NSFW / account features).
                 property string wallhavenKey: ""
-                // Shape the wallpaper is shown in on the desktop ("" = full screen): sunny, cookie9, arch, blob, clover4, ...
+                // Shape the wallpaper is shown in on the desktop ("" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ...
                 property string frame: ""
                 // The frame turns and pulses to the music while something plays.
                 property bool frameDance: true

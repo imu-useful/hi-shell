@@ -391,18 +391,11 @@ Scope {
                                 font.pixelSize: Appearance.font.size.labelMedium
                                 color: Colors.m3onSurfaceVariant
                             }
-                            Flow {
+                            FramePicker {
                                 Layout.fillWidth: true
-                                spacing: 6
-                                Repeater {
-                                    model: [["", "None"], ["sunny", "Sunny"], ["cookie9", "Cookie"], ["flower", "Flower"], ["clover4", "Clover"], ["blob", "Blob"], ["arch", "Arch"], ["square", "Square"]]
-                                    Chip {
-                                        required property var modelData
-                                        text: modelData[1]
-                                        selected: Config.options.wallpapers.frame === modelData[0]
-                                        onClicked: Config.options.wallpapers.frame = modelData[0]
-                                    }
-                                }
+                                Layout.margins: 0
+                                current: Config.options.wallpapers.frame
+                                onPicked: id => Config.options.wallpapers.frame = id
                             }
                         }
                     }

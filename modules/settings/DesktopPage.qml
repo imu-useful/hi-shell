@@ -91,19 +91,11 @@ ColumnLayout {
         icon: "crop_free"
         title: Translation.tr("Wallpaper frame")
 
-        Flow {
+        FramePicker {
             Layout.fillWidth: true
             Layout.margins: 12
-            spacing: 6
-            Repeater {
-                model: [["", "None"], ["sunny", "Sunny"], ["cookie9", "Cookie"], ["flower", "Flower"], ["clover4", "Clover"], ["blob", "Blob"], ["arch", "Arch"], ["square", "Square"]]
-                Chip {
-                    required property var modelData
-                    text: modelData[1]
-                    selected: Config.options.wallpapers.frame === modelData[0]
-                    onClicked: Config.options.wallpapers.frame = modelData[0]
-                }
-            }
+            current: Config.options.wallpapers.frame
+            onPicked: id => Config.options.wallpapers.frame = id
         }
         SwitchRow {
             icon: "graphic_eq"
