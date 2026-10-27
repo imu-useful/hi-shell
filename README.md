@@ -306,6 +306,25 @@ transparency, the audio visualizer, the dancing wallpaper frame and cover mode. 
 every few minutes. The values it changes are kept in `~/.config/hi-shell/config.json` (`powerSaving`), so turning the mode
 off restores them, also after a restart. It's switched on by hand only.
 
+## Spotify
+
+Shuffle and repeat buttons appear in the left sidebar's player for players that support them (Spotify does); from a
+terminal: `qs -c hi-shell ipc call mpris shuffle` and `... mpris repeat`.
+
+The **queue** comes from Spotify's Web API and needs a one-time setup:
+
+1. At [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) create an app (**Web API**) with the
+   redirect URI `http://127.0.0.1:8888/callback`.
+2. Put its **Client ID** into Settings › Services › Spotify. Only the Client ID is used: sign-in is PKCE, so the client
+   secret is never needed or stored.
+3. In the player's queue button (visible while Spotify plays), choose **Connect Spotify**. The browser opens to sign in; if
+   it can't, the link is shown to copy.
+
+The queue shows what is playing and what's next, with a search to add tracks. The token is kept in
+`~/.local/state/hi-shell/spotify-token.json` (mode 600); **Disconnect** deletes it. The Web API only lets you read and add
+to the queue, so tracks can't be removed or reordered here, managing the queue needs **Spotify Premium**, and there is no
+public API for Jam or DJ.
+
 ## Focus Mode
 
 A focus session: a minimal bar, Pomodoro cycles, and the apps and sites that distract you blocked. Open the settings from

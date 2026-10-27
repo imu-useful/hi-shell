@@ -1,0 +1,188 @@
+pragma Singleton
+
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import qs.common
+
+// Spotify's playback queue through the Web API (services/spotify.py): the queue, a track
+// search and adding to the queue. Needs the Client ID (Settings › Services › Spotify) and a
+// one-time sign-in in the browser (PKCE, no secret); queue management needs Premium.
+// Only fetched while the queue view is open (`users`) and the track changes.
+Singleton {
+    id: root
+
+    readonly property string script: Quickshell.shellDir + "/services/spotify.py"
+    readonly property bool configured: Config.options.spotify.clientId.trim() !== ""
+
+    // "idle" | "ok" | "needs_setup" | "needs_auth" | "error"
+    property string status: "idle"
+    property string message: ""
+    property var playing: null // { name, artists, uri, art }
+    property var queue: []
+    property var results: []
+    property string lastQuery: ""
+    // While signing in: what the sign-in said, and the address when the browser didn't open.
+    property string authNote: ""
+    property string authUrl: ""
+    // Views that want the queue (it isn't fetched otherwise).
+    property int users: 0
+
+    readonly property bool loading: fetcher.running
+    readonly property bool searching: searcher.running
+    readonly property bool connecting: authProc.running
+
+    function refresh() {
+        if (!configured) {
+            status = "needs_setup";
+            return;
+        }
+        if (fetcher.running)
+            return;
+        fetcher.command = ["python3", script, "queue"];
+        fetcher.running = true;
+    }
+
+    function search(query) {
+        const q = query.trim();
+        lastQuery = q;
+        if (q === "") {
+            results = [];
+            return;
+        }
+        searcher.running = false;
+        searcher.command = ["python3", script, "search", q];
+        searcher.running = true;
+    }
+
+    function add(uri) {
+        if (adder.running)
+            return;
+        adder.command = ["python3", script, "add", uri];
+        adder.running = true;
+    }
+
+    function connect() {
+        if (authProc.running)
+            return;
+        authNote = "";
+        authUrl = "";
+        message = "";
+        authProc.running = true;
+    }
+
+    function cancelConnect() {
+        authProc.running = false;
+    }
+
+    function disconnect() {
+        logout.running = true;
+    }
+
+    // One JSON object per command.
+    function parse(text) {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            return { status: "error", message: Translation.tr("Unexpected response") };
+        }
+    }
+
+    Process {
+        id: fetcher
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const d = root.parse(text);
+                root.status = d.status;
+                root.message = d.message ?? "";
+                if (d.status === "ok") {
+                    root.playing = d.playing ?? null;
+                    root.queue = d.queue ?? [];
+                }
+            }
+        }
+    }
+
+    Process {
+        id: searcher
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const d = root.parse(text);
+                if (d.status === "ok")
+                    root.results = d.tracks ?? [];
+                else {
+                    root.status = d.status;
+                    root.message = d.message ?? "";
+                }
+            }
+        }
+    }
+
+    Process {
+        id: adder
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const d = root.parse(text);
+                if (d.status === "ok") {
+                    ShellState.osdMessage("playlist_add", Translation.tr("Added to the queue"));
+                    root.refresh();
+                } else {
+                    root.status = d.status;
+                    root.message = d.message ?? "";
+                }
+            }
+        }
+    }
+
+    // Sign-in: it prints what it's doing on stderr, one line at a time.
+    Process {
+        id: authProc
+        command: ["python3", root.script, "auth"]
+        stderr: SplitParser {
+            onRead: line => {
+                if (line.startsWith("https://"))
+                    root.authUrl = line.trim();
+                else if (line.trim() !== "")
+                    root.authNote = line.trim();
+            }
+        }
+        onExited: code => {
+            if (code === 0) {
+                root.authNote = "";
+                root.authUrl = "";
+                root.refresh();
+            } else {
+                root.status = "error";
+                root.message = root.authNote || Translation.tr("Spotify sign-in failed");
+                root.authUrl = "";
+            }
+        }
+    }
+
+    Process {
+        id: logout
+        command: ["python3", root.script, "logout"]
+        onExited: {
+            root.queue = [];
+            root.playing = null;
+            root.results = [];
+            root.status = "needs_auth";
+            root.message = "";
+        }
+    }
+
+    // A new track: the queue moved on.
+    Connections {
+        target: Mpris
+        function onTitleChanged() {
+            if (root.users > 0 && root.status === "ok")
+                refreshLater.restart();
+        }
+    }
+    Timer {
+        id: refreshLater
+        interval: 1500
+        onTriggered: root.refresh()
+    }
+    onUsersChanged: if (users > 0 && configured && status !== "needs_setup") refresh()
+}

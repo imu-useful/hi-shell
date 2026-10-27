@@ -738,5 +738,19 @@
     "Repeat": "Повтор",
     "Spotify": "Spotify",
     "Client ID": "Client ID",
-    "From developer.spotify.com/dashboard; redirect URI http://127.0.0.1:8888/callback": "Из developer.spotify.com/dashboard; redirect URI http://127.0.0.1:8888/callback"
+    "From developer.spotify.com/dashboard; redirect URI http://127.0.0.1:8888/callback": "Из developer.spotify.com/dashboard; redirect URI http://127.0.0.1:8888/callback",
+    "Queue": "Очередь",
+    "Finish signing in in your browser…": "Завершите вход в браузере…",
+    "Put the Spotify Client ID in Settings › Services": "Укажите Spotify Client ID в Настройки › Сервисы",
+    "Connect Spotify to see and add to the queue": "Подключите Spotify, чтобы видеть очередь и добавлять в неё треки",
+    "Loading…": "Загрузка…",
+    "Try again": "Повторить",
+    "Connect Spotify": "Подключить Spotify",
+    "Reconnect": "Подключиться заново",
+    "Copy link": "Скопировать ссылку",
+    "Search a track to add": "Найти трек, чтобы добавить",
+    "Add to the queue": "Добавить в очередь",
+    "Added to the queue": "Добавлено в очередь",
+    "The queue is empty": "Очередь пуста",
+    "Spotify sign-in failed": "Не удалось войти в Spotify"
 }

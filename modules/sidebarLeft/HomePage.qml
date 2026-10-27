@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Mpris
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -58,11 +57,16 @@ ColumnLayout {
 
     // --- Now playing + lyrics ---
     Card {
+        id: playerCard
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: Mpris.hasPlayer
         baseColor: Colors.m3surfaceContainer
         clip: true
+
+        // Spotify's queue instead of the lyrics.
+        property bool queueOpen: false
+        readonly property bool showQueue: queueOpen && Mpris.isSpotify
 
         Component.onCompleted: Lyrics.users++
         Component.onDestruction: Lyrics.users--
@@ -123,10 +127,17 @@ ColumnLayout {
                         }
                         IconButton {
                             visible: Mpris.loopSupported
-                            icon: Mpris.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
-                            iconColor: Mpris.loopState === MprisLoopState.None ? Colors.m3onSurfaceVariant : Colors.m3primary
+                            icon: Mpris.loopTrack ? "repeat_one" : "repeat"
+                            iconColor: Mpris.loopOff ? Colors.m3onSurfaceVariant : Colors.m3primary
                             tooltip: Translation.tr("Repeat")
                             onClicked: Mpris.cycleLoop()
+                        }
+                        IconButton {
+                            visible: Mpris.isSpotify
+                            icon: "queue_music"
+                            iconColor: playerCard.showQueue ? Colors.m3primary : Colors.m3onSurfaceVariant
+                            tooltip: Translation.tr("Queue")
+                            onClicked: playerCard.queueOpen = !playerCard.queueOpen
                         }
                         Item { Layout.fillWidth: true }
                         IconButton {
@@ -165,10 +176,20 @@ ColumnLayout {
             }
 
             // Lyrics: current line bright and centered, the rest dimmed.
+            // Made only while it's open: it asks Spotify for the queue as long as it exists.
+            Loader {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                active: playerCard.showQueue
+                visible: active
+                sourceComponent: QueueView {}
+            }
+
             ListView {
                 id: lyrics
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                visible: !playerCard.showQueue
                 clip: true
                 interactive: !Lyrics.synced
                 model: Lyrics.lines

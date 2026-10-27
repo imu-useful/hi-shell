@@ -26,6 +26,8 @@ Singleton {
         return players.find(p => p.isPlaying) ?? players.find(p => p.trackTitle) ?? players[0] ?? null;
     }
     readonly property bool hasPlayer: active !== null
+    // The queue (Web API) is Spotify's; other players have none.
+    readonly property bool isSpotify: !!active && active.dbusName.toLowerCase().includes("spotify")
     readonly property bool playing: active?.isPlaying ?? false
 
     readonly property string title: active?.trackTitle || Translation.tr("No media")
@@ -41,6 +43,9 @@ Singleton {
     readonly property bool shuffle: !!active?.shuffle
     readonly property bool loopSupported: !!active?.loopSupported
     readonly property int loopState: active?.loopState ?? MprisLoopState.None
+    // For the UI, which can't import MprisLoopState (its own `Mpris` would hide this one).
+    readonly property bool loopOff: loopState === MprisLoopState.None
+    readonly property bool loopTrack: loopState === MprisLoopState.Track
 
     function togglePlaying() {
         if (active?.canTogglePlaying)
