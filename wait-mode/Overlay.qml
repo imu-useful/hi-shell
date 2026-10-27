@@ -131,6 +131,10 @@ PanelWindow {
             readonly property bool hasQueue: win.control.queue.length > 0
             readonly property bool showQueue: hasQueue || win.control.queueStale
 
+            // Count in for the beat (cava runs only while someone listens).
+            Component.onCompleted: Beat.users++
+            Component.onDestruction: Beat.users--
+
             RowLayout {
                 anchors.centerIn: parent
                 spacing: win.unit * 0.08
@@ -147,12 +151,34 @@ PanelWindow {
                         font.weight: Font.Medium
                         font.letterSpacing: 2
                     }
+                    // The cover jumps to the beat: on each hit it swells at once and lifts, then
+                    // settles back slowly.
                     RoundedImage {
+                        id: coverArt
                         Layout.alignment: Qt.AlignHCenter
                         implicitWidth: cover
                         implicitHeight: cover
                         radius: cover * 0.08
                         source: player?.trackArtUrl ?? ""
+
+                        // 0 at rest, 1 at the top of a hit; `power` is how hard that hit was.
+                        property real pulse: 0
+                        property real power: 0.5
+                        scale: 1 + 0.14 * power * pulse
+                        transform: Translate { y: -coverArt.pulse * coverArt.power * win.unit * 0.016 }
+
+                        SequentialAnimation {
+                            id: hit
+                            NumberAnimation { target: coverArt; property: "pulse"; to: 1; duration: 45; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: coverArt; property: "pulse"; to: 0; duration: 650; easing.type: Easing.InOutSine }
+                        }
+                        Connections {
+                            target: Beat
+                            function onBeat(strength) {
+                                coverArt.power = strength;
+                                hit.restart();
+                            }
+                        }
                     }
                     Text {
                         Layout.alignment: Qt.AlignHCenter
