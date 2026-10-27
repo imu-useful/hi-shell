@@ -113,7 +113,7 @@ ColumnLayout {
                                 iconSize: 16
                             }
                             StateLayer {
-                                onClicked: group.modelData.items.forEach(n => Notifications.dismiss(n.uid))
+                                onClicked: Notifications.erase(group.modelData.items.map(n => n.uid))
                             }
                         }
                     }

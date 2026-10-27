@@ -28,6 +28,35 @@ Singleton {
         items = items.filter((_, i) => i !== index);
         save();
     }
+    // Erase animation (TodoView): item time -> delay in ms; the items are removed for real
+    // when it's over. Items past the tenth go with the tenth.
+    property var erasing: ({})
+    function erase(times) {
+        if (times.length === 0)
+            return;
+        const map = {};
+        let longest = 0;
+        times.forEach((t, i) => {
+            map[t] = Math.round(Math.min(i, 10) * 55 * Appearance.anim.speed);
+            longest = Math.max(longest, map[t]);
+        });
+        erasing = Object.assign({}, erasing, map);
+        eraseTimer.interval = longest + Appearance.anim.normal + Appearance.anim.fast + 80;
+        eraseTimer.restart();
+    }
+    function eraseDone() {
+        erase(items.filter(i => i.done).map(i => i.time));
+    }
+    Timer {
+        id: eraseTimer
+        onTriggered: {
+            const gone = new Set(Object.keys(root.erasing).map(Number));
+            root.erasing = ({});
+            root.items = root.items.filter(i => !gone.has(i.time));
+            root.save();
+        }
+    }
+
     function clearDone() {
         items = items.filter(i => !i.done);
         save();

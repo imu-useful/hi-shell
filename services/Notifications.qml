@@ -121,13 +121,40 @@ Singleton {
         save();
     }
 
+    // Clear everything: the cards erase one after another, then they're really removed.
     function clear() {
-        for (const n of list) {
-            n.notification?.dismiss();
-            n.destroy();
+        erase(list.map(n => n.uid));
+    }
+
+    // Erase animation: uid -> delay in ms. The cards play it (NotificationCard), and once it's
+    // over the notifications are removed for real. Items past the tenth go with the tenth.
+    property var erasing: ({})
+    function erase(uids) {
+        if (uids.length === 0)
+            return;
+        const map = {};
+        let longest = 0;
+        uids.forEach((uid, i) => {
+            map[uid] = Math.round(Math.min(i, 10) * 55 * Appearance.anim.speed);
+            longest = Math.max(longest, map[uid]);
+        });
+        erasing = Object.assign({}, erasing, map);
+        eraseTimer.interval = longest + Appearance.anim.normal + Appearance.anim.fast + 80;
+        eraseTimer.restart();
+    }
+    Timer {
+        id: eraseTimer
+        onTriggered: {
+            const gone = new Set(Object.keys(root.erasing).map(Number));
+            root.erasing = ({});
+            const removed = root.list.filter(n => gone.has(n.uid));
+            root.list = root.list.filter(n => !gone.has(n.uid));
+            for (const n of removed) {
+                n.notification?.dismiss();
+                n.destroy();
+            }
+            root.save();
         }
-        list = [];
-        save();
     }
 
     // Run an action ("default" = clicking the notification body).

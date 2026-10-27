@@ -80,6 +80,12 @@ ColumnLayout {
         }
         boundsBehavior: Flickable.StopAtBounds
 
+        // Removing one entry or clearing them all: they slide away and the rest close up.
+        remove: EraseTransition {}
+        displaced: Transition {
+            SpatialAnim { properties: "y" }
+        }
+
         delegate: Rectangle {
             id: entry
 

@@ -35,11 +35,32 @@ Item {
         return Quickshell.iconPath(icon, true);
     }
 
-    implicitWidth: 380
-    implicitHeight: card.implicitHeight
+    // Erase animation (EraseAnim): slides away and fades (leave), then the row folds (collapse).
+    property real leave: 0
+    property real collapse: 1
+    // -1 / 1: the side it leaves to (the way it was swiped).
+    property int leaveDir: 1
+    readonly property var eraseDelay: Notifications.erasing[notif.uid]
 
+    implicitWidth: 380
+    implicitHeight: card.implicitHeight * collapse
+    clip: leave > 0
+
+    // The notification is removed once the animation is over (Notifications.erase).
     function dismiss() {
-        Notifications.dismiss(notif.uid);
+        leaveDir = card.x < 0 ? -1 : 1;
+        Notifications.erase([notif.uid]);
+    }
+
+    onEraseDelayChanged: {
+        if (eraseDelay !== undefined && !eraser.running) {
+            eraser.delay = eraseDelay;
+            eraser.start();
+        }
+    }
+    EraseAnim {
+        id: eraser
+        target: root
     }
 
     Rectangle {
@@ -51,7 +72,8 @@ Item {
         color: root.popup ? Colors.m3surfaceContainer : Colors.m3surfaceContainerHigh
         border.width: root.notif.critical ? 1.5 : root.popup ? 1 : 0
         border.color: root.notif.critical ? Colors.m3error : Qt.alpha(Colors.m3outlineVariant, 0.6)
-        opacity: 1 - Math.min(0.8, Math.abs(x) / width)
+        opacity: (1 - Math.min(0.8, Math.abs(x) / width)) * (1 - root.leave)
+        transform: Translate { x: root.leaveDir * root.leave * card.width * 0.5 }
 
         Behavior on x {
             enabled: !drag.active

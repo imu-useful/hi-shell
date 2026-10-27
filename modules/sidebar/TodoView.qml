@@ -72,16 +72,38 @@ ColumnLayout {
                 model: Todo.items
 
                 Rectangle {
+                    id: task
                     required property var modelData
                     required property int index
 
+                    // Erase animation (EraseAnim): slides away and fades, then the row folds.
+                    property real leave: 0
+                    property real collapse: 1
+                    readonly property var eraseDelay: Todo.erasing[modelData.time]
+                    onEraseDelayChanged: {
+                        if (eraseDelay !== undefined && !eraser.running) {
+                            eraser.delay = eraseDelay;
+                            eraser.start();
+                        }
+                    }
+                    EraseAnim {
+                        id: eraser
+                        target: task
+                    }
+
                     Layout.fillWidth: true
-                    implicitHeight: 48
+                    implicitHeight: 48 * collapse
+                    clip: leave > 0
+                    opacity: 1 - leave
+                    transform: Translate { x: task.leave * task.width * 0.5 }
                     radius: Appearance.rounding.large
                     color: modelData.done ? Colors.m3surfaceContainer : Colors.m3secondaryContainer
 
                     RowLayout {
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 48
                         anchors.leftMargin: 8
                         anchors.rightMargin: 4
                         spacing: 8
@@ -103,7 +125,7 @@ ColumnLayout {
                             implicitWidth: 36
                             implicitHeight: 36
                             icon: "delete"
-                            onClicked: Todo.remove(index)
+                            onClicked: Todo.erase([modelData.time])
                         }
                     }
                 }
@@ -114,7 +136,7 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignRight
                 icon: "done_all"
                 text: Translation.tr("Clear completed")
-                onClicked: Todo.clearDone()
+                onClicked: Todo.eraseDone()
             }
         }
     }

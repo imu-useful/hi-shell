@@ -111,12 +111,30 @@ ColumnLayout {
         id: list
         Layout.fillWidth: true
         Layout.fillHeight: true
-        visible: !root.showHistory && Claude.messages.count > 0
+        // Kept for a moment after the last message goes, so the messages can erase away.
+        property bool erasing: false
+        visible: !root.showHistory && (Claude.messages.count > 0 || erasing)
         clip: true
         spacing: 10
         model: Claude.messages
         boundsBehavior: Flickable.StopAtBounds
-        onCountChanged: Qt.callLater(positionViewAtEnd)
+        remove: EraseTransition {}
+        displaced: Transition {
+            SpatialAnim { properties: "y" }
+        }
+        onCountChanged: {
+            if (count === 0) {
+                erasing = true;
+                eraseHold.restart();
+            } else {
+                Qt.callLater(positionViewAtEnd);
+            }
+        }
+        Timer {
+            id: eraseHold
+            interval: Appearance.anim.normal + 12 * 45 * Appearance.anim.speed + 100
+            onTriggered: list.erasing = false
+        }
         onContentHeightChanged: if (Claude.busy || atYEnd) Qt.callLater(positionViewAtEnd)
 
         delegate: MessageBubble {
@@ -128,7 +146,7 @@ ColumnLayout {
     ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        visible: !root.showHistory && Claude.messages.count === 0
+        visible: !root.showHistory && Claude.messages.count === 0 && !list.erasing
         spacing: 12
 
         Item { Layout.fillHeight: true }
