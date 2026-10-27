@@ -2,7 +2,7 @@
 # hi-shell installer for Arch Linux + Hyprland 0.56+ (Lua config).
 #
 #   ./install.sh                 from a clone of the repo
-#   bash <(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
 #
 # Options:
 #   --no-deps   don't install packages

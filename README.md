@@ -107,8 +107,10 @@ git clone https://github.com/imu-useful/hi-shell.git ~/Projects/hi-shell
 or without cloning first (the repo goes to `~/.local/share/hi-shell/repo`):
 
 ```sh
-bash <(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
 ```
+
+That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
 The installer:
 
