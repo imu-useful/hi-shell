@@ -227,6 +227,7 @@ Scope {
                     anchors.fill: parent
                     shape: frame.shape || "circle"
                     maskRotation: frame.spin
+                    overscan: 0.21
                     source: wallpaper.source
                 }
             }
