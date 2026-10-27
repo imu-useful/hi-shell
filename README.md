@@ -333,9 +333,12 @@ with the active profile; `qs -c hi-shell ipc call focus start` does the same.
 
 **Known limitations of site blocking:**
 
-- **HTTPS sites don't show the Focus Mode page.** Only plain `http://` visits get the page. For `https://` sites the
-  browser shows a connection error. The site is still blocked; the page would need a certificate for the site, and
-  hi-shell doesn't install one.
+- **HTTPS sites show the browser's connection error, not the Focus Mode page.** A blocked site's HTTPS address
+  (`https://youtube.com`) gets nothing from hi-shell, so Firefox shows "Unable to connect". Only plain `http://` visits
+  get the Focus Mode page, and only when the browser actually uses HTTP. Browsers use HTTPS for many big sites all the
+  time: Firefox has youtube.com built in as HTTPS-only (HSTS), so for it the page never appears even when you type
+  `http://`. A site that is HTTP-only (like `example.com`) shows the page. Showing it on HTTPS would need a certificate
+  for every blocked site, which hi-shell doesn't install.
 - **Browsers with their own DNS over HTTPS skip `/etc/hosts`.** Firefox and Zen with DNS over HTTPS enabled resolve names
   themselves. For those, hi-shell closes browser tabs whose title names a blocked site, so the block works, but a page
   whose title mentions a blocked site can be closed too.
