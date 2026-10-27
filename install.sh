@@ -12,6 +12,8 @@
 #   --yes       don't ask: install everything that isn't switched off by another option
 #   --no-start  don't start the shell at the end
 #   --no-dots   don't offer hi-shell's terminal configs (fish, ...)
+#   --with-apps also install the optional apps (Zen Browser, Telegram, Vesktop, osu!lazer,
+#               Steam, Spotify, Neovim) with --yes; in the menu they're off by default
 #
 # What it does: installs the packages hi-shell uses, links the repo to
 # ~/.config/quickshell/hi-shell, loads hypr/hi-shell.lua from your Hyprland config
@@ -24,7 +26,7 @@ QS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell"
 HYPR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
 MARKER="-- hi-shell (added by install.sh)"
 
-DEPS=true YES=false START=true DOTS=true
+DEPS=true YES=false START=true DOTS=true APPS=false
 NOCONFIRM=()
 for arg in "$@"; do
     case "$arg" in
@@ -32,7 +34,8 @@ for arg in "$@"; do
         --yes | -y) YES=true; NOCONFIRM=(--noconfirm) ;;
         --no-start) START=false ;;
         --no-dots) DOTS=false ;;
-        -h | --help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --with-apps) APPS=true ;;
+        -h | --help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
     esac
 done
@@ -57,7 +60,8 @@ ask() { # ask "Should I do x?" -> 0 for yes; "a" answers yes to this and every l
 
 # --- What to install ---
 # One line per part; the hi-shell files themselves (source and link) are always installed.
-PARTS=(deps hypr fish kitty fastfetch start)
+APP_PARTS=(zen telegram vesktop osu steam spotify neovim)
+PARTS=(deps hypr fish kitty fastfetch "${APP_PARTS[@]}" start)
 declare -A PART_NAME=(
     [deps]="Packages hi-shell needs (pacman and AUR)"
     [hypr]="Load hi-shell from your Hyprland config"
@@ -65,8 +69,21 @@ declare -A PART_NAME=(
     [kitty]="Terminal config: kitty (colors follow the wallpaper)"
     [fastfetch]="Terminal config: fastfetch"
     [start]="Start hi-shell when done"
+    [zen]="App: Zen Browser"
+    [telegram]="App: Telegram"
+    [vesktop]="App: Vesktop (Discord)"
+    [osu]="App: osu!lazer"
+    [steam]="App: Steam"
+    [spotify]="App: Spotify"
+    [neovim]="App: Neovim"
 )
-declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [start]=$START)
+# Optional apps: the package to install (the first name found in a repo or the AUR wins).
+declare -A APP_PKG=(
+    [zen]="zen-browser-bin" [telegram]="telegram-desktop" [vesktop]="vesktop vesktop-bin"
+    [osu]="osu-lazer-bin" [steam]="steam" [spotify]="spotify" [neovim]="neovim"
+)
+declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [start]=$START
+    [zen]=$APPS [telegram]=$APPS [vesktop]=$APPS [osu]=$APPS [steam]=$APPS [spotify]=$APPS [neovim]=$APPS)
 choose_parts() {
     $YES && return
     [[ -r /dev/tty ]] || return
@@ -135,6 +152,43 @@ if $DEPS; then
             fi
         else
             warn "install ${aur_missing[*]} from the AUR (no paru or yay found)"
+        fi
+    fi
+fi
+
+# --- Optional apps ---
+# Only what you switched on in the menu (or --with-apps). A package that's in a configured
+# repo goes through pacman, anything else through the AUR helper.
+app_repo=() app_aur=()
+for app in "${APP_PARTS[@]}"; do
+    [[ ${WANT[$app]} == true ]] || continue
+    found=""
+    for p in ${APP_PKG[$app]}; do
+        if pacman -Qq "$p" &>/dev/null; then found="installed"; break; fi
+        if pacman -Si "$p" &>/dev/null; then app_repo+=("$p"); found="repo"; break; fi
+    done
+    if [[ -z "$found" ]]; then
+        # Not in any repo: the first name, from the AUR.
+        for p in ${APP_PKG[$app]}; do
+            if pacman -Qq "$p" &>/dev/null; then found="installed"; break; fi
+        done
+        [[ -z "$found" ]] && app_aur+=("${APP_PKG[$app]%% *}")
+        [[ -z "$found" && "$app" == steam ]] && warn "steam is in the multilib repo: enable [multilib] in /etc/pacman.conf first"
+    fi
+done
+if ((${#app_repo[@]} + ${#app_aur[@]})); then
+    step "Optional apps"
+    if ((${#app_repo[@]})); then
+        echo "From the repositories: ${app_repo[*]}"
+        ask "Should I install them with pacman?" && sudo pacman -S --needed "${NOCONFIRM[@]}" "${app_repo[@]}"
+    fi
+    if ((${#app_aur[@]})); then
+        helper=$(command -v paru || command -v yay || true)
+        if [[ -n "$helper" ]]; then
+            echo "From the AUR: ${app_aur[*]}"
+            ask "Should I install them with $(basename "$helper")?" && "$helper" -S --needed "${NOCONFIRM[@]}" "${app_aur[@]}"
+        else
+            warn "install ${app_aur[*]} from the AUR (no paru or yay found)"
         fi
     fi
 fi

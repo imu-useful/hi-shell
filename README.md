@@ -112,7 +112,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main
 
 That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
-The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch configs, starting the shell):
+The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch configs, optional apps, starting the shell):
 type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
 `y` yes, `n` no, `a` yes for all the rest.
 
@@ -124,7 +124,10 @@ The installer:
    `~/.config/hypr/hyprland.lua` otherwise (one marked line, with a backup of the file)
 4. starts the shell and warns about other bars or notification daemons that are still running
 
-Options: `--yes` (no menu and no questions: installs everything), `--no-deps`, `--no-start`, `--no-dots`. Then tap <kbd>Super</kbd>.
+The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!lazer, Steam (needs `[multilib]`), Spotify and Neovim.
+Each one goes through `pacman` if a configured repository has it, otherwise through `paru` / `yay`.
+
+Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`. Then tap <kbd>Super</kbd>.
 
 ### Update
 
