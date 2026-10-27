@@ -17,7 +17,7 @@ Singleton {
     property int version: 0
 
     // "" until the small font is ready.
-    readonly property string name: loader.status === FontLoader.Ready && loader.name === `${family} hi-shell` ? loader.name : ""
+    readonly property string name: loader.status === FontLoader.Ready && loader.name.startsWith(`${family} hi-shell `) ? loader.name : ""
 
     FontLoader {
         id: loader

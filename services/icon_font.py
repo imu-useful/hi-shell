@@ -7,7 +7,8 @@ Material Symbols holds ~3800 icons (15 MB, mapped once per variant by Qt, ~50 MB
 memory); the shell uses a few hundred. This finds the icon names in the shell's QML and
 JS (quoted words, and templates like `battery_${n}_bar`), keeps just those ligatures,
 pins the axes the shell never changes (weight 400, grade 0; FILL and opsz stay), and
-renames the family to "<family> hi-shell" so it can't be mistaken for the full font.
+renames the family to "<family> hi-shell <key>" (the key changes with every rebuild: Qt keeps
+a family it has loaded once, so a rebuilt font under the same name would show the old glyphs).
 Writes DIR/icons.ttf (loaded by the shell from the first frame) and prints its path; a
 hash of the font and the names found, in DIR/icons.key, keeps it from being rebuilt
 until either changes. Needs python-fonttools; prints nothing (and
@@ -76,7 +77,7 @@ def main():
         return 1
     words, templates = candidates(args.scan)
     st = os.stat(src)
-    key = hashlib.sha1(repr((2, args.family, src, st.st_size, int(st.st_mtime), sorted(words), sorted(templates))).encode()).hexdigest()[:12]
+    key = hashlib.sha1(repr((3, args.family, src, st.st_size, int(st.st_mtime), sorted(words), sorted(templates))).encode()).hexdigest()[:12]
     out = os.path.join(args.out, "icons.ttf")
     stamp = os.path.join(args.out, "icons.key")
     if os.path.exists(out) and os.path.exists(stamp) and open(stamp).read().strip() == key:
@@ -114,7 +115,7 @@ def main():
     if pin:
         font = instancer.instantiateVariableFont(font, pin)
 
-    family = f"{args.family} hi-shell"
+    family = f"{args.family} hi-shell {key[:6]}"
     for rec in font["name"].names:
         if rec.nameID in (1, 4, 16):
             rec.string = family
