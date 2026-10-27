@@ -129,6 +129,7 @@ PanelWindow {
             readonly property var player: win.control.player
             readonly property real cover: win.unit * 0.42
             readonly property bool hasQueue: win.control.queue.length > 0
+            readonly property bool showQueue: hasQueue || win.control.queueStale
 
             RowLayout {
                 anchors.centerIn: parent
@@ -155,7 +156,7 @@ PanelWindow {
                     }
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.maximumWidth: hasQueue ? cover * 1.2 : win.width * 0.8
+                        Layout.maximumWidth: showQueue ? cover * 1.2 : win.width * 0.8
                         text: player?.trackTitle ?? ""
                         color: Theme.text
                         elide: Text.ElideRight
@@ -164,7 +165,7 @@ PanelWindow {
                     }
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.maximumWidth: hasQueue ? cover * 1.2 : win.width * 0.8
+                        Layout.maximumWidth: showQueue ? cover * 1.2 : win.width * 0.8
                         text: player?.trackArtist ?? ""
                         color: Theme.muted
                         elide: Text.ElideRight
@@ -270,7 +271,7 @@ PanelWindow {
 
                 // What plays next (Spotify; needs hi-shell's sign-in).
                 ColumnLayout {
-                    visible: hasQueue
+                    visible: showQueue
                     Layout.alignment: Qt.AlignVCenter
                     Layout.preferredWidth: win.unit * 0.5
                     spacing: win.unit * 0.012
@@ -281,6 +282,16 @@ PanelWindow {
                         font.pixelSize: Math.max(14, win.unit * 0.022)
                         font.weight: Font.Medium
                         font.letterSpacing: 2
+                    }
+                    // Spotify isn't telling its servers what plays, so there's no queue to show.
+                    Text {
+                        visible: win.control.queueStale
+                        Layout.fillWidth: true
+                        wrapMode: Text.Wrap
+                        text: Theme.tr("The queue isn't available: Spotify hasn't reported the track that is playing now.",
+                                       "Очередь недоступна: Spotify не сообщает, какой трек играет сейчас.")
+                        color: Theme.muted
+                        font.pixelSize: win.unit * 0.024
                     }
                     Repeater {
                         model: win.control.queue

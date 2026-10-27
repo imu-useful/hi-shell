@@ -28,6 +28,12 @@ Singleton {
     // Views that want the queue (it isn't fetched otherwise).
     property int users: 0
 
+    // The API says another track plays than the player does: the Spotify app isn't sending
+    // its state up (a network or VPN problem), so the queue can't be known. Spotify also lags
+    // a few seconds behind after every track change, so it's asked again a few times first.
+    property int tries: 0
+    readonly property bool stale: status === "ok" && playing !== null && Mpris.isSpotify && playing.name !== Mpris.title
+
     readonly property bool loading: fetcher.running
     readonly property bool searching: searcher.running
     readonly property bool connecting: authProc.running
@@ -119,6 +125,11 @@ Singleton {
                 if (d.status === "ok") {
                     root.playing = d.playing ?? null;
                     root.queue = d.queue ?? [];
+                    if (root.stale && root.tries < 6) {
+                        root.tries++;
+                        refreshLater.interval = 2000;
+                        refreshLater.restart();
+                    }
                 }
             }
         }
@@ -196,8 +207,11 @@ Singleton {
     Connections {
         target: Mpris
         function onTitleChanged() {
-            if (root.users > 0 && root.status === "ok")
+            if (root.users > 0 && root.status === "ok") {
+                root.tries = 0;
+                refreshLater.interval = 1500;
                 refreshLater.restart();
+            }
         }
     }
     Timer {

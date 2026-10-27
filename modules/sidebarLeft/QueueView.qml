@@ -161,11 +161,23 @@ ColumnLayout {
         onTriggered: SpotifyQueue.search(search.text)
     }
 
+    // Spotify isn't reporting what plays, so a queue would be for another track.
+    StyledText {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        visible: SpotifyQueue.status === "ok" && SpotifyQueue.stale && !root.searchingNow
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        wrapMode: Text.Wrap
+        text: Translation.tr("The queue isn't available: Spotify hasn't reported the track that is playing now.")
+        color: Colors.m3onSurfaceVariant
+    }
+
     ListView {
         id: list
         Layout.fillWidth: true
         Layout.fillHeight: true
-        visible: SpotifyQueue.status === "ok"
+        visible: SpotifyQueue.status === "ok" && (!SpotifyQueue.stale || root.searchingNow)
         clip: true
         spacing: 4
         // The search results, or "now playing" followed by what's next.

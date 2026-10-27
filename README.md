@@ -321,7 +321,10 @@ The **queue** comes from Spotify's Web API and needs a one-time setup:
 3. In the player's queue button (visible while Spotify plays), choose **Connect Spotify**. The browser opens to sign in; if
    it can't, the link is shown to copy.
 
-The queue shows what is playing and what's next, with a search to add tracks. The token is kept in
+The queue shows what is playing and what's next, with a search to add tracks. It comes from Spotify's servers, which
+know what plays only while the Spotify app reports it: after a track change the answer can lag a few seconds (it's asked
+again), and if the app stops reporting (a network or VPN problem) the queue is hidden with a note instead of showing
+the queue of another track. The token is kept in
 `~/.local/state/hi-shell/spotify-token.json` (mode 600); **Disconnect** deletes it. The Web API only lets you read and add
 to the queue, so tracks can't be removed or reordered here, managing the queue needs **Spotify Premium**, and there is no
 public API for Jam or DJ.

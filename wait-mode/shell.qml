@@ -70,9 +70,21 @@ ShellRoot {
     // --- Spotify's queue, from hi-shell's services/spotify.py (needs its sign-in) ---
     readonly property bool isSpotify: !!player && player.dbusName.toLowerCase().includes("spotify")
     property var queue: [] // [{ name, artists, art }]
+    // Spotify's API says another track plays than the player does: the Spotify app isn't
+    // sending its state up (a network or VPN problem), so the queue can't be known.
+    property bool queueStale: false
+    // Spotify's API lags behind the player for a few seconds after a track change, so an
+    // answer for another track than the one playing is asked for again (a few times).
+    property int queueTries: 0
     function refreshQueue() {
         if (isSpotify && hasMusic && !queueProc.running)
             queueProc.running = true;
+    }
+    // A change that moves the queue: start over with fresh tries.
+    function queueMoved() {
+        queueTries = 0;
+        queueLater.interval = 1500;
+        queueLater.restart();
     }
     Process {
         id: queueProc
@@ -81,7 +93,16 @@ ShellRoot {
             onStreamFinished: {
                 try {
                     const d = JSON.parse(text);
-                    root.queue = d.status === "ok" ? (d.queue ?? []).slice(0, 6) : [];
+                    // The API's "playing" isn't what the player plays: it hasn't caught up.
+                    const stale = d.status === "ok" && d.playing && root.player && d.playing.name !== root.player.trackTitle;
+                    root.queueStale = !!stale;
+                    // A queue for another track would mislead: show none.
+                    root.queue = d.status === "ok" && !stale ? (d.queue ?? []).slice(0, 6) : [];
+                    if (stale && root.queueTries < 6) {
+                        root.queueTries++;
+                        queueLater.interval = 2000;
+                        queueLater.restart();
+                    }
                 } catch (e) {
                     root.queue = [];
                 }
@@ -91,7 +112,10 @@ ShellRoot {
     onIsSpotifyChanged: isSpotify ? refreshQueue() : queue = []
     Connections {
         target: root.player
-        function onTrackTitleChanged() { queueLater.restart(); }
+        function onTrackTitleChanged() { root.queueMoved(); }
+        // Shuffle and repeat change what comes next.
+        function onShuffleChanged() { root.queueMoved(); }
+        function onLoopStateChanged() { root.queueMoved(); }
     }
     Timer {
         id: queueLater
