@@ -170,7 +170,7 @@ Scope {
     }
 
     // Calculator: qalc, debounced.
-    onTermChanged: if (mode === "=" || mathLike) calcTimer.restart()
+    onTermChanged: if (mode === "=" || (mode === "" && Expression.isMath(term))) calcTimer.restart()
     Timer {
         id: calcTimer
         interval: 150
