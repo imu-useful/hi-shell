@@ -19,6 +19,7 @@
 3. **Hyprland IPC:** Use Quickshell's built-in Hyprland module for workspaces and window titles.
 4. **Python Backend:** If Quickshell's QML cannot handle the Claude CLI streaming properly, create a Python daemon (`ai_bridge.py`) that runs `claude` and streams the output to QML via a Unix socket.
 5. **Git Workflow:** Commit and push after every stage.
+6. **Language:** ALWAYS think and respond in English to save tokens, even if I write in Russian.
 
 ## Structure
 - `shell.qml` (Main entry point for hi-shell)
