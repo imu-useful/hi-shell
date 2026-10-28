@@ -31,6 +31,21 @@ Scope {
         Hyprland.dispatch(code);
     }
 
+    // Close the overview, then focus a window: while the overview holds the keyboard (exclusive
+    // focus) Hyprland ignores a focus request, so it has to let go first.
+    function focusWindow(address) {
+        setOpen(false);
+        focusLater.code = `hl.dsp.focus({ window = "address:0x${address}" })`;
+        focusLater.restart();
+    }
+
+    Timer {
+        id: focusLater
+        property string code: ""
+        interval: 80
+        onTriggered: root.dispatch(code)
+    }
+
     IpcHandler {
         target: "overview"
 
@@ -221,8 +236,7 @@ Scope {
                                         if (drag.active) {
                                             win.Drag.drop();
                                         } else {
-                                            root.dispatch(`hl.dsp.focus({ window = "address:0x${win.address}" })`);
-                                            root.setOpen(false);
+                                            root.focusWindow(win.address);
                                         }
                                     }
                                 }

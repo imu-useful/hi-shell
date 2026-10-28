@@ -50,9 +50,19 @@ Scope {
             return;
         }
         const w = windows[index];
-        if (w)
-            Hyprland.dispatch(`hl.dsp.focus({ window = "address:${w.address}" })`);
+        const wasShown = shown;
         close();
+        if (!w)
+            return;
+        const code = `hl.dsp.focus({ window = "address:${w.address}" })`;
+        // While the panel holds the keyboard (exclusive focus) Hyprland ignores a focus request:
+        // wait until it has let go.
+        if (wasShown) {
+            focusLater.code = code;
+            focusLater.restart();
+        } else {
+            Hyprland.dispatch(code);
+        }
     }
 
     function close() {
@@ -74,6 +84,13 @@ Scope {
             iconCache[appId] = Quickshell.iconPath(entry?.icon ?? appId, true);
         }
         return iconCache[appId];
+    }
+
+    Timer {
+        id: focusLater
+        property string code: ""
+        interval: 80
+        onTriggered: Hyprland.dispatch(code)
     }
 
     Timer {
