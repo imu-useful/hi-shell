@@ -60,8 +60,8 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
                     echo "${yellow}$mine has your changes: the new version is in $mine.new, merge it by hand.${reset}"
                 fi
             done
-        elif [[ -f "$hypr_dir/hi-shell.lua" ]]; then
-            echo "${yellow}hi-shell's Hyprland files moved to a folder: run ./install.sh to copy it to $hypr_dir/hi-shell and update the line that loads it.${reset}"
+        else
+            echo "${yellow}hi-shell's Hyprland files (keybinds, rules) are a folder now, hypr/hi-shell/. They keep loading from the repo; run ./install.sh to copy them to $hypr_dir/hi-shell, where you can edit them.${reset}"
         fi
         step "Reloading Hyprland (keybinds changed)"
         hyprctl reload >/dev/null || true

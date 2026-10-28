@@ -520,6 +520,7 @@ common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) wi
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
                      Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), presets.py
 translations/        interface translations (ru.json)
+hypr/hi-shell.lua    a stub for configs that still load the old single file (it loads the folder below)
 hypr/hi-shell/       Hyprland autostart, keybinds, Super tap, window and layer rules, Wait Mode submap (installed to ~/.config/hypr/hi-shell)
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
