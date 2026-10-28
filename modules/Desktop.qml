@@ -261,6 +261,43 @@ Scope {
                 onActivated: root.setEditing(false)
             }
 
+            // The frame centered at `center` (px along one axis) with `size`: its edges and center
+            // snap to the screen's edges, margin and middle and to the other widgets' edges and
+            // centers (10 px). { pos: the center, guide: the line it snapped to or -1 }.
+            function snapFrame(center, size, horizontal) {
+                const total = horizontal ? window.width : window.height;
+                const lines = [0, 24, total / 2, total - 24, total];
+                for (const w of widgets.children) {
+                    if (!w.visible || w.widgetId === undefined)
+                        continue;
+                    const start = horizontal ? w.x : w.y;
+                    const length = horizontal ? w.width : w.height;
+                    lines.push(start, start + length / 2, start + length);
+                }
+                let best = null;
+                for (const line of lines) {
+                    for (const offset of [-size / 2, 0, size / 2]) {
+                        const d = line - (center + offset);
+                        if (Math.abs(d) <= 10 && (best === null || Math.abs(d) < Math.abs(best.d)))
+                            best = { d, line };
+                    }
+                }
+                return best ? { pos: center + best.d, guide: best.line } : { pos: center, guide: -1 };
+            }
+
+            // Put the frame against the screen's left / center / right (or top / middle / bottom).
+            function alignFrame(horizontal, where) {
+                const w = Config.options.wallpapers;
+                const margin = 24;
+                const size = frame.width;
+                const total = horizontal ? window.width : window.height;
+                const center = where < 0 ? size / 2 + margin : where > 0 ? total - size / 2 - margin : total / 2;
+                if (horizontal)
+                    w.frameX = center / total;
+                else
+                    w.frameY = center / total;
+            }
+
             // Edit mode: the frame can be dragged (above the click-to-leave area, below the widgets).
             Item {
                 id: frameGrip
@@ -289,14 +326,20 @@ Scope {
                         if (!active)
                             return;
                         // The center stays on the screen.
-                        const cx = Config.options.wallpapers.frameX * window.width + translation.x;
-                        const cy = Config.options.wallpapers.frameY * window.height + translation.y;
-                        frame.drag = Qt.point(Math.max(0, Math.min(window.width, cx)) - Config.options.wallpapers.frameX * window.width,
-                                              Math.max(0, Math.min(window.height, cy)) - Config.options.wallpapers.frameY * window.height);
+                        const cx = Math.max(0, Math.min(window.width, Config.options.wallpapers.frameX * window.width + translation.x));
+                        const cy = Math.max(0, Math.min(window.height, Config.options.wallpapers.frameY * window.height + translation.y));
+                        // Edges and center snap to the screen and the widgets, with guide lines.
+                        const sx = window.snapFrame(cx, frame.width, true);
+                        const sy = window.snapFrame(cy, frame.height, false);
+                        widgets.guideX = sx.guide;
+                        widgets.guideY = sy.guide;
+                        frame.drag = Qt.point(sx.pos - Config.options.wallpapers.frameX * window.width,
+                                              sy.pos - Config.options.wallpapers.frameY * window.height);
                     }
                     onActiveChanged: {
                         if (active)
                             return;
+                        widgets.guideX = widgets.guideY = -1;
                         const w = Config.options.wallpapers;
                         w.frameX = w.frameX + frame.drag.x / window.width;
                         w.frameY = w.frameY + frame.drag.y / window.height;
@@ -499,6 +542,39 @@ Scope {
                                 text: Translation.tr(DesktopLayout.names[modelData])
                                 selected: DesktopLayout.entry(root.options.layout, modelData).enabled
                                 onClicked: root.setEnabled(modelData, !selected)
+                            }
+                        }
+                    }
+
+                    // Aligning the wallpaper's frame on the screen (it also snaps while dragged).
+                    RowLayout {
+                        Layout.fillWidth: true
+                        visible: frame.visible
+                        spacing: 4
+
+                        MaterialIcon {
+                            icon: "crop_free"
+                            color: Colors.m3primary
+                        }
+                        StyledText {
+                            Layout.fillWidth: true
+                            text: Translation.tr("Align the frame")
+                            color: Colors.m3onSurfaceVariant
+                        }
+                        Repeater {
+                            model: [
+                                { icon: "align_horizontal_left", horizontal: true, where: -1, tip: Translation.tr("Left") },
+                                { icon: "align_horizontal_center", horizontal: true, where: 0, tip: Translation.tr("Center horizontally") },
+                                { icon: "align_horizontal_right", horizontal: true, where: 1, tip: Translation.tr("Right") },
+                                { icon: "align_vertical_top", horizontal: false, where: -1, tip: Translation.tr("Top") },
+                                { icon: "align_vertical_center", horizontal: false, where: 0, tip: Translation.tr("Center vertically") },
+                                { icon: "align_vertical_bottom", horizontal: false, where: 1, tip: Translation.tr("Bottom") }
+                            ]
+                            IconButton {
+                                required property var modelData
+                                icon: modelData.icon
+                                tooltip: modelData.tip
+                                onClicked: window.alignFrame(modelData.horizontal, modelData.where)
                             }
                         }
                     }

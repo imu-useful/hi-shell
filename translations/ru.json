@@ -827,5 +827,8 @@
     "Release": "Релиз",
     "Blurred cover behind the player": "Размытая обложка за плеером",
     "The playing track's cover, blurred, fills the media cards": "Обложка играющего трека, размытая, заполняет карточки плеера",
-    "Drag widgets to move them, the corner or the right edge to resize · tap a chip to show or hide · drag here to move this bar": "Перетаскивайте виджеты, угол или правый край — для размера · нажмите на чип, чтобы показать или скрыть · потяните здесь, чтобы сдвинуть панель"
+    "Drag widgets to move them, the corner or the right edge to resize · tap a chip to show or hide · drag here to move this bar": "Перетаскивайте виджеты, угол или правый край — для размера · нажмите на чип, чтобы показать или скрыть · потяните здесь, чтобы сдвинуть панель",
+    "Align the frame": "Выровнять рамку",
+    "Center horizontally": "По центру по горизонтали",
+    "Center vertically": "По центру по вертикали"
 }
