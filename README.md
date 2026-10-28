@@ -31,7 +31,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | 🧭 **Bar** | Configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles, hover popups for media, resources, weather, battery and updates, a live audio spectrum |
 | 🚀 **App launcher** | Apps and settings, plus prefixes: `=` calculator (a plain "12*(3+4)" or "10+5=" is answered too, without the prefix), `>` run a command, `<` keybinds, `:` emoji, `;` clipboard (images with a preview), `/` settings |
 | ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats; or any [OpenRouter](https://openrouter.ai) model, the free ones included |
-| 🪟 **Overlays** | Workspace overview with window previews (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording, optional dock, rounded screen corners |
+| 🪟 **Overlays** | Workspace overview with a tile and icon per window (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording (with system sound or the microphone), optional dock, rounded screen corners |
 | ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics, weather, Claude chat, translator, clipboard history with image thumbnails |
 | 🎯 **Focus Mode** | Sessions with a minimal bar, Pomodoro cycles, blocked apps and sites, profiles, statistics and achievements |
 | ⏳ **Wait Mode** | A cover for the person while an AI works on the machine: a player or the wallpaper, keyboard and mouse shut out, no sleeping, Esc three times to exit; automation can still see and click what's underneath |
@@ -277,7 +277,7 @@ Sections:
 - `updates`: check interval, include AUR (via `yay` or `paru`)
 - `tray.hidden`: tray item ids to hide
 - `dock`: enabled (off by default), auto-hide, magnify, icon size, pinned app ids
-- `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`), record audio
+- `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`); `recordSound` for screen recordings: `off`, `system` (what plays through the speakers) or `mic` (also the buttons under the mode switcher in Record mode)
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default) or `standard` (the system's menus); also in Settings › Interface
 - `apps.terminal`: terminal for terminal apps and the system upgrade

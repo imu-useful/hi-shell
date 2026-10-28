@@ -11,7 +11,8 @@ import qs.services
 // Region capture: screenshot (copy + save), OCR (copy the text) or screen
 // recording. Drag to select, click a window to take exactly that window, or
 // click the empty desktop for the whole screen; Esc cancels. The screen is frozen (grim) first, so the overlay is never in
-// the picture. Recording shows a pill with the time; click it to stop.
+// the picture. Recording (with or without sound: the speakers' or the microphone) shows a pill
+// with the time; click it to stop.
 // IPC: `qs -c hi-shell ipc call region screenshot` (ocr, translate, record, stop, fullscreen).
 Scope {
     id: root
@@ -74,7 +75,11 @@ Scope {
         } else {
             // wf-recorder takes global logical coordinates.
             recordFile = `${Paths.home}/Videos/Recordings/${stamp}.mp4`;
-            recorder.command = ["sh", "-c", 'mkdir -p "$(dirname "$2")" && exec wf-recorder -g "$1" -f "$2"' + (Config.options.capture.recordAudio ? " -a" : ""), "sh",
+            // wf-recorder takes one audio device: the default microphone, or the monitor of the
+            // default output (what you hear).
+            const sound = Config.options.capture.recordSound;
+            const audio = sound === "system" ? ' -a"$(pactl get-default-sink).monitor"' : sound === "mic" ? " -a" : "";
+            recorder.command = ["sh", "-c", 'mkdir -p "$(dirname "$2")" && exec wf-recorder -g "$1" -f "$2"' + audio, "sh",
                 `${screenInfo.x + Math.round(x)},${screenInfo.y + Math.round(y)} ${Math.round(w)}x${Math.round(h)}`, recordFile];
             recorder.running = true;
             recordStart = Date.now();
@@ -344,6 +349,27 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 }
             }
 
+            // Sound of the recording, for the Record mode.
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 24 + 52 + 10
+                implicitWidth: sound.implicitWidth + 16
+                implicitHeight: sound.implicitHeight + 16
+                radius: height / 2
+                color: Colors.m3surfaceContainerHigh
+                visible: root.mode === "record"
+
+                SegmentedButton {
+                    id: sound
+                    readonly property var values: ["off", "system", "mic"]
+                    anchors.centerIn: parent
+                    model: [{ text: Translation.tr("No sound"), icon: "volume_off" }, { text: Translation.tr("System sound"), icon: "volume_up" }, { text: Translation.tr("Microphone"), icon: "mic" }]
+                    currentIndex: Math.max(0, values.indexOf(Config.options.capture.recordSound))
+                    onSelected: index => Config.options.capture.recordSound = values[index]
+                }
+            }
+
             StyledText {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
@@ -408,6 +434,12 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                             NumberAnimation { to: 0.3; duration: 700 }
                             NumberAnimation { to: 1; duration: 700 }
                         }
+                    }
+                    MaterialIcon {
+                        visible: Config.options.capture.recordSound !== "off"
+                        icon: Config.options.capture.recordSound === "mic" ? "mic" : "volume_up"
+                        iconSize: 18
+                        color: Colors.m3onErrorContainer
                     }
                     StyledText {
                         text: `REC ${Timers.format(recWindow.elapsed)}`

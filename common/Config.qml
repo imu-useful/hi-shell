@@ -283,7 +283,9 @@ Singleton {
                 // tesseract languages for OCR, e.g. "eng+rus"; auto = every installed one
                 // (install tesseract-data-rus for Russian)
                 property string ocrLanguages: "auto"
-                property bool recordAudio: false
+                // Sound of a screen recording: "off", "system" (what plays through the speakers)
+                // or "mic" (the default microphone)
+                property string recordSound: "off"
             }
 
             property JsonObject apps: JsonObject {
