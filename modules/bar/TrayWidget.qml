@@ -38,16 +38,22 @@ BarWidget {
                 function openMenu() {
                     // Items without a menu of their own are just activated.
                     if (modelData.menu)
-                        menu.open();
+                        lazyMenu.shown = true;
                     else
                         modelData.activate();
                 }
 
-                ContextMenu {
-                    id: menu
-                    target: entry
-                    handle: entry.modelData.menu
-                    edge: root.popupEdge === Edges.Top ? Edges.Top : Edges.Bottom
+                // The menu's window exists only while it's open.
+                PanelLoader {
+                    id: lazyMenu
+
+                    ContextMenu {
+                        target: entry
+                        handle: entry.modelData.menu
+                        edge: root.popupEdge === Edges.Top ? Edges.Top : Edges.Bottom
+                        shown: lazyMenu.revealed
+                        onCloseRequested: lazyMenu.shown = false
+                    }
                 }
 
                 IconImage {

@@ -10,7 +10,10 @@ import qs.common
 // and submenus that replace the list (with a back row) instead of opening a second window.
 // Usage:
 //
-//   ContextMenu { id: menu; target: icon; handle: item.menu }   ... menu.open()
+//   PanelLoader { id: lazy; ContextMenu { target: icon; handle: item.menu; shown: lazy.revealed
+//                                          onCloseRequested: lazy.shown = false } }   ... lazy.shown = true
+//
+// Wrapped in a PanelLoader the window (and its shadow layer) exists only while the menu is open.
 PopupWindow {
     id: root
 
@@ -26,17 +29,13 @@ PopupWindow {
     // The submenus entered so far: [{ handle, title }].
     property var trail: []
     readonly property var current: trail.length > 0 ? trail[trail.length - 1].handle : handle
+    // Set by the owner (a PanelLoader's `revealed`); the menu asks to be closed through the signal.
     property bool shown: false
 
-    function open() {
-        if (!handle)
-            return;
-        trail = [];
-        shown = true;
-    }
+    signal closeRequested
 
     function close() {
-        shown = false;
+        closeRequested();
     }
 
     anchor.item: target
