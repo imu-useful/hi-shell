@@ -235,38 +235,55 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
                 fillMode: Image.Stretch
             }
 
-            // Dim everything but the selection.
-            Rectangle { x: 0; y: 0; width: parent.width; height: window.sel.y; color: Qt.alpha("black", 0.45) }
-            Rectangle { x: 0; y: window.sel.y + window.sel.height; width: parent.width; height: parent.height - y; color: Qt.alpha("black", 0.45) }
-            Rectangle { x: 0; y: window.sel.y; width: window.sel.x; height: window.sel.height; color: Qt.alpha("black", 0.45) }
-            Rectangle { x: window.sel.x + window.sel.width; y: window.sel.y; width: parent.width - x; height: window.sel.height; color: Qt.alpha("black", 0.45) }
+            // The selection as it's drawn: it springs after `sel` (the real one), so a drag is
+            // followed with a little lag and overshoot, and hovering windows glides from one to
+            // the next. Without a selection it's a point under the cursor, the next one grows from.
+            readonly property bool hasSel: sel.width > 0
+            property real ax: hasSel ? sel.x : mouse.mouseX
+            property real ay: hasSel ? sel.y : mouse.mouseY
+            property real aw: hasSel ? sel.width : 0
+            property real ah: hasSel ? sel.height : 0
+            readonly property bool springy: Appearance.anim.speed > 0 && !Toggles.gameMode && !PowerSaver.enabled
+            Behavior on ax { enabled: window.springy; SpringAnimation { spring: 4.5; damping: 0.42; epsilon: 0.25 } }
+            Behavior on ay { enabled: window.springy; SpringAnimation { spring: 4.5; damping: 0.42; epsilon: 0.25 } }
+            Behavior on aw { enabled: window.springy; SpringAnimation { spring: 4.5; damping: 0.42; epsilon: 0.25 } }
+            Behavior on ah { enabled: window.springy; SpringAnimation { spring: 4.5; damping: 0.42; epsilon: 0.25 } }
 
+            // Dim everything but the selection, with the outline around it (shaders/dimming.frag).
+            property real dim: window.springy ? 0 : 0.5
+            NumberAnimation on dim {
+                running: window.springy
+                to: 0.5
+                duration: Appearance.anim.normal
+                easing.type: Easing.OutCubic
+            }
+
+            ShaderEffect {
+                anchors.fill: parent
+                property vector4d selectionRect: Qt.vector4d(window.ax, window.ay, Math.max(0, window.aw), Math.max(0, window.ah))
+                property color outlineColor: Colors.m3primary
+                property vector2d screenSize: Qt.vector2d(width, height)
+                property real dimOpacity: window.dim
+                property real borderRadius: 12
+                property real outlineThickness: 2
+                fragmentShader: Qt.resolvedUrl("../common/widgets/shaders/dimming.frag.qsb")
+            }
+
+            // Size of the selection, under its bottom left corner.
             Rectangle {
-                x: window.sel.x - 2
-                y: window.sel.y - 2
-                width: window.sel.width + 4
-                height: window.sel.height + 4
+                x: window.ax
+                y: window.ay + Math.max(0, window.ah) + 8
                 visible: window.sel.width > 0
-                color: "transparent"
-                radius: 4
-                border.width: 2
-                border.color: Colors.m3primary
-
-                Rectangle {
-                    anchors.top: parent.bottom
-                    anchors.topMargin: 6
-                    anchors.left: parent.left
-                    implicitWidth: size.implicitWidth + 16
-                    implicitHeight: 24
-                    radius: 12
-                    color: Colors.m3primary
-                    StyledText {
-                        id: size
-                        anchors.centerIn: parent
-                        text: `${Math.round(window.sel.width)} × ${Math.round(window.sel.height)}`
-                        font.pixelSize: Appearance.font.size.labelSmall
-                        color: Colors.m3onPrimary
-                    }
+                implicitWidth: size.implicitWidth + 16
+                implicitHeight: 24
+                radius: 12
+                color: Colors.m3primary
+                StyledText {
+                    id: size
+                    anchors.centerIn: parent
+                    text: `${Math.round(window.sel.width)} × ${Math.round(window.sel.height)}`
+                    font.pixelSize: Appearance.font.size.labelSmall
+                    color: Colors.m3onPrimary
                 }
             }
 

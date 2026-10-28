@@ -514,7 +514,7 @@ modules/             Bar, Desktop, DesktopVisualizer, DisplayMode, Settings, Wel
 common/              singletons (Config, Appearance, Colors, Theme, ShellState, Translation, Paths)
 common/widgets/      widget kit (StyledText, MaterialIcon, Card, Chip, SegmentedButton, M3Switch, ListRow,
                      StyledPopup, StyledFlickable, PanelLoader, Spectrum, animations, buttons, slider)
-common/widgets/shaders/  spectrum.frag (+ compiled .qsb) for the audio spectrum
+common/widgets/shaders/  spectrum.frag, dimming.frag (+ compiled .qsb) for the audio spectrum and the region selector
 common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) with morphing
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
                      Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), presets.py
