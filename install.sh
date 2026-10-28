@@ -12,6 +12,8 @@
 #   --yes       don't ask: install everything that isn't switched off by another option
 #   --no-start  don't start the shell at the end
 #   --no-dots   don't offer hi-shell's terminal configs (fish, ...)
+#   --channel=git|release  where update.sh gets updates: the latest main (git) or the latest
+#               tagged release (release, the default with --yes); asked when not given
 #   --with-apps also install the optional apps (Zen Browser, Telegram, Vesktop, osu!lazer,
 #               Steam, Spotify, Neovim) with --yes; in the menu they're off by default
 #
@@ -26,16 +28,18 @@ QS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell"
 HYPR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
 MARKER="-- hi-shell (added by install.sh)"
 
-DEPS=true YES=false START=true DOTS=true APPS=false
+DEPS=true YES=false START=true DOTS=true APPS=false CHANNEL=""
 NOCONFIRM=()
 for arg in "$@"; do
     case "$arg" in
+        --channel=git | --channel=release) CHANNEL="${arg#--channel=}" ;;
+        --channel*) echo "Use --channel=git or --channel=release" >&2; exit 1 ;;
         --no-deps) DEPS=false ;;
         --yes | -y) YES=true; NOCONFIRM=(--noconfirm) ;;
         --no-start) START=false ;;
         --no-dots) DOTS=false ;;
         --with-apps) APPS=true ;;
-        -h | --help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h | --help) sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
     esac
 done
@@ -117,6 +121,24 @@ choose_parts() {
 [[ $EUID -eq 0 ]] && die "run as your user, not root (sudo is used where needed)"
 command -v pacman >/dev/null || die "hi-shell targets Arch Linux (pacman not found)"
 choose_parts
+
+# Where update.sh gets updates from; kept in the config (update.channel).
+choose_channel() {
+    [[ -n "$CHANNEL" ]] && return
+    # Installed before: keep the choice made then.
+    CHANNEL="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("update", {}).get("channel", ""))' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || true)"
+    [[ "$CHANNEL" == git || "$CHANNEL" == release ]] && return
+    CHANNEL=release
+    $YES && return
+    [[ -r /dev/tty ]] || return
+    local reply
+    step "How should hi-shell update?"
+    echo "  1) release  the latest tagged release: tested, changes less often (default)"
+    echo "  2) git      the latest main: the newest features, may break now and then"
+    read -r -p "1 or 2, Enter = release (change it later in Settings > About): " reply </dev/tty || return
+    [[ "$reply" == 2 || "${reply,,}" == git ]] && CHANNEL=git
+}
+choose_channel
 
 # --- Packages ---
 PACMAN_PKGS=(
@@ -209,8 +231,34 @@ elif [[ -d "$CLONE_DIR/.git" ]]; then
 else
     REPO="$CLONE_DIR"
     mkdir -p "$(dirname "$REPO")"
-    git clone --depth 1 "$REPO_URL" "$REPO"
+    tag=""
+    if [[ "$CHANNEL" == release ]]; then
+        tag="$(git ls-remote --tags --refs "$REPO_URL" 'v*' | sed 's#.*refs/tags/##' | sort -V | tail -1)"
+        [[ -n "$tag" ]] || warn "no release found, installing the latest main instead"
+    fi
+    if [[ -n "$tag" ]]; then
+        echo "Release $tag"
+        git clone --depth 1 --branch "$tag" "$REPO_URL" "$REPO"
+    else
+        git clone --depth 1 "$REPO_URL" "$REPO"
+    fi
 fi
+
+# Remember the choice for update.sh (merged into the config the shell keeps).
+python3 - "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" "$CHANNEL" <<'PY'
+import json, os, sys
+path, channel = sys.argv[1:3]
+try:
+    with open(path) as f:
+        data = json.load(f)
+except (OSError, ValueError):
+    data = {}
+data.setdefault("update", {})["channel"] = channel
+os.makedirs(os.path.dirname(path), exist_ok=True)
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+PY
+echo "Updates from: $CHANNEL"
 
 # --- Link into Quickshell's config folder ---
 step "Link"

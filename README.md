@@ -116,6 +116,8 @@ The installer first shows what it can install (packages, the Hyprland hook, the 
 type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
 `y` yes, `n` no, `a` yes for all the rest.
 
+It also asks where updates come from: **release** (the latest tagged release, tested and changes less often, the default) or **git** (the latest `main`, the newest features, may break now and then). `--channel=git` or `--channel=release` answers it up front; you can switch later in Settings → About → Updates (`update.channel` in the config).
+
 The installer:
 
 1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
@@ -128,7 +130,7 @@ The installer:
 The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!lazer, Steam (needs `[multilib]`), Spotify and Neovim.
 Each one goes through `pacman` if a configured repository has it, otherwise through `paru` / `yay`.
 
-Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`. Then tap <kbd>Super</kbd>.
+Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`, `--channel=git|release`. Then tap <kbd>Super</kbd>.
 
 ### Update
 
@@ -136,7 +138,8 @@ Options: `--yes` (no menu and no questions: installs everything except the optio
 ~/.config/quickshell/hi-shell/update.sh
 ```
 
-Pulls the latest version (`git pull --ff-only`, so your local changes are never overwritten), shows what's new,
+Gets the latest version from where you chose at install: on **git** it pulls `main` (`git pull --ff-only`), on **release**
+it moves to the latest tagged release (`v*`). Your local changes are never overwritten. It shows what's new,
 restarts the shell and reloads Hyprland when the keybinds changed.
 
 ### Uninstall

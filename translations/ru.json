@@ -820,5 +820,9 @@
     "Keep my Hyprland files on update": "Не трогать мои файлы Hyprland при обновлении",
     "update.sh leaves ~/.config/hypr/hi-shell/ (keybinds, rules) alone and only lists what changed": "update.sh не трогает ~/.config/hypr/hi-shell/ (бинды, правила) и только показывает, что изменилось",
     "No sound": "Без звука",
-    "System sound": "Звук системы"
+    "System sound": "Звук системы",
+    "Update from": "Обновляться из",
+    "Release: update.sh moves to the latest tagged release": "Релиз: update.sh переходит на последний выпущенный релиз",
+    "Git: update.sh pulls the latest main, the newest features": "Git: update.sh берёт свежий main, самые новые функции",
+    "Release": "Релиз"
 }

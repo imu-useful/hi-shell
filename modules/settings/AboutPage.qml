@@ -66,6 +66,20 @@ ColumnLayout {
     }
 
     Section {
+        icon: "system_update"
+        title: Translation.tr("Updates")
+
+        ChoiceRow {
+            icon: "sync_alt"
+            title: Translation.tr("Update from")
+            subtitle: Config.options.update.channel === "release" ? Translation.tr("Release: update.sh moves to the latest tagged release") : Translation.tr("Git: update.sh pulls the latest main, the newest features")
+            value: Config.options.update.channel
+            options: [{ value: "release", text: Translation.tr("Release") }, { value: "git", text: "Git" }]
+            onSelected: value => Config.options.update.channel = value
+        }
+    }
+
+    Section {
         id: presets
         icon: "inventory_2"
         title: Translation.tr("Presets")

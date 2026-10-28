@@ -23,7 +23,8 @@ from pathlib import Path
 VERSION = 1
 # Config keys that belong to the machine or the person, not the look.
 PRIVATE = [("wallpapers", "unsplashKey"), ("wallpapers", "wallhavenKey"), ("hyprland", "monitors"),
-           ("weather", "latitude"), ("weather", "longitude"), ("weather", "city")]
+           ("weather", "latitude"), ("weather", "longitude"), ("weather", "city"),
+           ("ai", "openrouterKey"), ("hyprland", "keepFiles"), ("update", "channel")]
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif", ".jxl"}
 
 

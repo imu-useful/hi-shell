@@ -1,31 +1,53 @@
 #!/usr/bin/env bash
-# Update hi-shell: pull the latest version and restart the shell.
+# Update hi-shell and restart the shell.
 #
 #   ./update.sh            (or ~/.config/quickshell/hi-shell/update.sh)
 #
-# Uses `git pull --ff-only`, so local commits or edits that conflict stop the
-# update instead of being overwritten. Reloads Hyprland when hypr/ changed.
+# Where from is the choice made at install (Settings > About, or "update.channel" in the config):
+# "git" pulls the latest main with `git pull --ff-only`, "release" moves to the latest tagged
+# release. Either way, local edits that conflict stop the update instead of being overwritten.
+# Reloads Hyprland when hypr/ changed.
 set -euo pipefail
 
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 die() { echo "${red}error:${reset} $*" >&2; exit 1; }
 
-[[ "${1:-}" =~ ^(-h|--help)$ ]] && { sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+[[ "${1:-}" =~ ^(-h|--help)$ ]] && { sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
 
 # The repo this script lives in (works through the ~/.config/quickshell symlink too).
 REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 [[ -d "$REPO/.git" ]] || die "$REPO is not a git checkout; reinstall with install.sh"
 cd "$REPO"
 
-step "Updating $REPO"
+channel="$(python3 -c 'import json,sys; c=json.load(open(sys.argv[1])).get("update", {}).get("channel"); print("release" if c == "release" else "git")' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo git)"
+
+step "Updating $REPO ($channel)"
 before=$(git rev-parse HEAD)
 if ! git diff --quiet || ! git diff --cached --quiet; then
     echo "${yellow}You have local changes:${reset}"
     git status --short
     echo "They're kept; the update stops if they conflict."
 fi
-git pull --ff-only || die "couldn't fast-forward (local commits or conflicting changes); resolve them in $REPO and run again"
+if [[ "$channel" == release ]]; then
+    latest="$(git ls-remote --tags --refs origin 'v*' | sed 's#.*refs/tags/##' | sort -V | tail -1)"
+    [[ -n "$latest" ]] || die "no release found on origin; switch to git in Settings > About, or check your connection"
+    if [[ "$(git describe --tags --exact-match 2>/dev/null || true)" == "$latest" ]]; then
+        echo "Already on the latest release ($latest)."
+        exit 0
+    fi
+    git fetch --quiet --depth 1 origin "refs/tags/$latest:refs/tags/$latest" || die "couldn't fetch $latest"
+    git checkout --quiet "$latest" || die "couldn't switch to $latest (your local changes conflict); resolve them in $REPO and run again"
+    echo "Release $latest"
+else
+    # Back from a release (a detached checkout) to main.
+    if ! git symbolic-ref -q HEAD >/dev/null; then
+        git fetch --quiet --depth 1 origin main:refs/remotes/origin/main || die "couldn't fetch main"
+        git checkout --quiet -B main origin/main || die "couldn't switch to main (your local changes conflict); resolve them in $REPO and run again"
+        git branch --quiet --set-upstream-to=origin/main main
+    fi
+    git pull --ff-only || die "couldn't fast-forward (local commits or conflicting changes); resolve them in $REPO and run again"
+fi
 after=$(git rev-parse HEAD)
 
 if [[ "$before" == "$after" ]]; then

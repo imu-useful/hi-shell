@@ -288,6 +288,12 @@ Singleton {
                 property string recordSound: "off"
             }
 
+            // How update.sh updates: "git" (the latest main) or "release" (the latest tagged release).
+            // Chosen at install (install.sh --channel); installs from before this one follow git.
+            property JsonObject update: JsonObject {
+                property string channel: "git"
+            }
+
             property JsonObject apps: JsonObject {
                 // Used for desktop entries with Terminal=true
                 property string terminal: "kitty"
