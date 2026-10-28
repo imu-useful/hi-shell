@@ -3,12 +3,15 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
+import qs.services
 
 // Workspace overview: the current group of workspaces (bar.workspaces.shown)
-// with window previews. Click a window to focus it, a workspace to switch,
+// with their windows, each a tonal tile with its app's icon (screen captures of
+// the windows were slow and often wrong). Click a window to focus it, a workspace to switch,
 // drag a window onto another workspace to move it. Esc closes.
 // Toggle: Super+Tab or `qs -c hi-shell ipc call overview toggle`.
 Scope {
@@ -166,19 +169,42 @@ Scope {
                                 Drag.hotSpot.y: height / 2
 
                                 Rectangle {
+                                    id: tile
+
+                                    // The tile's color varies by app, from the palette's three container roles.
+                                    readonly property string appId: win.modelData.wayland?.appId ?? ""
+                                    readonly property color base: [Colors.m3primaryContainer, Colors.m3secondaryContainer, Colors.m3tertiaryContainer][hash(appId) % 3]
+                                    readonly property string icon: AppIcons.path(appId)
+
+                                    function hash(text) {
+                                        let h = 0;
+                                        for (let i = 0; i < text.length; i++)
+                                            h = (h * 31 + text.charCodeAt(i)) >>> 0;
+                                        return h;
+                                    }
+
                                     anchors.fill: parent
                                     radius: 6
-                                    color: Colors.m3surfaceContainerHighest
                                     clip: true
                                     border.width: hover.hovered ? 2 : 0
                                     border.color: Colors.m3primary
+                                    gradient: Gradient {
+                                        GradientStop { position: 0; color: Qt.lighter(tile.base, 1.12) }
+                                        GradientStop { position: 1; color: Qt.darker(tile.base, 1.18) }
+                                    }
 
-                                    ScreencopyView {
-                                        anchors.fill: parent
-                                        anchors.margins: 1
-                                        captureSource: root.open ? win.modelData.wayland : null
-                                        live: false
-                                        constraintSize: Qt.size(width * 2, height * 2)
+                                    IconImage {
+                                        anchors.centerIn: parent
+                                        visible: tile.icon !== ""
+                                        source: tile.icon
+                                        implicitSize: Math.max(12, Math.min(64, Math.min(tile.width, tile.height) * 0.55))
+                                    }
+                                    MaterialIcon {
+                                        anchors.centerIn: parent
+                                        visible: tile.icon === ""
+                                        icon: "web_asset"
+                                        iconSize: Math.max(12, Math.min(40, Math.min(tile.width, tile.height) * 0.5))
+                                        color: Colors.m3onPrimaryContainer
                                     }
                                 }
 

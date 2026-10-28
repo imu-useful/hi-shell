@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
+import qs.services
 
 // Workspace slots for this monitor, in groups of `bar.workspaces.shown`:
 // empty = small dot, occupied = the icons of its apps, up to `appsPerWorkspace` of them and
@@ -38,19 +39,6 @@ BarWidget {
 
     function workspace(id) {
         return Hyprland.workspaces.values.find(ws => ws.id === id) ?? null;
-    }
-
-    // appId -> icon path. heuristicLookup is a fuzzy search over every desktop
-    // entry, too slow to repeat on each window change (titles update often).
-    property var iconCache: ({})
-    function appIcon(appId) {
-        if (!appId)
-            return "";
-        if (!(appId in iconCache)) {
-            const entry = DesktopEntries.heuristicLookup(appId);
-            iconCache[appId] = Quickshell.iconPath(entry?.icon ?? appId, true);
-        }
-        return iconCache[appId];
     }
 
     // Active indicator. Its two ends are animated on their own: when they move together it
@@ -102,7 +90,7 @@ BarWidget {
                 readonly property string appKey: occupied ? [...new Set(ws.toplevels.values.map(t => t.wayland?.appId ?? "").filter(id => id))].join("\n") : ""
                 readonly property var apps: appKey === "" ? [] : appKey.split("\n")
                 readonly property int limit: Math.max(1, root.options.appsPerWorkspace)
-                readonly property var icons: root.options.appIcons ? apps.slice(0, limit).map(id => root.appIcon(id)).filter(path => path !== "") : []
+                readonly property var icons: root.options.appIcons ? apps.slice(0, limit).map(id => AppIcons.path(id)).filter(path => path !== "") : []
                 readonly property int extra: root.options.appIcons ? Math.max(0, apps.length - limit) : 0
                 readonly property bool hasIcons: icons.length > 0
                 readonly property int iconSize: root.slot - 8
