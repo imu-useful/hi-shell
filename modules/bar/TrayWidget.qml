@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.services
 
 // System tray icons. Left click = activate (or menu for menu-only items),
-// right click = menu, middle click = secondary action.
+// right click = menu (a Material You one, common/widgets/ContextMenu.qml), middle click = secondary action.
 BarWidget {
     id: root
 
@@ -36,10 +36,18 @@ BarWidget {
                 height: root.iconSize
 
                 function openMenu() {
-                    const window = QsWindow.window;
-                    const pos = entry.mapToItem(window.contentItem, 0, 0);
-                    const below = root.popupEdge === Edges.Bottom;
-                    modelData.display(window, pos.x, below ? pos.y + entry.height + 10 : pos.y);
+                    // Items without a menu of their own are just activated.
+                    if (modelData.menu)
+                        menu.open();
+                    else
+                        modelData.activate();
+                }
+
+                ContextMenu {
+                    id: menu
+                    target: entry
+                    handle: entry.modelData.menu
+                    edge: root.popupEdge === Edges.Top ? Edges.Top : Edges.Bottom
                 }
 
                 IconImage {
