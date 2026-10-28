@@ -210,7 +210,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | click the system icons | Right sidebar (scroll there to change the volume) |
 | right click the empty part of the bar | Bar settings |
 | right click a notification | Dismiss it (a popup or one in the notification center; swiping it sideways works too) |
-| right click the desktop | Edit desktop widgets (the toolbar can be dragged by its title out of the way): drag them (edges and centers snap to other widgets and the screen, with guide lines), resize them (corner = size, right edge = width), drag the wallpaper frame (it snaps to the screen edges, center and the widgets, or align it with the buttons in the toolbar), toggle them in the toolbar; Esc or Done to finish |
+| right click the desktop | Edit desktop widgets (the toolbar can be dragged by its title out of the way): drag them (edges and centers snap to other widgets and the screen, with guide lines), resize them (corner = size, right edge = width), drag the wallpaper frame (it snaps to the screen edges, center and the widgets), toggle them in the toolbar; Esc or Done to finish |
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 | scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 

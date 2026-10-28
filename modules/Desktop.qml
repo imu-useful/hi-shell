@@ -285,19 +285,6 @@ Scope {
                 return best ? { pos: center + best.d, guide: best.line } : { pos: center, guide: -1 };
             }
 
-            // Put the frame against the screen's left / center / right (or top / middle / bottom).
-            function alignFrame(horizontal, where) {
-                const w = Config.options.wallpapers;
-                const margin = 24;
-                const size = frame.width;
-                const total = horizontal ? window.width : window.height;
-                const center = where < 0 ? size / 2 + margin : where > 0 ? total - size / 2 - margin : total / 2;
-                if (horizontal)
-                    w.frameX = center / total;
-                else
-                    w.frameY = center / total;
-            }
-
             // Edit mode: the frame can be dragged (above the click-to-leave area, below the widgets).
             Item {
                 id: frameGrip
@@ -542,39 +529,6 @@ Scope {
                                 text: Translation.tr(DesktopLayout.names[modelData])
                                 selected: DesktopLayout.entry(root.options.layout, modelData).enabled
                                 onClicked: root.setEnabled(modelData, !selected)
-                            }
-                        }
-                    }
-
-                    // Aligning the wallpaper's frame on the screen (it also snaps while dragged).
-                    RowLayout {
-                        Layout.fillWidth: true
-                        visible: frame.visible
-                        spacing: 4
-
-                        MaterialIcon {
-                            icon: "crop_free"
-                            color: Colors.m3primary
-                        }
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: Translation.tr("Align the frame")
-                            color: Colors.m3onSurfaceVariant
-                        }
-                        Repeater {
-                            model: [
-                                { icon: "align_horizontal_left", horizontal: true, where: -1, tip: Translation.tr("Left") },
-                                { icon: "align_horizontal_center", horizontal: true, where: 0, tip: Translation.tr("Center horizontally") },
-                                { icon: "align_horizontal_right", horizontal: true, where: 1, tip: Translation.tr("Right") },
-                                { icon: "align_vertical_top", horizontal: false, where: -1, tip: Translation.tr("Top") },
-                                { icon: "align_vertical_center", horizontal: false, where: 0, tip: Translation.tr("Center vertically") },
-                                { icon: "align_vertical_bottom", horizontal: false, where: 1, tip: Translation.tr("Bottom") }
-                            ]
-                            IconButton {
-                                required property var modelData
-                                icon: modelData.icon
-                                tooltip: modelData.tip
-                                onClicked: window.alignFrame(modelData.horizontal, modelData.where)
                             }
                         }
                     }
