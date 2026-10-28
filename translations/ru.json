@@ -795,5 +795,11 @@
     "Keep these display settings?": "Сохранить эти настройки экрана?",
     "%1 goes back to how it was in %2 s": "%1 вернётся к прежним настройкам через %2 с",
     "Revert": "Сбросить",
-    "Keep": "Сохранить"
+    "Keep": "Сохранить",
+    "Workspace switching": "Переключение воркспейсов",
+    "Stretch: the pill stretches over the slots in between, like a snake": "Растяжение: индикатор тянется через промежуточные воркспейсы, как змейка",
+    "Slide": "Скольжение",
+    "Stretch": "Растяжение",
+    "Apps per workspace": "Приложений на воркспейс",
+    "How many app icons a workspace shows; the rest are counted as +N": "Сколько иконок приложений показывает воркспейс; остальные считаются как +N"
 }

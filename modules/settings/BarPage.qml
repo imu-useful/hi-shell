@@ -201,6 +201,23 @@ ColumnLayout {
             checked: root.bar.workspaces.appIcons
             onToggled: checked => root.bar.workspaces.appIcons = checked
         }
+        StepperRow {
+            icon: "stacks"
+            title: Translation.tr("Apps per workspace")
+            subtitle: Translation.tr("How many app icons a workspace shows; the rest are counted as +N")
+            value: root.bar.workspaces.appsPerWorkspace
+            from: 1
+            to: 6
+            onChanged: value => root.bar.workspaces.appsPerWorkspace = value
+        }
+        ChoiceRow {
+            icon: "swipe_right_alt"
+            title: Translation.tr("Workspace switching")
+            subtitle: Translation.tr("Stretch: the pill stretches over the slots in between, like a snake")
+            value: root.bar.workspaces.switchStyle
+            options: [{ value: "slide", text: Translation.tr("Slide") }, { value: "stretch", text: Translation.tr("Stretch") }]
+            onSelected: value => root.bar.workspaces.switchStyle = value
+        }
         TextRow {
             icon: "schedule"
             title: Translation.tr("Time format")

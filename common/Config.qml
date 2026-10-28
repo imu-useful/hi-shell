@@ -89,6 +89,10 @@ Singleton {
                     property int shown: 10
                     property bool numbers: false
                     property bool appIcons: true
+                    // Icons shown per workspace; the apps beyond it are counted as "+N"
+                    property int appsPerWorkspace: 3
+                    // How the active pill moves: "slide" or "stretch" (it stretches over the slots in between, like a snake)
+                    property string switchStyle: "slide"
                 }
                 property JsonObject clock: JsonObject {
                     // Qt date format strings
