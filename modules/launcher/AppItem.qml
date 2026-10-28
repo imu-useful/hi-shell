@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
+import qs.services
 
 // One launcher result: a DesktopEntry app, or a plain object with
 // name / comment and materialIcon or glyph (an emoji).
@@ -14,6 +15,8 @@ Rectangle {
     readonly property bool isSetting: modelData.run !== undefined
     required property int index
     property bool selected: false
+    // A clipboard image's file (see Launcher.imageItem), decoded when the row appears.
+    property string thumb: ""
 
     signal activated
     signal hovered
@@ -24,14 +27,33 @@ Rectangle {
 
     Behavior on color { ColorAnimation { duration: 120 } }
 
+    Component.onCompleted: if (modelData.clip) Clipboard.decodeThumbnail(modelData.clip, url => root.thumb = url)
+
     RowLayout {
         anchors.fill: parent
         anchors.leftMargin: 12
         anchors.rightMargin: 12
         spacing: 12
 
+        // A clipboard image's thumbnail.
         Rectangle {
-            visible: root.isSetting
+            visible: root.thumb !== ""
+            implicitWidth: 40
+            implicitHeight: 40
+            radius: Appearance.rounding.small
+            color: Colors.m3surfaceContainerHighest
+            clip: true
+            Image {
+                anchors.fill: parent
+                source: root.thumb
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                sourceSize: Qt.size(80, 80)
+            }
+        }
+
+        Rectangle {
+            visible: root.isSetting && root.thumb === ""
             implicitWidth: 32
             implicitHeight: 32
             radius: 16

@@ -64,13 +64,26 @@ Scope {
             return term === "" ? [] : emoji.filter(e => e[1].includes(term.toLowerCase())).slice(0, 40)
                 .map(e => ({ name: e[1], comment: Translation.tr("Enter copies it"), glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
         case ";":
-            return Clipboard.entries.filter(e => !e.image && e.text.toLowerCase().includes(term.toLowerCase())).slice(0, 40)
-                .map(e => ({ name: e.text.replace(/\s+/g, " "), comment: Translation.tr("Copy"), materialIcon: "content_paste", run: () => Clipboard.copy(e) }));
+            // Images match by their description ("png 1920x1080") and the word "image".
+            return Clipboard.entries.filter(e => (e.image ? `${e.text} image` : e.text).toLowerCase().includes(term.toLowerCase())).slice(0, 40)
+                .map(e => e.image ? imageItem(e) : { name: e.text.replace(/\s+/g, " "), comment: Translation.tr("Copy"), materialIcon: "content_paste", run: () => Clipboard.copy(e) });
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
             return [...inlineMath(), ...focusMatches(term), ...settingsMatches(term), ...filterApps(term)];
         }
+    }
+
+    // A clipboard image: cliphist describes it as "[[ binary data 105 KiB png 1920x1080 ]]".
+    function imageItem(e) {
+        const m = e.text.match(/binary data ([\d.]+ \w+) (\w+) (\d+)x(\d+)/);
+        return {
+            name: m ? `${Translation.tr("Image")} · ${m[3]} × ${m[4]}` : Translation.tr("Image"),
+            comment: m ? `${m[1]} ${m[2].toUpperCase()} · ${Translation.tr("Copy")}` : Translation.tr("Copy"),
+            materialIcon: "image",
+            clip: e,
+            run: () => Clipboard.copy(e)
+        };
     }
 
     function inlineMath() {
@@ -435,6 +448,25 @@ Scope {
                             selected: ListView.isCurrentItem
                             onHovered: list.currentIndex = index
                             onActivated: root.launch(modelData)
+                        }
+                    }
+
+                    // Preview of the selected clipboard image.
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 260
+                        visible: preview.source !== ""
+                        radius: Appearance.rounding.large
+                        color: Colors.m3surfaceContainerHighest
+
+                        Image {
+                            id: preview
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            source: list.currentItem?.modelData?.clip ? (list.currentItem.thumb ?? "") : ""
+                            fillMode: Image.PreserveAspectFit
+                            asynchronous: true
+                            sourceSize.height: 520
                         }
                     }
 
