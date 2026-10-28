@@ -71,6 +71,11 @@ ColumnLayout {
         Component.onCompleted: Lyrics.users++
         Component.onDestruction: Lyrics.users--
 
+        CoverBackdrop {
+            source: Mpris.artUrl
+            radius: playerCard.radius
+        }
+
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 16

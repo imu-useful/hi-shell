@@ -824,5 +824,7 @@
     "Update from": "Обновляться из",
     "Release: update.sh moves to the latest tagged release": "Релиз: update.sh переходит на последний выпущенный релиз",
     "Git: update.sh pulls the latest main, the newest features": "Git: update.sh берёт свежий main, самые новые функции",
-    "Release": "Релиз"
+    "Release": "Релиз",
+    "Blurred cover behind the player": "Размытая обложка за плеером",
+    "The playing track's cover, blurred, fills the media cards": "Обложка играющего трека, размытая, заполняет карточки плеера"
 }

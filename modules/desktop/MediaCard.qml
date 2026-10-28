@@ -41,6 +41,11 @@ DesktopCard {
         }
     }
 
+    CoverBackdrop {
+        source: Mpris.artUrl
+        radius: root.radius
+    }
+
     ColumnLayout {
         id: content
         anchors.fill: parent

@@ -43,6 +43,13 @@ ColumnLayout {
             from: 0; to: 50; suffix: "%"
             onMoved: value => a.transparencyLevel = value / 100
         }
+        SwitchRow {
+            icon: "album"
+            title: Translation.tr("Blurred cover behind the player")
+            subtitle: Translation.tr("The playing track's cover, blurred, fills the media cards")
+            checked: a.coverBackdrop
+            onToggled: checked => a.coverBackdrop = checked
+        }
         ChoiceRow {
             icon: "menu_open"
             title: Translation.tr("Context menus")

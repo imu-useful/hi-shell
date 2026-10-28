@@ -50,6 +50,8 @@ Singleton {
                 // Translucent surfaces (the compositor blurs what's behind them).
                 property bool transparency: true
                 property real transparencyLevel: 0.12
+                // The playing track's cover, blurred, behind the media cards.
+                property bool coverBackdrop: true
                 property JsonObject fonts: JsonObject {
                     property string main: "Google Sans Flex"
                     property string title: "Google Sans Flex"
