@@ -9,15 +9,21 @@ import Quickshell.Io
 // from the cache at once; the script checks it in the background and rebuilds it when
 // the shell's icons or the font change. Without it (no python-fonttools, another icon
 // font that isn't installed) the full font is used.
+//
+// A font rebuilt while the shell runs isn't swapped in: Qt keeps the glyph numbers of the old
+// one in the texts already drawn, and they'd show other icons (the buttons' icons shuffled).
+// The full font fills in until the next start, which loads the new one.
 Singleton {
     id: root
 
     readonly property string family: Config.options.appearance.fonts.icon
     readonly property string dir: `${Paths.cache}/icons`
     property int version: 0
+    // The small font was rebuilt after it was loaded.
+    property bool stale: false
 
-    // "" until the small font is ready.
-    readonly property string name: loader.status === FontLoader.Ready && loader.name.startsWith(`${family} hi-shell `) ? loader.name : ""
+    // "" until the small font is ready (and when it's stale).
+    readonly property string name: !stale && loader.status === FontLoader.Ready && loader.name.startsWith(`${family} hi-shell `) ? loader.name : ""
 
     FontLoader {
         id: loader
@@ -33,14 +39,17 @@ Singleton {
             "--scan", Quickshell.shellDir, "--out", root.dir]
         stdout: StdioCollector {
             // Made just now (the first time, or after the font failed to load).
-            onStreamFinished: if (text.trim() && root.name === "") root.version++
+            onStreamFinished: if (text.trim() && root.name === "" && !root.stale) root.version++
         }
         stderr: StdioCollector {
             // Rebuilt: the shell's icons or the font changed.
             onStreamFinished: {
                 if (text.includes("icon_font:")) {
                     console.info(text.trim());
-                    root.version++;
+                    if (root.name === "")
+                        root.version++;
+                    else
+                        root.stale = true;
                 }
             }
         }
