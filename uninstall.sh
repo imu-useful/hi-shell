@@ -34,11 +34,19 @@ removed=false
 while IFS= read -r file; do
     # Remove the dofile line and the marker comment install.sh put above it.
     cp "$file" "$file.backup-hi-shell-uninstall"
-    sed -i -e '/^-- hi-shell (added by install.sh)$/d' -e '/quickshell\/hi-shell\/hypr\/hi-shell\.lua/d' "$file"
+    sed -i -e '/^-- hi-shell (added by install.sh)$/d' -e '/quickshell\/hi-shell\/hypr\/hi-shell\.lua/d' -e '/\.config\/hypr\/hi-shell\.lua/d' "$file"
     echo "Removed from $file (backup: $file.backup-hi-shell-uninstall)"
     removed=true
-done < <(grep -rlF "quickshell/hi-shell/hypr/hi-shell.lua" "$HYPR_DIR" --include='*.lua' 2>/dev/null | grep -v '\.backup' || true)
+done < <(grep -rlF -e "quickshell/hi-shell/hypr/hi-shell.lua" -e ".config/hypr/hi-shell.lua" "$HYPR_DIR" --include='*.lua' 2>/dev/null | grep -v -e '\.backup' -e "^$HYPR_DIR/hi-shell.lua$" || true)
 $removed || echo "hi-shell wasn't loaded from $HYPR_DIR."
+# The copy install.sh made: removed unless you changed it (then it stays, it's yours).
+if [[ -f "$HYPR_DIR/hi-shell.lua" ]]; then
+    if cmp -s "$(dirname "$(readlink -f "$0")")/hypr/hi-shell.lua" "$HYPR_DIR/hi-shell.lua"; then
+        rm "$HYPR_DIR/hi-shell.lua" && echo "Removed $HYPR_DIR/hi-shell.lua"
+    else
+        echo "Kept $HYPR_DIR/hi-shell.lua (it differs from hi-shell's; delete it if you don't need it)."
+    fi
+fi
 [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && hyprctl reload >/dev/null 2>&1 || true
 
 step "Quickshell link"

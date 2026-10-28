@@ -16,8 +16,8 @@
 #               Steam, Spotify, Neovim) with --yes; in the menu they're off by default
 #
 # What it does: installs the packages hi-shell uses, links the repo to
-# ~/.config/quickshell/hi-shell, loads hypr/hi-shell.lua from your Hyprland config
-# (one line, marked "hi-shell" so uninstall.sh can remove it) and starts the shell.
+# ~/.config/quickshell/hi-shell, copies hypr/hi-shell.lua into ~/.config/hypr and loads it from
+# your Hyprland config (one line, marked "hi-shell" so uninstall.sh can remove it) and starts the shell.
 set -euo pipefail
 
 REPO_URL="https://github.com/imu-useful/hi-shell.git"
@@ -229,8 +229,12 @@ fi
 echo "$target -> $REPO"
 
 # --- Hyprland integration ---
+# hypr/hi-shell.lua (keybinds, window and layer rules) is copied into your Hyprland folder, so
+# it's right there to edit, and loaded from your config with one line.
 step "Hyprland"
-line="dofile(os.getenv(\"HOME\") .. \"/.config/quickshell/hi-shell/hypr/hi-shell.lua\")"
+HYPR_LUA="$HYPR_DIR/hi-shell.lua"
+line="dofile(os.getenv(\"HOME\") .. \"${HYPR_LUA#"$HOME"}\")"
+old_path="quickshell/hi-shell/hypr/hi-shell.lua"   # where earlier versions loaded it from
 if [[ -f "$HYPR_DIR/custom/execs.lua" ]]; then
     hypr_file="$HYPR_DIR/custom/execs.lua"   # illogical-impulse / end-4 dots
 elif [[ -f "$HYPR_DIR/hyprland.lua" ]]; then
@@ -238,20 +242,45 @@ elif [[ -f "$HYPR_DIR/hyprland.lua" ]]; then
 else
     hypr_file=""
 fi
+# An earlier install may have the line in another file of the Hyprland folder.
+loaded_in="$(grep -rlF -e "$old_path" -e "${HYPR_LUA#"$HOME"}" "$HYPR_DIR" --include='*.lua' 2>/dev/null | grep -v -e '\.backup' -e "^$HYPR_LUA$" | head -1 || true)"
+[[ -n "$loaded_in" ]] && hypr_file="$loaded_in"
+
+# Copy hi-shell.lua; a copy that differs (yours, edited) is replaced only on request.
+copy_hypr_lua() {
+    if [[ -f "$HYPR_LUA" ]] && cmp -s "$REPO/hypr/hi-shell.lua" "$HYPR_LUA"; then
+        return 0
+    fi
+    if [[ -f "$HYPR_LUA" ]]; then
+        ask "Your $HYPR_LUA differs from hi-shell's. Replace it (yours is kept as hi-shell.lua.backup-<date>)?" || return 0
+        cp "$HYPR_LUA" "$HYPR_LUA.backup-$(date +%Y%m%d-%H%M%S)"
+    fi
+    mkdir -p "$HYPR_DIR"
+    cp "$REPO/hypr/hi-shell.lua" "$HYPR_LUA"
+    echo "Copied hi-shell.lua to $HYPR_LUA (edit your keys and rules there)"
+}
 
 if [[ ${WANT[hypr]} != true ]]; then
-    echo "Skipped. Add this line to your Hyprland config yourself: $line"
+    echo "Skipped. Copy hypr/hi-shell.lua to $HYPR_LUA and add this line to your Hyprland config yourself: $line"
 elif [[ -z "$hypr_file" ]]; then
     warn "no Lua Hyprland config found ($HYPR_DIR/hyprland.lua). hi-shell needs Hyprland 0.56+ with the Lua config;"
-    warn "add this line to it yourself: $line"
-elif grep -qF "hi-shell/hypr/hi-shell.lua" "$hypr_file"; then
+    warn "copy hypr/hi-shell.lua to $HYPR_LUA and add this line to your config yourself: $line"
+elif grep -qF "${HYPR_LUA#"$HOME"}" "$hypr_file"; then
     echo "Already loaded from $hypr_file"
-elif ask "Should I load hi-shell from $hypr_file (a backup is kept)?"; then
+    copy_hypr_lua
+elif ask "Should I copy hi-shell.lua to $HYPR_DIR and load it from $hypr_file (a backup of the file is kept)?"; then
+    copy_hypr_lua
     cp "$hypr_file" "$hypr_file.backup-hi-shell"
-    # Start on a new line; uninstall.sh removes exactly these two lines.
-    [[ -s "$hypr_file" && -n "$(tail -c1 "$hypr_file")" ]] && echo >>"$hypr_file"
-    printf '%s\n%s\n' "$MARKER" "$line" >>"$hypr_file"
-    echo "Added to $hypr_file (backup: $hypr_file.backup-hi-shell)"
+    if grep -qF "$old_path" "$hypr_file"; then
+        # Moved from the repo's folder to the Hyprland one: point the old line at the copy.
+        sed -i "\\#$old_path#c\\$line" "$hypr_file"
+        echo "Updated the line in $hypr_file (backup: $hypr_file.backup-hi-shell)"
+    else
+        # Start on a new line; uninstall.sh removes exactly these two lines.
+        [[ -s "$hypr_file" && -n "$(tail -c1 "$hypr_file")" ]] && echo >>"$hypr_file"
+        printf '%s\n%s\n' "$MARKER" "$line" >>"$hypr_file"
+        echo "Added to $hypr_file (backup: $hypr_file.backup-hi-shell)"
+    fi
 fi
 
 # Another bar or notification daemon would run next to hi-shell.

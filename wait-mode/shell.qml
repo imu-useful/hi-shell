@@ -201,7 +201,7 @@ ShellRoot {
             onStreamFinished: {
                 root.bindsBlocked = text.trim() === "hi-wait";
                 if (!root.bindsBlocked)
-                    console.warn("Wait Mode: Hyprland has no 'hi-wait' submap; key binds stay on. Reload Hyprland (hyprctl reload) with hi-shell's hypr/hi-shell.lua.");
+                    console.warn("Wait Mode: Hyprland has no 'hi-wait' submap; key binds stay on. Reload Hyprland (hyprctl reload) with hi-shell's hi-shell.lua.");
             }
         }
     }

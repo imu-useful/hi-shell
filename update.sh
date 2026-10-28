@@ -39,6 +39,19 @@ echo
 
 if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     if ! git diff --quiet "$before" "$after" -- hypr/; then
+        # hi-shell.lua is a copy in ~/.config/hypr that you may have edited: it's replaced only
+        # while it's still the version that came with the old release, else the new one waits
+        # next to it as hi-shell.lua.new.
+        hypr_copy="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hi-shell.lua"
+        if [[ -f "$hypr_copy" ]]; then
+            if git show "$before:hypr/hi-shell.lua" 2>/dev/null | cmp -s - "$hypr_copy"; then
+                cp "$REPO/hypr/hi-shell.lua" "$hypr_copy"
+                echo "Updated $hypr_copy"
+            else
+                cp "$REPO/hypr/hi-shell.lua" "$hypr_copy.new"
+                echo "${yellow}$hypr_copy has your changes: the new version is in $hypr_copy.new, merge it by hand.${reset}"
+            fi
+        fi
         step "Reloading Hyprland (keybinds changed)"
         hyprctl reload >/dev/null || true
     fi

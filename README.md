@@ -120,8 +120,9 @@ The installer:
 
 1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
 2. links the repo to `~/.config/quickshell/hi-shell`
-3. loads `hypr/hi-shell.lua` from your Hyprland config — `~/.config/hypr/custom/execs.lua` on illogical-impulse dots,
-   `~/.config/hypr/hyprland.lua` otherwise (one marked line, with a backup of the file)
+3. copies `hypr/hi-shell.lua` to `~/.config/hypr/hi-shell.lua` (yours to edit) and loads it from your Hyprland config —
+   `~/.config/hypr/custom/execs.lua` on illogical-impulse dots, `~/.config/hypr/hyprland.lua` otherwise (one marked line,
+   with a backup of the file; an earlier install's line is moved to the copy)
 4. starts the shell and warns about other bars or notification daemons that are still running
 
 The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!lazer, Steam (needs `[multilib]`), Spotify and Neovim.
@@ -158,11 +159,15 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
    ln -s ~/Projects/hi-shell ~/.config/quickshell/hi-shell
    ```
 
-2. Load the Hyprland integration (autostart, keybinds, blur rules) from your config,
-   e.g. `~/.config/hypr/custom/execs.lua` on illogical-impulse or `hyprland.lua` otherwise:
+2. Copy the Hyprland integration (autostart, keybinds, window and layer rules) next to your Hyprland config and load it
+   from there, e.g. from `~/.config/hypr/custom/execs.lua` on illogical-impulse or `hyprland.lua` otherwise:
+
+   ```sh
+   cp ~/Projects/hi-shell/hypr/hi-shell.lua ~/.config/hypr/hi-shell.lua
+   ```
 
    ```lua
-   dofile(os.getenv("HOME") .. "/.config/quickshell/hi-shell/hypr/hi-shell.lua")
+   dofile(os.getenv("HOME") .. "/.config/hypr/hi-shell.lua")
    ```
 
    It starts `qs -c hi-shell` when Hyprland starts. To run it now without logging out:
@@ -204,7 +209,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 | scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 
-Change the keys in `hypr/hi-shell.lua`. Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
+Change the keys in `~/.config/hypr/hi-shell.lua` (the Keybinds section; `update.sh` keeps your edits and leaves the new version as `hi-shell.lua.new` when the file changed upstream). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 
 ```sh
 qs -c hi-shell ipc call launcher toggle       # also: ai, sidebarRight, calendar
@@ -242,7 +247,7 @@ qs -c hi-shell ipc call welcome open                  # the first-run welcome ag
 
 Use the settings panel (<kbd>Super</kbd>+<kbd>Escape</kbd>), or edit `~/.config/hi-shell/config.json` (created with
 the defaults on first start; edits apply live). The Hyprland page applies changes at once and keeps them in
-`~/.config/hi-shell/hyprland.lua`, which `hypr/hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
+`~/.config/hi-shell/hyprland.lua`, which `hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
 A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 Sections:
@@ -512,7 +517,7 @@ common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) wi
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
                      Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), presets.py
 translations/        interface translations (ru.json)
-hypr/hi-shell.lua    Hyprland autostart, keybinds and layer rules
+hypr/hi-shell.lua    Hyprland autostart, keybinds, window and layer rules (installed to ~/.config/hypr)
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
 dots/                terminal configs (fish, kitty, fastfetch, btop)
