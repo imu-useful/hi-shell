@@ -404,13 +404,23 @@ Scope {
             }
 
             // --- Edit toolbar ---
+            // Bottom center until it's dragged (by its title) out of the way, e.g. to put widgets
+            // along the bottom of the screen; the place is kept (desktop.toolbar).
             DesktopCard {
+                id: toolbarCard
+
+                readonly property var saved: root.options.toolbar
+                readonly property real freeX: Math.max(0, parent.width - width)
+                readonly property real freeY: Math.max(0, parent.height - height)
+                // Distance dragged so far, added to the saved place until the drag ends.
+                property real shiftX: 0
+                property real shiftY: 0
+
                 visible: root.editing && window.hasWidgets
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 48
                 width: Math.min(parent.width - 64, toolbar.implicitWidth + 32)
                 height: toolbar.implicitHeight + 24
+                x: Math.max(0, Math.min(freeX, (saved.x >= 0 ? saved.x * freeX : freeX / 2) + shiftX))
+                y: Math.max(0, Math.min(freeY, (saved.y >= 0 ? saved.y * freeY : freeY - 48) + shiftY))
                 baseColor: Colors.m3surfaceContainerHigh
 
                 ColumnLayout {
@@ -421,18 +431,56 @@ Scope {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        MaterialIcon {
-                            icon: "dashboard_customize"
-                            color: Colors.m3primary
-                        }
-                        StyledText {
+
+                        // The handle: drag the toolbar by its icon and title.
+                        Item {
                             Layout.fillWidth: true
-                            text: Translation.tr("Drag widgets to move them, the corner or the right edge to resize · tap a chip to show or hide")
+                            implicitHeight: title.implicitHeight
+
+                            RowLayout {
+                                id: title
+                                anchors.fill: parent
+                                spacing: 8
+                                MaterialIcon {
+                                    icon: "drag_indicator"
+                                    color: Colors.m3outline
+                                }
+                                MaterialIcon {
+                                    icon: "dashboard_customize"
+                                    color: Colors.m3primary
+                                }
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    text: Translation.tr("Drag widgets to move them, the corner or the right edge to resize · tap a chip to show or hide · drag here to move this bar")
+                                    elide: Text.ElideRight
+                                }
+                            }
+                            HoverHandler {
+                                cursorShape: Qt.SizeAllCursor
+                            }
+                            DragHandler {
+                                target: null
+                                onActiveTranslationChanged: {
+                                    toolbarCard.shiftX = activeTranslation.x;
+                                    toolbarCard.shiftY = activeTranslation.y;
+                                }
+                                onActiveChanged: {
+                                    if (active)
+                                        return;
+                                    // Keep where it ended up, then drop the drag offset.
+                                    root.options.toolbar.x = toolbarCard.freeX > 0 ? toolbarCard.x / toolbarCard.freeX : 0.5;
+                                    root.options.toolbar.y = toolbarCard.freeY > 0 ? toolbarCard.y / toolbarCard.freeY : 1;
+                                    toolbarCard.shiftX = toolbarCard.shiftY = 0;
+                                }
+                            }
                         }
                         M3Button {
                             tonal: true
                             text: Translation.tr("Reset")
-                            onClicked: root.options.layout = {}
+                            onClicked: {
+                                root.options.layout = {};
+                                root.options.toolbar.x = root.options.toolbar.y = -1;
+                            }
                         }
                         M3Button {
                             text: Translation.tr("Done")

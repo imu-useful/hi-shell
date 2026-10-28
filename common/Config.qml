@@ -164,6 +164,12 @@ Singleton {
                 // Widget id -> { enabled, x, y } with x / y as fractions of the screen;
                 // missing ids use the defaults in modules/desktop/Layout.js. Edit mode writes this.
                 property var layout: ({})
+                // Where the edit toolbar was dragged to, as fractions of the free space on the
+                // screen (-1 = the default, bottom center).
+                property JsonObject toolbar: JsonObject {
+                    property real x: -1
+                    property real y: -1
+                }
                 property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]
                 // Picture for the image frame widget (empty = the wallpaper).
                 property string image: ""
