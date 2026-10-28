@@ -56,6 +56,8 @@ ShellRoot {
 
     DisplayMode {}
 
+    DisplayConfirm {}
+
     RegionSelector {}
 
     Dock {}

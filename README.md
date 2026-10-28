@@ -243,6 +243,8 @@ qs -c hi-shell ipc call welcome open                  # the first-run welcome ag
 Use the settings panel (<kbd>Super</kbd>+<kbd>Escape</kbd>), or edit `~/.config/hi-shell/config.json` (created with
 the defaults on first start; edits apply live). The Hyprland page applies changes at once and keeps them in
 `~/.config/hi-shell/hyprland.lua`, which `hypr/hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
+A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
+15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`

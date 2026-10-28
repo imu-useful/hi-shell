@@ -47,18 +47,86 @@ Singleton {
     }
 
     // --- Monitors ---
-    // rule: { mode: "1920x1080@60", position: "0x0", scale: 1, transform: 0 }
-    function setMonitor(name, changes) {
-        const m = monitors.find(x => x.name === name);
-        if (!m)
-            return;
-        const current = overrides.monitors[name] ?? {
+    // A new resolution, orientation or scale is tried first: it's applied at once but kept
+    // only when confirmed (Keep); otherwise, after `confirmSeconds` or on Revert, the monitor
+    // goes back to how it was. Nothing is saved until it's kept.
+    readonly property int confirmSeconds: 15
+    // The monitor being tried ("" = none), the rule it had before, the rule being tried, seconds left.
+    property string pendingName: ""
+    property var pendingPrevious: null
+    property var pendingRule: null
+    property int countdown: 0
+
+    function liveRule(m) {
+        return {
             mode: `${m.width}x${m.height}@${m.refreshRate.toFixed(2)}`,
             position: `${m.x}x${m.y}`,
             scale: m.scale,
             transform: m.transform
         };
+    }
+
+    function keepPending() {
+        if (pendingName === "")
+            return;
+        const all = Object.assign({}, overrides.monitors);
+        all[pendingName] = pendingRule;
+        overrides.monitors = all;
+        writeLua();
+        clearPending();
+    }
+
+    function revertPending() {
+        if (pendingName === "")
+            return;
+        apply(`hl.monitor(${lua(Object.assign({ output: pendingName }, pendingPrevious))})`);
+        clearPending();
+        refreshLater.restart();
+    }
+
+    function clearPending() {
+        countdownTimer.stop();
+        pendingName = "";
+        pendingPrevious = null;
+        pendingRule = null;
+        countdown = 0;
+    }
+
+    Timer {
+        id: countdownTimer
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            if (--root.countdown <= 0)
+                root.revertPending();
+        }
+    }
+
+    // rule: { mode: "1920x1080@60", position: "0x0", scale: 1, transform: 0 }
+    function setMonitor(name, changes) {
+        const m = monitors.find(x => x.name === name);
+        if (!m)
+            return;
+        const trying = pendingName === name;
+        const current = trying ? pendingRule : (overrides.monitors[name] ?? liveRule(m));
         const rule = Object.assign({}, current, changes);
+        if (trying || "mode" in changes || "transform" in changes || "scale" in changes) {
+            // Another monitor still waiting for an answer is settled first (kept as it is).
+            if (pendingName !== "" && !trying)
+                keepPending();
+            if (!trying) {
+                pendingName = name;
+                pendingPrevious = liveRule(m);
+            }
+            pendingRule = rule;
+            if ("mode" in changes || "transform" in changes || "scale" in changes) {
+                countdown = confirmSeconds;
+                countdownTimer.restart();
+            }
+            apply(`hl.monitor(${lua(Object.assign({ output: name }, rule))})`);
+            refreshLater.restart();
+            return;
+        }
         const all = Object.assign({}, overrides.monitors);
         all[name] = rule;
         overrides.monitors = all;
@@ -68,6 +136,7 @@ Singleton {
     }
 
     function resetAll() {
+        clearPending();
         overrides.monitors = {};
         overrides.options = {};
         writeLua();

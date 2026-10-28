@@ -791,5 +791,9 @@
     "Context menus": "Контекстные меню",
     "The tray's right-click menus": "Меню по правому клику на значках в трее",
     "New": "Новое",
-    "Standard": "Стандартное"
+    "Standard": "Стандартное",
+    "Keep these display settings?": "Сохранить эти настройки экрана?",
+    "%1 goes back to how it was in %2 s": "%1 вернётся к прежним настройкам через %2 с",
+    "Revert": "Сбросить",
+    "Keep": "Сохранить"
 }
