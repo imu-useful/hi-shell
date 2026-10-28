@@ -185,7 +185,10 @@ Scope {
                 property point drag: Qt.point(0, 0)
                 x: Config.options.wallpapers.frameX * parent.width - width / 2 + drag.x
                 y: Config.options.wallpapers.frameY * parent.height - height / 2 + drag.y
-                width: Math.min(parent.width, parent.height) * 0.62
+                // The size in the config, or the one being dragged (-1 when not resizing).
+                property real dragSize: -1
+                readonly property real sizeFraction: dragSize > 0 ? dragSize : Config.options.wallpapers.frameSize
+                width: Math.min(parent.width, parent.height) * sizeFraction
                 height: width
 
                 readonly property bool dancing: visible && Config.options.wallpapers.frameDance && Mpris.playing
@@ -306,8 +309,84 @@ Scope {
                     anchors.fill: parent
                     cursorShape: frameDrag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                 }
+
+                // Size badge while it's not the normal size.
+                Rectangle {
+                    visible: Math.abs(frame.sizeFraction - 0.62) > 0.005
+                    anchors.right: parent.right
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: 8
+                    implicitWidth: sizeLabel.implicitWidth + 14
+                    implicitHeight: 22
+                    radius: 11
+                    color: Colors.m3secondaryContainer
+                    StyledText {
+                        id: sizeLabel
+                        anchors.centerIn: parent
+                        text: Math.round(frame.sizeFraction / 0.62 * 100) + "%"
+                        font.pixelSize: Appearance.font.size.labelSmall
+                        color: Colors.m3onSecondaryContainer
+                    }
+                }
+
+                // Resize: drag the corner, the frame grows around its center (double click = the
+                // normal size).
+                Rectangle {
+                    anchors.horizontalCenter: parent.right
+                    anchors.verticalCenter: parent.bottom
+                    implicitWidth: 24
+                    implicitHeight: 24
+                    radius: 12
+                    color: frameResize.pressed ? Colors.m3primary : Colors.m3secondaryContainer
+                    border.width: 2
+                    border.color: Colors.m3primary
+
+                    MaterialIcon {
+                        anchors.centerIn: parent
+                        icon: "open_in_full"
+                        iconSize: 14
+                        color: frameResize.pressed ? Colors.m3onPrimary : Colors.m3onSecondaryContainer
+                    }
+
+                    MouseArea {
+                        id: frameResize
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        cursorShape: Qt.SizeFDiagCursor
+                        preventStealing: true
+                        property real startFraction: 0.62
+                        property real startWidth: 1
+                        property point startPos
+
+                        onPressed: mouse => {
+                            startFraction = frame.sizeFraction;
+                            startWidth = Math.max(1, frame.width);
+                            startPos = mapToItem(frameGrip.parent, mouse.x, mouse.y);
+                            frame.dragSize = startFraction;
+                        }
+                        onPositionChanged: mouse => {
+                            if (!pressed)
+                                return;
+                            const p = mapToItem(frameGrip.parent, mouse.x, mouse.y);
+                            // The center stays put, so the corner moving by d makes the side 2d longer.
+                            const side = startWidth + (p.x - startPos.x) + (p.y - startPos.y);
+                            frame.dragSize = Math.max(0.2, Math.min(1.5, Math.round(startFraction * side / startWidth * 100) / 100));
+                        }
+                        onReleased: {
+                            const v = frame.dragSize;
+                            frame.dragSize = -1;
+                            Config.options.wallpapers.frameSize = Math.abs(v - 0.62) < 0.02 ? 0.62 : v;
+                        }
+                        onDoubleClicked: {
+                            frame.dragSize = -1;
+                            Config.options.wallpapers.frameSize = 0.62;
+                        }
+                    }
+                }
+
                 DragHandler {
                     id: frameDrag
+                    enabled: !frameResize.pressed
                     target: null
                     onTranslationChanged: {
                         if (!active)

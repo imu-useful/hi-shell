@@ -153,6 +153,8 @@ Singleton {
                 // Moved by dragging it in the desktop's edit mode.
                 property real frameX: 0.5
                 property real frameY: 0.5
+                // The frame's size, as a fraction of the screen's shorter side.
+                property real frameSize: 0.62
             }
 
             property JsonObject desktop: JsonObject {
