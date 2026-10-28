@@ -147,6 +147,17 @@ PanelWindow {
                 color: root.barColor
             }
 
+            // Right click on the empty part of the bar opens its settings; the widgets sit above
+            // this and keep their own clicks.
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onClicked: {
+                    ShellState.settingsPage = "bar";
+                    ShellState.settingsOpen = true;
+                }
+            }
+
             Item {
                 id: content
 
