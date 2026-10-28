@@ -250,8 +250,17 @@ loaded_in="$(grep -rlF -e "${old_paths[0]}" -e "${old_paths[1]}" -e "${entry#"$H
 
 # Copy the files; one that differs from hi-shell's (yours, edited) is replaced only on request.
 copy_hypr_lua() {
-    local src name changed=false
+    local src name changed=false keep
     mkdir -p "$HYPR_LUA_DIR"
+    # "Keep my Hyprland files on update" (Settings > Hyprland): add only the files you don't have.
+    keep="$(python3 -c 'import json,sys; print(str(bool(json.load(open(sys.argv[1])).get("hyprland", {}).get("keepFiles"))).lower())' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo false)"
+    if [[ "$keep" == true ]]; then
+        for src in "$REPO"/hypr/hi-shell/*.lua; do
+            [[ -e "$HYPR_LUA_DIR/$(basename "$src")" ]] || cp "$src" "$HYPR_LUA_DIR/"
+        done
+        echo "Kept your files in $HYPR_LUA_DIR (Settings > Hyprland > Keep my Hyprland files on update)"
+        return 0
+    fi
     for src in "$REPO"/hypr/hi-shell/*.lua; do
         name="$(basename "$src")"
         [[ -f "$HYPR_LUA_DIR/$name" ]] && ! cmp -s "$src" "$HYPR_LUA_DIR/$name" && changed=true

@@ -815,5 +815,8 @@
     "Slide": "Скольжение",
     "Stretch": "Растяжение",
     "Apps per workspace": "Приложений на воркспейс",
-    "How many app icons a workspace shows; the rest are counted as +N": "Сколько иконок приложений показывает воркспейс; остальные считаются как +N"
+    "How many app icons a workspace shows; the rest are counted as +N": "Сколько иконок приложений показывает воркспейс; остальные считаются как +N",
+    "Keybinds and rules": "Бинды и правила",
+    "Keep my Hyprland files on update": "Не трогать мои файлы Hyprland при обновлении",
+    "update.sh leaves ~/.config/hypr/hi-shell/ (keybinds, rules) alone and only lists what changed": "update.sh не трогает ~/.config/hypr/hi-shell/ (бинды, правила) и только показывает, что изменилось"
 }

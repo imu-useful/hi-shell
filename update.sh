@@ -41,9 +41,20 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     if ! git diff --quiet "$before" "$after" -- hypr/; then
         # hypr/hi-shell/ is copied to ~/.config/hypr/hi-shell/, where you may have edited it: a file
         # is replaced only while it's still the version that came with the old release, else the
-        # new one waits next to it as <name>.new. Files you don't have yet are added.
+        # new one waits next to it as <name>.new. Files you don't have yet are added. With
+        # "Keep my Hyprland files on update" (Settings > Hyprland) nothing in that folder is touched:
+        # the files that changed are only listed.
         hypr_dir="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
-        if [[ -d "$hypr_dir/hi-shell" ]]; then
+        keep="$(python3 -c 'import json,sys; print(str(bool(json.load(open(sys.argv[1])).get("hyprland", {}).get("keepFiles"))).lower())' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo false)"
+        reload=true
+        if [[ ! -d "$hypr_dir/hi-shell" ]]; then
+            echo "${yellow}hi-shell's Hyprland files (keybinds, rules) are a folder now, hypr/hi-shell/. They keep loading from the repo; run ./install.sh to copy them to $hypr_dir/hi-shell, where you can edit them.${reset}"
+        elif [[ "$keep" == true ]]; then
+            reload=false
+            echo "Your Hyprland files in $hypr_dir/hi-shell are kept as they are (Settings > Hyprland). Changed upstream:"
+            git diff --name-only "$before" "$after" -- hypr/hi-shell | sed 's#^hypr/hi-shell/#  #'
+            echo "  see them with: git -C $REPO diff $before $after -- hypr/hi-shell"
+        else
             for src in "$REPO"/hypr/hi-shell/*.lua; do
                 name="$(basename "$src")"
                 mine="$hypr_dir/hi-shell/$name"
@@ -60,11 +71,11 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
                     echo "${yellow}$mine has your changes: the new version is in $mine.new, merge it by hand.${reset}"
                 fi
             done
-        else
-            echo "${yellow}hi-shell's Hyprland files (keybinds, rules) are a folder now, hypr/hi-shell/. They keep loading from the repo; run ./install.sh to copy them to $hypr_dir/hi-shell, where you can edit them.${reset}"
         fi
-        step "Reloading Hyprland (keybinds changed)"
-        hyprctl reload >/dev/null || true
+        if $reload; then
+            step "Reloading Hyprland (keybinds changed)"
+            hyprctl reload >/dev/null || true
+        fi
     fi
     step "Restarting hi-shell"
     qs -c hi-shell kill &>/dev/null || true

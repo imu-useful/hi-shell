@@ -211,7 +211,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 | scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 
-Change the keys in `~/.config/hypr/hi-shell/keybinds.lua` (the other files in that folder hold the startup, window and layer rules; `update.sh` keeps your edits and leaves a new version of a changed file as `<name>.lua.new`). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
+Change the keys in `~/.config/hypr/hi-shell/keybinds.lua` (the other files in that folder hold the startup, window and layer rules; `update.sh` keeps your edits and leaves a new version of a changed file as `<name>.lua.new`; turn on Settings → Hyprland → "Keep my Hyprland files on update", `hyprland.keepFiles` in the config, and updates don't touch that folder at all, they only list what changed upstream). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 
 ```sh
 qs -c hi-shell ipc call launcher toggle       # also: ai, sidebarRight, calendar

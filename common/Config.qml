@@ -264,6 +264,8 @@ Singleton {
                 property var monitors: ({})
                 // option path ("general.gaps_in") -> value
                 property var options: ({})
+                // Updates leave ~/.config/hypr/hi-shell/ (keybinds, rules) alone (update.sh, install.sh read this)
+                property bool keepFiles: false
             }
 
             property JsonObject dock: JsonObject {

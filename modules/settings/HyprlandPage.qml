@@ -278,6 +278,19 @@ ColumnLayout {
         }
     }
 
+    Section {
+        icon: "keyboard"
+        title: Translation.tr("Keybinds and rules")
+
+        SwitchRow {
+            icon: "lock"
+            title: Translation.tr("Keep my Hyprland files on update")
+            subtitle: Translation.tr("update.sh leaves ~/.config/hypr/hi-shell/ (keybinds, rules) alone and only lists what changed")
+            checked: Config.options.hyprland.keepFiles
+            onToggled: checked => Config.options.hyprland.keepFiles = checked
+        }
+    }
+
     RowLayout {
         Layout.fillWidth: true
         StyledText {
