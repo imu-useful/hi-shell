@@ -206,6 +206,11 @@ Singleton {
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""
+                // "claude" (the CLI) or "openrouter" (any model, the free ones included)
+                property string provider: "claude"
+                property string openrouterKey: ""
+                // OpenRouter model id, e.g. "meta-llama/llama-3.3-70b-instruct:free"
+                property string openrouterModel: ""
             }
 
             property JsonObject translator: JsonObject {

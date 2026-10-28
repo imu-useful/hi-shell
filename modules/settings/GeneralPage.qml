@@ -48,6 +48,23 @@ ColumnLayout {
             options: Claude.models.map(m => ({ value: m.id, text: m.name }))
             onSelected: value => Claude.model = value
         }
+        ChoiceRow {
+            icon: "hub"
+            title: Translation.tr("Provider")
+            subtitle: Translation.tr("OpenRouter runs any of its models, the free ones included")
+            value: Claude.provider
+            options: [{ value: "claude", text: "Claude" }, { value: "openrouter", text: "OpenRouter" }]
+            onSelected: value => Claude.provider = value
+        }
+        TextRow {
+            icon: "key"
+            title: Translation.tr("OpenRouter API key")
+            subtitle: Translation.tr("Free at openrouter.ai/keys; the model is picked in the sidebar chat")
+            value: o.ai.openrouterKey
+            secret: true
+            fieldWidth: 300
+            onEdited: text => o.ai.openrouterKey = text.trim()
+        }
     }
 
     Section {

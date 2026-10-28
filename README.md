@@ -30,7 +30,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | --- | --- |
 | 🧭 **Bar** | Configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles, hover popups for media, resources, weather, battery and updates, a live audio spectrum |
 | 🚀 **App launcher** | Apps and settings, plus prefixes: `=` calculator (a plain "12*(3+4)" or "10+5=" is answered too, without the prefix), `>` run a command, `<` keybinds, `:` emoji, `;` clipboard, `/` settings |
-| ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats |
+| ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats; or any [OpenRouter](https://openrouter.ai) model, the free ones included |
 | 🪟 **Overlays** | Workspace overview with window previews (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording, optional dock, rounded screen corners |
 | ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics, weather, Claude chat, translator, clipboard history with image thumbnails |
 | 🎯 **Focus Mode** | Sessions with a minimal bar, Pomodoro cycles, blocked apps and sites, profiles, statistics and achievements |
@@ -267,6 +267,7 @@ Sections:
   `qs -c hi-shell ipc call coverMode toggle`), draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
   mode), `worldClocks` (IANA zones), `image` for the image frame, bottom `visualizer`
 - `ai.model`: claude CLI model alias (empty = CLI default, `opus`, `sonnet`, `haiku`; also the picker in the chat)
+- `ai.provider`: `claude` or `openrouter` (the button next to the history button in the chat switches it); `ai.openrouterKey`: your key from openrouter.ai/keys; `ai.openrouterModel`: the model id (the chat's picker lists OpenRouter's free models)
 - `translator`: target language and the quick-pick list
 - `clipboard.watch`: start `wl-paste --watch cliphist store` with the shell (skipped if already running)
 - `weather`: `city` (or `latitude`/`longitude`; empty = locate by IP, which a VPN will skew), `imperial`, refresh interval

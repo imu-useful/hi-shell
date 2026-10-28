@@ -13,9 +13,18 @@ ColumnLayout {
     id: root
 
     property bool showHistory: false
+    property bool showModels: false
+    property string modelFilter: ""
 
     function focusInput() {
         input.forceActiveFocus();
+    }
+
+    function toggleModels() {
+        showModels = !showModels;
+        showHistory = false;
+        if (showModels && Claude.freeModels.length === 0)
+            Claude.loadFreeModels();
     }
 
     spacing: 10
@@ -25,18 +34,41 @@ ColumnLayout {
         spacing: 6
 
         SegmentedButton {
+            visible: !Claude.openrouter
             model: Claude.models.map(m => m.name)
             currentIndex: Math.max(0, Claude.models.findIndex(m => m.id === Claude.model))
             enabled: !Claude.busy
             onSelected: index => Claude.model = Claude.models[index].id
         }
+        Chip {
+            visible: Claude.openrouter
+            Layout.maximumWidth: root.width - 130
+            icon: "expand_more"
+            text: Claude.modelName || Translation.tr("Pick a model")
+            selected: root.showModels
+            enabled: !Claude.busy
+            onClicked: root.toggleModels()
+        }
         Item { Layout.fillWidth: true }
+        IconButton {
+            implicitWidth: 36
+            implicitHeight: 36
+            icon: Claude.openrouter ? "hub" : "auto_awesome"
+            enabled: !Claude.busy
+            onClicked: {
+                Claude.provider = Claude.openrouter ? "claude" : "openrouter";
+                root.showModels = false;
+            }
+        }
         IconButton {
             implicitWidth: 36
             implicitHeight: 36
             icon: "history"
             filled: root.showHistory
-            onClicked: root.showHistory = !root.showHistory
+            onClicked: {
+                root.showHistory = !root.showHistory;
+                root.showModels = false;
+            }
         }
         IconButton {
             implicitWidth: 36
@@ -53,10 +85,83 @@ ColumnLayout {
 
     StyledText {
         Layout.fillWidth: true
-        visible: Claude.inputTokens + Claude.outputTokens > 0 && !root.showHistory
+        visible: Claude.inputTokens + Claude.outputTokens > 0 && !root.showHistory && !root.showModels
         text: Translation.tr("%1 in · %2 out").arg(Claude.formatTokens(Claude.inputTokens)).arg(Claude.formatTokens(Claude.outputTokens)) + (Claude.costUsd > 0 ? " · $" + Claude.costUsd.toFixed(3) : "")
         font.pixelSize: Appearance.font.size.labelSmall
         color: Colors.m3outline
+    }
+
+    // --- OpenRouter's free models ---
+    Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: 36
+        radius: 18
+        visible: root.showModels
+        color: Colors.m3surfaceContainerHighest
+
+        TextInput {
+            id: modelSearch
+            anchors.fill: parent
+            anchors.leftMargin: 14
+            anchors.rightMargin: 14
+            verticalAlignment: TextInput.AlignVCenter
+            font.family: Appearance.font.main
+            font.pixelSize: Appearance.font.size.bodyMedium
+            color: Colors.m3onSurface
+            clip: true
+            selectByMouse: true
+            onTextChanged: root.modelFilter = text.trim().toLowerCase()
+
+            StyledText {
+                visible: modelSearch.text === ""
+                text: Translation.tr("Search free models…")
+                color: Colors.m3outline
+            }
+        }
+    }
+
+    StyledFlickable {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        visible: root.showModels
+        contentHeight: modelsColumn.implicitHeight
+
+        ColumnLayout {
+            id: modelsColumn
+            width: parent.width
+            spacing: 2
+
+            StyledText {
+                visible: Claude.loadingModels || Claude.modelsError !== "" || (Claude.freeModels.length > 0 && modelRepeater.count === 0)
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 30
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                text: Claude.loadingModels ? Translation.tr("Loading models…") : Claude.modelsError !== "" ? Claude.modelsError : Translation.tr("No models match")
+                color: Colors.m3onSurfaceVariant
+            }
+
+            Repeater {
+                id: modelRepeater
+                model: Claude.freeModels.filter(m => root.modelFilter === "" || m.id.toLowerCase().includes(root.modelFilter) || m.name.toLowerCase().includes(root.modelFilter))
+
+                ListRow {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    icon: modelData.id === Claude.openrouterModel ? "check" : "smart_toy"
+                    title: modelData.name
+                    subtitle: modelData.id
+                    clickable: true
+                    color: modelData.id === Claude.openrouterModel ? Colors.m3secondaryContainer : "transparent"
+                    onClicked: {
+                        Claude.openrouterModel = modelData.id;
+                        root.showModels = false;
+                        root.focusInput();
+                    }
+                }
+            }
+        }
     }
 
     // --- Saved chats ---
@@ -113,7 +218,7 @@ ColumnLayout {
         Layout.fillHeight: true
         // Kept for a moment after the last message goes, so the messages can erase away.
         property bool erasing: false
-        visible: !root.showHistory && (Claude.messages.count > 0 || erasing)
+        visible: !root.showHistory && !root.showModels && (Claude.messages.count > 0 || erasing)
         clip: true
         spacing: 10
         model: Claude.messages
@@ -146,7 +251,7 @@ ColumnLayout {
     ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        visible: !root.showHistory && Claude.messages.count === 0 && !list.erasing
+        visible: !root.showHistory && !root.showModels && Claude.messages.count === 0 && !list.erasing
         spacing: 12
 
         Item { Layout.fillHeight: true }
@@ -227,6 +332,7 @@ ColumnLayout {
                     Claude.send(text);
                     text = "";
                     root.showHistory = false;
+                    root.showModels = false;
                 }
 
                 Keys.onPressed: event => {

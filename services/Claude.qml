@@ -7,7 +7,9 @@ import qs.common
 
 // Claude chat through the `claude` CLI (Claude Code), shared by the quick
 // palette (Super+Y) and the left sidebar. Answers stream in; follow-ups resume
-// the CLI session. Chats are saved to ~/.local/state/hi-shell/claude-chats.json
+// the CLI session. With the OpenRouter provider the same chat talks to any
+// OpenRouter model (the free ones are listed) over its streaming API instead;
+// there the whole conversation is sent with every message. Chats are saved to ~/.local/state/hi-shell/claude-chats.json
 // and can be reopened; each tracks tokens and cost reported by the CLI.
 Singleton {
     id: root
@@ -16,7 +18,7 @@ Singleton {
     property ListModel messages: ListModel {}
     property string sessionId: ""
     property string chatId: ""
-    readonly property bool busy: proc.running
+    readonly property bool busy: proc.running || orProc.running
 
     // Usage of the current chat, from the CLI's result events.
     property int inputTokens: 0
@@ -35,6 +37,23 @@ Singleton {
         { id: "haiku", name: "Haiku" }
     ]
 
+    // "claude" or "openrouter"
+    property string provider: Config.options.ai.provider
+    readonly property bool openrouter: provider === "openrouter"
+    property string openrouterModel: Config.options.ai.openrouterModel
+    // Free OpenRouter models, [{ id, name }], loaded on demand.
+    property var freeModels: []
+    property bool loadingModels: false
+    property string modelsError: ""
+    // What the sidebar shows as the current model.
+    readonly property string modelName: openrouter ? (freeModels.find(m => m.id === openrouterModel)?.name ?? openrouterModel) : model
+
+    // The request body is passed through the environment and the key through a
+    // curl config on a pipe, so neither the key nor its header shows in `ps`.
+    readonly property int maxBodyBytes: 100000
+    readonly property string curlScript: 'exec curl -sS -N --max-time 600 -K <(printf \'header = "Authorization: Bearer %s"\\n\' "$OR_KEY") '
+        + '-H "Content-Type: application/json" -H "X-Title: hi-shell" --data-binary "$OR_BODY" https://openrouter.ai/api/v1/chat/completions'
+
     property bool gotResult: false
     property bool cancelled: false
 
@@ -49,6 +68,11 @@ Singleton {
         messages.append({ role: "assistant", text: "", done: false });
         gotResult = false;
         cancelled = false;
+
+        if (openrouter) {
+            sendOpenRouter();
+            return;
+        }
 
         const args = ["-p", "--output-format", "stream-json", "--include-partial-messages", "--verbose",
             // Chat only: no file edits or shell commands from the shell UI.
@@ -65,11 +89,72 @@ Singleton {
         proc.running = true;
     }
 
+    // The conversation so far as chat messages, newest last, within maxBodyBytes.
+    function conversation() {
+        const list = [];
+        for (let i = 0; i < messages.count - 1; i++) {
+            const m = messages.get(i);
+            if ((m.role === "user" || m.role === "assistant") && m.text !== "")
+                list.push({ role: m.role, content: m.text });
+        }
+        const body = () => JSON.stringify({ model: openrouterModel, stream: true, usage: { include: true }, messages: list });
+        while (list.length > 1 && body().length > maxBodyBytes)
+            list.shift();
+        return body();
+    }
+
+    function sendOpenRouter() {
+        const key = Config.options.ai.openrouterKey;
+        if (key === "")
+            return finishWith("error", Translation.tr("Add your OpenRouter API key in Settings → General."));
+        if (openrouterModel === "")
+            return finishWith("error", Translation.tr("Pick an OpenRouter model first."));
+        orProc.environment = ({
+            PATH: `${Quickshell.env("HOME")}/.local/bin:${Quickshell.env("PATH")}`,
+            OR_KEY: key,
+            OR_BODY: conversation()
+        });
+        orProc.command = ["bash", "-c", curlScript];
+        orProc.running = true;
+    }
+
+    function finishWith(role, text) {
+        gotResult = true;
+        finish(role, text);
+    }
+
+    // OpenRouter's free models (prompt and completion both cost nothing).
+    function loadFreeModels() {
+        if (loadingModels)
+            return;
+        loadingModels = true;
+        modelsError = "";
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState !== XMLHttpRequest.DONE)
+                return;
+            loadingModels = false;
+            try {
+                if (xhr.status !== 200)
+                    throw new Error(`HTTP ${xhr.status}`);
+                freeModels = JSON.parse(xhr.responseText).data
+                    .filter(m => Number(m.pricing?.prompt) === 0 && Number(m.pricing?.completion) === 0)
+                    .map(m => ({ id: m.id, name: m.name ?? m.id }))
+                    .sort((a, b) => a.name.localeCompare(b.name));
+            } catch (e) {
+                modelsError = Translation.tr("Couldn't load the model list (%1)").arg(e.message);
+            }
+        };
+        xhr.open("GET", "https://openrouter.ai/api/v1/models");
+        xhr.send();
+    }
+
     function cancel() {
         if (!busy)
             return;
         cancelled = true;
         proc.running = false;
+        orProc.running = false;
     }
 
     // Start a new chat (the current one stays in the history).
@@ -87,6 +172,7 @@ Singleton {
         if (!chat || busy)
             return;
         messages.clear();
+        provider = chat.provider ?? "claude";
         for (const m of chat.messages)
             messages.append({ role: m.role, text: m.text, done: true });
         chatId = chat.id;
@@ -142,7 +228,8 @@ Singleton {
             id: chatId,
             title: first.length > 60 ? first.slice(0, 57) + "…" : first,
             sessionId,
-            model,
+            provider,
+            model: openrouter ? openrouterModel : model,
             updated: Date.now(),
             messages: list,
             inputTokens,
@@ -193,7 +280,35 @@ Singleton {
         }
     }
 
+    // One server event of an OpenRouter stream: "data: {json}" lines, ": comment" keep-alives
+    // and "data: [DONE]". An error before the stream starts comes as a plain JSON line.
+    function handleOpenRouterLine(line) {
+        const payload = line.startsWith("data:") ? line.slice(5).trim() : line.trim();
+        if (payload === "" || payload === "[DONE]" || payload.startsWith(":"))
+            return;
+        let ev;
+        try {
+            ev = JSON.parse(payload);
+        } catch (e) {
+            return;
+        }
+        if (ev.error)
+            return finishWith("error", ev.error.message ?? Translation.tr("OpenRouter returned an error."));
+        const delta = ev.choices?.[0]?.delta?.content;
+        if (delta) {
+            const i = messages.count - 1;
+            messages.setProperty(i, "text", messages.get(i).text + delta);
+        }
+        if (ev.usage) {
+            inputTokens += ev.usage.prompt_tokens ?? 0;
+            outputTokens += ev.usage.completion_tokens ?? 0;
+            costUsd += ev.usage.cost ?? 0;
+        }
+    }
+
     onModelChanged: if (Config.options.ai.model !== model) Config.options.ai.model = model
+    onProviderChanged: if (Config.options.ai.provider !== provider) Config.options.ai.provider = provider
+    onOpenrouterModelChanged: if (Config.options.ai.openrouterModel !== openrouterModel) Config.options.ai.openrouterModel = openrouterModel
 
     IpcHandler {
         target: "claude"
@@ -248,6 +363,33 @@ Singleton {
                 root.finish("error", Translation.tr("The `claude` CLI was not found. Install Claude Code and make sure `claude` is on PATH."));
             else
                 root.finish("error", stderr.text.trim() || Translation.tr("claude exited with code %1.").arg(exitCode));
+        }
+    }
+
+    Process {
+        id: orProc
+
+        workingDirectory: Quickshell.env("HOME")
+
+        stdout: SplitParser {
+            onRead: line => root.handleOpenRouterLine(line)
+        }
+        stderr: StdioCollector {
+            id: orStderr
+        }
+
+        onExited: (exitCode, exitStatus) => {
+            if (root.gotResult)
+                return;
+            const cur = root.current();
+            if (root.cancelled)
+                root.finish(undefined, cur.text === "" ? Translation.tr("_Stopped._") : cur.text + "\n\n_Stopped._");
+            else if (exitCode !== 0)
+                root.finish("error", orStderr.text.trim() || Translation.tr("curl exited with code %1.").arg(exitCode));
+            else if (cur.text === "")
+                root.finish("error", Translation.tr("The model returned an empty answer."));
+            else
+                root.finish();
         }
     }
 }
