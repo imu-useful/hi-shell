@@ -46,10 +46,15 @@ Item {
         blurEnabled: true
         blur: 1
         blurMax: 48
+        // The default padding makes room for the blur outside the item, which stretches the mask
+        // over it: the corners then no longer line up with the card's.
+        autoPaddingEnabled: false
         saturation: 0.25
         brightness: -0.12
         maskEnabled: true
         maskSource: mask
+        maskThresholdMin: 0.5
+        maskSpreadAtMin: 1
         opacity: image.status === Image.Ready ? 1 : 0
         Behavior on opacity { EffectAnim { duration: Appearance.anim.slow } }
     }
