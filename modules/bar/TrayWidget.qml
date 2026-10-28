@@ -46,6 +46,8 @@ BarWidget {
                 // The menu's window exists only while it's open.
                 PanelLoader {
                     id: lazyMenu
+                    // No close animation to wait for in game mode and power saving.
+                    closeDelay: Toggles.gameMode || PowerSaver.enabled ? 0 : Appearance.anim.spatial + 50
 
                     ContextMenu {
                         target: entry

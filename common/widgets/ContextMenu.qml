@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.common
+import qs.services
 
 // A Material You menu for the entries an app exposes (the system tray's menus): a rounded
 // tonal card with a hover / press state layer on every row, check marks and radio dots,
@@ -31,6 +32,8 @@ PopupWindow {
     readonly property var current: trail.length > 0 ? trail[trail.length - 1].handle : handle
     // Set by the owner (a PanelLoader's `revealed`); the menu asks to be closed through the signal.
     property bool shown: false
+    // No pop-in, spring or shadow in game mode and power saving: the menu just appears.
+    readonly property bool animated: !Toggles.gameMode && !PowerSaver.enabled && Appearance.anim.speed > 0
 
     signal closeRequested
 
@@ -86,12 +89,12 @@ PopupWindow {
         opacity: root.shown ? 1 : 0
         scale: root.shown ? 1 : 0.9
         transformOrigin: root.edge === Edges.Bottom ? Item.Top : Item.Bottom
-        Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
-        Behavior on scale { SpringAnim {} }
-        Behavior on slide { SpringAnim {} }
-        Behavior on height { SpringAnim {} }
+        Behavior on opacity { enabled: root.animated; EffectAnim { duration: Appearance.anim.fast } }
+        Behavior on scale { enabled: root.animated; SpringAnim {} }
+        Behavior on slide { enabled: root.animated; SpringAnim {} }
+        Behavior on height { enabled: root.animated; SpringAnim {} }
 
-        layer.enabled: true
+        layer.enabled: root.animated
         layer.effect: MultiEffect {
             shadowEnabled: true
             shadowColor: Qt.alpha("black", 0.45)
