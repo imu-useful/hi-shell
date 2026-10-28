@@ -37,7 +37,12 @@ BarWidget {
 
                 function openMenu() {
                     // Items without a menu of their own are just activated.
-                    if (modelData.menu)
+                    if (modelData.menu && Config.options.appearance.contextMenu === "standard") {
+                        // The system's own menu.
+                        const window = QsWindow.window;
+                        const pos = entry.mapToItem(window.contentItem, 0, 0);
+                        modelData.display(window, pos.x, root.popupEdge === Edges.Bottom ? pos.y + entry.height + 10 : pos.y);
+                    } else if (modelData.menu)
                         lazyMenu.shown = true;
                     else
                         modelData.activate();

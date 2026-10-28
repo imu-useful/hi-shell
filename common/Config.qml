@@ -66,6 +66,9 @@ Singleton {
                 property bool gtkColorScheme: true
                 // Rounded black screen corners, radius in px (0 = off).
                 property int screenCorners: 16
+                // Context menus (the system tray's): material = the shell's own Material You menu,
+                // standard = the one the system draws.
+                property string contextMenu: "material"
             }
 
             property JsonObject bar: JsonObject {

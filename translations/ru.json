@@ -787,5 +787,9 @@
     "Seconds in the digital clock": "Секунды в цифровых часах",
     "Move the frame": "Переместить рамку",
     "Drag it on the desktop, in edit mode": "Перетащите её на рабочем столе, в режиме правки",
-    "Move": "Переместить"
+    "Move": "Переместить",
+    "Context menus": "Контекстные меню",
+    "The tray's right-click menus": "Меню по правому клику на значках в трее",
+    "New": "Новое",
+    "Standard": "Стандартное"
 }

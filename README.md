@@ -269,6 +269,7 @@ Sections:
 - `dock`: enabled (off by default), auto-hide, magnify, icon size, pinned app ids
 - `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`), record audio
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
+- `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default) or `standard` (the system's menus); also in Settings › Interface
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
 ## Terminal configs

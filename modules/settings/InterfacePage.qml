@@ -43,6 +43,14 @@ ColumnLayout {
             from: 0; to: 50; suffix: "%"
             onMoved: value => a.transparencyLevel = value / 100
         }
+        ChoiceRow {
+            icon: "menu_open"
+            title: Translation.tr("Context menus")
+            subtitle: Translation.tr("The tray's right-click menus")
+            value: a.contextMenu
+            options: [{ value: "material", text: Translation.tr("New") }, { value: "standard", text: Translation.tr("Standard") }]
+            onSelected: value => a.contextMenu = value
+        }
         SliderRow {
             icon: "rounded_corner"
             title: Translation.tr("Screen corners")
