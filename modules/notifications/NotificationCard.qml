@@ -9,7 +9,7 @@ import qs.services
 
 // One notification: icon / image, app + time, summary, body (click to expand),
 // actions and inline reply. As a popup it shows a countdown bar that pauses on
-// hover. Swipe sideways (or the close button) to dismiss.
+// hover. Swipe sideways, right click (or the close button) to dismiss.
 Item {
     id: root
 
@@ -108,6 +108,12 @@ Item {
                 else
                     root.expanded = !root.expanded;
             }
+        }
+
+        // Right click = dismiss.
+        TapHandler {
+            acceptedButtons: Qt.RightButton
+            onTapped: root.dismiss()
         }
 
         RowLayout {
