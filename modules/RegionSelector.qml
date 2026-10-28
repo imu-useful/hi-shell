@@ -12,7 +12,7 @@ import qs.services
 // recording. Drag to select, click a window to take exactly that window, or
 // click the empty desktop for the whole screen; Esc cancels. The screen is frozen (grim) first, so the overlay is never in
 // the picture. Recording (with or without sound: the speakers' or the microphone) shows a pill
-// with the time; click it to stop.
+// with the time, outside the recorded region (a recording captures what's drawn); click it to stop.
 // IPC: `qs -c hi-shell ipc call region screenshot` (ocr, translate, record, stop, fullscreen).
 Scope {
     id: root
@@ -26,6 +26,8 @@ Scope {
     readonly property bool recording: recorder.running
     property real recordStart: 0
     property string recordFile: ""
+    // What's being recorded, in the output's logical px: the indicator stays out of it.
+    property rect recordRegion: Qt.rect(0, 0, 0, 0)
 
     readonly property string tmp: Paths.cache + "/region"
 
@@ -75,6 +77,7 @@ Scope {
         } else {
             // wf-recorder takes global logical coordinates.
             recordFile = `${Paths.home}/Videos/Recordings/${stamp}.mp4`;
+            recordRegion = Qt.rect(x, y, w, h);
             // wf-recorder takes one audio device: the default microphone, or the monitor of the
             // default output (what you hear).
             const sound = Config.options.capture.recordSound;
@@ -394,11 +397,31 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         PanelWindow {
             id: recWindow
             screen: Quickshell.screens.find(s => s.name === root.screenInfo?.name) ?? Quickshell.screens[0]
+            // The recording captures whatever is drawn in its region, this pill included, so it
+            // sits at the first of these spots that's clear of the region (top / bottom center,
+            // then the corners); when the region covers the screen it isn't shown at all (stop
+            // with the keybind again, or the bar's button).
+            readonly property int pillWidth: pill.implicitWidth
+            readonly property int pillHeight: pill.implicitHeight
+            readonly property int below: Appearance.sizes.barHeight + Appearance.sizes.barMargin + 10
+            readonly property var spots: {
+                const w = screen?.width ?? 0, h = screen?.height ?? 0;
+                return [[(w - pillWidth) / 2, below], [(w - pillWidth) / 2, h - pillHeight - 16],
+                        [w - pillWidth - 16, below], [16, below],
+                        [w - pillWidth - 16, h - pillHeight - 16], [16, h - pillHeight - 16]];
+            }
+            readonly property var spot: spots.find(p => {
+                const r = root.recordRegion, pad = 8;
+                return p[0] + pillWidth + pad <= r.x || p[0] - pad >= r.x + r.width || p[1] + pillHeight + pad <= r.y || p[1] - pad >= r.y + r.height;
+            })
+            visible: spot !== undefined
             anchors.top: true
-            margins.top: Appearance.sizes.barHeight + Appearance.sizes.barMargin + 10
+            anchors.left: true
+            margins.top: spot ? spot[1] : 0
+            margins.left: spot ? spot[0] : 0
             exclusiveZone: 0
-            implicitWidth: pill.implicitWidth
-            implicitHeight: pill.implicitHeight
+            implicitWidth: pillWidth
+            implicitHeight: pillHeight
             color: "transparent"
 
             WlrLayershell.namespace: "hi-shell-recording"
