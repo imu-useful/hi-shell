@@ -10,7 +10,7 @@ import qs.common.widgets
 import qs.modules.ai
 
 // Claude AI command palette.
-// Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call ai toggle`.
+// Toggle: Hyprland keybind (hypr/hi-shell/keybinds.lua) or `qs -c hi-shell ipc call ai toggle`.
 Scope {
     id: root
 

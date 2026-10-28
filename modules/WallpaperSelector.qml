@@ -9,7 +9,7 @@ import qs.services
 
 // Wallpaper picker: local folders (cached thumbnails) or online search
 // (Wallhaven, Unsplash with a key), plus color scheme, mode and frame controls.
-// Toggle: Super+R (hypr/hi-shell.lua), the bar's wallpaper button, or
+// Toggle: Super+R (hypr/hi-shell/keybinds.lua), the bar's wallpaper button, or
 // `qs -c hi-shell ipc call wallpaper toggleSelector`.
 Scope {
     id: root

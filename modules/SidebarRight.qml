@@ -11,7 +11,7 @@ import qs.modules.sidebar
 
 // Right sidebar: header, quick toggles, sliders and notifications / calendar /
 // to-do / timers; Wi-Fi, Bluetooth and audio open as sub-pages.
-// Toggle: bar system icons, Hyprland keybind (hypr/hi-shell.lua) or
+// Toggle: bar system icons, Hyprland keybind (hypr/hi-shell/keybinds.lua) or
 // `qs -c hi-shell ipc call sidebarRight toggle`.
 Scope {
     id: root

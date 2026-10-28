@@ -7,7 +7,7 @@ import Quickshell.Services.Mpris
 // A separate Quickshell instance, so it keeps going when hi-shell restarts; start and stop
 // it with wait-mode.sh. The person is shut out: the screen is covered by an overlay that
 // takes keyboard and pointer, Hyprland's key binds are off (the "hi-wait" submap, see
-// hypr/hi-shell.lua), and the machine doesn't sleep. Esc three times ends it.
+// hypr/hi-shell/wait-mode.lua), and the machine doesn't sleep. Esc three times ends it.
 //
 // For automated tests, `qs -p <this folder> ipc call waitmode bypass true [seconds]` makes the
 // overlay invisible and click-through and gives the keyboard back, so screenshots show the
@@ -201,7 +201,7 @@ ShellRoot {
             onStreamFinished: {
                 root.bindsBlocked = text.trim() === "hi-wait";
                 if (!root.bindsBlocked)
-                    console.warn("Wait Mode: Hyprland has no 'hi-wait' submap; key binds stay on. Reload Hyprland (hyprctl reload) with hi-shell's hi-shell.lua.");
+                    console.warn("Wait Mode: Hyprland has no 'hi-wait' submap; key binds stay on. Reload Hyprland (hyprctl reload) with hi-shell's hypr/hi-shell/wait-mode.lua.");
             }
         }
     }

@@ -11,7 +11,7 @@ import qs.common.widgets
 // Alt+Tab window switcher: windows in most-recently-used order with previews.
 // Hold Alt and press Tab (Shift+Tab back), let go of Alt to switch. A quick tap
 // switches to the previous window without showing anything. Driven by
-// hypr/hi-shell.lua: `qs -c hi-shell ipc call switcher next` (prev, commit, cancel).
+// hypr/hi-shell/keybinds.lua: `qs -c hi-shell ipc call switcher next` (prev, commit, cancel).
 Scope {
     id: root
 

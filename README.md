@@ -120,9 +120,9 @@ The installer:
 
 1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
 2. links the repo to `~/.config/quickshell/hi-shell`
-3. copies `hypr/hi-shell.lua` to `~/.config/hypr/hi-shell.lua` (yours to edit) and loads it from your Hyprland config —
+3. copies the folder `hypr/hi-shell/` to `~/.config/hypr/hi-shell/` (yours to edit) and loads it from your Hyprland config —
    `~/.config/hypr/custom/execs.lua` on illogical-impulse dots, `~/.config/hypr/hyprland.lua` otherwise (one marked line,
-   with a backup of the file; an earlier install's line is moved to the copy)
+   with a backup of the file; an earlier install's line is moved to the folder)
 4. starts the shell and warns about other bars or notification daemons that are still running
 
 The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!lazer, Steam (needs `[multilib]`), Spotify and Neovim.
@@ -163,11 +163,11 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
    from there, e.g. from `~/.config/hypr/custom/execs.lua` on illogical-impulse or `hyprland.lua` otherwise:
 
    ```sh
-   cp ~/Projects/hi-shell/hypr/hi-shell.lua ~/.config/hypr/hi-shell.lua
+   cp -r ~/Projects/hi-shell/hypr/hi-shell ~/.config/hypr/hi-shell
    ```
 
    ```lua
-   dofile(os.getenv("HOME") .. "/.config/hypr/hi-shell.lua")
+   dofile(os.getenv("HOME") .. "/.config/hypr/hi-shell/init.lua")
    ```
 
    It starts `qs -c hi-shell` when Hyprland starts. To run it now without logging out:
@@ -210,7 +210,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | hover a bar widget | Details popup (media controls, resources, weather forecast, battery, updates) |
 | scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 
-Change the keys in `~/.config/hypr/hi-shell.lua` (the Keybinds section; `update.sh` keeps your edits and leaves the new version as `hi-shell.lua.new` when the file changed upstream). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
+Change the keys in `~/.config/hypr/hi-shell/keybinds.lua` (the other files in that folder hold the startup, window and layer rules; `update.sh` keeps your edits and leaves a new version of a changed file as `<name>.lua.new`). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 
 ```sh
 qs -c hi-shell ipc call launcher toggle       # also: ai, sidebarRight, calendar
@@ -248,7 +248,7 @@ qs -c hi-shell ipc call welcome open                  # the first-run welcome ag
 
 Use the settings panel (<kbd>Super</kbd>+<kbd>Escape</kbd>), or edit `~/.config/hi-shell/config.json` (created with
 the defaults on first start; edits apply live). The Hyprland page applies changes at once and keeps them in
-`~/.config/hi-shell/hyprland.lua`, which `hi-shell.lua` loads at startup; "Reset Hyprland overrides" removes them.
+`~/.config/hi-shell/hyprland.lua`, which `overrides.lua` loads at startup; "Reset Hyprland overrides" removes them.
 A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 Sections:
@@ -377,7 +377,7 @@ and add it) starts and stops it, and so does `qs -c hi-shell ipc call waitmode s
   "Wait Mode" when nothing plays. Those five are the only buttons that work on the cover. Colors, wallpaper and language come from
   hi-shell.
 - **Shut out:** the overlay takes the keyboard and the pointer, and Hyprland's key binds are off (the empty `hi-wait`
-  submap in `hypr/hi-shell.lua`, so reload Hyprland after updating: `update.sh` does). Not even a Super tap opens the
+  submap in `hypr/hi-shell/wait-mode.lua`, so reload Hyprland after updating: `update.sh` does). Not even a Super tap opens the
   launcher. The machine doesn't sleep or dim.
 - **Exit:** press **Esc three times** (within a few seconds of each other). If the cover itself ever fails,
   **Ctrl+Alt+Shift+Esc** stops it, and so does `systemctl --user stop hi-wait-mode` from a terminal or another TTY.
@@ -519,7 +519,7 @@ common/shapes/       Material 3 Expressive shapes (MaterialShape, ShapeImage) wi
 services/            QML services (Mpris, Weather, Battery, Brightness, NetworkSpeed, Notifications, Tray,
                      Updates, SystemStats, Calendar, Presets) and scripts: theme_updater.py (matugen), presets.py
 translations/        interface translations (ru.json)
-hypr/hi-shell.lua    Hyprland autostart, keybinds, window and layer rules (installed to ~/.config/hypr)
+hypr/hi-shell/       Hyprland autostart, keybinds, Super tap, window and layer rules, Wait Mode submap (installed to ~/.config/hypr/hi-shell)
 run.sh               start the shell (Vulkan rendering when available)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
 dots/                terminal configs (fish, kitty, fastfetch, btop)

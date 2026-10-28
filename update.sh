@@ -4,7 +4,7 @@
 #   ./update.sh            (or ~/.config/quickshell/hi-shell/update.sh)
 #
 # Uses `git pull --ff-only`, so local commits or edits that conflict stop the
-# update instead of being overwritten. Reloads Hyprland when hypr/hi-shell.lua changed.
+# update instead of being overwritten. Reloads Hyprland when hypr/ changed.
 set -euo pipefail
 
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
@@ -39,18 +39,29 @@ echo
 
 if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     if ! git diff --quiet "$before" "$after" -- hypr/; then
-        # hi-shell.lua is a copy in ~/.config/hypr that you may have edited: it's replaced only
-        # while it's still the version that came with the old release, else the new one waits
-        # next to it as hi-shell.lua.new.
-        hypr_copy="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hi-shell.lua"
-        if [[ -f "$hypr_copy" ]]; then
-            if git show "$before:hypr/hi-shell.lua" 2>/dev/null | cmp -s - "$hypr_copy"; then
-                cp "$REPO/hypr/hi-shell.lua" "$hypr_copy"
-                echo "Updated $hypr_copy"
-            else
-                cp "$REPO/hypr/hi-shell.lua" "$hypr_copy.new"
-                echo "${yellow}$hypr_copy has your changes: the new version is in $hypr_copy.new, merge it by hand.${reset}"
-            fi
+        # hypr/hi-shell/ is copied to ~/.config/hypr/hi-shell/, where you may have edited it: a file
+        # is replaced only while it's still the version that came with the old release, else the
+        # new one waits next to it as <name>.new. Files you don't have yet are added.
+        hypr_dir="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
+        if [[ -d "$hypr_dir/hi-shell" ]]; then
+            for src in "$REPO"/hypr/hi-shell/*.lua; do
+                name="$(basename "$src")"
+                mine="$hypr_dir/hi-shell/$name"
+                if [[ ! -f "$mine" ]]; then
+                    cp "$src" "$mine"
+                    echo "Added $mine"
+                elif cmp -s "$src" "$mine"; then
+                    :
+                elif git show "$before:hypr/hi-shell/$name" 2>/dev/null | cmp -s - "$mine"; then
+                    cp "$src" "$mine"
+                    echo "Updated $mine"
+                else
+                    cp "$src" "$mine.new"
+                    echo "${yellow}$mine has your changes: the new version is in $mine.new, merge it by hand.${reset}"
+                fi
+            done
+        elif [[ -f "$hypr_dir/hi-shell.lua" ]]; then
+            echo "${yellow}hi-shell's Hyprland files moved to a folder: run ./install.sh to copy it to $hypr_dir/hi-shell and update the line that loads it.${reset}"
         fi
         step "Reloading Hyprland (keybinds changed)"
         hyprctl reload >/dev/null || true

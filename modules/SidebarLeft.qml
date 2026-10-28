@@ -11,7 +11,7 @@ import qs.modules.sidebarLeft
 
 // Left sidebar: home (greeting, media + lyrics, weather), Claude chat,
 // translator, clipboard history.
-// Toggle: Super+Z (hypr/hi-shell.lua), the bar's sidebar button, or
+// Toggle: Super+Z (hypr/hi-shell/keybinds.lua), the bar's sidebar button, or
 // `qs -c hi-shell ipc call sidebarLeft toggle` / `openTab claude`.
 Scope {
     id: root

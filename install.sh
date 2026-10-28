@@ -16,7 +16,7 @@
 #               Steam, Spotify, Neovim) with --yes; in the menu they're off by default
 #
 # What it does: installs the packages hi-shell uses, links the repo to
-# ~/.config/quickshell/hi-shell, copies hypr/hi-shell.lua into ~/.config/hypr and loads it from
+# ~/.config/quickshell/hi-shell, copies hypr/hi-shell/ into ~/.config/hypr and loads it from
 # your Hyprland config (one line, marked "hi-shell" so uninstall.sh can remove it) and starts the shell.
 set -euo pipefail
 
@@ -229,12 +229,14 @@ fi
 echo "$target -> $REPO"
 
 # --- Hyprland integration ---
-# hypr/hi-shell.lua (keybinds, window and layer rules) is copied into your Hyprland folder, so
-# it's right there to edit, and loaded from your config with one line.
+# hypr/hi-shell/ (startup, keybinds, window and layer rules, ...) is copied into your Hyprland
+# folder, so it's right there to edit, and loaded from your config with one line.
 step "Hyprland"
-HYPR_LUA="$HYPR_DIR/hi-shell.lua"
-line="dofile(os.getenv(\"HOME\") .. \"${HYPR_LUA#"$HOME"}\")"
-old_path="quickshell/hi-shell/hypr/hi-shell.lua"   # where earlier versions loaded it from
+HYPR_LUA_DIR="$HYPR_DIR/hi-shell"
+entry="$HYPR_LUA_DIR/init.lua"
+line="dofile(os.getenv(\"HOME\") .. \"${entry#"$HOME"}\")"
+# Where earlier versions loaded it from: the repo's folder, then a single ~/.config/hypr/hi-shell.lua.
+old_paths=("quickshell/hi-shell/hypr/hi-shell.lua" ".config/hypr/hi-shell.lua")
 if [[ -f "$HYPR_DIR/custom/execs.lua" ]]; then
     hypr_file="$HYPR_DIR/custom/execs.lua"   # illogical-impulse / end-4 dots
 elif [[ -f "$HYPR_DIR/hyprland.lua" ]]; then
@@ -243,37 +245,53 @@ else
     hypr_file=""
 fi
 # An earlier install may have the line in another file of the Hyprland folder.
-loaded_in="$(grep -rlF -e "$old_path" -e "${HYPR_LUA#"$HOME"}" "$HYPR_DIR" --include='*.lua' 2>/dev/null | grep -v -e '\.backup' -e "^$HYPR_LUA$" | head -1 || true)"
+loaded_in="$(grep -rlF -e "${old_paths[0]}" -e "${old_paths[1]}" -e "${entry#"$HOME"}" "$HYPR_DIR" --include='*.lua' 2>/dev/null | grep -v -e '\.backup' -e "^$HYPR_LUA_DIR/" -e "^$HYPR_DIR/hi-shell.lua$" | head -1 || true)"
 [[ -n "$loaded_in" ]] && hypr_file="$loaded_in"
 
-# Copy hi-shell.lua; a copy that differs (yours, edited) is replaced only on request.
+# Copy the files; one that differs from hi-shell's (yours, edited) is replaced only on request.
 copy_hypr_lua() {
-    if [[ -f "$HYPR_LUA" ]] && cmp -s "$REPO/hypr/hi-shell.lua" "$HYPR_LUA"; then
+    local src name changed=false
+    mkdir -p "$HYPR_LUA_DIR"
+    for src in "$REPO"/hypr/hi-shell/*.lua; do
+        name="$(basename "$src")"
+        [[ -f "$HYPR_LUA_DIR/$name" ]] && ! cmp -s "$src" "$HYPR_LUA_DIR/$name" && changed=true
+    done
+    if $changed && ! ask "Files in $HYPR_LUA_DIR differ from hi-shell's. Replace them (yours are kept as <name>.backup-<date>)?"; then
+        # Only the files you don't have yet.
+        for src in "$REPO"/hypr/hi-shell/*.lua; do
+            [[ -e "$HYPR_LUA_DIR/$(basename "$src")" ]] || cp "$src" "$HYPR_LUA_DIR/"
+        done
         return 0
     fi
-    if [[ -f "$HYPR_LUA" ]]; then
-        ask "Your $HYPR_LUA differs from hi-shell's. Replace it (yours is kept as hi-shell.lua.backup-<date>)?" || return 0
-        cp "$HYPR_LUA" "$HYPR_LUA.backup-$(date +%Y%m%d-%H%M%S)"
+    for src in "$REPO"/hypr/hi-shell/*.lua; do
+        name="$(basename "$src")"
+        if [[ -f "$HYPR_LUA_DIR/$name" ]] && ! cmp -s "$src" "$HYPR_LUA_DIR/$name"; then
+            cp "$HYPR_LUA_DIR/$name" "$HYPR_LUA_DIR/$name.backup-$(date +%Y%m%d-%H%M%S)"
+        fi
+        cp "$src" "$HYPR_LUA_DIR/$name"
+    done
+    echo "Copied hi-shell's Hyprland files to $HYPR_LUA_DIR (edit your keys and rules there)"
+    # The single file of the previous layout is replaced by the folder.
+    if [[ -f "$HYPR_DIR/hi-shell.lua" ]]; then
+        mv "$HYPR_DIR/hi-shell.lua" "$HYPR_DIR/hi-shell.lua.backup-$(date +%Y%m%d-%H%M%S)"
+        echo "Moved the old $HYPR_DIR/hi-shell.lua aside (any edits of yours are in the backup)"
     fi
-    mkdir -p "$HYPR_DIR"
-    cp "$REPO/hypr/hi-shell.lua" "$HYPR_LUA"
-    echo "Copied hi-shell.lua to $HYPR_LUA (edit your keys and rules there)"
 }
 
 if [[ ${WANT[hypr]} != true ]]; then
-    echo "Skipped. Copy hypr/hi-shell.lua to $HYPR_LUA and add this line to your Hyprland config yourself: $line"
+    echo "Skipped. Copy hypr/hi-shell/ to $HYPR_LUA_DIR and add this line to your Hyprland config yourself: $line"
 elif [[ -z "$hypr_file" ]]; then
     warn "no Lua Hyprland config found ($HYPR_DIR/hyprland.lua). hi-shell needs Hyprland 0.56+ with the Lua config;"
-    warn "copy hypr/hi-shell.lua to $HYPR_LUA and add this line to your config yourself: $line"
-elif grep -qF "${HYPR_LUA#"$HOME"}" "$hypr_file"; then
+    warn "copy hypr/hi-shell/ to $HYPR_LUA_DIR and add this line to your config yourself: $line"
+elif grep -qF "${entry#"$HOME"}" "$hypr_file"; then
     echo "Already loaded from $hypr_file"
     copy_hypr_lua
-elif ask "Should I copy hi-shell.lua to $HYPR_DIR and load it from $hypr_file (a backup of the file is kept)?"; then
+elif ask "Should I copy hi-shell's Hyprland files to $HYPR_LUA_DIR and load them from $hypr_file (a backup of the file is kept)?"; then
     copy_hypr_lua
     cp "$hypr_file" "$hypr_file.backup-hi-shell"
-    if grep -qF "$old_path" "$hypr_file"; then
-        # Moved from the repo's folder to the Hyprland one: point the old line at the copy.
-        sed -i "\\#$old_path#c\\$line" "$hypr_file"
+    if grep -qF -e "${old_paths[0]}" -e "${old_paths[1]}" "$hypr_file"; then
+        # An earlier layout: point its line at the folder.
+        sed -i -e "\\#${old_paths[0]}#c\\$line" -e "\\#${old_paths[1]}#c\\$line" "$hypr_file"
         echo "Updated the line in $hypr_file (backup: $hypr_file.backup-hi-shell)"
     else
         # Start on a new line; uninstall.sh removes exactly these two lines.

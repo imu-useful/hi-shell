@@ -7,7 +7,7 @@ import qs.common
 
 // Hyprland settings for the settings app. Changes apply at once (hyprctl eval)
 // and are kept in Config hyprland.*, from which ~/.config/hi-shell/hyprland.lua
-// is generated; hypr/hi-shell.lua loads that file, so they survive restarts.
+// is generated; hypr/hi-shell/overrides.lua loads that file, so they survive restarts.
 Singleton {
     id: root
 

@@ -15,7 +15,7 @@ import "launcher/Expression.js" as Expression
 // a calculation typed as it is ("12*(3+4)") is answered above the apps, no prefix needed;
 // prefixes switch the source:  = calculator · > run a command · < keybinds ·
 // : emoji · ; clipboard · / settings.
-// Toggle: Hyprland keybind (hypr/hi-shell.lua) or `qs -c hi-shell ipc call launcher toggle`.
+// Toggle: Hyprland keybind (hypr/hi-shell/keybinds.lua) or `qs -c hi-shell ipc call launcher toggle`.
 Scope {
     id: root
 
@@ -329,7 +329,7 @@ Scope {
                 width: parent.width
                 implicitHeight: column.implicitHeight + 24
                 radius: Appearance.rounding.extraLarge
-                // Translucent so the compositor blur (see hypr/hi-shell.lua) shows through.
+                // Translucent so the compositor blur (see hypr/hi-shell/layer-rules.lua) shows through.
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: 1
                 border.color: Colors.m3outlineVariant
