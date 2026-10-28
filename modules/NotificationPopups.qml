@@ -8,7 +8,8 @@ import qs.services
 import qs.modules.notifications
 
 // Notification popups in the corner next to the bar, on the focused monitor.
-// The window only takes input where cards are; the rest is click-through.
+// The window only takes input where cards are; the rest is click-through. It takes keyboard
+// focus on a click while a card has an inline reply field (messengers), so you can type in it.
 PanelWindow {
     id: root
 
@@ -32,6 +33,7 @@ PanelWindow {
 
     WlrLayershell.namespace: "hi-shell-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: Notifications.popups.some(n => n.notification?.hasInlineReply) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     Column {
         id: column

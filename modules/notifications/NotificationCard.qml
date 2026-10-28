@@ -82,7 +82,7 @@ Item {
 
         HoverHandler {
             id: hover
-            onHoveredChanged: root.notif.paused = hovered
+            onHoveredChanged: root.notif.paused = hovered || reply.activeFocus
         }
 
         // Swipe to dismiss.
@@ -260,6 +260,9 @@ Item {
                         font.pixelSize: Appearance.font.size.bodyMedium
                         color: Colors.m3onSurface
                         clip: true
+                        // The popup stays while you're typing, not only while the pointer is on it.
+                        onActiveFocusChanged: root.notif.paused = hover.hovered || activeFocus
+                        Keys.onEscapePressed: focus = false
                         onAccepted: if (text.trim()) Notifications.reply(root.notif.uid, text)
 
                         StyledText {
