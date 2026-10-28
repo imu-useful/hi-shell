@@ -301,8 +301,18 @@ Scope {
 
             anchors.top: true
             margins.top: screen ? screen.height * 0.18 : 0
-            implicitWidth: 600
+            // Wide and symmetric, so the card can slide to the left for the preview of a clipboard
+            // image without the window itself moving; only the card and the preview take input.
+            readonly property int cardWidth: 600
+            readonly property int gap: 16
+            readonly property int previewWidth: Math.max(240, Math.min(400, ((screen?.width ?? 1920) - cardWidth - 64) / 2 - gap))
+            readonly property bool showPreview: root.mode === ";" && (list.currentItem?.modelData?.clip ?? null) !== null && (list.currentItem?.thumb ?? "") !== ""
+            implicitWidth: cardWidth + 2 * (previewWidth + gap)
             implicitHeight: card.implicitHeight
+            mask: Region {
+                Region { item: card }
+                Region { item: previewBox }
+            }
             color: "transparent"
 
             exclusionMode: ExclusionMode.Ignore
@@ -339,7 +349,10 @@ Scope {
             Rectangle {
                 id: card
 
-                width: parent.width
+                // Centered; with an image to preview, the card and the preview together are.
+                width: window.cardWidth
+                x: window.previewWidth + window.gap - (window.showPreview ? (window.previewWidth + window.gap) / 2 : 0)
+                Behavior on x { SpatialAnim {} }
                 implicitHeight: column.implicitHeight + 24
                 radius: Appearance.rounding.extraLarge
                 // Translucent so the compositor blur (see hypr/hi-shell/layer-rules.lua) shows through.
@@ -451,25 +464,6 @@ Scope {
                         }
                     }
 
-                    // Preview of the selected clipboard image.
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 260
-                        visible: preview.source !== ""
-                        radius: Appearance.rounding.large
-                        color: Colors.m3surfaceContainerHighest
-
-                        Image {
-                            id: preview
-                            anchors.fill: parent
-                            anchors.margins: 8
-                            source: list.currentItem?.modelData?.clip ? (list.currentItem.thumb ?? "") : ""
-                            fillMode: Image.PreserveAspectFit
-                            asynchronous: true
-                            sourceSize.height: 520
-                        }
-                    }
-
                     StyledText {
                         Layout.fillWidth: true
                         Layout.margins: 12
@@ -477,6 +471,48 @@ Scope {
                         text: root.mode === "" ? Translation.tr("No apps match “%1”").arg(root.query) : root.mode === ":" && root.emoji.length === 0 ? Translation.tr("Loading emoji…") : root.term === "" ? Translation.tr("Type to search") : Translation.tr("Nothing found")
                         horizontalAlignment: Text.AlignHCenter
                         font.pixelSize: 13
+                        color: Colors.m3onSurfaceVariant
+                    }
+                }
+            }
+
+            // Preview of the selected clipboard image, to the right of the card.
+            Rectangle {
+                id: previewBox
+
+                x: card.x + card.width + window.gap
+                width: window.showPreview ? window.previewWidth : 0
+                height: card.implicitHeight
+                radius: Appearance.rounding.extraLarge
+                color: Appearance.translucent(Colors.m3surfaceContainer)
+                border.width: width > 0 ? 1 : 0
+                border.color: Colors.m3outlineVariant
+                clip: true
+                opacity: window.showPreview && loader.revealed ? 1 : 0
+                Behavior on width { SpatialAnim {} }
+                Behavior on opacity { EffectAnim {} }
+
+                // Fixed size inside, so the image doesn't re-fit while the panel opens.
+                Item {
+                    width: window.previewWidth
+                    height: parent.height
+
+                    Image {
+                        id: preview
+                        anchors.fill: parent
+                        anchors.margins: 14
+                        anchors.bottomMargin: 44
+                        source: list.currentItem?.modelData?.clip ? (list.currentItem.thumb ?? "") : ""
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        sourceSize.height: 800
+                    }
+                    StyledText {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 14
+                        text: list.currentItem?.modelData?.name ?? ""
+                        font.pixelSize: Appearance.font.size.labelMedium
                         color: Colors.m3onSurfaceVariant
                     }
                 }
