@@ -885,5 +885,18 @@
     "not writable": "нет прав на запись",
     "hi-shell's own": "собственный hi-shell",
     "%1 more not shown": "Ещё %1 не показано",
-    "Couldn't change it (see the shell's log)": "Не удалось изменить (см. лог шелла)"
+    "Couldn't change it (see the shell's log)": "Не удалось изменить (см. лог шелла)",
+    "Shortcuts of your Hyprland config": "Сочетания клавиш вашего конфига Hyprland",
+    "Changed in the files in place (a copy of each is kept); new ones go to ~/.config/hi-shell/binds.lua. Applies after a Hyprland reload.": "Меняются в файлах на месте (копия каждого сохраняется); новые попадают в ~/.config/hi-shell/binds.lua. Применяется после перезагрузки Hyprland.",
+    "Your Hyprland config is somewhere else, so its keybinds can't be listed; the ones added here still go to binds.lua.": "Конфиг Hyprland лежит в другом месте, поэтому его сочетания не показаны; добавленные здесь всё равно попадают в binds.lua.",
+    "Keybinds added here won't work until it is: run install.sh again (or add the line it shows to your config).": "Добавленные здесь сочетания не заработают, пока он не подключён: запустите install.sh ещё раз (или добавьте в конфиг строку, которую он покажет).",
+    "Keys, e.g. SUPER + F1": "Клавиши, например SUPER + F1",
+    "Command, e.g. firefox": "Команда, например firefox",
+    "Description (optional)": "Описание (необязательно)",
+    "Search keybinds…": "Поиск сочетаний…",
+    "%1 of %2": "%1 из %2",
+    "No description": "Без описания",
+    "also bound elsewhere": "те же клавиши заняты ещё где-то",
+    "No keybinds found yet": "Сочетаний пока нет",
+    "Press the shortcut… (Esc cancels)": "Нажмите сочетание… (Esc — отмена)"
 }
