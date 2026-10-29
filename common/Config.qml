@@ -287,9 +287,6 @@ Singleton {
                 property var options: ({})
                 // Updates leave ~/.config/hypr/hi-shell/ (keybinds, rules) alone (update.sh, install.sh read this)
                 property bool keepFiles: false
-                // Commands Hyprland runs when it starts (Settings > Autostart; written into the generated
-                // file as hl.exec_cmd on "hyprland.start"): [{ cmd: "discord --start-minimized", enabled: true }]
-                property var autostart: ([])
             }
 
             property JsonObject dock: JsonObject {

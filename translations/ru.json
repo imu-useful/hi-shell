@@ -870,5 +870,11 @@
     "Run now": "Запустить сейчас",
     "Add a command": "Добавить команду",
     "Add": "Добавить",
-    "Like exec-once: runs once at Hyprland's start (▶ runs it now). Lines from your own config aren't listed.": "Как exec-once: запускается один раз при старте Hyprland (▶ — сейчас). Строки из вашего конфига не показываются."
+    "Like exec-once: at the next start (▶ runs it now). Lines of your Hyprland files are changed in place; a copy of each file is kept.": "Как exec-once: при следующем старте (▶ запускает сразу). Строки ваших файлов Hyprland меняются на месте, копия каждого файла сохраняется.",
+    "hi-shell (exec.lua)": "hi-shell (exec.lua)",
+    "At start": "При старте",
+    "On every reload": "При каждой перезагрузке",
+    "line %1": "строка %1",
+    "No commands found yet": "Команд пока нет",
+    "Goes into ~/.config/hi-shell/exec.lua": "Попадёт в ~/.config/hi-shell/exec.lua"
 }
