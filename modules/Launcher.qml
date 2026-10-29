@@ -229,19 +229,32 @@ Scope {
         calcResult = "";
     }
     readonly property var modNames: [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]]
+    // What an undescribed bind does. Hyprland's Lua binds report "HL.Dispatcher(focus)" and a
+    // function id, or "function: 0x...", instead of the command.
+    function bindAction(dispatcher) {
+        const name = /^HL\.Dispatcher\((\w+)\)$/.exec(dispatcher ?? "")?.[1];
+        if (name === "exec_cmd")
+            return Translation.tr("Run a command");
+        if (!name)
+            return Translation.tr("Custom action");
+        const words = name.replace(/_/g, " ");
+        return words.charAt(0).toUpperCase() + words.slice(1);
+    }
     Process {
         id: bindLoader
         command: ["hyprctl", "binds", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
+                    // Binds with a description first; the rest (Lua binds without one) by what they do.
                     root.binds = JSON.parse(text).filter(b => !b.submap).map(b => {
                         const mods = root.modNames.filter(([bit]) => b.modmask & bit).map(([, n]) => n);
                         return {
-                            label: b.description || `${b.dispatcher} ${b.arg}`.trim(),
-                            keys: [...mods, b.key].join(" + ")
+                            label: b.description || root.bindAction(b.dispatcher),
+                            keys: [...mods, b.key || (b.keycode ? `code:${b.keycode}` : "")].filter(k => k).join(" + "),
+                            described: !!b.description
                         };
-                    });
+                    }).sort((a, b) => b.described - a.described);
                 } catch (e) {}
             }
         }
