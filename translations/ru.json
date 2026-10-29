@@ -138,7 +138,7 @@
     "To-Do": "Задачи",
     "All done": "Всё сделано",
     "Sleep": "Сон",
-    "Off": "Выкл.",
+    "Off": "Выкл",
     "Local time": "Местное время",
     "Reply": "Ответить",
     "A Material 3 Expressive desktop shell for Hyprland": "Оболочка рабочего стола в стиле Material 3 Expressive для Hyprland",
@@ -853,5 +853,13 @@
     "In the empty notification center": "В пустом центре уведомлений",
     "Dino": "Динозаврик",
     "Snake": "Змейка",
-    "Minesweeper": "Сапёр"
+    "Minesweeper": "Сапёр",
+    "AI": "ИИ",
+    "Enable AI": "Включить ИИ",
+    "Off removes the AI tab from the left sidebar and the palette (Super+Y)": "Выключенный ИИ убирает вкладку из левой панели и палитру (Super+Y)",
+    "An AI chat in the left sidebar and a palette on Super + Y. Pick who answers, or turn it off.": "Чат с ИИ в левой панели и палитра на Super + Y. Выберите, кто отвечает, или выключите ИИ.",
+    "The AI tab and the palette stay hidden. Settings > General turns it on again.": "Вкладка ИИ и палитра скрыты. Включить снова можно в Настройки > Общие.",
+    "Models and the rest are in Settings > General.": "Модели и остальное — в Настройки > Общие.",
+    "AI palette": "Палитра ИИ",
+    "AI chat with Claude": "Чат с ИИ через Claude"
 }

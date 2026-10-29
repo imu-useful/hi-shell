@@ -18,8 +18,13 @@ Scope {
     // Unsent prompt; kept here because the window is destroyed while closed.
     property string draft: ""
 
+    // Off with the AI (Settings > General): the keybind and the IPC calls do nothing.
+    readonly property bool enabled: Config.options.ai.enabled
+    onEnabledChanged: if (!enabled) open = false
+
     function toggle() {
-        open = !open;
+        if (enabled || open)
+            open = !open;
     }
 
     function close() {
@@ -37,12 +42,15 @@ Scope {
             root.toggle();
         }
         function open(): void {
-            root.open = true;
+            if (root.enabled)
+                root.open = true;
         }
         function close(): void {
             root.close();
         }
         function ask(prompt: string): void {
+            if (!root.enabled)
+                return;
             root.open = true;
             session.send(prompt);
         }

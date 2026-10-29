@@ -8,8 +8,9 @@ import qs.common
 import qs.common.widgets
 import qs.common.shapes
 import qs.services
+import qs.modules.settings
 
-// First-run welcome: language, look, shortcuts and missing programs.
+// First-run welcome: language, look, the AI (a choice, or off), shortcuts and missing programs.
 // Shown once (until ~/.local/state/hi-shell/welcome-done exists);
 // reopen with `qs -c hi-shell ipc call welcome open`.
 Scope {
@@ -17,20 +18,22 @@ Scope {
 
     property bool open: false
     property int step: 0
-    readonly property int steps: 4
+    readonly property int steps: 5
     property var missing: []
 
     // [command, what needs it]
     readonly property var programs: [
-        ["matugen", "colors from the wallpaper"], ["claude", "Claude AI"], ["cliphist", "clipboard history"],
+        ["matugen", "colors from the wallpaper"], ["claude", "AI chat with Claude"], ["cliphist", "clipboard history"],
         ["trans", "translator"], ["qalc", "calculator"], ["grim", "screenshots"], ["slurp", "screenshots"],
         ["tesseract", "OCR"], ["wf-recorder", "screen recording"], ["cava", "visualizer"],
         ["hyprlock", "lock screen"], ["hyprsunset", "night light"], ["brightnessctl", "brightness"],
         ["magick", "wallpaper thumbnails"]
     ]
 
-    readonly property var shortcuts: [
-        ["Super", "App launcher"], ["Super + Y", "Claude AI palette"], ["Super + Z", "Left sidebar"],
+    // Without the AI there's no palette to open.
+    readonly property var shortcuts: Config.options.ai.enabled ? allShortcuts : allShortcuts.filter(s => s[0] !== "Super + Y")
+    readonly property var allShortcuts: [
+        ["Super", "App launcher"], ["Super + Y", "AI palette"], ["Super + Z", "Left sidebar"],
         ["Super + U", "Right sidebar"], ["Super + Tab", "Workspace overview"], ["Super + R", "Wallpaper picker"],
         ["Super + Shift + S", "Screenshot / OCR / record"], ["Super + V", "Clipboard history"],
         ["Super + Escape", "Settings"]
@@ -138,7 +141,7 @@ Scope {
                     Loader {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        sourceComponent: [hello, look, keys, done][root.step]
+                        sourceComponent: [hello, look, ai, keys, done][root.step]
                     }
 
                     // --- Navigation ---
@@ -344,6 +347,102 @@ Scope {
             }
 
             Component {
+                id: ai
+                ColumnLayout {
+                    spacing: 12
+                    StyledText {
+                        text: Translation.tr("AI")
+                        font.family: Appearance.font.title
+                        font.pixelSize: Appearance.font.size.headlineSmall
+                    }
+                    StyledText {
+                        Layout.fillWidth: true
+                        wrapMode: Text.Wrap
+                        text: Translation.tr("An AI chat in the left sidebar and a palette on Super + Y. Pick who answers, or turn it off.")
+                        color: Colors.m3onSurfaceVariant
+                    }
+                    Flow {
+                        Layout.fillWidth: true
+                        spacing: 6
+
+                        Chip {
+                            icon: "block"
+                            text: Translation.tr("Off")
+                            selected: !Config.options.ai.enabled
+                            onClicked: Config.options.ai.enabled = false
+                        }
+                        Chip {
+                            icon: "auto_awesome"
+                            text: "Claude"
+                            selected: Config.options.ai.enabled && Claude.provider === "claude"
+                            onClicked: {
+                                Config.options.ai.enabled = true;
+                                Claude.provider = "claude";
+                            }
+                        }
+                        Repeater {
+                            model: Claude.providers
+                            Chip {
+                                required property var modelData
+                                icon: modelData.icon
+                                text: modelData.name
+                                selected: Config.options.ai.enabled && Claude.provider === modelData.id
+                                onClicked: {
+                                    Config.options.ai.enabled = true;
+                                    Claude.provider = modelData.id;
+                                }
+                            }
+                        }
+                    }
+
+                    // What the choice needs.
+                    StyledText {
+                        Layout.fillWidth: true
+                        visible: !Config.options.ai.enabled
+                        wrapMode: Text.Wrap
+                        text: Translation.tr("The AI tab and the palette stay hidden. Settings > General turns it on again.")
+                        color: Colors.m3onSurfaceVariant
+                    }
+                    ListRow {
+                        Layout.fillWidth: true
+                        visible: Config.options.ai.enabled && Claude.provider === "claude"
+                        icon: "terminal"
+                        title: Translation.tr("Claude needs Claude Code")
+                        subtitle: Translation.tr("npm install -g @anthropic-ai/claude-code, then run claude once to sign in")
+                    }
+                    TextRow {
+                        visible: Config.options.ai.enabled && Claude.compat && (Claude.spec?.key ?? false)
+                        icon: "key"
+                        title: Translation.tr("%1 API key").arg(Claude.providerName)
+                        subtitle: Claude.spec?.keyUrl ? Translation.tr("Get one at %1; the model is picked in the sidebar chat").arg(Claude.spec.keyUrl) : ""
+                        value: Claude.keyFor(Claude.provider)
+                        secret: true
+                        fieldWidth: 240
+                        onEdited: text => Claude.setKey(Claude.provider, text.trim())
+                    }
+                    TextRow {
+                        visible: Config.options.ai.enabled && Claude.compat && (Claude.provider === "ollama" || (Claude.spec?.urlRequired ?? false))
+                        icon: "link"
+                        title: Translation.tr("%1 server address").arg(Claude.providerName)
+                        subtitle: Claude.spec?.urlRequired ? Translation.tr("Ending in /v1, e.g. http://localhost:1234/v1") : Translation.tr("Default %1").arg(Claude.spec?.url ?? "")
+                        value: Config.options.ai.urls[Claude.provider] ?? ""
+                        placeholder: Claude.spec?.url ?? ""
+                        fieldWidth: 240
+                        onEdited: text => Claude.setUrl(Claude.provider, text.trim())
+                    }
+                    StyledText {
+                        Layout.fillWidth: true
+                        visible: Config.options.ai.enabled
+                        wrapMode: Text.Wrap
+                        text: Translation.tr("Models and the rest are in Settings > General.")
+                        color: Colors.m3outline
+                        font.pixelSize: Appearance.font.size.labelMedium
+                    }
+                    Item { Layout.fillHeight: true }
+                }
+            }
+
+            Component {
                 id: keys
                 ColumnLayout {
                     spacing: 12
@@ -417,7 +516,8 @@ Scope {
                         Layout.fillWidth: true
                         spacing: 6
                         Repeater {
-                            model: root.missing
+                            // The claude CLI only matters when Claude is the one answering.
+                            model: root.missing.filter(c => c !== "claude" || (Config.options.ai.enabled && Config.options.ai.provider === "claude"))
                             Chip {
                                 required property string modelData
                                 icon: "error"
@@ -427,7 +527,7 @@ Scope {
                     }
                     ListRow {
                         Layout.fillWidth: true
-                        visible: root.missing.includes("claude")
+                        visible: root.missing.includes("claude") && Config.options.ai.enabled && Config.options.ai.provider === "claude"
                         icon: "auto_awesome"
                         title: Translation.tr("Claude needs Claude Code")
                         subtitle: Translation.tr("npm install -g @anthropic-ai/claude-code, then run claude once to sign in")

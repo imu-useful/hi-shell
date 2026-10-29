@@ -40,68 +40,83 @@ ColumnLayout {
         icon: "auto_awesome"
         title: Translation.tr("AI chat")
 
-        ChoiceRow {
-            icon: "neurology"
-            title: Translation.tr("Model")
-            subtitle: Translation.tr("Used by the palette and the sidebar chat")
-            value: Claude.model
-            options: Claude.models.map(m => ({ value: m.id, text: m.name }))
-            onSelected: value => Claude.model = value
+        SwitchRow {
+            icon: "power_settings_new"
+            title: Translation.tr("Enable AI")
+            subtitle: Translation.tr("Off removes the AI tab from the left sidebar and the palette (Super+Y)")
+            checked: o.ai.enabled
+            onToggled: checked => o.ai.enabled = checked
         }
-        ListRow {
-            Layout.fillWidth: true
-            icon: "hub"
-            title: Translation.tr("Provider")
-            subtitle: Translation.tr("Who answers in the chat (also switched in the chat itself); add their keys below")
-        }
-        Flow {
-            Layout.fillWidth: true
-            Layout.leftMargin: 16
-            Layout.rightMargin: 16
-            Layout.bottomMargin: 6
-            spacing: 6
 
-            Chip {
-                icon: "auto_awesome"
-                text: "Claude"
-                selected: Claude.provider === "claude"
-                onClicked: Claude.provider = "claude"
+        // Everything about the AI, only while it's on.
+        ColumnLayout {
+            Layout.fillWidth: true
+            visible: o.ai.enabled
+            spacing: 0
+
+            ChoiceRow {
+                icon: "neurology"
+                title: Translation.tr("Model")
+                subtitle: Translation.tr("Used by the palette and the sidebar chat")
+                value: Claude.model
+                options: Claude.models.map(m => ({ value: m.id, text: m.name }))
+                onSelected: value => Claude.model = value
             }
-            Repeater {
-                model: Claude.providers
+            ListRow {
+                Layout.fillWidth: true
+                icon: "hub"
+                title: Translation.tr("Provider")
+                subtitle: Translation.tr("Who answers in the chat (also switched in the chat itself); add their keys below")
+            }
+            Flow {
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                Layout.bottomMargin: 6
+                spacing: 6
+
                 Chip {
-                    required property var modelData
-                    icon: modelData.icon
-                    text: modelData.name
-                    selected: Claude.provider === modelData.id
-                    onClicked: Claude.provider = modelData.id
+                    icon: "auto_awesome"
+                    text: "Claude"
+                    selected: Claude.provider === "claude"
+                    onClicked: Claude.provider = "claude"
+                }
+                Repeater {
+                    model: Claude.providers
+                    Chip {
+                        required property var modelData
+                        icon: modelData.icon
+                        text: modelData.name
+                        selected: Claude.provider === modelData.id
+                        onClicked: Claude.provider = modelData.id
+                    }
                 }
             }
-        }
-        Repeater {
-            model: Claude.providers.filter(p => p.key || p.id === "custom")
-            TextRow {
-                required property var modelData
-                icon: "key"
-                title: Translation.tr("%1 API key").arg(modelData.name)
-                subtitle: modelData.keyUrl ? Translation.tr("Get one at %1; the model is picked in the sidebar chat").arg(modelData.keyUrl) : Translation.tr("Optional")
-                value: Claude.keyFor(modelData.id)
-                secret: true
-                fieldWidth: 300
-                onEdited: text => Claude.setKey(modelData.id, text.trim())
+            Repeater {
+                model: Claude.providers.filter(p => p.key || p.id === "custom")
+                TextRow {
+                    required property var modelData
+                    icon: "key"
+                    title: Translation.tr("%1 API key").arg(modelData.name)
+                    subtitle: modelData.keyUrl ? Translation.tr("Get one at %1; the model is picked in the sidebar chat").arg(modelData.keyUrl) : Translation.tr("Optional")
+                    value: Claude.keyFor(modelData.id)
+                    secret: true
+                    fieldWidth: 300
+                    onEdited: text => Claude.setKey(modelData.id, text.trim())
+                }
             }
-        }
-        Repeater {
-            model: Claude.providers.filter(p => p.id === "ollama" || p.urlRequired)
-            TextRow {
-                required property var modelData
-                icon: "link"
-                title: Translation.tr("%1 server address").arg(modelData.name)
-                subtitle: modelData.urlRequired ? Translation.tr("Ending in /v1, e.g. http://localhost:1234/v1") : Translation.tr("Default %1").arg(modelData.url)
-                value: Config.options.ai.urls[modelData.id] ?? ""
-                placeholder: modelData.url
-                fieldWidth: 300
-                onEdited: text => Claude.setUrl(modelData.id, text.trim())
+            Repeater {
+                model: Claude.providers.filter(p => p.id === "ollama" || p.urlRequired)
+                TextRow {
+                    required property var modelData
+                    icon: "link"
+                    title: Translation.tr("%1 server address").arg(modelData.name)
+                    subtitle: modelData.urlRequired ? Translation.tr("Ending in /v1, e.g. http://localhost:1234/v1") : Translation.tr("Default %1").arg(modelData.url)
+                    value: Config.options.ai.urls[modelData.id] ?? ""
+                    placeholder: modelData.url
+                    fieldWidth: 300
+                    onEdited: text => Claude.setUrl(modelData.id, text.trim())
+                }
             }
         }
     }

@@ -17,7 +17,10 @@ Scope {
     id: root
 
     readonly property bool open: ShellState.sidebarLeftOpen && !ShellState.zen
-    readonly property list<string> tabs: ["home", "claude", "translator", "clipboard"]
+    // The AI chat tab is there unless the AI is off (Settings > General).
+    readonly property bool ai: Config.options.ai.enabled
+    readonly property list<string> tabs: ai ? ["home", "claude", "translator", "clipboard"] : ["home", "translator", "clipboard"]
+    readonly property string tab: tabs.includes(ShellState.sidebarLeftTab) ? ShellState.sidebarLeftTab : "home"
 
     function setOpen(value) {
         ShellState.sidebarLeftOpen = value;
@@ -37,7 +40,7 @@ Scope {
         }
         // home, claude, translator, clipboard
         function openTab(tab: string): void {
-            ShellState.sidebarLeftTab = tab;
+            ShellState.sidebarLeftTab = tab === "claude" && !root.ai ? "home" : tab;
             root.setOpen(true);
         }
     }
@@ -77,7 +80,7 @@ Scope {
 
             Shortcut {
                 sequence: "Escape"
-                onActivated: Claude.busy && ShellState.sidebarLeftTab === "claude" ? Claude.cancel() : root.setOpen(false)
+                onActivated: Claude.busy && root.tab === "claude" ? Claude.cancel() : root.setOpen(false)
             }
 
             Rectangle {
@@ -102,11 +105,11 @@ Scope {
                         Layout.fillWidth: true
                         model: [
                             { icon: "home", text: Translation.tr("Home") },
-                            { icon: "auto_awesome", text: Translation.tr("Claude") },
+                            { icon: "auto_awesome", text: Translation.tr("AI") },
                             { icon: "translate", text: Translation.tr("Translate") },
                             { icon: "content_paste", text: Translation.tr("Clipboard") }
-                        ]
-                        currentIndex: Math.max(0, root.tabs.indexOf(ShellState.sidebarLeftTab))
+                        ].filter((_, i) => root.ai || i !== 1)
+                        currentIndex: Math.max(0, root.tabs.indexOf(root.tab))
                         onSelected: index => ShellState.sidebarLeftTab = root.tabs[index]
                     }
 
@@ -114,7 +117,7 @@ Scope {
                         id: page
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        sourceComponent: ({ home: home, claude: claude, translator: translator, clipboard: clipboard })[ShellState.sidebarLeftTab] ?? home
+                        sourceComponent: ({ home: home, claude: claude, translator: translator, clipboard: clipboard })[root.tab] ?? home
                         // Put the cursor where you'd type.
                         onLoaded: if (item.focusInput) Qt.callLater(() => item.focusInput())
                     }

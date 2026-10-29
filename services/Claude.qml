@@ -94,9 +94,12 @@ Singleton {
     property bool gotResult: false
     property bool cancelled: false
 
+    // AI switched off (Settings > General, or the welcome screen).
+    readonly property bool enabled: Config.options.ai.enabled
+
     function send(prompt) {
         const text = prompt.trim();
-        if (busy || text === "")
+        if (!enabled || busy || text === "")
             return;
         if (chatId === "")
             chatId = String(Date.now());

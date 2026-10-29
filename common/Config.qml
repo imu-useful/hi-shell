@@ -218,6 +218,9 @@ Singleton {
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""
+                // Off: no AI chat tab, no palette (Super+Y), nothing asks a model. The welcome
+                // screen and Settings > General switch it.
+                property bool enabled: true
                 // "claude" (the CLI) or a provider id from services/AiProviders.js: openrouter, openai,
                 // gemini, groq, deepseek, mistral, ollama, custom
                 property string provider: "claude"
