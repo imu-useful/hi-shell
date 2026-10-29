@@ -119,11 +119,12 @@ DesktopCard {
             id: track
             Layout.fillWidth: true
             implicitHeight: 4
-            radius: 2
             visible: Mpris.length > 0
-            color: Colors.m3secondaryContainer
+            color: "transparent"
 
             property real shown: Mpris.progress
+            // Pointer on the bar or dragging it: the bar thickens and the handle shows.
+            readonly property bool expanded: seekable && (seek.containsMouse || seeking)
             // Dragging the bar to seek: where the pointer is (0..1) until it's let go.
             property bool seeking: false
             property real seekValue: 0
@@ -163,10 +164,22 @@ DesktopCard {
                 property: "shown"
             }
 
+            // The bar and its fill grow around the middle of the 4 px the layout gives them, so
+            // the card doesn't change size.
+            Rectangle {
+                id: bar
+                width: parent.width
+                height: track.expanded ? 8 : 4
+                anchors.verticalCenter: parent.verticalCenter
+                radius: height / 2
+                color: Colors.m3secondaryContainer
+                Behavior on height { enabled: root.animate; SpatialAnim { duration: Appearance.anim.fast } }
+            }
             Rectangle {
                 width: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
-                height: parent.height
-                radius: 2
+                height: bar.height
+                anchors.verticalCenter: parent.verticalCenter
+                radius: height / 2
                 color: Colors.m3primary
             }
 
@@ -174,16 +187,22 @@ DesktopCard {
             // would seek to.
             Rectangle {
                 id: handle
-                visible: track.seekable && (seek.containsMouse || track.seeking)
+                visible: opacity > 0
+                opacity: track.expanded ? 1 : 0
+                scale: track.expanded ? 1 : 0.3
+                Behavior on opacity { enabled: root.animate; EffectAnim { duration: Appearance.anim.fast } }
+                Behavior on scale { enabled: root.animate; SpringAnim { overshoot: 1.6 } }
                 x: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown)) - width / 2
                 anchors.verticalCenter: parent.verticalCenter
                 width: 4
-                height: 16
+                height: 18
                 radius: 2
                 color: Colors.m3primary
 
                 Rectangle {
-                    visible: track.seeking
+                    opacity: track.seeking ? 1 : 0
+                    visible: opacity > 0
+                    Behavior on opacity { enabled: root.animate; EffectAnim { duration: Appearance.anim.fast } }
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.top
                     anchors.bottomMargin: 6
@@ -226,8 +245,9 @@ DesktopCard {
                         track.seekValue = valueAt(mouse.x);
                 }
                 onReleased: mouse => {
-                    Mpris.seekTo(valueAt(mouse.x));
+                    // The bar is where the pointer was; the player's position arrives a moment later.
                     track.shown = valueAt(mouse.x);
+                    Mpris.seekTo(valueAt(mouse.x));
                     track.seeking = false;
                 }
                 onCanceled: track.seeking = false
