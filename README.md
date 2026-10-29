@@ -503,6 +503,7 @@ the same file.
 
 ## Troubleshooting
 
+- **A black screen and no bar, while the panels and Settings open:** the GPU's Vulkan driver is the usual cause (old Intel graphics: Ivy Bridge, Haswell, Broadwell). `run.sh` uses OpenGL on those and on software rendering by itself; if yours isn't recognized, start it with `QSG_RHI_BACKEND=opengl ~/.config/quickshell/hi-shell/run.sh -d` (to make it stick, set `QSG_RHI_BACKEND=opengl` in the Hyprland environment).
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
 - **Rendering:** `run.sh` (what Hyprland starts) uses Vulkan when a Vulkan driver is installed, which costs less CPU
   per frame than OpenGL. To use OpenGL: `qs -c hi-shell kill; QSG_RHI_BACKEND=opengl ~/.config/quickshell/hi-shell/run.sh -d`.
