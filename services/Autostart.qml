@@ -27,8 +27,14 @@ Singleton {
 
     readonly property string script: `${Quickshell.shellDir}/services/execs.py`
 
+    // A change that lands while a scan is running would be missed by it: scan again when it's done.
+    property bool rescan: false
+
     function refresh() {
-        scan.running = true;
+        if (scan.running)
+            rescan = true;
+        else
+            scan.running = true;
     }
 
     // Values go as --name=value: a commented-out line starts with dashes, which a separate
@@ -97,6 +103,10 @@ Singleton {
     Process {
         id: scan
         command: ["python3", root.script, "scan", `--hypr=${root.hyprDir}`, `--exec=${root.execFile}`, `--shell-hypr=${Quickshell.shellDir}/hypr`]
+        onExited: if (root.rescan) {
+            root.rescan = false;
+            running = true;
+        }
         stdout: StdioCollector {
             onStreamFinished: {
                 try {

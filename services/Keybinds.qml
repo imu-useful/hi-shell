@@ -25,8 +25,14 @@ Singleton {
 
     readonly property string script: `${Quickshell.shellDir}/services/binds.py`
 
+    // A change that lands while a scan is running would be missed by it: scan again when it's done.
+    property bool rescan: false
+
     function refresh() {
-        scan.running = true;
+        if (scan.running)
+            rescan = true;
+        else
+            scan.running = true;
     }
 
     function add(keys, cmd, desc) {
@@ -103,6 +109,10 @@ Singleton {
     Process {
         id: scan
         command: ["python3", root.script, "scan", `--hypr=${root.hyprDir}`, `--binds=${root.bindsFile}`, `--shell-hypr=${Quickshell.shellDir}/hypr`]
+        onExited: if (root.rescan) {
+            root.rescan = false;
+            running = true;
+        }
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
