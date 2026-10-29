@@ -3,20 +3,7 @@
 # noticeably less CPU per frame than OpenGL (visualizers, the dancing frame).
 # Set QSG_RHI_BACKEND yourself to choose (e.g. QSG_RHI_BACKEND=opengl ./run.sh).
 # Extra arguments go to qs (e.g. -d to detach).
-
-# Not on the GPUs whose Vulkan driver is partial or software: old Intel (Ivy Bridge, Haswell,
-# Broadwell and the like: HD Graphics 2000 to 5xxx) and llvmpipe. Qt draws black windows on
-# them (a black desktop and no bar), while OpenGL works.
-use_vulkan() {
-    ls /usr/share/vulkan/icd.d/*.json >/dev/null 2>&1 || return 1
-    gpu=$( { vulkaninfo --summary 2>/dev/null | grep -i deviceName; lspci 2>/dev/null | grep -iE 'vga|3d|display'; } )
-    if printf '%s\n' "$gpu" | grep -qiE '\((IVB|BYT|HSW|BDW|CHV)[^)]*\)|HD Graphics [2-5][0-9]{3}([^0-9]|$)|llvmpipe|lavapipe|swrast'; then
-        return 1
-    fi
-    return 0
-}
-
-if [ -z "$QSG_RHI_BACKEND" ] && use_vulkan; then
+if [ -z "$QSG_RHI_BACKEND" ] && ls /usr/share/vulkan/icd.d/*.json >/dev/null 2>&1; then
     export QSG_RHI_BACKEND=vulkan
 fi
 
