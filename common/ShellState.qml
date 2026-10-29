@@ -53,6 +53,21 @@ Singleton {
         function hide(): void {
             root.barHidden = true;
         }
+        // For bug reports: what decides whether the bar shows (`qs -c hi-shell ipc call bar status`).
+        function status(): string {
+            return JSON.stringify({
+                started: root.started,
+                barHidden: root.barHidden,
+                zen: root.zen,
+                animationSpeed: Appearance.anim.speed,
+                barStyle: Config.options.bar.style,
+                barPosition: Config.options.bar.position,
+                barHeight: Config.options.bar.height,
+                screens: Quickshell.screens.map(s => `${s.name} ${s.width}x${s.height}`),
+                wallpaper: Config.options.desktop.wallpaper,
+                widgets: [Config.options.bar.left.length, Config.options.bar.center.length, Config.options.bar.right.length]
+            });
+        }
     }
     // Text to start the launcher with (IPC launcher search), consumed on open.
     property string launcherQuery: ""
