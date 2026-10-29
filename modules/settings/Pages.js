@@ -10,6 +10,7 @@ const pages = [
     { id: "interface", title: "Interface", icon: "palette", keywords: "fonts font animation speed motion transparency opacity sidebar quick toggles night light temperature" },
     { id: "services", title: "Services", icon: "settings_suggest", keywords: "weather city location fahrenheit battery warnings low critical notifications timeout dnd do not disturb updates aur unsplash wallhaven api key folders" },
     { id: "hyprland", title: "Hyprland", icon: "dvr", keywords: "hyprland display displays monitor mode duplicate mirror extend projector second screen resolution refresh rate scale orientation rotate position gaps border rounding blur shadow animations input mouse sensitivity touchpad natural scroll focus" },
+    { id: "autostart", title: "Autostart", icon: "rocket_launch", keywords: "autostart startup start login boot exec exec-once run command commands program programs app apps launch hyprland" },
     { id: "about", title: "About", icon: "info", keywords: "about version quickshell source credits presets preset export import backup share" }
 ];
 

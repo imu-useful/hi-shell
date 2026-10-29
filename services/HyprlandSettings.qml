@@ -168,6 +168,18 @@ Singleton {
         return out;
     }
 
+    // The autostart commands (Settings > Autostart): save a new list, and write it into the generated file.
+    function setAutostart(list) {
+        overrides.autostart = list;
+        writeLua();
+    }
+
+    // Start a command now, the way Hyprland would at its start.
+    function runNow(cmd) {
+        if ((cmd ?? "").trim() !== "")
+            apply(`hl.exec_cmd(${lua(cmd.trim())})`);
+    }
+
     // JS value -> Lua literal
     function lua(v) {
         if (typeof v === "string")
@@ -183,6 +195,13 @@ Singleton {
             lines.push(`hl.monitor(${lua(Object.assign({ output: name }, overrides.monitors[name]))})`);
         if (Object.keys(overrides.options).length)
             lines.push(`hl.config(${lua(nest(overrides.options))})`);
+        // Autostart (Settings > Autostart): like exec-once, once when Hyprland starts.
+        const commands = (overrides.autostart ?? []).filter(e => e.enabled && (e.cmd ?? "").trim() !== "");
+        if (commands.length) {
+            lines.push("hl.on(\"hyprland.start\", function()");
+            commands.forEach(e => lines.push(`    hl.exec_cmd(${lua(e.cmd.trim())})`));
+            lines.push("end)");
+        }
         luaWriter.setText(lines.join("\n") + "\n");
     }
 

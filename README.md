@@ -271,6 +271,7 @@ Sections:
   `qs -c hi-shell ipc call coverMode toggle`), draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
   mode), `worldClocks` (IANA zones), `image` for the image frame, bottom `visualizer`
 - `ai.model`: claude CLI model alias (empty = CLI default, `opus`, `sonnet`, `haiku`; also the picker in the chat)
+- `hyprland.autostart`: commands Hyprland runs when it starts, `[{ "cmd": "discord --start-minimized", "enabled": true }]` (Settings → Autostart adds, edits, switches off, deletes or runs one now; they're written into `~/.config/hi-shell/hyprland.lua` as `hl.exec_cmd` on `hyprland.start`, like `exec-once`)
 - `ai.enabled`: `false` turns the AI off (no AI tab in the left sidebar, no palette on Super+Y); the welcome screen asks, and Settings → General → AI chat → Enable AI switches it
 - `ai.provider`: `claude` (the CLI) or a provider id: `openrouter`, `openai`, `gemini`, `groq`, `deepseek`, `mistral`, `ollama`, `custom` (the first chip in the chat's header switches it, so do Settings → General → AI chat); `ai.keys`, `ai.models`, `ai.urls`: the API key, the chosen model and the server address per provider id (the model is picked from the provider's own list in the chat; `ollama` and `custom` take an address, `custom` any OpenAI-compatible `…/v1`)
 - `translator`: target language and the quick-pick list

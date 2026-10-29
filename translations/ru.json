@@ -861,5 +861,14 @@
     "The AI tab and the palette stay hidden. Settings > General turns it on again.": "Вкладка ИИ и палитра скрыты. Включить снова можно в Настройки > Общие.",
     "Models and the rest are in Settings > General.": "Модели и остальное — в Настройки > Общие.",
     "AI palette": "Палитра ИИ",
-    "AI chat with Claude": "Чат с ИИ через Claude"
+    "AI chat with Claude": "Чат с ИИ через Claude",
+    "Autostart": "Автозапуск",
+    "Run when Hyprland starts": "Запускать при старте Hyprland",
+    "Command": "Команда",
+    "Command (off)": "Команда (выкл)",
+    "e.g. discord --start-minimized": "например, discord --start-minimized",
+    "Run now": "Запустить сейчас",
+    "Add a command": "Добавить команду",
+    "Add": "Добавить",
+    "Like exec-once: runs once at Hyprland's start (▶ runs it now). Lines from your own config aren't listed.": "Как exec-once: запускается один раз при старте Hyprland (▶ — сейчас). Строки из вашего конфига не показываются."
 }

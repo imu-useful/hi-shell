@@ -234,7 +234,7 @@ Scope {
                             width: flick.width - 12
                             sourceComponent: ({
                                 quick: quick, general: general, bar: bar, desktop: desktop,
-                                interface: iface, services: services, hyprland: hyprland, about: about, lock: lock
+                                interface: iface, services: services, hyprland: hyprland, autostart: autostart, about: about, lock: lock
                             })[ShellState.settingsPage] ?? quick
                             onLoaded: {
                                 flick.targetY = 0;
@@ -249,6 +249,7 @@ Scope {
                         Component { id: iface; InterfacePage {} }
                         Component { id: services; ServicesPage {} }
                         Component { id: hyprland; HyprlandPage {} }
+                        Component { id: autostart; AutostartPage {} }
                         Component { id: about; AboutPage {} }
                         Component { id: lock; LockPage {} }
                     }
