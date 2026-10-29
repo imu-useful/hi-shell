@@ -21,10 +21,11 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: root.radius
-        topLeftRadius: root.topLeftRadius
-        topRightRadius: root.topRightRadius
-        bottomLeftRadius: root.bottomLeftRadius
-        bottomRightRadius: root.bottomRightRadius
+        // Not -1 handed over as it is: an explicit -1 reads as 0, not as "use radius".
+        topLeftRadius: root.topLeftRadius >= 0 ? root.topLeftRadius : root.radius
+        topRightRadius: root.topRightRadius >= 0 ? root.topRightRadius : root.radius
+        bottomLeftRadius: root.bottomLeftRadius >= 0 ? root.bottomLeftRadius : root.radius
+        bottomRightRadius: root.bottomRightRadius >= 0 ? root.bottomRightRadius : root.radius
         color: root.tint
         opacity: !root.enabled ? 0 : root.pressed ? 0.12 : root.containsMouse ? 0.08 : 0
         Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
