@@ -124,8 +124,14 @@ DesktopCard {
             color: Colors.m3secondaryContainer
 
             property real shown: Mpris.progress
+            // Dragging the bar to seek: where the pointer is (0..1) until it's let go.
+            property bool seeking: false
+            property real seekValue: 0
+            readonly property bool seekable: Mpris.active?.canSeek ?? false
 
             function glide() {
+                if (seeking)
+                    return;
                 const to = Mpris.progress;
                 const step = to - shown;
                 glideAnim.stop();
@@ -158,10 +164,73 @@ DesktopCard {
             }
 
             Rectangle {
-                width: parent.width * Math.max(0, Math.min(1, track.shown))
+                width: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
                 height: parent.height
                 radius: 2
                 color: Colors.m3primary
+            }
+
+            // The handle, while the pointer is over the bar or it's being dragged, with the time it
+            // would seek to.
+            Rectangle {
+                id: handle
+                visible: track.seekable && (seek.containsMouse || track.seeking)
+                x: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown)) - width / 2
+                anchors.verticalCenter: parent.verticalCenter
+                width: 4
+                height: 16
+                radius: 2
+                color: Colors.m3primary
+
+                Rectangle {
+                    visible: track.seeking
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: 6
+                    implicitWidth: seekTime.implicitWidth + 14
+                    implicitHeight: 22
+                    radius: 11
+                    color: Colors.m3primary
+                    StyledText {
+                        id: seekTime
+                        anchors.centerIn: parent
+                        text: Timers.format(track.seekValue * Mpris.length)
+                        font.pixelSize: Appearance.font.size.labelSmall
+                        font.features: { "tnum": 1 }
+                        color: Colors.m3onPrimary
+                    }
+                }
+            }
+
+            // Click or drag along the bar to seek (not while widgets are being edited: then a drag
+            // moves the widget).
+            MouseArea {
+                id: seek
+                anchors.fill: parent
+                anchors.topMargin: -10
+                anchors.bottomMargin: -10
+                enabled: track.seekable && !ShellState.desktopEditing
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                preventStealing: true
+
+                function valueAt(x) {
+                    return Math.max(0, Math.min(1, x / track.width));
+                }
+                onPressed: mouse => {
+                    track.seeking = true;
+                    track.seekValue = valueAt(mouse.x);
+                }
+                onPositionChanged: mouse => {
+                    if (track.seeking)
+                        track.seekValue = valueAt(mouse.x);
+                }
+                onReleased: mouse => {
+                    Mpris.seekTo(valueAt(mouse.x));
+                    track.shown = valueAt(mouse.x);
+                    track.seeking = false;
+                }
+                onCanceled: track.seeking = false
             }
         }
 

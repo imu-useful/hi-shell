@@ -37,7 +37,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | ⏳ **Wait Mode** | A cover for the person while an AI works on the machine: a player or the wallpaper, keyboard and mouse shut out, no sleeping, Esc three times to exit; automation can still see and click what's underneath |
 | 🔋 **Power saving** | One switch turns off animations, blur, transparency, the visualizer and the dancing frame, and puts them back when it's turned off |
 | ➡️ **Right sidebar** | Quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic, Wi-Fi and Bluetooth pages, per-app volume, notification center, calendar, to-do, focus / stopwatch / countdown timers |
-| 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics, greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
+| 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics (click or drag its progress bar to seek), greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
 | 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
 | ⚙️ **Settings** | Every option in a settings app, Hyprland displays / gaps / blur / input included, searchable from the launcher |
 | 🌍 **Languages** | English and Russian: the whole interface, dates and plural forms |
