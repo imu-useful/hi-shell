@@ -69,6 +69,11 @@ RowLayout {
 
             StateLayer {
                 tint: segment.contentColor
+                // The segment rounds each corner on its own; the hover tint follows.
+                topLeftRadius: segment.topLeftRadius
+                topRightRadius: segment.topRightRadius
+                bottomLeftRadius: segment.bottomLeftRadius
+                bottomRightRadius: segment.bottomRightRadius
                 onClicked: {
                     root.currentIndex = segment.index;
                     root.selected(segment.index);
