@@ -14,6 +14,7 @@ ColumnLayout {
 
     property bool showHistory: false
     property bool showModels: false
+    property bool showProviders: false
     property string modelFilter: ""
 
     function focusInput() {
@@ -22,9 +23,14 @@ ColumnLayout {
 
     function toggleModels() {
         showModels = !showModels;
-        showHistory = false;
-        if (showModels && Claude.freeModels.length === 0)
-            Claude.loadFreeModels();
+        showHistory = showProviders = false;
+        if (showModels && Claude.modelList.length === 0)
+            Claude.loadModels();
+    }
+
+    function toggleProviders() {
+        showProviders = !showProviders;
+        showHistory = showModels = false;
     }
 
     spacing: 10
@@ -33,33 +39,15 @@ ColumnLayout {
         Layout.fillWidth: true
         spacing: 6
 
-        SegmentedButton {
-            visible: !Claude.openrouter
-            model: Claude.models.map(m => m.name)
-            currentIndex: Math.max(0, Claude.models.findIndex(m => m.id === Claude.model))
-            enabled: !Claude.busy
-            onSelected: index => Claude.model = Claude.models[index].id
-        }
+        // Who answers: Claude, or one of the providers (the list opens below).
         Chip {
-            visible: Claude.openrouter
-            Layout.maximumWidth: root.width - 130
-            icon: "expand_more"
-            text: Claude.modelName || Translation.tr("Pick a model")
-            selected: root.showModels
+            icon: Claude.compat ? Claude.spec.icon : "auto_awesome"
+            text: Claude.providerName
+            selected: root.showProviders
             enabled: !Claude.busy
-            onClicked: root.toggleModels()
+            onClicked: root.toggleProviders()
         }
         Item { Layout.fillWidth: true }
-        IconButton {
-            implicitWidth: 36
-            implicitHeight: 36
-            icon: Claude.openrouter ? "hub" : "auto_awesome"
-            enabled: !Claude.busy
-            onClicked: {
-                Claude.provider = Claude.openrouter ? "claude" : "openrouter";
-                root.showModels = false;
-            }
-        }
         IconButton {
             implicitWidth: 36
             implicitHeight: 36
@@ -67,7 +55,7 @@ ColumnLayout {
             filled: root.showHistory
             onClicked: {
                 root.showHistory = !root.showHistory;
-                root.showModels = false;
+                root.showModels = root.showProviders = false;
             }
         }
         IconButton {
@@ -83,15 +71,91 @@ ColumnLayout {
         }
     }
 
+    // The model: Claude's three, or a chip that opens the provider's list.
+    RowLayout {
+        Layout.fillWidth: true
+        visible: !root.showProviders
+
+        SegmentedButton {
+            visible: !Claude.compat
+            model: Claude.models.map(m => m.name)
+            currentIndex: Math.max(0, Claude.models.findIndex(m => m.id === Claude.model))
+            enabled: !Claude.busy
+            onSelected: index => Claude.model = Claude.models[index].id
+        }
+        Chip {
+            visible: Claude.compat
+            Layout.maximumWidth: root.width - 20
+            icon: "expand_more"
+            text: Claude.modelName || Translation.tr("Pick a model")
+            selected: root.showModels
+            enabled: !Claude.busy
+            onClicked: root.toggleModels()
+        }
+        Item { Layout.fillWidth: true }
+    }
+
     StyledText {
         Layout.fillWidth: true
-        visible: Claude.inputTokens + Claude.outputTokens > 0 && !root.showHistory && !root.showModels
+        visible: Claude.inputTokens + Claude.outputTokens > 0 && !root.showHistory && !root.showModels && !root.showProviders
         text: Translation.tr("%1 in · %2 out").arg(Claude.formatTokens(Claude.inputTokens)).arg(Claude.formatTokens(Claude.outputTokens)) + (Claude.costUsd > 0 ? " · $" + Claude.costUsd.toFixed(3) : "")
         font.pixelSize: Appearance.font.size.labelSmall
         color: Colors.m3outline
     }
 
-    // --- OpenRouter's free models ---
+    // --- Providers ---
+    StyledFlickable {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        visible: root.showProviders
+        contentHeight: providersColumn.implicitHeight
+
+        ColumnLayout {
+            id: providersColumn
+            width: parent.width
+            spacing: 2
+
+            ListRow {
+                Layout.fillWidth: true
+                icon: Claude.provider === "claude" ? "check" : "auto_awesome"
+                title: "Claude"
+                subtitle: Translation.tr("Through the claude CLI (Claude Code)")
+                clickable: true
+                color: Claude.provider === "claude" ? Colors.m3secondaryContainer : "transparent"
+                onClicked: {
+                    Claude.provider = "claude";
+                    root.showProviders = false;
+                    root.focusInput();
+                }
+            }
+
+            Repeater {
+                model: Claude.providers
+
+                ListRow {
+                    required property var modelData
+                    readonly property bool ready: Claude.configured(modelData.id)
+                    Layout.fillWidth: true
+                    icon: Claude.provider === modelData.id ? "check" : modelData.icon
+                    title: modelData.name
+                    subtitle: !ready ? (modelData.urlRequired ? Translation.tr("Set the server address in Settings → General") : Translation.tr("Add an API key in Settings → General")) : Translation.tr(modelData.note ?? "")
+                    clickable: true
+                    color: Claude.provider === modelData.id ? Colors.m3secondaryContainer : "transparent"
+                    onClicked: {
+                        Claude.provider = modelData.id;
+                        root.showProviders = false;
+                        // Straight to the model list when none is chosen yet.
+                        if (ready && Claude.modelFor(modelData.id) === "")
+                            root.toggleModels();
+                        else
+                            root.focusInput();
+                    }
+                }
+            }
+        }
+    }
+
+    // --- The provider's models ---
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: 36
@@ -114,7 +178,7 @@ ColumnLayout {
 
             StyledText {
                 visible: modelSearch.text === ""
-                text: Translation.tr("Search free models…")
+                text: Claude.provider === "openrouter" ? Translation.tr("Search free models…") : Translation.tr("Search models…")
                 color: Colors.m3outline
             }
         }
@@ -132,7 +196,7 @@ ColumnLayout {
             spacing: 2
 
             StyledText {
-                visible: Claude.loadingModels || Claude.modelsError !== "" || (Claude.freeModels.length > 0 && modelRepeater.count === 0)
+                visible: Claude.loadingModels || Claude.modelsError !== "" || (Claude.modelList.length > 0 && modelRepeater.count === 0)
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 30
                 Layout.fillWidth: true
@@ -144,18 +208,18 @@ ColumnLayout {
 
             Repeater {
                 id: modelRepeater
-                model: Claude.freeModels.filter(m => root.modelFilter === "" || m.id.toLowerCase().includes(root.modelFilter) || m.name.toLowerCase().includes(root.modelFilter))
+                model: Claude.modelList.filter(m => root.modelFilter === "" || m.id.toLowerCase().includes(root.modelFilter) || m.name.toLowerCase().includes(root.modelFilter))
 
                 ListRow {
                     required property var modelData
                     Layout.fillWidth: true
-                    icon: modelData.id === Claude.openrouterModel ? "check" : "smart_toy"
+                    icon: modelData.id === Claude.apiModel ? "check" : "smart_toy"
                     title: modelData.name
                     subtitle: modelData.id
                     clickable: true
-                    color: modelData.id === Claude.openrouterModel ? Colors.m3secondaryContainer : "transparent"
+                    color: modelData.id === Claude.apiModel ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
-                        Claude.openrouterModel = modelData.id;
+                        Claude.setModel(Claude.provider, modelData.id);
                         root.showModels = false;
                         root.focusInput();
                     }
@@ -218,7 +282,7 @@ ColumnLayout {
         Layout.fillHeight: true
         // Kept for a moment after the last message goes, so the messages can erase away.
         property bool erasing: false
-        visible: !root.showHistory && !root.showModels && (Claude.messages.count > 0 || erasing)
+        visible: !root.showHistory && !root.showModels && !root.showProviders && (Claude.messages.count > 0 || erasing)
         clip: true
         spacing: 10
         model: Claude.messages
@@ -251,7 +315,7 @@ ColumnLayout {
     ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        visible: !root.showHistory && !root.showModels && Claude.messages.count === 0 && !list.erasing
+        visible: !root.showHistory && !root.showModels && !root.showProviders && Claude.messages.count === 0 && !list.erasing
         spacing: 12
 
         Item { Layout.fillHeight: true }
@@ -332,7 +396,7 @@ ColumnLayout {
                     Claude.send(text);
                     text = "";
                     root.showHistory = false;
-                    root.showModels = false;
+                    root.showModels = root.showProviders = false;
                 }
 
                 Keys.onPressed: event => {

@@ -216,10 +216,16 @@ Singleton {
             property JsonObject ai: JsonObject {
                 // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
                 property string model: ""
-                // "claude" (the CLI) or "openrouter" (any model, the free ones included)
+                // "claude" (the CLI) or a provider id from services/AiProviders.js: openrouter, openai,
+                // gemini, groq, deepseek, mistral, ollama, custom
                 property string provider: "claude"
+                // Per provider id: API key, chosen model, and the server address where it isn't the
+                // default (Ollama's port, a custom server)
+                property var keys: ({})
+                property var models: ({})
+                property var urls: ({})
+                // Before the per-provider maps: OpenRouter's key and model (still read as a fallback)
                 property string openrouterKey: ""
-                // OpenRouter model id, e.g. "meta-llama/llama-3.3-70b-instruct:free"
                 property string openrouterModel: ""
             }
 

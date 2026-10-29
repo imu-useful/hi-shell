@@ -38,7 +38,7 @@ ColumnLayout {
 
     Section {
         icon: "auto_awesome"
-        title: Translation.tr("Claude")
+        title: Translation.tr("AI chat")
 
         ChoiceRow {
             icon: "neurology"
@@ -48,22 +48,61 @@ ColumnLayout {
             options: Claude.models.map(m => ({ value: m.id, text: m.name }))
             onSelected: value => Claude.model = value
         }
-        ChoiceRow {
+        ListRow {
+            Layout.fillWidth: true
             icon: "hub"
             title: Translation.tr("Provider")
-            subtitle: Translation.tr("OpenRouter runs any of its models, the free ones included")
-            value: Claude.provider
-            options: [{ value: "claude", text: "Claude" }, { value: "openrouter", text: "OpenRouter" }]
-            onSelected: value => Claude.provider = value
+            subtitle: Translation.tr("Who answers in the chat (also switched in the chat itself); add their keys below")
         }
-        TextRow {
-            icon: "key"
-            title: Translation.tr("OpenRouter API key")
-            subtitle: Translation.tr("Free at openrouter.ai/keys; the model is picked in the sidebar chat")
-            value: o.ai.openrouterKey
-            secret: true
-            fieldWidth: 300
-            onEdited: text => o.ai.openrouterKey = text.trim()
+        Flow {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            Layout.bottomMargin: 6
+            spacing: 6
+
+            Chip {
+                icon: "auto_awesome"
+                text: "Claude"
+                selected: Claude.provider === "claude"
+                onClicked: Claude.provider = "claude"
+            }
+            Repeater {
+                model: Claude.providers
+                Chip {
+                    required property var modelData
+                    icon: modelData.icon
+                    text: modelData.name
+                    selected: Claude.provider === modelData.id
+                    onClicked: Claude.provider = modelData.id
+                }
+            }
+        }
+        Repeater {
+            model: Claude.providers.filter(p => p.key || p.id === "custom")
+            TextRow {
+                required property var modelData
+                icon: "key"
+                title: Translation.tr("%1 API key").arg(modelData.name)
+                subtitle: modelData.keyUrl ? Translation.tr("Get one at %1; the model is picked in the sidebar chat").arg(modelData.keyUrl) : Translation.tr("Optional")
+                value: Claude.keyFor(modelData.id)
+                secret: true
+                fieldWidth: 300
+                onEdited: text => Claude.setKey(modelData.id, text.trim())
+            }
+        }
+        Repeater {
+            model: Claude.providers.filter(p => p.id === "ollama" || p.urlRequired)
+            TextRow {
+                required property var modelData
+                icon: "link"
+                title: Translation.tr("%1 server address").arg(modelData.name)
+                subtitle: modelData.urlRequired ? Translation.tr("Ending in /v1, e.g. http://localhost:1234/v1") : Translation.tr("Default %1").arg(modelData.url)
+                value: Config.options.ai.urls[modelData.id] ?? ""
+                placeholder: modelData.url
+                fieldWidth: 300
+                onEdited: text => Claude.setUrl(modelData.id, text.trim())
+            }
         }
     }
 
