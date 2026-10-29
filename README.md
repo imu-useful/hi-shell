@@ -282,7 +282,7 @@ Sections:
 - `dock`: enabled (off by default), auto-hide, magnify, icon size, pinned app ids
 - `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`); `recordSound` for screen recordings: `off`, `system` (what plays through the speakers) or `mic` (also the buttons under the mode switcher in Record mode)
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
-- `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default) or `standard` (the system's menus); also in Settings › Interface
+- `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default), `caelestia` (the same menus in the look of [caelestia's shell](https://github.com/caelestia-dots/shell): compact pill rows, a Back pill under a submenu) or `standard` (the system's menus); also in Settings › Interface
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
 ## Terminal configs

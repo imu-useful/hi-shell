@@ -55,7 +55,7 @@ ColumnLayout {
             title: Translation.tr("Context menus")
             subtitle: Translation.tr("The tray's right-click menus")
             value: a.contextMenu
-            options: [{ value: "material", text: Translation.tr("New") }, { value: "standard", text: Translation.tr("Standard") }]
+            options: [{ value: "material", text: Translation.tr("New") }, { value: "caelestia", text: "Caelestia" }, { value: "standard", text: Translation.tr("Standard") }]
             onSelected: value => a.contextMenu = value
         }
         SliderRow {

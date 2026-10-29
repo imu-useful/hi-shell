@@ -15,6 +15,10 @@ import qs.services
 //                                          onCloseRequested: lazy.shown = false } }   ... lazy.shown = true
 //
 // Wrapped in a PanelLoader the window (and its shadow layer) exists only while the menu is open.
+//
+// Two looks (appearance.contextMenu): "material", rows with a tonal state layer and the back row on
+// top, and "caelestia", after caelestia's shell: compact pill rows on a low card, a "Back" pill at
+// the bottom of a submenu and a springier pop-in.
 PopupWindow {
     id: root
 
@@ -25,6 +29,8 @@ PopupWindow {
     property int edge: Edges.Bottom
     property int gap: 8
 
+    // The caelestia look.
+    readonly property bool pill: Config.options.appearance.contextMenu === "caelestia"
     readonly property int shadowPad: 14
     readonly property int menuWidth: 248
     // The submenus entered so far: [{ handle, title }].
@@ -80,14 +86,14 @@ PopupWindow {
         x: root.shadowPad
         y: root.shadowPad + (root.edge === Edges.Bottom ? -slide : slide)
         width: root.menuWidth
-        height: column.implicitHeight + 16
+        height: column.implicitHeight + (root.pill ? 8 : 16)
         radius: Appearance.rounding.large
-        color: Colors.m3surfaceContainer
-        border.width: 1
+        color: root.pill ? Colors.m3surfaceContainerLow : Colors.m3surfaceContainer
+        border.width: root.pill ? 0 : 1
         border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
         opacity: root.shown ? 1 : 0
-        scale: root.shown ? 1 : 0.9
+        scale: root.shown ? 1 : (root.pill ? 0.8 : 0.9)
         transformOrigin: root.edge === Edges.Bottom ? Item.Top : Item.Bottom
         Behavior on opacity { enabled: root.animated; EffectAnim { duration: Appearance.anim.fast } }
         Behavior on scale { enabled: root.animated; SpringAnim {} }
@@ -116,9 +122,10 @@ PopupWindow {
             signal activated
 
             width: parent?.width ?? 0
-            height: 40
-            radius: Appearance.rounding.medium
-            color: "transparent"
+            height: root.pill ? 36 : 40
+            radius: root.pill ? height / 2 : Appearance.rounding.medium
+            // The caelestia look: the back row is a filled pill.
+            color: root.pill && back ? Colors.m3secondaryContainer : "transparent"
             opacity: enabled ? 1 : 0.38
 
             Item {
@@ -131,9 +138,9 @@ PopupWindow {
                 MaterialIcon {
                     anchors.centerIn: parent
                     visible: row.back || (row.mark !== "none" && row.marked) || (row.mark === "radio")
-                    icon: row.back ? "arrow_back" : row.mark === "radio" ? (row.marked ? "radio_button_checked" : "radio_button_unchecked") : "check"
+                    icon: row.back ? (root.pill ? "chevron_left" : "arrow_back") : row.mark === "radio" ? (row.marked ? "radio_button_checked" : "radio_button_unchecked") : "check"
                     iconSize: 20
-                    color: row.marked ? Colors.m3primary : Colors.m3onSurfaceVariant
+                    color: row.back && root.pill ? Colors.m3onSecondaryContainer : row.marked ? Colors.m3primary : Colors.m3onSurfaceVariant
                 }
                 IconImage {
                     anchors.fill: parent
@@ -149,9 +156,9 @@ PopupWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: row.submenu ? 40 : 14
                 anchors.verticalCenter: parent.verticalCenter
-                text: row.label
+                text: row.back && root.pill ? Translation.tr("Back") : row.label
                 elide: Text.ElideRight
-                color: row.back ? Colors.m3onSurfaceVariant : Colors.m3onSurface
+                color: row.back ? (root.pill ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant) : Colors.m3onSurface
                 font.weight: row.back ? Font.Medium : Font.Normal
             }
 
@@ -167,19 +174,20 @@ PopupWindow {
 
             StateLayer {
                 enabled: row.enabled
+                tint: row.back && root.pill ? Colors.m3onSecondaryContainer : Colors.m3onSurface
                 onClicked: row.activated()
             }
         }
 
         Column {
             id: column
-            x: 8
-            y: 8
-            width: parent.width - 16
-            spacing: 0
+            x: root.pill ? 4 : 8
+            y: root.pill ? 4 : 8
+            width: parent.width - (root.pill ? 8 : 16)
+            spacing: root.pill ? 2 : 0
 
             MenuRow {
-                visible: root.trail.length > 0
+                visible: !root.pill && root.trail.length > 0
                 height: visible ? 40 : 0
                 back: true
                 label: root.trail.length > 0 ? root.trail[root.trail.length - 1].title : ""
@@ -201,7 +209,7 @@ PopupWindow {
                         id: separator
                         Item {
                             width: slot.width
-                            height: 17
+                            height: root.pill ? 9 : 17
                             Rectangle {
                                 anchors.centerIn: parent
                                 width: parent.width - 24
@@ -233,6 +241,15 @@ PopupWindow {
                         }
                     }
                 }
+            }
+
+            // The caelestia look: Back is a pill under the entries of a submenu.
+            MenuRow {
+                visible: root.pill && root.trail.length > 0
+                height: visible ? 36 : 0
+                back: true
+                label: root.trail.length > 0 ? root.trail[root.trail.length - 1].title : ""
+                onActivated: root.trail = root.trail.slice(0, -1)
             }
         }
     }
