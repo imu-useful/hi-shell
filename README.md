@@ -503,6 +503,7 @@ the same file.
 
 ## Troubleshooting
 
+- **A black desktop and no bar, while the panels and Settings open (and `qs -c hi-shell ipc call bar status` looks normal):** seen with Hyprland 0.57.0 on an old Intel GPU (HD Graphics 4000, which Hyprland runs on GLES 3.0): its layers on Background and Top drew nothing. Hyprland 0.56.2 worked; it wasn't the shell (an older shell version showed the same), the Vulkan / OpenGL choice or the blur. If you see the same, check with `hyprctl version` and try an older Hyprland, and report it to Hyprland.
 - **Logs:** run `qs -c hi-shell` in a terminal, or `qs -c hi-shell log` for a running instance.
 - **Rendering:** `run.sh` (what Hyprland starts) uses Vulkan when a Vulkan driver is installed, which costs less CPU
   per frame than OpenGL. To use OpenGL: `qs -c hi-shell kill; QSG_RHI_BACKEND=opengl ~/.config/quickshell/hi-shell/run.sh -d`.
