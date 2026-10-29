@@ -145,10 +145,11 @@ Scope {
 import json, subprocess, sys
 mons = json.load(sys.stdin)
 m = next(m for m in mons if m["focused"])
-ws = {m["activeWorkspace"]["id"], m["specialWorkspace"]["id"]}
+# By name: Hyprland 0.57 sends a special workspace without an id, and an empty one when none is open.
+ws = {m["activeWorkspace"]["name"], m["specialWorkspace"].get("name")} - {None, ""}
 clients = json.loads(subprocess.run(["hyprctl", "clients", "-j"], capture_output=True, text=True).stdout)
 wins = [{"x": c["at"][0] - m["x"], "y": c["at"][1] - m["y"], "w": c["size"][0], "h": c["size"][1], "title": c["title"]}
-        for c in clients if c["mapped"] and not c["hidden"] and c["workspace"]["id"] in ws]
+        for c in clients if c["mapped"] and not c["hidden"] and c["workspace"].get("name") in ws]
 print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale"], "windows": wins}))'
         `, "sh", root.tmp]
         stdout: StdioCollector {
