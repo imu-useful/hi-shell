@@ -2,6 +2,7 @@ import QtQuick
 import qs.common
 import qs.common.widgets
 import qs.services
+import "KeyNames.js" as KeyNames
 
 // A field for a keybind's keys ("SUPER + SHIFT + S"): typed by hand, or recorded: the keyboard
 // button waits for the shortcut and writes it in the way Hyprland takes it. While it waits Hyprland's
@@ -23,52 +24,8 @@ Rectangle {
     border.width: field.activeFocus ? 2 : 0
     border.color: Colors.m3primary
 
-    // Qt key -> the name Hyprland knows.
-    readonly property var names: ({
-        [Qt.Key_Space]: "Space", [Qt.Key_Return]: "Return", [Qt.Key_Enter]: "Return", [Qt.Key_Tab]: "Tab",
-        [Qt.Key_Backspace]: "BackSpace", [Qt.Key_Delete]: "Delete", [Qt.Key_Insert]: "Insert",
-        [Qt.Key_Home]: "Home", [Qt.Key_End]: "End", [Qt.Key_PageUp]: "Prior", [Qt.Key_PageDown]: "Next",
-        [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down",
-        [Qt.Key_Print]: "Print", [Qt.Key_Period]: "period", [Qt.Key_Comma]: "comma", [Qt.Key_Minus]: "minus",
-        [Qt.Key_Equal]: "equal", [Qt.Key_Slash]: "slash", [Qt.Key_Backslash]: "backslash",
-        [Qt.Key_Semicolon]: "semicolon", [Qt.Key_Apostrophe]: "apostrophe", [Qt.Key_BracketLeft]: "bracketleft",
-        [Qt.Key_BracketRight]: "bracketright", [Qt.Key_QuoteLeft]: "grave",
-        [Qt.Key_VolumeUp]: "XF86AudioRaiseVolume", [Qt.Key_VolumeDown]: "XF86AudioLowerVolume", [Qt.Key_VolumeMute]: "XF86AudioMute",
-        [Qt.Key_MediaPlay]: "XF86AudioPlay", [Qt.Key_MediaTogglePlayPause]: "XF86AudioPlay", [Qt.Key_MediaNext]: "XF86AudioNext",
-        [Qt.Key_MediaPrevious]: "XF86AudioPrev", [Qt.Key_MediaStop]: "XF86AudioStop",
-        [Qt.Key_MonBrightnessUp]: "XF86MonBrightnessUp", [Qt.Key_MonBrightnessDown]: "XF86MonBrightnessDown",
-        [Qt.Key_MicMute]: "XF86AudioMicMute"
-    })
-    readonly property var modifierKeys: [Qt.Key_Shift, Qt.Key_Control, Qt.Key_Alt, Qt.Key_Meta, Qt.Key_AltGr, Qt.Key_Super_L, Qt.Key_Super_R, Qt.Key_CapsLock]
-
-    // "SUPER + SHIFT + S" from a key event, or "" when it's only a modifier.
     function combo(event) {
-        const k = event.key;
-        if (modifierKeys.includes(k))
-            return "";
-        let name = names[k];
-        if (name === undefined) {
-            if (k >= Qt.Key_F1 && k <= Qt.Key_F35)
-                name = "F" + (k - Qt.Key_F1 + 1);
-            else if ((k >= Qt.Key_A && k <= Qt.Key_Z) || (k >= Qt.Key_0 && k <= Qt.Key_9))
-                name = String.fromCharCode(k);
-            // Anything else (another layout's letters, shifted symbols): the key's code, which
-            // Hyprland binds as code:N whatever the layout.
-            else if (event.nativeScanCode > 0)
-                name = `code:${event.nativeScanCode}`;
-            else
-                return "";
-        }
-        const mods = [];
-        if (event.modifiers & Qt.MetaModifier)
-            mods.push("SUPER");
-        if (event.modifiers & Qt.ControlModifier)
-            mods.push("CTRL");
-        if (event.modifiers & Qt.AltModifier)
-            mods.push("ALT");
-        if (event.modifiers & Qt.ShiftModifier)
-            mods.push("SHIFT");
-        return [...mods, name].join(" + ");
+        return KeyNames.combo(event.key, event.modifiers, event.nativeScanCode);
     }
 
     function startRecording() {

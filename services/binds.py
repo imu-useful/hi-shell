@@ -84,6 +84,9 @@ def args_of(text):
     return -1, spans
 
 
+MAX_STATEMENT_LINES = 80
+
+
 def statement(lines, i):
     """The bind that starts at line index i: (last line index, text with comment marks off, off?),
     or None when it isn't closed or isn't a bind."""
@@ -91,16 +94,18 @@ def statement(lines, i):
     if not m:
         return None
     off = bool(m.group("off"))
-    parts = [COMMENT_PREFIX.sub(r"\1", lines[i], count=1) if off else lines[i]]
-    j = i
-    while True:
-        end, _ = args_of("\n".join(parts))
-        if end >= 0:
-            return j, "\n".join(parts), off
-        j += 1
-        if j >= len(lines) or (off and not COMMENT_PREFIX.match(lines[j])):
-            return None
+    parts = []
+    for j in range(i, min(len(lines), i + MAX_STATEMENT_LINES)):
+        if j > i and off and not COMMENT_PREFIX.match(lines[j]):
+            break
         parts.append(COMMENT_PREFIX.sub(r"\1", lines[j], count=1) if off else lines[j])
+    # One pass over the text finds where the call closes (it stops there).
+    text = "\n".join(parts)
+    end, _ = args_of(text)
+    if end < 0:
+        return None
+    last = i + text.count("\n", 0, end)
+    return last, "\n".join(parts[:last - i + 1]), off
 
 
 def parse(text):

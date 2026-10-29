@@ -239,6 +239,9 @@ Scope {
                             onLoaded: {
                                 flick.targetY = 0;
                                 flick.contentY = 0;
+                                // A page that's a list of its own (Keybinds) is as tall as the window and scrolls itself.
+                                if (item.viewHeight !== undefined)
+                                    item.viewHeight = Qt.binding(() => flick.height - 24);
                             }
                         }
 
