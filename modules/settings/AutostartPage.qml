@@ -26,6 +26,21 @@ ColumnLayout {
             subtitle: Translation.tr("Like exec-once: at the next start (▶ runs it now). Lines of your Hyprland files are changed in place; a copy of each file is kept.")
         }
 
+        // Things that mean the list isn't what it seems.
+        ListRow {
+            Layout.fillWidth: true
+            visible: !Autostart.exists
+            icon: "folder_off"
+            title: Translation.tr("No Hyprland folder at %1").arg(Autostart.hyprDir.replace(Paths.home, "~"))
+            subtitle: Translation.tr("Your Hyprland config is somewhere else, so its commands can't be listed; the ones added here still go to exec.lua.")
+        }
+        ListRow {
+            Layout.fillWidth: true
+            visible: Autostart.exists && !Autostart.loaded
+            icon: "warning"
+            title: Translation.tr("hi-shell isn't loaded from your Hyprland config")
+            subtitle: Translation.tr("Commands added here won't run until it is: run install.sh again (or add the line it shows to your config).")
+        }
         StyledText {
             Layout.fillWidth: true
             Layout.leftMargin: 16
@@ -47,13 +62,17 @@ ColumnLayout {
                 icon: modelData.own ? "rocket_launch" : "terminal"
                 // Where it comes from, and when it runs.
                 title: modelData.own ? Translation.tr("hi-shell (exec.lua)") : modelData.rel
-                subtitle: `${modelData.kind === "start" ? Translation.tr("At start") : Translation.tr("On every reload")} · ${Translation.tr("line %1").arg(modelData.line)}`
+                subtitle: modelData.readonly
+                    ? `${Translation.tr("line %1").arg(modelData.line)} · ${modelData.why === "symlink" ? Translation.tr("a symlink: change its target") : modelData.why === "no-write" ? Translation.tr("not writable") : Translation.tr("hi-shell's own")}`
+                    : `${modelData.kind === "start" ? Translation.tr("At start") : Translation.tr("On every reload")} · ${Translation.tr("line %1").arg(modelData.line)}`
                 value: modelData.cmd
+                readOnly: modelData.readonly
                 fieldWidth: 360
-                enabled: !modelData.readonly
                 opacity: modelData.enabled ? 1 : 0.6
                 // An emptied field removes the line.
                 onEdited: text => {
+                    if (row.modelData.readonly)
+                        return;
                     if (text.trim() === "")
                         Autostart.remove(row.modelData);
                     else if (text.trim() !== row.modelData.cmd)
@@ -61,6 +80,7 @@ ColumnLayout {
                 }
 
                 M3Switch {
+                    enabled: !row.modelData.readonly
                     checked: row.modelData.enabled
                     onToggled: checked => Autostart.setEnabled(row.modelData, checked)
                 }
@@ -70,6 +90,7 @@ ColumnLayout {
                     onClicked: HyprlandSettings.runNow(row.modelData.cmd)
                 }
                 IconButton {
+                    enabled: !row.modelData.readonly
                     icon: "delete"
                     tooltip: Translation.tr("Delete")
                     onClicked: Autostart.remove(row.modelData)
@@ -80,8 +101,15 @@ ColumnLayout {
         StyledText {
             Layout.fillWidth: true
             Layout.leftMargin: 16
-            visible: Autostart.entries.length === 0
+            visible: Autostart.entries.length === 0 && Autostart.exists
             text: Translation.tr("No commands found yet")
+            color: Colors.m3onSurfaceVariant
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            visible: Autostart.total > Autostart.entries.length
+            text: Translation.tr("%1 more not shown").arg(Autostart.total - Autostart.entries.length)
             color: Colors.m3onSurfaceVariant
         }
 

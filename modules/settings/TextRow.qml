@@ -11,6 +11,7 @@ ListRow {
     property string placeholder: ""
     property int fieldWidth: 240
     property bool secret: false
+    property bool readOnly: false
     signal edited(string text)
 
     Layout.fillWidth: true
@@ -36,6 +37,7 @@ ListRow {
             color: Colors.m3onSurface
             clip: true
             selectByMouse: true
+            readOnly: root.readOnly
             onAccepted: {
                 root.edited(text);
                 focus = false;

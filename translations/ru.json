@@ -876,5 +876,14 @@
     "On every reload": "При каждой перезагрузке",
     "line %1": "строка %1",
     "No commands found yet": "Команд пока нет",
-    "Goes into ~/.config/hi-shell/exec.lua": "Попадёт в ~/.config/hi-shell/exec.lua"
+    "Goes into ~/.config/hi-shell/exec.lua": "Попадёт в ~/.config/hi-shell/exec.lua",
+    "No Hyprland folder at %1": "Нет папки Hyprland: %1",
+    "Your Hyprland config is somewhere else, so its commands can't be listed; the ones added here still go to exec.lua.": "Конфиг Hyprland лежит в другом месте, поэтому его команды не показаны; добавленные здесь всё равно попадают в exec.lua.",
+    "hi-shell isn't loaded from your Hyprland config": "hi-shell не подключён из вашего конфига Hyprland",
+    "Commands added here won't run until it is: run install.sh again (or add the line it shows to your config).": "Добавленные здесь команды не запустятся, пока он не подключён: запустите install.sh ещё раз (или добавьте в конфиг строку, которую он покажет).",
+    "a symlink: change its target": "символьная ссылка: меняйте её цель",
+    "not writable": "нет прав на запись",
+    "hi-shell's own": "собственный hi-shell",
+    "%1 more not shown": "Ещё %1 не показано",
+    "Couldn't change it (see the shell's log)": "Не удалось изменить (см. лог шелла)"
 }

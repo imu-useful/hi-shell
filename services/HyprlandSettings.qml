@@ -190,8 +190,12 @@ Singleton {
         if (Object.keys(overrides.options).length)
             lines.push(`hl.config(${lua(nest(overrides.options))})`);
         // The autostart commands are their own file (Settings > Autostart, services/Autostart.qml).
+        // pcall: a mistake in a hand-edited exec.lua is reported, and nothing else is lost with it.
         const exec = lua(`${Config.dir}/exec.lua`);
-        lines.push(`local exec = ${exec}`, "local f = io.open(exec, \"r\")", "if f then", "    f:close()", "    dofile(exec)", "end");
+        lines.push(`local exec = ${exec}`, "local f = io.open(exec, \"r\")", "if f then", "    f:close()",
+            "    local ok, err = pcall(dofile, exec)", "    if not ok then",
+            "        hl.exec_cmd(\"notify-send -a hi-shell 'exec.lua has an error' '\" .. tostring(err):gsub(\"'\", \"\") .. \"'\")",
+            "    end", "end");
         luaWriter.setText(lines.join("\n") + "\n");
     }
 
