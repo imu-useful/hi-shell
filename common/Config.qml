@@ -130,6 +130,8 @@ Singleton {
                 }
                 // Night light color temperature (K) for hyprsunset.
                 property int nightLightTemperature: 4500
+                // The game in the empty notification center: dino, snake or minesweeper
+                property string game: "dino"
             }
 
             property JsonObject spotify: JsonObject {

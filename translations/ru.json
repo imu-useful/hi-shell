@@ -843,5 +843,15 @@
     "Add an API key in Settings → General": "Добавьте ключ API в Настройки → Общие",
     "Any of its models; the picker lists the free ones": "Любые его модели; в списке бесплатные",
     "Local models; the picker lists what you've pulled": "Локальные модели; в списке то, что вы скачали",
-    "Any OpenAI-compatible server (LM Studio, llama.cpp, vLLM, ...)": "Любой OpenAI-совместимый сервер (LM Studio, llama.cpp, vLLM, ...)"
+    "Any OpenAI-compatible server (LM Studio, llama.cpp, vLLM, ...)": "Любой OpenAI-совместимый сервер (LM Studio, llama.cpp, vLLM, ...)",
+    "Click to play snake": "Нажмите, чтобы сыграть в змейку",
+    "Click to try again": "Нажмите, чтобы попробовать снова",
+    "Mines": "Мины",
+    "Best": "Рекорд",
+    "New game": "Новая игра",
+    "Game": "Игра",
+    "In the empty notification center": "В пустом центре уведомлений",
+    "Dino": "Динозаврик",
+    "Snake": "Змейка",
+    "Minesweeper": "Сапёр"
 }

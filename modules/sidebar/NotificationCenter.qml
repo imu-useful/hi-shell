@@ -58,12 +58,17 @@ ColumnLayout {
             width: parent.width
             spacing: 12
 
-            // Empty state: Chrome's T-rex; click it to play.
-            DinoGame {
+            // Empty state: a game to play (sidebar.game: Chrome's T-rex, snake or minesweeper).
+            Loader {
                 visible: Notifications.list.length === 0
+                active: visible
                 Layout.fillWidth: true
                 Layout.topMargin: 16
+                sourceComponent: ({ snake: snake, minesweeper: minesweeper })[Config.options.sidebar.game] ?? dino
             }
+            Component { id: dino; DinoGame {} }
+            Component { id: snake; SnakeGame {} }
+            Component { id: minesweeper; MinesweeperGame {} }
 
             Repeater {
                 model: ScriptModel {

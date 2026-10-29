@@ -439,8 +439,15 @@ with the active profile; `qs -c hi-shell ipc call focus start` does the same.
 hi-shell is a notification daemon. Only one daemon can run at a time: while another one
 (illogical-impulse's `qs -c ii`, mako, dunst, ...) is running, hi-shell waits and takes over once it exits.
 History is kept in `~/.local/state/hi-shell/notifications.json`.
-With no notifications, the notification center shows Chrome's T-rex: click it to play (Space / Up / click to jump, Down
-to duck; the best score is kept in `~/.local/state/hi-shell/dino.txt`).
+With no notifications, the notification center has a game to play, chosen in Settings → Interface → Sidebars → Game
+(`sidebar.game`: `dino`, `snake` or `minesweeper`):
+
+- **Dino**, Chrome's T-rex: click it to play (Space / Up / click to jump, Down to duck); the best score is kept in
+  `~/.local/state/hi-shell/dino.txt`.
+- **Snake**: click to start, arrows / WASD turn (or click beside the head to turn towards the click); walls and your tail
+  are deadly, it speeds up as it eats; the best score is in `snake.txt` there.
+- **Minesweeper**: left click opens a square (on a number with all its flags placed, it opens the rest around it), right
+  click flags; the first click is always safe, the face starts a new game; the best winning time is in `minesweeper.txt`.
 
 Popups appear in the corner next to the bar: click a popup for the app's default action (or to expand it),
 use its buttons or inline reply, swipe it sideways or press × to dismiss. Hovering pauses its timeout.

@@ -79,6 +79,14 @@ ColumnLayout {
             options: [{ value: "android", text: Translation.tr("Android") }, { value: "classic", text: Translation.tr("Classic") }]
             onSelected: value => Config.options.sidebar.quickToggles.style = value
         }
+        ChoiceRow {
+            icon: "sports_esports"
+            title: Translation.tr("Game")
+            subtitle: Translation.tr("In the empty notification center")
+            value: Config.options.sidebar.game
+            options: [{ value: "dino", text: Translation.tr("Dino") }, { value: "snake", text: Translation.tr("Snake") }, { value: "minesweeper", text: Translation.tr("Minesweeper") }]
+            onSelected: value => Config.options.sidebar.game = value
+        }
         SliderRow {
             icon: "nightlight"
             title: Translation.tr("Night light temperature")
