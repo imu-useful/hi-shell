@@ -2,7 +2,7 @@
 
 # 👋 hi-shell
 
-**A Material 3 Expressive desktop shell for Hyprland — with Claude AI built in.**
+**A Material 3 Expressive desktop shell for Hyprland — with AI built in.**
 
 Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, animations everywhere, English and Russian.
 
@@ -30,9 +30,9 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | --- | --- |
 | 🧭 **Bar** | Configurable widgets (left / center / right), any screen edge, Hug / Float / Islands / M3 styles, hover popups for media, resources, weather, battery and updates, a live audio spectrum |
 | 🚀 **App launcher** | Apps and settings, plus prefixes: `=` calculator (a plain "12*(3+4)" or "10+5=" is answered too, without the prefix), `>` run a command, `<` keybinds, `:` emoji, `;` clipboard (images with a preview), `/` settings |
-| ✨ **Claude AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar through the `claude` CLI: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats; or other AI services: [OpenRouter](https://openrouter.ai) (the free models included), OpenAI, Gemini, Groq, DeepSeek, Mistral, a local Ollama, or any OpenAI-compatible server |
+| ✨ **AI** | Quick palette (<kbd>Super</kbd>+<kbd>Y</kbd>) and a full chat in the left sidebar: streamed answers, code blocks with copy buttons, model picker, token / cost usage, saved chats. Works with Claude (through the `claude` CLI) and other AI services: [OpenRouter](https://openrouter.ai) (the free models included), OpenAI, Gemini, Groq, DeepSeek, Mistral, a local Ollama, or any OpenAI-compatible server |
 | 🪟 **Overlays** | Workspace overview with a tile and icon per window (drag windows between workspaces), session screen, polkit dialog, region screenshot / OCR / recording (with system sound or the microphone), optional dock, rounded screen corners |
-| ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics (and the cover blurred behind it, `appearance.coverBackdrop`, off in Settings → Interface), weather, Claude chat, translator, clipboard history with image thumbnails |
+| ⬅️ **Left sidebar** | Greeting, now playing with synced lyrics (and the cover blurred behind it, `appearance.coverBackdrop`, off in Settings → Interface), weather, AI chat, translator, clipboard history with image thumbnails |
 | 🎯 **Focus Mode** | Sessions with a minimal bar, Pomodoro cycles, blocked apps and sites, profiles, statistics and achievements |
 | ⏳ **Wait Mode** | A cover for the person while an AI works on the machine: a player or the wallpaper, keyboard and mouse shut out, no sleeping, Esc three times to exit; automation can still see and click what's underneath |
 | 🔋 **Power saving** | One switch turns off animations, blur, transparency, the visualizer and the dancing frame, and puts them back when it's turned off |
@@ -52,8 +52,8 @@ and the audio spectrum is drawn by a single shader.
 | :---: | :---: |
 | <img src="docs/screenshots/launcher.webp" alt="App launcher"> | <img src="docs/screenshots/sidebar-right.webp" alt="Right sidebar"> |
 | **App launcher** — apps, settings, calculator, emoji, clipboard | **Right sidebar** — quick toggles, sliders, notifications |
-| <img src="docs/screenshots/settings.webp" alt="Settings"> | <img src="docs/screenshots/claude.webp" alt="Claude palette"> |
-| **Settings** — every option, searchable from the launcher | **Claude palette** — ask anything, answers stream in |
+| <img src="docs/screenshots/settings.webp" alt="Settings"> | <img src="docs/screenshots/claude.webp" alt="AI palette"> |
+| **Settings** — every option, searchable from the launcher | **AI palette** — ask anything, answers stream in |
 | <img src="docs/screenshots/wallpapers.webp" alt="Wallpaper picker"> | <img src="docs/screenshots/display-mode.webp" alt="Display mode"> |
 | **Wallpapers** — local and online, scheme, mode, 28 frames | **Display mode** — duplicate or extend to a second screen |
 | <img src="docs/screenshots/welcome.webp" alt="Welcome"> | <img src="docs/screenshots/session.webp" alt="Session screen"> |
@@ -88,7 +88,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `libqalculate` (`qalc`) | launcher calculator |
 | `tesseract`, `tesseract-data-eng`, `tesseract-data-rus` (+ other languages), `wf-recorder` | region OCR and screen recording |
 | `hyprlock` | lock screen (hi-shell's Lock runs it) |
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | the AI palette (`claude` must be on `PATH` and signed in) |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (optional) | the AI chat with Claude (`claude` must be on `PATH` and signed in); the other AI services need only their API key |
 
 ```sh
 paru -S quickshell-git matugen python ttf-material-symbols-variable-git
@@ -188,7 +188,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | Shortcut | Action |
 | --- | --- |
 | <kbd>Super</kbd> (tap) or <kbd>Super</kbd>+<kbd>Space</kbd> | App launcher |
-| <kbd>Super</kbd>+<kbd>Y</kbd> | Claude AI palette |
+| <kbd>Super</kbd>+<kbd>Y</kbd> | AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | Workspace overview |
