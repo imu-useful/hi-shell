@@ -4,7 +4,9 @@
 Prints one JSON object per image as soon as its thumbnail exists (cached ones
 first), so the wallpaper grid fills in while new thumbnails are generated:
 
-    {"path": "/abs/wall.png", "name": "wall", "thumb": "/cache/ab12.jpg"}
+    {"path": "/abs/wall.png", "name": "wall", "thumb": "/cache/ab12.jpg", "live": false}
+
+`live` is true for videos and animated pictures (gif).
 
 Usage: thumbnails.py --cache DIR FOLDER [FOLDER...]
 """
@@ -18,12 +20,15 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".avif", ".jxl"}
+from stills import VIDEO_EXTENSIONS, frame, is_live, is_video
+
+# Pictures, and videos (live wallpapers; their thumbnail is a frame of them).
+EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".avif", ".jxl", ".apng"} | VIDEO_EXTENSIONS
 SIZE = "480x270"
 
 
 def emit(path: Path, thumb: Path) -> None:
-    print(json.dumps({"path": str(path), "name": path.stem, "thumb": str(thumb)}), flush=True)
+    print(json.dumps({"path": str(path), "name": path.stem, "thumb": str(thumb), "live": is_live(path)}), flush=True)
 
 
 def thumb_for(path: Path, cache: Path) -> Path:
@@ -33,6 +38,9 @@ def thumb_for(path: Path, cache: Path) -> Path:
 
 
 def make(path: Path, thumb: Path) -> bool:
+    if is_video(path):
+        # Fill and center-crop, as the picture thumbnails below.
+        return frame(path, thumb, f"scale={SIZE.replace('x', ':')}:force_original_aspect_ratio=increase,crop={SIZE.replace('x', ':')}")
     # [0]: first frame of animated images; ^ + extent: fill and center-crop.
     cmd = ["magick", f"{path}[0]", "-auto-orient", "-thumbnail", f"{SIZE}^", "-gravity", "center",
            "-extent", SIZE, "-quality", "82", str(thumb)]

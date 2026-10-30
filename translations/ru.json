@@ -179,6 +179,8 @@
     "Hide updates when there are none": "Скрывать, если обновлений нет",
     "Draw the wallpaper": "Рисовать обои",
     "Turn off if another tool (swww, hyprpaper) draws it": "Выключите, если обои рисует другая программа (swww, hyprpaper)",
+    "Play live wallpapers": "Играть живые обои",
+    "A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture": "Видео- или gif-обои двигаются; пока окно закрывает рабочий стол, они на паузе. Выключено: показывается неподвижная картинка",
     "Visualizer while music plays": "Визуализатор во время музыки",
     "Needs cava": "Нужен cava",
     "Widgets on": "Виджеты на экране",

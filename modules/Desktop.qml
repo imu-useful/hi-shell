@@ -132,7 +132,7 @@ Scope {
                 // (The cover from the local copy CoverMode downloads: quicker than fetching the
                 // player's URL again, and the same picture the palette came from.)
                 property string source: CoverMode.active ? (CoverMode.file ? `file://${CoverMode.file}` : Mpris.artUrl)
-                                                         : Wallpapers.current ? `file://${Wallpapers.current}` : ""
+                                                         : Wallpapers.still ? `file://${Wallpapers.still}` : ""
                 property bool flip: false
                 onSourceChanged: {
                     flip = !flip;
@@ -170,6 +170,15 @@ Scope {
                     sourceSize: Qt.size(window.width, window.height)
                     opacity: parent.flip && status === Image.Ready ? 1 : 0
                     Behavior on opacity { EffectAnim { duration: Appearance.anim.slow * 2 } }
+                }
+
+                // A video or gif wallpaper plays over its still; paused while a window covers the
+                // desktop (nobody sees it) and with power saving.
+                LiveWallpaper {
+                    id: live
+                    anchors.fill: parent
+                    source: Wallpapers.live && !CoverMode.active ? Wallpapers.current : ""
+                    playing: !window.covered && !PowerSaver.enabled
                 }
             }
 
@@ -235,6 +244,7 @@ Scope {
                     maskRotation: frame.spin
                     overscan: 0.21
                     source: wallpaper.source
+                    sourceItem: live.ready ? live.output : null
                 }
             }
 

@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from stills import still_for
+
 STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state"))
 DEFAULT_OUTPUT = STATE_HOME / "hi-shell/colors.json"
 HI_WALLPAPER_FILE = STATE_HOME / "hi-shell/wallpaper.txt"
@@ -123,8 +125,14 @@ def main() -> int:
         log(f"up to date ({wallpaper.name}, {mode}, {scheme})")
         return 0
 
+    # A video has no colors of its own: the palette comes from a frame of it.
+    picture = still_for(wallpaper)
+    if picture is None:
+        log(f"couldn't take a frame of {wallpaper.name}")
+        return 1
+
     try:
-        colors = generate(wallpaper, mode, scheme)
+        colors = generate(picture, mode, scheme)
     except (OSError, RuntimeError, ValueError, KeyError, subprocess.SubprocessError) as e:
         log(f"matugen failed: {e}")
         return 1

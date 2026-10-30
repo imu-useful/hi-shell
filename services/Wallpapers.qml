@@ -8,7 +8,10 @@ import qs.common
 // Current wallpaper (kept in ~/.local/state/hi-shell/wallpaper.txt), local
 // folders with cached thumbnails, and online search (Wallhaven; Unsplash with a
 // key). The desktop layer draws `current`; the palette follows it via Theme.
-// IPC: `qs -c hi-shell ipc call wallpaper set <path>` (random, toggleSelector).
+// A wallpaper can be live: a video (mp4, webm, mkv, ...) or a gif. The desktop plays it over `still`,
+// a picture of it (the picture itself, or a frame of the video taken by services/stills.py), which
+// everything that needs an image (palette, lock screen, thumbnails) uses.
+// IPC: `qs -c hi-shell ipc call wallpaper set <path>` (random, toggleSelector, status).
 Singleton {
     id: root
 
@@ -17,6 +20,20 @@ Singleton {
     readonly property string thumbDir: Paths.cache + "/thumbnails"
 
     property string current: ""
+
+    readonly property var videoExtensions: ["mp4", "webm", "mkv", "mov", "avi", "m4v", "ogv", "flv", "wmv", "ts", "mpg", "mpeg"]
+    readonly property var animatedExtensions: ["gif", "apng"]
+    // "video", "gif", or "" for a plain picture.
+    function kindOf(path) {
+        const ext = path.slice(path.lastIndexOf(".") + 1).toLowerCase();
+        return videoExtensions.includes(ext) ? "video" : animatedExtensions.includes(ext) ? "gif" : "";
+    }
+    readonly property string kind: kindOf(current)
+    // Played on the desktop (Settings > Desktop can switch it off).
+    readonly property bool live: kind !== "" && options.animate
+    // A picture of the wallpaper; empty while a video's frame is being taken.
+    property string videoStill: ""
+    readonly property string still: kind === "video" ? videoStill : current
 
     // [{ path, name, thumb }]
     property var local: []
@@ -46,6 +63,22 @@ Singleton {
         current = p;
         store.setText(p + "\n");
         Theme.setWallpaper(p);
+        updateStill();
+    }
+
+    // A frame of the video wallpaper (one at a time; again if the wallpaper changed meanwhile).
+    function updateStill() {
+        if (kind !== "video") {
+            videoStill = "";
+            return;
+        }
+        if (stiller.running) {
+            stiller.again = true;
+            return;
+        }
+        stiller.file = current;
+        stiller.command = ["python3", Quickshell.shellDir + "/services/stills.py", "--cache", thumbDir, current];
+        stiller.running = true;
     }
 
     function random() {
@@ -146,6 +179,29 @@ Singleton {
     }
 
     Process {
+        id: stiller
+        property string file: ""
+        property bool again: false
+        stdout: StdioCollector {
+            onStreamFinished: if (stiller.file === root.current) root.videoStill = text.trim()
+        }
+        onExited: {
+            if (again || file !== root.current) {
+                again = false;
+                root.updateStill();
+            }
+        }
+    }
+
+    // What the wallpaper looks like as a picture, for wait-mode (its own process, no Wallpapers service).
+    FileView {
+        id: stillStore
+        path: Paths.state + "/wallpaper-still.txt"
+        printErrors: false
+    }
+    onStillChanged: if (still !== "") stillStore.setText(still + "\n")
+
+    Process {
         id: downloader
         property string target: ""
         onExited: code => {
@@ -194,7 +250,10 @@ Singleton {
         id: store
         path: root.stateFile
         printErrors: false
-        onLoaded: root.current = text().trim()
+        onLoaded: {
+            root.current = text().trim();
+            root.updateStill();
+        }
         // First run: start from what the palette was generated from (e.g. illogical-impulse's wallpaper).
         onLoadFailed: root.current = Colors.wallpaper
     }
@@ -224,6 +283,9 @@ Singleton {
         }
         function get(): string {
             return root.current;
+        }
+        function status(): string {
+            return JSON.stringify({ current: root.current, kind: root.kind, live: root.live, still: root.still });
         }
         function toggleSelector(): void {
             ShellState.wallpaperSelectorOpen = !ShellState.wallpaperSelectorOpen;

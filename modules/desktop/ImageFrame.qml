@@ -16,6 +16,6 @@ Item {
         anchors.fill: parent
         anchors.margins: 8
         shape: "sunny"
-        source: Config.options.desktop.image ? `file://${Config.options.desktop.image}` : Colors.wallpaper ? `file://${Colors.wallpaper}` : ""
+        source: Config.options.desktop.image ? `file://${Config.options.desktop.image}` : Wallpapers.still ? `file://${Wallpapers.still}` : ""
     }
 }

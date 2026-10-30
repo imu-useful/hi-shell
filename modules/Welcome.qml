@@ -277,7 +277,7 @@ Scope {
                             clip: true
                             Image {
                                 anchors.fill: parent
-                                source: Wallpapers.current ? `file://${Wallpapers.current}` : ""
+                                source: Wallpapers.still ? `file://${Wallpapers.still}` : ""
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 sourceSize.width: 520

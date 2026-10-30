@@ -18,6 +18,8 @@ Item {
     // Extra picture around the shape, as a fraction of the size on each side. A turning
     // shape's tips reach past the square it fits in, and would be cut off without it.
     property real overscan: 0
+    // A live picture (a playing video) to show instead of the image, centered and cropped to a square.
+    property Item sourceItem: null
     readonly property real stage: 1 + 2 * overscan
 
     implicitWidth: 64
@@ -53,11 +55,20 @@ Item {
         }
     }
 
+    ShaderEffectSource {
+        id: liveSource
+        visible: false
+        live: true
+        sourceItem: root.sourceItem
+        readonly property real side: root.sourceItem ? Math.min(root.sourceItem.width, root.sourceItem.height) : 0
+        sourceRect: root.sourceItem ? Qt.rect((root.sourceItem.width - side) / 2, (root.sourceItem.height - side) / 2, side, side) : Qt.rect(0, 0, 0, 0)
+    }
+
     MultiEffect {
         anchors.centerIn: parent
         width: image.width
         height: image.height
-        source: image
+        source: root.sourceItem ? liveSource : image
         maskEnabled: true
         maskSource: maskLayer
         maskThresholdMin: 0.5

@@ -273,6 +273,24 @@ Scope {
                                     layer.smooth: true
                                 }
 
+                                // A video or gif.
+                                Rectangle {
+                                    visible: tile.modelData.live === true
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.margins: 8
+                                    width: 26
+                                    height: 26
+                                    radius: 13
+                                    color: Qt.alpha(Colors.m3surface, 0.75)
+                                    MaterialIcon {
+                                        anchors.centerIn: parent
+                                        icon: "play_arrow"
+                                        iconSize: 18
+                                        color: Colors.m3onSurface
+                                    }
+                                }
+
                                 // Label on hover
                                 Rectangle {
                                     anchors.left: parent.left

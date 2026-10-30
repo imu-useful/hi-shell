@@ -147,6 +147,8 @@ Singleton {
                 property string unsplashKey: ""
                 // Optional Wallhaven API key (only needed for NSFW / account features).
                 property string wallhavenKey: ""
+                // Play a video or gif wallpaper (off: its still picture is shown). It pauses while a window covers the desktop.
+                property bool animate: true
                 // Shape the wallpaper is shown in on the desktop ("" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ...
                 property string frame: ""
                 // The frame turns and pulses to the music while something plays.

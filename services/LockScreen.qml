@@ -37,7 +37,7 @@ Singleton {
     readonly property string text: {
         const font = Appearance.font.main;
         const icons = Appearance.font.icon;
-        const wallpaper = Config.options.lock.wallpaper ? Wallpapers.current : "";
+        const wallpaper = Config.options.lock.wallpaper ? Wallpapers.still : "";
         const lc = Translation.code === "ru" ? "ru_RU.UTF-8" : "en_US.UTF-8";
         const tr = s => sq(Translation.tr(s));
         const primary = rgba(Colors.m3primary);

@@ -38,7 +38,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | 🔋 **Power saving** | One switch turns off animations, blur, transparency, the visualizer and the dancing frame, and puts them back when it's turned off |
 | ➡️ **Right sidebar** | Quick toggles (Android-style pills or classic buttons, editable), volume / brightness / mic, Wi-Fi and Bluetooth pages, per-app volume, notification center, calendar, to-do, focus / stopwatch / countdown timers |
 | 🖼️ **Desktop** | Shape clock, big clock, weather, resources, calendar, media with lyrics (click or drag its progress bar to seek), greeting, to-do, notes, world clock, timers, user card, image frame; audio visualizer; drag-to-place edit mode |
-| 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
+| 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), live wallpapers (video, gif), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
 | ⚙️ **Settings** | Every option in a settings app, Hyprland displays / gaps / blur / input included, searchable from the launcher |
 | 🌍 **Languages** | English and Russian: the whole interface, dates and plural forms |
 | 👋 **Welcome & presets** | A first-run setup, and presets that save your config, wallpaper and colors to one shareable file |
@@ -87,6 +87,7 @@ Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
 | `imagemagick`, `curl` | wallpaper thumbnails and downloads |
 | `libqalculate` (`qalc`) | launcher calculator |
 | `tesseract`, `tesseract-data-eng`, `tesseract-data-rus` (+ other languages), `wf-recorder` | region OCR and screen recording |
+| `ffmpeg`, `qt6-multimedia-ffmpeg` | live (video) wallpapers: playing them and taking a frame for the palette and thumbnails |
 | `hyprlock` | lock screen (hi-shell's Lock runs it) |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (optional) | the AI chat with Claude (`claude` must be on `PATH` and signed in); the other AI services need only their API key |
 
@@ -466,6 +467,10 @@ Open the picker with <kbd>Super</kbd>+<kbd>R</kbd> or the wallpaper button on th
 
 - **Local**: every image in `wallpapers.directories` (default `~/Pictures/Wallpapers`), with thumbnails cached in
   `~/.cache/hi-shell/thumbnails` (the first scan of a big folder takes a minute; the grid fills in as it goes)
+- **Live wallpapers**: videos (mp4, webm, mkv, mov, avi, ...) and gifs in those folders show up in the grid with a play badge
+  and play on the desktop (also inside the frame). They pause while a window covers the desktop and with power saving, have
+  no sound, and Settings → Desktop → "Play live wallpapers" turns them into their still picture. The palette, the lock
+  screen and wait mode use a frame of the video (cached by `services/stills.py`). Needs `ffmpeg` and `qt6-multimedia-ffmpeg`
 - **Online**: Wallhaven search with a minimum resolution (1080p / 2K / 4K) and paging; picks are downloaded to
   `wallpapers.downloadDirectory`. Unsplash appears too once `wallpapers.unsplashKey` is set
   (free key from [unsplash.com/developers](https://unsplash.com/developers))
