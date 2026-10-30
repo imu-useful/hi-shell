@@ -253,6 +253,29 @@ Scope {
                         currentIndex: Math.max(0, codes.indexOf(Config.options.language))
                         onSelected: index => Config.options.language = codes[index]
                     }
+                    Item { implicitHeight: 4 }
+                    StyledText {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: Translation.tr("News in the channel, questions and chat in the group")
+                        color: Colors.m3outline
+                        font.pixelSize: Appearance.font.size.labelMedium
+                    }
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 8
+                        M3Button {
+                            tonal: true
+                            icon: "campaign"
+                            text: Translation.tr("Channel")
+                            onClicked: Qt.openUrlExternally("https://t.me/hi_shell")
+                        }
+                        M3Button {
+                            tonal: true
+                            icon: "forum"
+                            text: Translation.tr("Group")
+                            onClicked: Qt.openUrlExternally("https://t.me/tux_emp")
+                        }
+                    }
                     Item { Layout.fillHeight: true }
                 }
             }

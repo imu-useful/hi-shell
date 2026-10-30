@@ -900,5 +900,8 @@
     "No description": "Без описания",
     "also bound elsewhere": "те же клавиши заняты ещё где-то",
     "No keybinds found yet": "Сочетаний пока нет",
-    "Press the shortcut… (Esc cancels)": "Нажмите сочетание… (Esc — отмена)"
+    "Press the shortcut… (Esc cancels)": "Нажмите сочетание… (Esc — отмена)",
+    "News in the channel, questions and chat in the group": "Новости — в канале, вопросы и общение — в группе",
+    "Channel": "Канал",
+    "Group": "Группа"
 }
