@@ -4,7 +4,7 @@
 - **Shell UI:** Quickshell (QML, Wayland)
 - **Backend / AI Bridge:** Python 3 (using `qml` Python bindings or subprocess for Claude CLI)
 - **Design:** Material You (Material 3) via Quickshell's theming or QML Material components.
-- **OS:** Arch Linux + Hyprland (Wayland); NixOS through the flake (`flake.nix`, `nix/`)
+- **OS:** Arch Linux + Hyprland (Wayland)
 
 ## Core Features
 1. **Top Bar:** Workspaces (Hyprland), active window title, clock, system tray (volume, battery, network), system stats (CPU/RAM).
