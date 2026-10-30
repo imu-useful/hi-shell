@@ -20,11 +20,9 @@ Singleton {
     property string error: ""
     property real lastCheck: 0
     property string aurHelper: ""
-    // Only pacman systems have updates to count (not NixOS, Debian, ...).
-    property bool available: false
 
     function refresh() {
-        if (options.enabled && available && !checker.running && !upgrade.running)
+        if (options.enabled && !checker.running && !upgrade.running)
             checker.running = true;
     }
 
@@ -40,17 +38,6 @@ Singleton {
     function parse(lines, aur) {
         return lines.split("\n").map(l => l.trim().split(/\s+/)).filter(f => f.length >= 4 && f[2] === "->")
             .map(f => ({ name: f[0], from: f[1], to: f[3], aur }));
-    }
-
-    Process {
-        running: true
-        command: ["sh", "-c", "command -v checkupdates"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.available = text.trim() !== "";
-                root.refresh();
-            }
-        }
     }
 
     Process {

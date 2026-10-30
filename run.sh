@@ -3,8 +3,7 @@
 # noticeably less CPU per frame than OpenGL (visualizers, the dancing frame).
 # Set QSG_RHI_BACKEND yourself to choose (e.g. QSG_RHI_BACKEND=opengl ./run.sh).
 # Extra arguments go to qs (e.g. -d to detach).
-# (/run/opengl-driver is where NixOS puts the graphics drivers.)
-if [ -z "$QSG_RHI_BACKEND" ] && ls /usr/share/vulkan/icd.d/*.json /run/opengl-driver/share/vulkan/icd.d/*.json >/dev/null 2>&1; then
+if [ -z "$QSG_RHI_BACKEND" ] && ls /usr/share/vulkan/icd.d/*.json >/dev/null 2>&1; then
     export QSG_RHI_BACKEND=vulkan
 fi
 

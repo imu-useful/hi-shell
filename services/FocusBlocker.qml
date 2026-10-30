@@ -290,8 +290,6 @@ Singleton {
     readonly property string fifo: `${Quickshell.env("XDG_RUNTIME_DIR")}/hi-shell-focus.fifo`
     readonly property string pageState: `${Paths.state}/focus_page.json`
     readonly property string helper: `${Quickshell.shellDir}/services/focus_hosts.py`
-    // pkexec needs a full path; python lives elsewhere than /usr/bin on NixOS.
-    property string python: "/usr/bin/python3"
     property bool checked: false
 
     function send(command) {
@@ -303,7 +301,7 @@ Singleton {
             return;
         if (sitesWanted && !sitesRunning && !hostsStart.running) {
             writePage();
-            hostsStart.command = ["pkexec", python, helper, "start", "--user", Quickshell.env("USER"),
+            hostsStart.command = ["pkexec", "/usr/bin/python3", helper, "start", "--user", Quickshell.env("USER"),
                 "--fifo", fifo, "--page", `${Quickshell.shellDir}/services/focus_page.html`, "--state", pageState, ...sites];
             hostsStart.running = true;
         } else if (!sitesWanted && sitesRunning) {
@@ -349,14 +347,6 @@ Singleton {
     // At startup: a helper still running from before a shell restart (keep it if the
     // session goes on, else stop it), or a block left in /etc/hosts by a crash.
     Process {
-        running: true
-        command: ["sh", "-c", "command -v python3"]
-        stdout: StdioCollector {
-            onStreamFinished: if (text.trim()) root.python = text.trim()
-        }
-    }
-
-    Process {
         id: startupCheck
         running: true
         command: ["sh", "-c", '[ -p "$1" ] && echo running; grep -qF "hi-shell focus mode" /etc/hosts && echo hosts; true', "sh", root.fifo]
@@ -366,7 +356,7 @@ Singleton {
                 if (running)
                     root.sitesRunning = true;
                 else if (text.includes("hosts") && !root.sitesWanted)
-                    Quickshell.execDetached(["pkexec", root.python, root.helper, "restore"]);
+                    Quickshell.execDetached(["pkexec", "/usr/bin/python3", root.helper, "restore"]);
                 root.checked = true;
                 // Focus may load its session a moment later; syncSites runs again then.
                 root.syncSites();

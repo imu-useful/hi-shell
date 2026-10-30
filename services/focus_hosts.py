@@ -31,8 +31,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HOSTS = "/etc/hosts"
 BACKUP = "/etc/hosts.hi-shell.bak"
-# NixOS keeps /etc/hosts as a symlink (into /etc/static); where it pointed is kept here, so it comes back.
-LINK = "/etc/hosts.hi-shell.link"
 BEGIN = "# >>> hi-shell focus mode (temporary, removed when the session ends) >>>"
 END = "# <<< hi-shell focus mode <<<"
 DOMAIN = re.compile(r"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
@@ -52,30 +50,11 @@ def strip_block(text):
 
 def write_hosts(text):
     # Atomic, keeping the usual owner and mode.
-    if os.path.islink(HOSTS) and not os.path.exists(LINK):
-        with open(LINK, "w") as f:
-            f.write(os.readlink(HOSTS))
     tmp = HOSTS + ".hi-shell.tmp"
     with open(tmp, "w") as f:
         f.write(text)
     os.chmod(tmp, 0o644)
     os.rename(tmp, HOSTS)
-
-
-def unblock(domains):
-    """Takes the block out for good and puts a symlinked /etc/hosts back."""
-    set_block(domains, False)
-    try:
-        with open(LINK) as f:
-            target = f.read().strip()
-        tmp = HOSTS + ".hi-shell.tmp"
-        if os.path.lexists(tmp):
-            os.unlink(tmp)
-        os.symlink(target, tmp)
-        os.rename(tmp, HOSTS)
-        os.unlink(LINK)
-    except OSError:
-        pass
 
 
 def set_block(domains, on):
@@ -214,7 +193,7 @@ def start(args):
                 elif cmd == "stop":
                     done = True
     finally:
-        unblock(domains)
+        set_block(domains, False)
         if server:
             try:
                 os.kill(server, signal.SIGTERM)
@@ -246,7 +225,7 @@ def main():
     sub.add_parser("restore")
     args = p.parse_args()
     if args.cmd == "restore":
-        unblock([])
+        set_block([], False)
         return 0
     return start(args)
 

@@ -119,23 +119,8 @@ choose_parts() {
 }
 
 [[ $EUID -eq 0 ]] && die "run as your user, not root (sudo is used where needed)"
-NO_PACMAN=false
-if [[ -e /etc/NIXOS ]] || ! command -v pacman >/dev/null; then
-    NO_PACMAN=true
-    if [[ -e /etc/NIXOS ]]; then
-        warn "NixOS: packages are declared, not installed. Use the flake (see \"NixOS\" in README.md):"
-        warn "its Home Manager module installs hi-shell, its dependencies and the Hyprland files."
-    else
-        warn "pacman not found: skipping the packages (hi-shell is made for Arch Linux; see Requirements in README.md)."
-    fi
-    DEPS=false WANT[deps]=false
-    for app in "${APP_PARTS[@]}"; do WANT[$app]=false; done
-fi
+command -v pacman >/dev/null || die "hi-shell targets Arch Linux (pacman not found)"
 choose_parts
-if $NO_PACMAN; then # the menu may have switched them back on
-    DEPS=false WANT[deps]=false
-    for app in "${APP_PARTS[@]}"; do WANT[$app]=false; done
-fi
 
 # Where update.sh gets updates from; kept in the config (update.channel).
 choose_channel() {
@@ -232,7 +217,7 @@ if ((${#app_repo[@]} + ${#app_aur[@]})); then
     fi
 fi
 
-command -v qs >/dev/null || die "quickshell (qs) is not installed; install quickshell (AUR: quickshell-git, NixOS: pkgs.quickshell)"
+command -v qs >/dev/null || die "quickshell (qs) is not installed; install quickshell-git from the AUR"
 
 # --- Source ---
 step "Source"
