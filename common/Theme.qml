@@ -14,6 +14,9 @@ Singleton {
     readonly property var options: Config.options.appearance
     readonly property bool busy: updater.running
     property var pendingArgs: null
+    // The cover the palette comes from in cover mode ("" otherwise): updates that name no
+    // wallpaper (a new mode or scheme) keep it instead of falling back to the wallpaper.
+    property string cover: ""
 
     readonly property list<string> schemes: ["tonal-spot", "content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "vibrant"]
 
@@ -25,7 +28,8 @@ Singleton {
             return;
         }
         const scheme = schemes.includes(options.scheme) ? options.scheme : "tonal-spot";
-        updater.command = ["python3", Quickshell.shellDir + "/services/theme_updater.py", "--output", Colors.path, "--scheme", scheme, ...args];
+        updater.command = ["python3", Quickshell.shellDir + "/services/theme_updater.py", "--output", Colors.path, "--scheme", scheme,
+            ...(cover && !args.includes("--wallpaper") ? ["--wallpaper", cover] : []), ...args];
         updater.running = true;
     }
 

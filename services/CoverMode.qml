@@ -34,6 +34,7 @@ Singleton {
             file = "";
             if (themed) {
                 themed = false;
+                Theme.cover = "";
                 Theme.setWallpaper(Wallpapers.current);
             }
             return;
@@ -71,6 +72,7 @@ Singleton {
         onTriggered: {
             if (root.active && root.file) {
                 root.themed = true;
+                Theme.cover = root.file;
                 Theme.setWallpaper(root.file);
             }
         }
