@@ -63,7 +63,7 @@ and the audio spectrum is drawn by a single shader.
 
 ## Requirements
 
-Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
+Arch Linux (or [NixOS](#nixos)) + Hyprland **0.56+** (the integration file uses the Lua config).
 
 | Package | Used for |
 | --- | --- |
@@ -132,6 +132,26 @@ The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!laze
 Each one goes through `pacman` if a configured repository has it, otherwise through `paru` / `yay`.
 
 Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`, `--channel=git|release`. Then tap <kbd>Super</kbd>.
+
+### NixOS
+
+hi-shell ships a flake with a package and a Home Manager module (the packages are declared, so `install.sh` doesn't install any on NixOS).
+
+```nix
+# flake.nix
+inputs.hi-shell = {
+  url = "github:imu-useful/hi-shell";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+# in your Home Manager config (modules = [ hi-shell.homeManagerModules.default ... ])
+programs.hi-shell.enable = true;
+```
+
+It installs `hi-shell` with all the helper programs from the Requirements table on its `PATH`, the Material Symbols font, and links the shell to `~/.config/quickshell/hi-shell` (so `qs -c hi-shell` works as everywhere else; remove an old link or clone there first).
+The Hyprland files are copied to `~/.config/hypr/hi-shell/`; load them from your `hyprland.lua` (Hyprland 0.56+ with the Lua config) with
+`dofile(os.getenv("HOME") .. "/.config/hypr/hi-shell/init.lua")`. `programs.hi-shell.hyprland.installFiles = false` leaves that folder to you.
+Install `polkit` the NixOS way (`security.polkit.enable = true`) for Focus Mode's site blocking. The update counter hides itself (there is no pacman), and `update.sh` isn't used: update the flake input.
+Without Home Manager: `nix run github:imu-useful/hi-shell` starts the shell (the link above still has to exist for the keybinds).
 
 ### Update
 
