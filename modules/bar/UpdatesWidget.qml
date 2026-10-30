@@ -8,7 +8,7 @@ import qs.services
 BarWidget {
     id: root
 
-    shown: Config.options.updates.enabled && (Updates.count > 0 || !Config.options.bar.updates.hideWhenNone)
+    shown: Config.options.updates.enabled && Updates.available && (Updates.count > 0 || !Config.options.bar.updates.hideWhenNone)
     clickable: true
     padding: 8
     contentWidth: grid.implicitWidth
