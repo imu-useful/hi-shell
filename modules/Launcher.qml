@@ -70,7 +70,7 @@ Scope {
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return [...inlineMath(), ...focusMatches(term), ...settingsMatches(term), ...filterApps(term)];
+            return [...inlineMath(), ...focusMatches(term), ...settingsMatches(term), ...filterApps(term), ...emojiMatches(term)];
         }
     }
 
@@ -84,6 +84,15 @@ Scope {
             clip: e,
             run: () => Clipboard.copy(e)
         };
+    }
+
+    // Emoji after the apps in a plain search ("check" finds ✅ under the apps).
+    function emojiMatches(text) {
+        const q = text.toLowerCase();
+        if (q === "")
+            return [];
+        return emoji.filter(e => e[1].includes(q)).slice(0, 12)
+            .map(e => ({ name: e[1], comment: Translation.tr("Enter copies it"), glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
     }
 
     function inlineMath() {
