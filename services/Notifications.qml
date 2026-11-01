@@ -20,6 +20,11 @@ Singleton {
     readonly property list<QtObject> popups: list.filter(n => n.popup)
     readonly property int unread: list.filter(n => !n.read).length
     property bool dnd: false
+    // The popups take keyboard focus only while a reply field is being typed in, or the pointer is
+    // on a card that has one: a popup that asks for it when it appears takes it from the launcher or
+    // an app being typed in. (A layer surface can't be clicked into without it, hence the hover.)
+    property bool replying: false
+    property var replyHover: null
     property int nextId: 1
 
     component Notif: QtObject {

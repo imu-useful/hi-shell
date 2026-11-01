@@ -82,8 +82,13 @@ Item {
 
         HoverHandler {
             id: hover
-            onHoveredChanged: root.notif.paused = hovered || reply.activeFocus
+            onHoveredChanged: {
+                root.notif.paused = hovered || reply.activeFocus;
+                if (root.notif.notification?.hasInlineReply)
+                    Notifications.replyHover = hovered ? root.notif : (Notifications.replyHover === root.notif ? null : Notifications.replyHover);
+            }
         }
+        Component.onDestruction: if (Notifications.replyHover === root.notif) Notifications.replyHover = null
 
         // Swipe to dismiss.
         DragHandler {
@@ -267,7 +272,10 @@ Item {
                         color: Colors.m3onSurface
                         clip: true
                         // The popup stays while you're typing, not only while the pointer is on it.
-                        onActiveFocusChanged: root.notif.paused = hover.hovered || activeFocus
+                        onActiveFocusChanged: {
+                            root.notif.paused = hover.hovered || activeFocus;
+                            Notifications.replying = activeFocus;
+                        }
                         Keys.onEscapePressed: focus = false
                         onAccepted: if (text.trim()) Notifications.reply(root.notif.uid, text)
 
