@@ -346,6 +346,8 @@
         "%1 сообщений"
     ],
     "Clear history": "Очистить историю",
+    "Pin": "Закрепить",
+    "Unpin": "Открепить",
     "Clipboard history is empty": "История буфера обмена пуста",
     "Nothing matches": "Нет совпадений",
     "Search %1 items": [

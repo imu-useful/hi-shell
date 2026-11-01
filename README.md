@@ -200,7 +200,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Copy text from a region (OCR) |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> | Translate text from a region (OCR into the sidebar translator) |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> | Record a region (press again to stop) |
-| <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history, images too with thumbnails and a preview of the selected one (Enter copies) |
+| <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history, images too with thumbnails and a preview of the selected one (Enter copies); pin an entry to keep it when the history is cleared (right-click for Pin / Delete) |
 | <kbd>Super</kbd>+<kbd>.</kbd> | Emoji picker |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Session screen |
 | Display key (<kbd>Fn</kbd>+<kbd>F10</kbd> on Lenovo, `XF86Display`) | Display mode: this screen only, duplicate, extend left / right, second screen only; press again for the next, Enter to apply |

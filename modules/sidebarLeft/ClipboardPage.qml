@@ -5,12 +5,21 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// Clipboard history (cliphist): search, click to copy, delete, image thumbnails.
+// Clipboard history (cliphist): search, click to copy, pin, delete, image thumbnails.
+// Pinned entries come first and survive "Clear history". Right-click an entry for its menu.
 ColumnLayout {
     id: root
 
     property string query: ""
-    readonly property var shown: query === "" ? Clipboard.entries : Clipboard.entries.filter(e => !e.image && e.text.toLowerCase().includes(query.toLowerCase()))
+    // The entry the right-click menu is open for, and where it was opened (in the list).
+    property var menuEntry: null
+    property point menuAt: Qt.point(0, 0)
+    readonly property var shown: [...Clipboard.pinnedEntries, ...Clipboard.history].filter(e => query === "" || (!e.image && e.text.toLowerCase().includes(query.toLowerCase())))
+
+    function openMenu(entry, mouse) {
+        menuAt = entry.mapToItem(list, mouse.x, mouse.y);
+        menuEntry = entry.e;
+    }
 
     signal copied
 
@@ -68,6 +77,41 @@ ColumnLayout {
         }
     }
 
+    // A row of the right-click menu.
+    component MenuRow: Rectangle {
+        id: row
+
+        required property string icon
+        required property string text
+        signal chosen
+
+        width: parent.width
+        height: 40
+        radius: Appearance.rounding.small
+        color: "transparent"
+
+        MaterialIcon {
+            id: rowIcon
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            icon: row.icon
+            iconSize: 18
+        }
+        StyledText {
+            anchors.left: rowIcon.right
+            anchors.right: parent.right
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            text: row.text
+            elide: Text.ElideRight
+        }
+        StateLayer {
+            onClicked: row.chosen()
+        }
+    }
+
     ListView {
         id: list
         Layout.fillWidth: true
@@ -92,6 +136,7 @@ ColumnLayout {
             required property var modelData
             // Null for a moment while a removed entry's delegate is torn down.
             readonly property var e: modelData ?? ({ id: "", text: "", image: false })
+            readonly property bool pinned: Clipboard.isPinned(e.id)
             property string thumb: ""
 
             width: list.width
@@ -127,7 +172,12 @@ ColumnLayout {
             }
 
             StateLayer {
-                onClicked: {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: mouse => {
+                    if (mouse.button === Qt.RightButton) {
+                        root.openMenu(entry, mouse);
+                        return;
+                    }
                     Clipboard.copy(entry.e);
                     root.copied();
                 }
@@ -139,8 +189,59 @@ ColumnLayout {
                 anchors.margins: 4
                 implicitWidth: 34
                 implicitHeight: 34
-                icon: "close"
-                onClicked: Clipboard.remove(entry.e)
+                icon: "push_pin"
+                filled: entry.pinned
+                tooltip: entry.pinned ? Translation.tr("Unpin") : Translation.tr("Pin")
+                onClicked: Clipboard.togglePin(entry.e)
+            }
+        }
+
+        // Clicking outside the menu closes it.
+        MouseArea {
+            anchors.fill: parent
+            z: 1
+            visible: root.menuEntry !== null
+            acceptedButtons: Qt.AllButtons
+            onPressed: root.menuEntry = null
+        }
+
+        Rectangle {
+            id: menu
+
+            readonly property bool pinned: root.menuEntry !== null && Clipboard.isPinned(root.menuEntry.id)
+
+            z: 2
+            visible: root.menuEntry !== null
+            x: Math.max(0, Math.min(root.menuAt.x, list.width - width))
+            y: Math.max(0, Math.min(root.menuAt.y, list.height - height))
+            width: 170
+            height: menuColumn.implicitHeight + 12
+            radius: Appearance.rounding.medium
+            color: Colors.m3surfaceContainerHighest
+
+            Column {
+                id: menuColumn
+                x: 6
+                y: 6
+                width: menu.width - 12
+                spacing: 2
+
+                MenuRow {
+                    icon: menu.pinned ? "keep_off" : "push_pin"
+                    text: menu.pinned ? Translation.tr("Unpin") : Translation.tr("Pin")
+                    onChosen: {
+                        Clipboard.togglePin(root.menuEntry);
+                        root.menuEntry = null;
+                    }
+                }
+                MenuRow {
+                    icon: "delete"
+                    text: Translation.tr("Delete")
+                    onChosen: {
+                        Clipboard.remove(root.menuEntry);
+                        root.menuEntry = null;
+                    }
+                }
             }
         }
 

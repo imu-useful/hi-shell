@@ -65,7 +65,7 @@ Scope {
                 .map(e => ({ name: e[1], comment: Translation.tr("Enter copies it"), glyph: e[0], run: () => Quickshell.clipboardText = e[0] }));
         case ";":
             // Images match by their description ("png 1920x1080") and the word "image".
-            return Clipboard.entries.filter(e => (e.image ? `${e.text} image` : e.text).toLowerCase().includes(term.toLowerCase())).slice(0, 40)
+            return [...Clipboard.pinnedEntries, ...Clipboard.history].filter(e => (e.image ? `${e.text} image` : e.text).toLowerCase().includes(term.toLowerCase())).slice(0, 40)
                 .map(e => e.image ? imageItem(e) : { name: e.text.replace(/\s+/g, " "), comment: Translation.tr("Copy"), materialIcon: "content_paste", run: () => Clipboard.copy(e) });
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
