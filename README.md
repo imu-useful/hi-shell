@@ -101,8 +101,8 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 ### Quick install
 
 ```sh
-git clone https://github.com/imu-useful/hi-shell.git ~/Projects/hi-shell
-~/Projects/hi-shell/install.sh
+git clone https://github.com/imu-useful/hi-shell.git ~/hi-shell
+~/hi-shell/install.sh
 ```
 
 or without cloning first (the repo goes to `~/.local/share/hi-shell/repo`):
@@ -158,16 +158,16 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 1. Clone the repo and link it where Quickshell looks for configs:
 
    ```sh
-   git clone https://github.com/imu-useful/hi-shell.git ~/Projects/hi-shell
+   git clone https://github.com/imu-useful/hi-shell.git ~/hi-shell
    mkdir -p ~/.config/quickshell
-   ln -s ~/Projects/hi-shell ~/.config/quickshell/hi-shell
+   ln -s ~/hi-shell ~/.config/quickshell/hi-shell
    ```
 
 2. Copy the Hyprland integration (autostart, keybinds, window and layer rules) next to your Hyprland config and load it
    from there, e.g. from `~/.config/hypr/custom/execs.lua` on illogical-impulse or `hyprland.lua` otherwise:
 
    ```sh
-   cp -r ~/Projects/hi-shell/hypr/hi-shell ~/.config/hypr/hi-shell
+   cp -r ~/hi-shell/hypr/hi-shell ~/.config/hypr/hi-shell
    ```
 
    ```lua
