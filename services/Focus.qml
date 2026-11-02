@@ -264,6 +264,7 @@ Singleton {
         if (restore.wallpaper && sessionProfile.wallpaper && Wallpapers.current === sessionProfile.wallpaper)
             Wallpapers.set(restore.wallpaper);
         hyprOff(false);
+        Notifications.releaseHeld();
         active = false;
         ShellState.zen = false;
         sessionFile.setText("{}\n");
@@ -346,6 +347,9 @@ Singleton {
         const key = `${phase.kind}-${phase.round}-${phase.cycle}`;
         if (key === phaseKey)
             return;
+        // A break (or the end) brings the notifications held during the focus period.
+        if (phase.kind !== "focus")
+            Notifications.releaseHeld();
         const first = phaseKey === "";
         phaseKey = key;
         if (phase.kind === "done") {

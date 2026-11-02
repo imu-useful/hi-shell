@@ -43,6 +43,8 @@ Singleton {
         // [{ identifier, text }]
         property var actions: []
         property bool popup: false
+        // Arrived during a focus period: kept for the break's summary (releaseHeld), not shown.
+        property bool held: false
         property bool read: false
         property int timeout: 0 // ms; 0 = stays until dismissed
 
@@ -80,6 +82,20 @@ Singleton {
         Notif {}
     }
 
+    // Focus Mode's break: one summary of the held notifications (they stay in the history, unread).
+    function releaseHeld() {
+        const held = list.filter(n => n.held);
+        if (held.length === 0)
+            return;
+        const apps = {};
+        for (const n of held) {
+            apps[n.appName] = (apps[n.appName] ?? 0) + 1;
+            n.held = false;
+        }
+        const summary = Object.entries(apps).sort((a, b) => b[1] - a[1]).map(([app, count]) => `${app} ${count}`).join(" · ");
+        Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-i", "notification", Translation.trn("%1 notification while you focused", "%1 notifications while you focused", held.length), summary]);
+    }
+
     function add(n) {
         n.tracked = true;
         // Replacing an existing notification (same app re-sending with replaces_id).
@@ -98,7 +114,9 @@ Singleton {
                      : n.expireTimeout > 0 ? n.expireTimeout : options.defaultTimeout;
         item.read = false;
         item.elapsed = 0;
-        item.popup = !dnd || item.critical;
+        // Focus Mode holds the ordinary ones until the break; the shell's own (focus and timer messages) pass.
+        item.held = Focus.restricted && !item.critical && item.appName !== "hi-shell";
+        item.popup = (!dnd || item.critical) && !item.held;
         if (!existing)
             list = [item, ...list].slice(0, Math.max(1, options.historyLimit));
         save();
