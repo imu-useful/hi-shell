@@ -325,7 +325,7 @@ Scope {
             anchors.bottom: true
             // 0 when shown; below the edge while hidden (the close animation runs as it goes down).
             property real offsetScale: loader.revealed ? 0 : 1
-            Behavior on offsetScale { SpatialAnim {} }
+            Behavior on offsetScale { SpatialAnim { duration: Appearance.anim.normal } }
             margins.bottom: Appearance.sizes.barMargin - (implicitHeight + 8) * offsetScale
             // Wide and symmetric, so the card can slide to the left for the preview of a clipboard
             // image without the window itself moving; only the card and the preview take input.
