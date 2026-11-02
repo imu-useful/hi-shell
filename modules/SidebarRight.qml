@@ -103,6 +103,8 @@ Scope {
                 id: panel
 
                 x: loader.revealed ? window.bounceRoom : window.bounceRoom + window.panelWidth + 8
+                // Slides and fades together, on the spatial curve (as caelestia's sidebar).
+                opacity: loader.revealed ? 1 : 0
                 width: window.panelWidth
                 height: parent.height
                 radius: Appearance.rounding.extraLarge
@@ -110,7 +112,8 @@ Scope {
                 border.width: 1
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
-                Behavior on x { SpringAnim { overshoot: 0.9 } }
+                Behavior on x { SpatialAnim {} }
+                Behavior on opacity { SpatialAnim {} }
 
                 // Main page
                 ColumnLayout {
