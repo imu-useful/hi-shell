@@ -909,5 +909,8 @@
     "Hold notifications until the break": "Придерживать уведомления до перерыва",
     "Ordinary notifications don't pop up in a focus period. One summary comes at the break; critical ones still show": "Обычные уведомления не всплывают во время фокуса. В перерыв приходит одна сводка; критичные показываются как обычно",
     "%1 notification while you focused": "%1 уведомление за время фокуса",
-    "%1 notifications while you focused": "%1 уведомлений за время фокуса"
+    "%1 notifications while you focused": "%1 уведомлений за время фокуса",
+    "Breathe in": "Вдох",
+    "Hold": "Задержка",
+    "Breathe out": "Выдох"
 }

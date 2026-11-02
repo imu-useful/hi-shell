@@ -52,7 +52,15 @@ BarWidget {
             font.weight: Font.DemiBold
             font.features: { "tnum": 1 }
         }
+        // On a break, the breathing cue instead of the cycle.
         StyledText {
+            visible: root.onBreak
+            text: Focus.breathCue
+            color: root.accent
+            font.pixelSize: Appearance.font.size.labelMedium
+        }
+        StyledText {
+            visible: !root.onBreak
             Layout.rightMargin: Focus.canStop ? 0 : 6
             text: `${Focus.phase.cycle}/${Focus.sessionProfile.timer?.cycles ?? 0}`
             font.pixelSize: Appearance.font.size.labelMedium

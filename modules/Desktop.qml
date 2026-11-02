@@ -225,7 +225,7 @@ Scope {
                 }
 
                 // Swell with the bass; ease back when the music stops. Grows in as it appears.
-                scale: (0.6 + 0.4 * window.frameIntro) * (0.9 + 0.1 * window.reveal) * (dancing ? 1 + 0.07 * Beat.bass : 1)
+                scale: (0.6 + 0.4 * window.frameIntro) * (0.9 + 0.1 * window.reveal) * (dancing ? 1 + 0.07 * Beat.bass : 1) * (Focus.breathing ? 1 + 0.05 * Focus.breath : 1)
                 Behavior on scale {
                     enabled: !frame.dancing
                     SpatialAnim { duration: Appearance.anim.spatial }

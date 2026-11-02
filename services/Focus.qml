@@ -284,6 +284,24 @@ Singleton {
         onTriggered: root.now = Date.now()
     }
 
+    // Breathing on the breaks: a 16 s box pattern (in 4 s, hold 4 s, out 4 s, hold 4 s). The shaped
+    // wallpaper frame swells and shrinks with `breath` (0..1), and the bar's cue says what to do.
+    readonly property bool breathing: active && (phase.kind === "short" || phase.kind === "long")
+    readonly property int breathPeriod: 16000
+    property real breath: 0
+    property string breathCue: ""
+    Timer {
+        running: root.breathing && !PowerSaver.enabled
+        interval: 100
+        repeat: true
+        onTriggered: {
+            const t = (Date.now() % root.breathPeriod) / root.breathPeriod * 4; // 0..4: one quarter per step
+            const step = Math.floor(t), part = t - step;
+            root.breath = [part, 1, 1 - part, 0][step];
+            root.breathCue = [Translation.tr("Breathe in"), Translation.tr("Hold"), Translation.tr("Breathe out"), Translation.tr("Hold")][step];
+        }
+    }
+
     function segments(p) {
         const t = p.timer, out = [];
         for (let i = 0; i < t.cycles; i++) {
