@@ -15,6 +15,7 @@ Singleton {
     // Left sidebar tab: home | claude | translator | clipboard
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
+    property bool weatherOpen: false
     property bool desktopEditing: false
     // Windows cover the desktop widgets (their screen's workspace has windows):
     // second-by-second clocks, lyrics and the visualizer pause.

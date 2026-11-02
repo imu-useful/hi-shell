@@ -13,7 +13,8 @@ BarWidget {
     contentWidth: vertical ? thickness : row.implicitWidth
     contentHeight: column.implicitHeight
     clickable: true
-    onClicked: Weather.refresh()
+    // Click: the details window (its refresh button refreshes).
+    onClicked: ShellState.weatherOpen = !ShellState.weatherOpen
 
     function hour(iso) {
         return iso.slice(11, 16);
@@ -81,7 +82,7 @@ BarWidget {
 
     StyledPopup {
         target: root
-        hovered: root.hovered
+        hovered: root.hovered && !ShellState.weatherOpen
         edge: root.popupEdge
 
         ColumnLayout {

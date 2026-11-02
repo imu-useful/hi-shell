@@ -66,6 +66,8 @@ ShellRoot {
 
     CalendarPopup {}
 
+    WeatherPopup {}
+
     NotificationPopups {}
 
     OnScreenDisplay {}
