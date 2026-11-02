@@ -321,8 +321,12 @@ Scope {
             // Open on the monitor that currently has focus.
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
-            anchors.top: true
-            margins.top: screen ? screen.height * 0.18 : 0
+            // At the bottom: it rises from the screen's bottom edge and goes back down (as caelestia's launcher).
+            anchors.bottom: true
+            // 0 when shown; below the edge while hidden (the close animation runs as it goes down).
+            property real offsetScale: loader.revealed ? 0 : 1
+            Behavior on offsetScale { SpatialAnim {} }
+            margins.bottom: Appearance.sizes.barMargin - (implicitHeight + 8) * offsetScale
             // Wide and symmetric, so the card can slide to the left for the preview of a clipboard
             // image without the window itself moving; only the card and the preview take input.
             readonly property int cardWidth: 600
@@ -382,11 +386,8 @@ Scope {
                 border.width: 1
                 border.color: Colors.m3outlineVariant
 
-                opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.85
-                transformOrigin: Item.Top
-                Behavior on opacity { EffectAnim {} }
-                Behavior on scale { SpringAnim {} }
+                opacity: 1 - window.offsetScale
+                Behavior on opacity { SpatialAnim {} }
 
                 ColumnLayout {
                     id: column
