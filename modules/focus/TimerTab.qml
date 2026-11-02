@@ -137,4 +137,17 @@ ColumnLayout {
             }
         }
     }
+
+    Section {
+        icon: "notifications_paused"
+        title: Translation.tr("Notifications")
+
+        SwitchRow {
+            icon: "notifications_paused"
+            title: Translation.tr("Hold notifications until the break")
+            subtitle: Translation.tr("Ordinary notifications don't pop up in a focus period. One summary comes at the break; critical ones still show")
+            checked: Config.options.notifications.holdInFocus
+            onToggled: checked => Config.options.notifications.holdInFocus = checked
+        }
+    }
 }

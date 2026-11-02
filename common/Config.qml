@@ -267,6 +267,8 @@ Singleton {
                 // Popup timeout (ms) when the app doesn't set one.
                 property int defaultTimeout: 6000
                 property int historyLimit: 100
+                // Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus).
+                property bool holdInFocus: true
             }
 
             property JsonObject updates: JsonObject {

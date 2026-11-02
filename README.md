@@ -412,7 +412,7 @@ with the active profile; `qs -c hi-shell ipc call focus start` does the same.
   Nothing is blocked during breaks.
 - **Held notifications:** during a focus period the ordinary notifications don't pop up. They stay in the history, and when
   the break (or the session's end) starts, one summary says what came in ("Telegram 3 · Почта 2"). Critical ones and the
-  shell's own messages still show.
+  shell's own messages still show. Settings → Focus → Timer has the switch (`notifications.holdInFocus`).
 - **Exit:** *Manual* has a Stop button. *Timer* has none and ends after the last focus period. *Tasks* has none and ends
   when the tasks picked for the session are done (a Tasks session can't start without one). From a terminal,
   `qs -c hi-shell ipc call focus abort` ends any session.

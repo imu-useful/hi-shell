@@ -115,7 +115,7 @@ Singleton {
         item.read = false;
         item.elapsed = 0;
         // Focus Mode holds the ordinary ones until the break; the shell's own (focus and timer messages) pass.
-        item.held = Focus.restricted && !item.critical && item.appName !== "hi-shell";
+        item.held = options.holdInFocus && Focus.restricted && !item.critical && item.appName !== "hi-shell";
         item.popup = (!dnd || item.critical) && !item.held;
         if (!existing)
             list = [item, ...list].slice(0, Math.max(1, options.historyLimit));
