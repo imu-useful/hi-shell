@@ -149,5 +149,12 @@ ColumnLayout {
             checked: Config.options.notifications.holdInFocus
             onToggled: checked => Config.options.notifications.holdInFocus = checked
         }
+        SwitchRow {
+            icon: "air"
+            title: Translation.tr("Breathing on the breaks")
+            subtitle: Translation.tr("A 16-second breathing guide in the bar and on the wallpaper frame while a break runs")
+            checked: Config.options.focus.breathing
+            onToggled: checked => Config.options.focus.breathing = checked
+        }
     }
 }

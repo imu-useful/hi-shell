@@ -912,5 +912,7 @@
     "%1 notifications while you focused": "%1 уведомлений за время фокуса",
     "Breathe in": "Вдох",
     "Hold": "Задержка",
-    "Breathe out": "Выдох"
+    "Breathe out": "Выдох",
+    "Breathing on the breaks": "Дыхание на перерывах",
+    "A 16-second breathing guide in the bar and on the wallpaper frame while a break runs": "Дыхательная подсказка в панели и на рамке обоев, пока идёт перерыв (16 секунд на цикл)"
 }

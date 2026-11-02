@@ -263,6 +263,11 @@ Singleton {
                 property bool warnings: true
             }
 
+            property JsonObject focus: JsonObject {
+                // Breathing on the breaks (Focus Mode): the bar's cue and the wallpaper frame follow it.
+                property bool breathing: true
+            }
+
             property JsonObject notifications: JsonObject {
                 // Popup timeout (ms) when the app doesn't set one.
                 property int defaultTimeout: 6000

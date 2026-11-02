@@ -414,7 +414,8 @@ with the active profile; `qs -c hi-shell ipc call focus start` does the same.
   the break (or the session's end) starts, one summary says what came in ("Telegram 3 · Почта 2"). Critical ones and the
   shell's own messages still show. Settings → Focus → Timer has the switch (`notifications.holdInFocus`).
 - **Breathing on breaks:** a 16-second box pattern (in, hold, out, hold). The bar's cue says which step it is, and the
-  shaped wallpaper frame swells and shrinks with it. Off with the power saving.
+  shaped wallpaper frame swells and shrinks with it. Off with the power saving, or with the switch in Settings → Focus →
+  Timer (`focus.breathing`).
 - **Exit:** *Manual* has a Stop button. *Timer* has none and ends after the last focus period. *Tasks* has none and ends
   when the tasks picked for the session are done (a Tasks session can't start without one). From a terminal,
   `qs -c hi-shell ipc call focus abort` ends any session.

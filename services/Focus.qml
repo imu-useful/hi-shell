@@ -286,7 +286,7 @@ Singleton {
 
     // Breathing on the breaks: a 16 s box pattern (in 4 s, hold 4 s, out 4 s, hold 4 s). The shaped
     // wallpaper frame swells and shrinks with `breath` (0..1), and the bar's cue says what to do.
-    readonly property bool breathing: active && (phase.kind === "short" || phase.kind === "long")
+    readonly property bool breathing: active && Config.options.focus.breathing && (phase.kind === "short" || phase.kind === "long")
     readonly property int breathPeriod: 16000
     property real breath: 0
     property string breathCue: ""
