@@ -386,8 +386,8 @@ Scope {
                 border.width: 1
                 border.color: Colors.m3outlineVariant
 
+                // The window's offsetScale is already animated; a second animation here would lag it.
                 opacity: 1 - window.offsetScale
-                Behavior on opacity { SpatialAnim {} }
 
                 ColumnLayout {
                     id: column
