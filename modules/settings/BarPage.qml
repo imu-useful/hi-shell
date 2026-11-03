@@ -156,6 +156,18 @@ ColumnLayout {
             ]
             onSelected: value => root.bar.style = value
         }
+        ListRow {
+            icon: "pets"
+            title: Translation.tr("Logo")
+            subtitle: Translation.tr("The button at the start of the bar. Auto is this system's distribution")
+        }
+        LogoPicker {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            current: root.bar.logo
+            onPicked: name => root.bar.logo = name
+        }
         SliderRow {
             icon: "height"
             title: Translation.tr("Thickness")

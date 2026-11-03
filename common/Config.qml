@@ -78,6 +78,8 @@ Singleton {
                 property string position: "top"
                 // hug: edge to edge | float: detached, rounded | islands: one pill per section | m3: edge to edge, tonal groups
                 property string style: "float"
+                // The logo of the bar's first button: "auto" (this system's) or a distribution id (common/icons/distros).
+                property string logo: "auto"
                 // Bar thickness (height, or width for a vertical bar) and gap to the screen edge.
                 property int height: 40
                 property int margin: 6
