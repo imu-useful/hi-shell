@@ -27,6 +27,20 @@ ColumnLayout {
     function appName(app) {
         return DesktopEntries.heuristicLookup(app)?.name ?? app;
     }
+    property bool adding: false
+    property int newMinutes: 30
+
+    function usedToday(app) {
+        return todays.find(a => a.app === app)?.seconds ?? 0;
+    }
+    function addLimit() {
+        const app = ScreenTime.appKey(program.text);
+        if (app === "")
+            return;
+        ScreenTime.setLimit(app, newMinutes);
+        program.text = "";
+        adding = false;
+    }
     function appIcon(app) {
         // Quickshell.iconPath gives an image:// URL already.
         return AppIcons.path(app);
@@ -155,18 +169,101 @@ ColumnLayout {
         }
 
         Repeater {
-            model: root.shownApps
+            model: ScreenTime.limitedApps
 
             StepperRow {
                 required property var modelData
                 icon: "hourglass_top"
-                title: root.appName(modelData.app)
-                subtitle: Translation.tr("%1 used today").arg(root.duration(modelData.seconds))
-                value: ScreenTime.limitOf(modelData.app)
+                title: root.appName(modelData)
+                subtitle: Translation.tr("%1 used today").arg(root.duration(root.usedToday(modelData)))
+                value: ScreenTime.limitOf(modelData)
                 step: 5
                 from: 0
                 to: 720
-                onChanged: value => ScreenTime.setLimit(modelData.app, value)
+                onChanged: value => ScreenTime.setLimit(modelData, value)
+            }
+        }
+
+        // A new limit: the program's name or command, and its minutes.
+        ListRow {
+            Layout.fillWidth: true
+            icon: "add"
+            title: Translation.tr("Add a limit")
+            subtitle: Translation.tr("A program's name or command (firefox, Telegram, org.telegram.desktop)")
+            IconButton {
+                icon: root.adding ? "close" : "add"
+                onClicked: root.adding = !root.adding
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            visible: root.adding
+            spacing: 10
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 40
+                radius: 20
+                color: Colors.m3surfaceContainerHighest
+
+                TextInput {
+                    id: program
+                    anchors.fill: parent
+                    anchors.leftMargin: 16
+                    anchors.rightMargin: 16
+                    verticalAlignment: TextInput.AlignVCenter
+                    font.family: Appearance.font.mono
+                    font.pixelSize: Appearance.font.size.bodyMedium
+                    color: Colors.m3onSurface
+                    clip: true
+                    selectByMouse: true
+                    onAccepted: root.addLimit()
+
+                    StyledText {
+                        anchors.fill: parent
+                        visible: program.text === ""
+                        verticalAlignment: Text.AlignVCenter
+                        text: Translation.tr("firefox")
+                        color: Colors.m3outline
+                    }
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+
+                StyledText {
+                    text: Translation.tr("Minutes a day")
+                    color: Colors.m3onSurfaceVariant
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                IconButton {
+                    icon: "remove"
+                    enabled: root.newMinutes > 5
+                    onClicked: root.newMinutes -= 5
+                }
+                StyledText {
+                    Layout.preferredWidth: 48
+                    horizontalAlignment: Text.AlignHCenter
+                    text: root.newMinutes
+                    font.features: { "tnum": 1 }
+                }
+                IconButton {
+                    icon: "add"
+                    enabled: root.newMinutes < 720
+                    onClicked: root.newMinutes += 5
+                }
+                M3Button {
+                    text: Translation.tr("Add")
+                    icon: "add"
+                    enabled: program.text.trim() !== ""
+                    onClicked: root.addLimit()
+                }
             }
         }
     }

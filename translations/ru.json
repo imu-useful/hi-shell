@@ -925,5 +925,8 @@
     "Set the minutes for an app; 0 is no limit. Apps from today's list are shown.": "Минуты на приложение; 0 — без лимита. Показаны приложения из списка за сегодня.",
     "%1 used today": "%1 сегодня",
     "Time is up for %1": "Время вышло: %1",
-    "%1 minutes today, the limit you set": "%1 минут сегодня — установленный лимит"
+    "%1 minutes today, the limit you set": "%1 минут сегодня — установленный лимит",
+    "Add a limit": "Добавить лимит",
+    "A program's name or command (firefox, Telegram, org.telegram.desktop)": "Название программы или команда (firefox, Telegram, org.telegram.desktop)",
+    "Minutes a day": "Минут в день"
 }

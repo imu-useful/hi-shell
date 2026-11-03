@@ -10,7 +10,8 @@ import qs.common
 // Screen time: how long each app had the focus, per day, and an optional daily limit per app.
 // Kept in ~/.local/state/hi-shell/screentime.json (the last DAYS_KEPT days). The focused window's app
 // is counted every TICK seconds; a limit gives one notification a day when it runs out.
-// Settings > Screen time shows it; `qs -c hi-shell ipc call screentime today` prints today's totals.
+// Settings > Screen time shows it; `qs -c hi-shell ipc call screentime today` prints today's totals,
+// `... screentime limit firefox 30` sets a limit (0 removes it).
 Singleton {
     id: root
 
@@ -50,6 +51,15 @@ Singleton {
         }
         return out;
     }
+    // The app id of what was typed: a program name ("firefox", "Telegram") or its id ("org.telegram.desktop").
+    function appKey(text) {
+        const typed = text.trim();
+        const entry = DesktopEntries.heuristicLookup(typed);
+        return (entry?.id ?? typed.replace(/\.desktop$/i, "").split("/").pop()).toLowerCase();
+    }
+    // Every app with a limit, sorted.
+    readonly property var limitedApps: Object.keys(data.limits).sort()
+
     function limitOf(app) {
         return data.limits[app] ?? 0;
     }
@@ -83,8 +93,9 @@ Singleton {
     function save() {
         if (!loaded)
             return;
-        const keys = Object.keys(data.days).sort();
-        const days = Object.fromEntries(keys.slice(-daysKept).map(k => [k, data.days[k]]));
+        const days = {};
+        for (const key of Object.keys(data.days).sort().slice(-daysKept))
+            days[key] = data.days[key];
         store.setText(JSON.stringify(Object.assign({}, data, { days }), null, 2) + "\n");
     }
 
@@ -128,6 +139,13 @@ Singleton {
 
         function today(): string {
             return JSON.stringify(root.totals(root.today));
+        }
+        // Minutes for an app (its name or command; 0 removes the limit), and the limits as JSON.
+        function limit(program: string, minutes: int): void {
+            root.setLimit(root.appKey(program), minutes);
+        }
+        function limits(): string {
+            return JSON.stringify(root.data.limits);
         }
     }
 }
