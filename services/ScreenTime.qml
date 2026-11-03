@@ -60,6 +60,14 @@ Singleton {
     // Every app with a limit, sorted.
     readonly property var limitedApps: Object.keys(data.limits).sort()
 
+    // "1 h 5 min", "12 min", "< 1 min".
+    function duration(seconds) {
+        const m = Math.floor(seconds / 60), h = Math.floor(m / 60);
+        if (m === 0)
+            return Translation.tr("< 1 min");
+        return h ? (m % 60 ? Translation.tr("%1 h %2 min").arg(h).arg(m % 60) : Translation.tr("%1 h").arg(h)) : Translation.tr("%1 min").arg(m);
+    }
+
     function limitOf(app) {
         return data.limits[app] ?? 0;
     }

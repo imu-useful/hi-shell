@@ -928,5 +928,7 @@
     "%1 minutes today, the limit you set": "%1 минут сегодня — установленный лимит",
     "Add a limit": "Добавить лимит",
     "A program's name or command (firefox, Telegram, org.telegram.desktop)": "Название программы или команда (firefox, Telegram, org.telegram.desktop)",
-    "Minutes a day": "Минут в день"
+    "Minutes a day": "Минут в день",
+    "Screen time today": "Экранное время сегодня",
+    "Nothing yet": "Пока ничего"
 }

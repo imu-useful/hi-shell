@@ -59,7 +59,7 @@ Scope {
             margins.top: Appearance.sizes.barMargin
             margins.bottom: Appearance.sizes.barMargin
             implicitWidth: 340
-            implicitHeight: 360
+            implicitHeight: card.implicitHeight
             color: "transparent"
 
             WlrLayershell.namespace: "hi-shell-calendar"
@@ -80,7 +80,8 @@ Scope {
             Rectangle {
                 id: card
 
-                anchors.fill: parent
+                width: parent.width
+                implicitHeight: column.implicitHeight + 32
                 radius: Appearance.rounding.extraLarge
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: 1
@@ -92,9 +93,20 @@ Scope {
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
 
-                MonthGrid {
+                ColumnLayout {
+                    id: column
                     anchors.fill: parent
                     anchors.margins: 16
+                    spacing: 12
+
+                    MonthGrid {
+                        Layout.fillWidth: true
+                    }
+
+                    // The screen time: today's total and apps, and the week's bars.
+                    ScreenTimeStrip {
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }
