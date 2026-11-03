@@ -7,11 +7,11 @@ import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
 import qs.services
+import qs.modules.dock
 
-// Dock (Config dock.*): pinned and running apps with window dots and hover
-// magnification. Click = launch or focus (cycles windows), middle click = new
-// window, right click = pin / unpin. Auto-hide: shows when the pointer
-// reaches the bottom edge.
+// Dock (Config dock.*): pinned and running apps. Click: launch, or focus (cycles the app's windows).
+// Middle click: a new window. Wheel over an app: its windows in turn. Right click: a menu (pin,
+// move, new window). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom.
 Variants {
     // One dock: on dock.monitor, or the first screen.
     model: Config.options.dock.enabled ? Quickshell.screens.filter(s => !Config.options.dock.monitor || s.name === Config.options.dock.monitor).slice(0, 1) : []
@@ -22,18 +22,18 @@ Variants {
         required property ShellScreen modelData
         readonly property var options: Config.options.dock
         readonly property int iconSize: options.iconSize
-        readonly property bool shown: !options.autoHide || hover.hovered || ShellState.overviewOpen
-
-        // Which windows exist (app id + address) and the pins. A string, so it only
-        // changes when the dock's contents do, not on every window title update.
+        readonly property bool shown: !options.autoHide || hover.hovered || ShellState.overviewOpen || menu.open
+        readonly property int menuGap: 10
+        // Which windows exist (app id + address) and the pins. A string, so it only changes when the
+        // dock's contents do, not on every window title update.
         readonly property string appsKey: options.pinned.join(",") + "|"
             + Hyprland.toplevels.values.map(t => `${t.wayland?.appId ?? ""}@${t.address}`).join(",")
 
-        // Pinned ids first, then running apps that aren't pinned. Rebuilt only when
-        // appsKey changes, so the icons aren't recreated all the time.
+        // Pinned ids first (in their order), then running apps that aren't pinned.
         property var apps: []
         onAppsKeyChanged: apps = buildApps()
         Component.onCompleted: apps = buildApps()
+        readonly property int pinnedCount: apps.filter(a => a.pinned).length
 
         property var entryCache: ({})
         function entryFor(id) {
@@ -57,33 +57,70 @@ Variants {
             return ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
         }
 
-        screen: modelData
-        anchors.bottom: true
-        exclusiveZone: options.autoHide ? 0 : dock.height + 12
-        implicitWidth: dock.width + 40
-        implicitHeight: iconSize * 1.6 + 40
-        // Only the dock (or, hidden, a thin strip at the bottom edge) takes input.
-        mask: Region { item: window.shown ? dock : trigger }
-        color: "transparent"
-
-        WlrLayershell.namespace: "hi-shell-dock"
-        WlrLayershell.layer: WlrLayer.Top
-
-        function activate(app) {
+        // Focus the app's next window (step -1 for the previous one); a closed app is launched.
+        function cycle(app, step) {
             if (app.windows.length === 0) {
                 if (app.entry)
                     FocusBlocker.launch(app.entry);
                 return;
             }
-            // Cycle through the app's windows, starting after the focused one.
-            const active = Hyprland.activeToplevel;
-            const i = app.windows.indexOf(active);
-            const next = app.windows[(i + 1) % app.windows.length];
+            const i = app.windows.indexOf(Hyprland.activeToplevel);
+            const n = app.windows.length;
+            const next = app.windows[((i < 0 ? 0 : i + step) % n + n) % n];
             Hyprland.dispatch(`hl.dsp.focus({ window = "address:0x${next.address}" })`);
+        }
+        function launch(app) {
+            if (app.entry)
+                FocusBlocker.launch(app.entry);
         }
         function togglePin(app) {
             const list = options.pinned.filter(id => id.toLowerCase() !== app.id);
             options.pinned = app.pinned ? list : [...list, app.id];
+        }
+        // Swaps a pinned app with its neighbour in the pins.
+        function movePin(app, step) {
+            const pins = options.pinned.slice();
+            const i = pins.findIndex(id => id.toLowerCase() === app.id);
+            const j = i + step;
+            if (i < 0 || j < 0 || j >= pins.length)
+                return;
+            [pins[i], pins[j]] = [pins[j], pins[i]];
+            options.pinned = pins;
+        }
+
+        // The menu of an app, opened above its icon.
+        property var menuApp: null
+        property real menuX: 0
+        readonly property bool menuOpen: menuApp !== null
+        function openMenu(app, item) {
+            const p = item.mapToItem(dock, item.width / 2, 0);
+            menuX = Math.max(8, Math.min(width - menu.width - 8, dock.x + p.x - menu.width / 2));
+            menuApp = app;
+        }
+        function closeMenu() {
+            menuApp = null;
+        }
+
+        screen: modelData
+        anchors.bottom: true
+        exclusiveZone: options.autoHide ? 0 : dock.height + 12
+        implicitWidth: Math.max(dock.width + 40, menu.width + 16)
+        implicitHeight: iconSize * 1.6 + 40 + (menuOpen ? menu.height + menuGap : 0)
+        // Only the dock (or, hidden, a thin strip at the bottom edge) and the open menu take input.
+        mask: Region {
+            Region { item: window.shown ? dock : trigger }
+            Region { item: menu }
+        }
+        color: "transparent"
+
+        WlrLayershell.namespace: "hi-shell-dock"
+        WlrLayershell.layer: WlrLayer.Top
+
+        // A click outside the menu closes it.
+        HyprlandFocusGrab {
+            windows: [window]
+            active: window.menuOpen
+            onCleared: window.closeMenu()
         }
 
         Item {
@@ -100,7 +137,8 @@ Variants {
         Rectangle {
             id: dock
 
-            readonly property real mouseX: dockHover.hovered ? dockHover.point.position.x : -1000
+            // The pointer's x in the row (-1000 when it's not over the dock): the icons grow toward it.
+            readonly property real pointerX: dockHover.hovered ? dockHover.point.position.x - row.x : -1000
 
             anchors.horizontalCenter: parent.horizontalCenter
             y: window.shown ? parent.height - height - 8 : parent.height + 4
@@ -122,77 +160,55 @@ Variants {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 6
+                spacing: 2
 
                 Repeater {
                     model: window.apps
 
-                    Item {
-                        id: item
-
+                    DockItem {
+                        id: dockItem
                         required property var modelData
-                        // Magnification by distance from the pointer.
-                        readonly property real center: x + width / 2
-                        readonly property real distance: Math.abs(dock.mouseX - row.x - center)
-                        readonly property real magnify: window.options.magnify ? Math.max(0, 1 - distance / (window.iconSize * 2.5)) * 0.45 : 0
-                        readonly property real size: window.iconSize * (1 + magnify)
+                        required property int index
+                        app: modelData
+                        iconSize: window.iconSize
+                        pointer: dock.pointerX
+                        magnifies: window.options.magnify
+                        dividerAfter: window.pinnedCount > 0 && index === window.pinnedCount - 1 && window.apps.length > window.pinnedCount
 
-                        width: size
-                        height: window.iconSize
-                        Behavior on width { NumberAnimation { duration: 90 } }
-
-                        IconImage {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.bottom
-                            implicitSize: item.size
-                            source: Quickshell.iconPath(item.modelData.entry?.icon ?? item.modelData.id, "application-x-executable")
+                        onClicked: button => {
+                            if (button === Qt.RightButton)
+                                window.openMenu(app, dockItem);
+                            else if (button === Qt.MiddleButton)
+                                window.launch(app);
+                            else
+                                window.cycle(app, 1);
                         }
-
-                        // Open-window dots
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.bottom
-                            anchors.topMargin: 3
-                            spacing: 3
-                            Repeater {
-                                model: Math.min(3, item.modelData.windows.length)
-                                Rectangle {
-                                    width: item.modelData.windows.includes(Hyprland.activeToplevel) ? 10 : 5
-                                    height: 4
-                                    radius: 2
-                                    color: Colors.m3primary
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: area
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => {
-                                if (mouse.button === Qt.RightButton)
-                                    window.togglePin(item.modelData);
-                                else if (mouse.button === Qt.MiddleButton && item.modelData.entry)
-                                    FocusBlocker.launch(item.modelData.entry);
-                                else
-                                    window.activate(item.modelData);
-                            }
-                        }
-
-                        StyledPopup {
-                            target: item
-                            hovered: area.containsMouse
-                            edge: Edges.Top
-                            openDelay: 400
-                            padding: 10
-                            StyledText {
-                                text: (item.modelData.entry?.name ?? item.modelData.id) + (item.modelData.pinned ? "" : " · " + Translation.tr("right click to pin"))
-                            }
-                        }
+                        onWheeled: step => window.cycle(app, step)
                     }
                 }
+            }
+        }
+
+        DockMenu {
+            id: menu
+            x: window.menuX
+            y: dock.y - height - window.menuGap
+            visible: window.menuOpen
+            app: window.menuApp
+            canMoveLeft: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) > 0
+            canMoveRight: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) < window.options.pinned.length - 1
+            canOpen: window.menuApp?.entry !== null && window.menuApp?.entry !== undefined
+            onPin: {
+                window.togglePin(window.menuApp);
+                window.closeMenu();
+            }
+            onMove: step => {
+                window.movePin(window.menuApp, step);
+                window.closeMenu();
+            }
+            onOpen: {
+                window.launch(window.menuApp);
+                window.closeMenu();
             }
         }
     }

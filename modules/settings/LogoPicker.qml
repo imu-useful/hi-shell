@@ -41,7 +41,7 @@ Flow {
                 width: 32
                 height: 32
                 visible: tile.modelData !== "auto"
-                logo: tile.modelData
+                logo: tile.modelData === "auto" ? "" : tile.modelData
                 tint: tile.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
             }
             StateLayer {

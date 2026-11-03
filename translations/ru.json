@@ -959,5 +959,10 @@
     "Starting…": "Запускаю…",
     "Translating… %1 of %2": "Перевожу… %1 из %2",
     "Done: %1": "Готово: %1",
-    "Couldn't make the language": "Не удалось сделать язык"
+    "Couldn't make the language": "Не удалось сделать язык",
+    "Right click for more": "Правый клик — ещё",
+    "Pin to the dock": "Закрепить в доке",
+    "Move left": "Влево",
+    "Move right": "Вправо",
+    "New window": "Новое окно"
 }
