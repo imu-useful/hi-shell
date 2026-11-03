@@ -914,5 +914,16 @@
     "Hold": "Задержка",
     "Breathe out": "Выдох",
     "Breathing on the breaks": "Дыхание на перерывах",
-    "A 16-second breathing guide in the bar and on the wallpaper frame while a break runs": "Дыхательная подсказка в панели и на рамке обоев, пока идёт перерыв (16 секунд на цикл)"
+    "A 16-second breathing guide in the bar and on the wallpaper frame while a break runs": "Дыхательная подсказка в панели и на рамке обоев, пока идёт перерыв (16 секунд на цикл)",
+    "Screen time": "Экранное время",
+    "The last 7 days": "Последние 7 дней",
+    "Daily limits": "Дневные лимиты",
+    "Nothing counted yet": "Пока ничего не посчитано",
+    "Time with an app in the focus, counted every %1 seconds. Kept in ~/.local/state/hi-shell/screentime.json": "Время, когда приложение было в фокусе; считается каждые %1 с. Хранится в ~/.local/state/hi-shell/screentime.json",
+    "< 1 min": "< 1 мин",
+    "A notification when an app's time for today runs out": "Уведомление, когда время приложения на сегодня заканчивается",
+    "Set the minutes for an app; 0 is no limit. Apps from today's list are shown.": "Минуты на приложение; 0 — без лимита. Показаны приложения из списка за сегодня.",
+    "%1 used today": "%1 сегодня",
+    "Time is up for %1": "Время вышло: %1",
+    "%1 minutes today, the limit you set": "%1 минут сегодня — установленный лимит"
 }

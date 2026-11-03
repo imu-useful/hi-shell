@@ -14,7 +14,8 @@ const defaults = {
     notes: { enabled: false, x: 0.55, y: 0.56 },
     timers: { enabled: false, x: 0.30, y: 0.76 },
     userCard: { enabled: false, x: 0.03, y: 0.76 },
-    imageFrame: { enabled: false, x: 0.40, y: 0.36 }
+    imageFrame: { enabled: false, x: 0.40, y: 0.36 },
+    screenTime: { enabled: false, x: 0.55, y: 0.76 }
 };
 
 const names = {
@@ -30,7 +31,8 @@ const names = {
     notes: "Notes",
     timers: "Timers",
     userCard: "User",
-    imageFrame: "Image"
+    imageFrame: "Image",
+    screenTime: "Screen time"
 };
 
 const ids = Object.keys(defaults);

@@ -13,6 +13,7 @@ const pages = [
     { id: "autostart", title: "Autostart", icon: "rocket_launch", keywords: "autostart startup start login boot exec exec-once run command commands program programs app apps launch hyprland" },
     // The Keybinds page (KeybindsPage.qml) is switched off for now: put its entry back here to show it.
     // { id: "keybinds", title: "Keybinds", icon: "keyboard", keywords: "keybinds keybindings shortcuts hotkeys keys bind binds key super ctrl alt shift remap rebind hyprland" },
+    { id: "screentime", title: "Screen time", icon: "hourglass_top", keywords: "screen time usage used apps app limit limits minutes hours today week statistics focus time spent" },
     { id: "about", title: "About", icon: "info", keywords: "about version quickshell source credits presets preset export import backup share" }
 ];
 

@@ -481,6 +481,11 @@ Scope {
                     WeatherCard {}
                 }
                 DesktopWidget {
+                    widgetId: "screenTime"
+                    editing: root.editing
+                    ScreenTimeCard {}
+                }
+                DesktopWidget {
                     widgetId: "resources"
                     editing: root.editing
                     ResourceTiles {}
