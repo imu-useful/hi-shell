@@ -134,6 +134,15 @@ Each one goes through `pacman` if a configured repository has it, otherwise thro
 
 Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`, `--channel=git|release`. Then tap <kbd>Super</kbd>.
 
+### NixOS
+
+The installer runs on NixOS too, but it doesn't install packages there: it prints the nixpkgs names of what hi-shell
+needs (`matugen`, `quickshell`, `hyprlock`, `ffmpeg`, ...). Add them to `environment.systemPackages` in your
+configuration and run `nixos-rebuild switch`, then run `install.sh` again for the config files. Things that are
+different there: the Updates widget is off (updates come with `nixos-rebuild`), and Focus Mode's site blocking runs
+the helper with `/run/current-system/sw/bin/python3`. Optional apps are not installed by the installer; add them to
+your configuration yourself. Only the Arch path is tested so far.
+
 ### Update
 
 ```sh

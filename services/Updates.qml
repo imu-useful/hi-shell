@@ -7,10 +7,12 @@ import qs.common
 
 // Pending package updates: repo packages via checkupdates (pacman-contrib),
 // AUR via yay / paru. `run()` opens a terminal with the system upgrade.
+// NixOS has none of that: its updates come with nixos-rebuild, so this stays off there.
 Singleton {
     id: root
 
     readonly property var options: Config.options.updates
+    readonly property bool supported: Distro.id !== "nixos"
 
     // [{ name, from, to, aur }]
     property var packages: []
@@ -22,7 +24,7 @@ Singleton {
     property string aurHelper: ""
 
     function refresh() {
-        if (options.enabled && !checker.running && !upgrade.running)
+        if (options.enabled && supported && !checker.running && !upgrade.running)
             checker.running = true;
     }
 

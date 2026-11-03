@@ -119,7 +119,14 @@ choose_parts() {
 }
 
 [[ $EUID -eq 0 ]] && die "run as your user, not root (sudo is used where needed)"
-command -v pacman >/dev/null || die "hi-shell targets Arch Linux (pacman not found)"
+# NixOS has no pacman: its packages come from the Nix config (printed below); everything else is the same.
+IS_NIXOS=false
+[[ -e /etc/NIXOS ]] && IS_NIXOS=true
+if $IS_NIXOS; then
+    echo "NixOS: packages are not installed here; see the list in the packages step."
+else
+    command -v pacman >/dev/null || die "hi-shell targets Arch Linux and NixOS (pacman not found)"
+fi
 choose_parts
 
 # Where update.sh gets updates from; kept in the config (update.channel).
@@ -148,7 +155,20 @@ PACMAN_PKGS=(
 )
 AUR_PKGS=(quickshell-git ttf-material-symbols-variable-git)
 
-if $DEPS; then
+# NixOS names of the same packages (nixpkgs).
+NIX_PKGS=(
+    matugen python3 pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
+    libnotify hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
+    cava imagemagick curl libqalculate tesseract wf-recorder git python3Packages.fonttools wtype ffmpeg
+    quickshell material-symbols
+)
+
+if $DEPS && $IS_NIXOS; then
+    step "Packages (NixOS)"
+    echo "Add these to environment.systemPackages in your NixOS configuration, then nixos-rebuild switch:"
+    echo "  ${NIX_PKGS[*]}"
+    echo "(or try them first with: nix-shell -p ${NIX_PKGS[*]})"
+elif $DEPS; then
     step "Packages"
     missing=()
     for p in "${PACMAN_PKGS[@]}"; do pacman -Qq "$p" &>/dev/null || missing+=("$p"); done
@@ -184,6 +204,11 @@ fi
 # Only what you switched on in the menu (or --with-apps). A package that's in a configured
 # repo goes through pacman, anything else through the AUR helper.
 app_repo=() app_aur=()
+if $IS_NIXOS; then
+    # Optional apps are pacman / AUR packages: on NixOS they go in the Nix config.
+    for app in "${APP_PARTS[@]}"; do [[ ${WANT[$app]} == true ]] && warn "$app: add it to your NixOS configuration (not installed here)"; done
+    APP_PARTS=()
+fi
 for app in "${APP_PARTS[@]}"; do
     [[ ${WANT[$app]} == true ]] || continue
     found=""
@@ -217,7 +242,13 @@ if ((${#app_repo[@]} + ${#app_aur[@]})); then
     fi
 fi
 
-command -v qs >/dev/null || die "quickshell (qs) is not installed; install quickshell-git from the AUR"
+if ! command -v qs >/dev/null; then
+    if $IS_NIXOS; then
+        die "quickshell (qs) is not installed; add quickshell to environment.systemPackages"
+    else
+        die "quickshell (qs) is not installed; install quickshell-git from the AUR"
+    fi
+fi
 
 # --- Source ---
 step "Source"

@@ -290,6 +290,8 @@ Singleton {
     readonly property string fifo: `${Quickshell.env("XDG_RUNTIME_DIR")}/hi-shell-focus.fifo`
     readonly property string pageState: `${Paths.state}/focus_page.json`
     readonly property string helper: `${Quickshell.shellDir}/services/focus_hosts.py`
+    // pkexec needs an absolute path: NixOS keeps python3 in its system profile, not /usr/bin.
+    readonly property string python: Distro.id === "nixos" ? "/run/current-system/sw/bin/python3" : "/usr/bin/python3"
     property bool checked: false
 
     function send(command) {
@@ -301,7 +303,7 @@ Singleton {
             return;
         if (sitesWanted && !sitesRunning && !hostsStart.running) {
             writePage();
-            hostsStart.command = ["pkexec", "/usr/bin/python3", helper, "start", "--user", Quickshell.env("USER"),
+            hostsStart.command = ["pkexec", root.python, helper, "start", "--user", Quickshell.env("USER"),
                 "--fifo", fifo, "--page", `${Quickshell.shellDir}/services/focus_page.html`, "--state", pageState, ...sites];
             hostsStart.running = true;
         } else if (!sitesWanted && sitesRunning) {
@@ -356,7 +358,7 @@ Singleton {
                 if (running)
                     root.sitesRunning = true;
                 else if (text.includes("hosts") && !root.sitesWanted)
-                    Quickshell.execDetached(["pkexec", "/usr/bin/python3", root.helper, "restore"]);
+                    Quickshell.execDetached(["pkexec", root.python, root.helper, "restore"]);
                 root.checked = true;
                 // Focus may load its session a moment later; syncSites runs again then.
                 root.syncSites();
