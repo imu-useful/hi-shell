@@ -144,10 +144,10 @@ BarWidget {
                     Repeater {
                         model: cell.icons
 
-                        IconImage {
+                        ThemedIcon {
                             required property string modelData
                             source: modelData
-                            implicitSize: cell.iconSize
+                            size: cell.iconSize
                             opacity: cell.isActive ? 1 : 0.85
                         }
                     }

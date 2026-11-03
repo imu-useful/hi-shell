@@ -50,6 +50,8 @@ Singleton {
             property var customLanguages: []
 
             property JsonObject appearance: JsonObject {
+                // App icons in one color, the palette's primary (dock, workspaces, launcher).
+                property bool themedIcons: false
                 // Translucent surfaces (the compositor blurs what's behind them).
                 property bool transparency: true
                 property real transparencyLevel: 0.12

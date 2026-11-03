@@ -30,11 +30,11 @@ Item {
     width: iconSize + 8
     height: iconSize
 
-    IconImage {
+    ThemedIcon {
         id: icon
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        implicitSize: root.iconSize
+        size: root.iconSize
         transformOrigin: Item.Bottom
         scale: 1 + root.magnify
         source: Quickshell.iconPath(root.app.entry?.icon ?? root.app.id, "application-x-executable")

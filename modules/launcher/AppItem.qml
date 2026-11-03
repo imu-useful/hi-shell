@@ -74,9 +74,9 @@ Rectangle {
             }
         }
 
-        IconImage {
+        ThemedIcon {
             visible: !root.isSetting
-            implicitSize: 32
+            size: 32
             // Wait for a real size: a 0 sourceSize makes Qt rasterize SVGs at native size.
             source: actualSize > 0 && !root.isSetting ? Quickshell.iconPath(root.modelData.icon, "application-x-executable") : ""
         }

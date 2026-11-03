@@ -51,6 +51,13 @@ ColumnLayout {
             onToggled: checked => a.coverBackdrop = checked
         }
         SwitchRow {
+            icon: "palette"
+            title: Translation.tr("Themed app icons")
+            subtitle: Translation.tr("The apps' icons in one color, the wallpaper's primary: in the dock, the bar's workspaces and the launcher")
+            checked: Config.options.appearance.themedIcons
+            onToggled: checked => Config.options.appearance.themedIcons = checked
+        }
+        SwitchRow {
             icon: "movie"
             title: Translation.tr("Viewing mode when a video fills the screen")
             subtitle: Translation.tr("A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on")
