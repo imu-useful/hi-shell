@@ -45,6 +45,9 @@ Singleton {
 
             // Interface language: auto (from $LANG), en, ru
             property string language: "auto"
+            // Languages made with AI (Settings > General > Language): [{ code, name }]; their files are
+            // in ~/.config/hi-shell/translations.
+            property var customLanguages: []
 
             property JsonObject appearance: JsonObject {
                 // Translucent surfaces (the compositor blurs what's behind them).

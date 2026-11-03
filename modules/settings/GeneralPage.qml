@@ -21,6 +21,50 @@ ColumnLayout {
             options: [{ value: "auto", text: Translation.tr("Auto") }, ...Translation.available.map(l => ({ value: l.code, text: l.name }))]
             onSelected: value => o.language = value
         }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "auto_awesome"
+            title: Translation.tr("Make a language with AI")
+            subtitle: Translation.tr("Type the code (de, fr, pt-BR), and a model: the shell's strings are translated into it, and it appears above")
+        }
+        TextRow {
+            id: langCode
+            icon: "tag"
+            title: Translation.tr("Language code")
+            placeholder: "de"
+            fieldWidth: 160
+            onEdited: text => langCode.value = text.trim()
+        }
+        TextRow {
+            id: langName
+            icon: "translate"
+            title: Translation.tr("Name in that language")
+            placeholder: Translation.tr("Deutsch (optional)")
+            fieldWidth: 160
+            onEdited: text => langName.value = text.trim()
+        }
+        TextRow {
+            id: langModel
+            icon: "smart_toy"
+            title: Translation.tr("Model")
+            subtitle: Config.options.ai.provider === "claude" ? Translation.tr("From the Claude CLI: sonnet, opus or haiku") : Config.options.ai.provider
+            placeholder: Config.options.ai.provider === "claude" ? "sonnet" : (Config.options.ai.models[Config.options.ai.provider] ?? "")
+            value: Config.options.ai.provider === "claude" ? "" : (Config.options.ai.models[Config.options.ai.provider] ?? "")
+            fieldWidth: 200
+            onEdited: text => langModel.value = text.trim()
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "play_arrow"
+            title: LanguageMaker.running ? LanguageMaker.status : (LanguageMaker.error || LanguageMaker.status || Translation.tr("Ready"))
+            subtitle: LanguageMaker.error && !LanguageMaker.running ? Translation.tr("See the shell's log for the details") : ""
+            M3Button {
+                text: Translation.tr("Generate")
+                icon: "auto_awesome"
+                enabled: !LanguageMaker.running && /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(langCode.value) && langCode.value !== "en"
+                onClicked: LanguageMaker.generate(langCode.value, langName.value, langModel.value || (Config.options.ai.provider === "claude" ? "sonnet" : (Config.options.ai.models[Config.options.ai.provider] ?? "")))
+            }
+        }
     }
 
     Section {

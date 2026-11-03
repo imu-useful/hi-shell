@@ -947,5 +947,17 @@
     "Viewing": "Просмотр",
     "On while fullscreen": "Вкл, пока на весь экран",
     "Viewing mode when a video fills the screen": "Режим просмотра, когда видео на весь экран",
-    "A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on": "Окно на весь экран с играющим видео скрывает панель, придерживает уведомления и не даёт экрану погаснуть"
+    "A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on": "Окно на весь экран с играющим видео скрывает панель, придерживает уведомления и не даёт экрану погаснуть",
+    "Make a language with AI": "Сделать язык с помощью ИИ",
+    "Type the code (de, fr, pt-BR), and a model: the shell's strings are translated into it, and it appears above": "Введите код (de, fr, pt-BR) и модель: строки оболочки переведутся на этот язык, и он появится выше",
+    "Language code": "Код языка",
+    "Name in that language": "Название на этом языке",
+    "Deutsch (optional)": "Deutsch (необязательно)",
+    "From the Claude CLI: sonnet, opus or haiku": "Из Claude CLI: sonnet, opus или haiku",
+    "Generate": "Сгенерировать",
+    "See the shell's log for the details": "Подробности в логе оболочки",
+    "Starting…": "Запускаю…",
+    "Translating… %1 of %2": "Перевожу… %1 из %2",
+    "Done: %1": "Готово: %1",
+    "Couldn't make the language": "Не удалось сделать язык"
 }

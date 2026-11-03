@@ -6,14 +6,18 @@ import Quickshell.Io
 
 // Interface language. Strings are written in English and looked up in
 // translations/<code>.json (English text -> translation); missing ones stay English.
+// Languages made with AI (services/LanguageMaker.qml) are in ~/.config/hi-shell/translations.
 // Use Translation.tr("Text") in bindings, with .arg() for placeholders: tr("%1 updates").arg(n).
 Singleton {
     id: root
 
-    readonly property var available: [
+    readonly property var builtin: [
         { code: "en", name: "English" },
         { code: "ru", name: "Русский" }
     ]
+    readonly property var available: [...builtin, ...Config.options.customLanguages.filter(l => !builtin.some(b => b.code === l.code))]
+    readonly property bool isBuiltin: builtin.some(b => b.code === code)
+    readonly property string file: isBuiltin ? Quickshell.shellPath(`translations/${code}.json`) : `${Config.dir}/translations/${code}.json`
 
     // auto -> the first language of $LANG / $LC_MESSAGES we have, else English
     readonly property string code: {
@@ -47,8 +51,15 @@ Singleton {
         return s.replace("%1", n);
     }
 
+    // Re-reads the language's file (after it was made).
+    function reload() {
+        if (code !== "en")
+            fileView.reload();
+    }
+
     FileView {
-        path: root.code === "en" ? "" : Quickshell.shellPath(`translations/${root.code}.json`)
+        id: fileView
+        path: root.code === "en" ? "" : root.file
         printErrors: false
         onLoaded: {
             try {
