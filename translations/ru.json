@@ -947,9 +947,5 @@
     "Viewing": "Просмотр",
     "On while fullscreen": "Вкл, пока на весь экран",
     "Viewing mode when a video fills the screen": "Режим просмотра, когда видео на весь экран",
-    "A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on": "Окно на весь экран с играющим видео скрывает панель, придерживает уведомления и не даёт экрану погаснуть",
-    "Quiet": "Тишина",
-    "On in a game": "Вкл, в игре",
-    "Quiet mode in a fullscreen game": "Тишина в игре на весь экран",
-    "A game on the whole screen hides the bar and holds notifications, and keeps the screen on": "Игра на весь экран скрывает панель, придерживает уведомления и не даёт экрану погаснуть"
+    "A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on": "Окно на весь экран с играющим видео скрывает панель, придерживает уведомления и не даёт экрану погаснуть"
 }

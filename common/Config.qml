@@ -216,11 +216,6 @@ Singleton {
 
             // Power saving (services/PowerSaver.qml): turned on by hand. `saved` keeps the
             // values it changed, to put back when it's turned off.
-            property JsonObject quiet: JsonObject {
-                // Quiet by itself: a game (Steam, Proton, gamescope) fullscreen.
-                property bool auto: true
-            }
-
             property JsonObject viewing: JsonObject {
                 // Viewing mode by itself: a fullscreen window while something plays.
                 property bool auto: true
