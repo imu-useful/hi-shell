@@ -143,6 +143,8 @@ Singleton {
 
             property JsonObject wallpapers: JsonObject {
                 property list<string> directories: ["~/Pictures/Wallpapers"]
+                // A slideshow: a random picture from the folders every this many minutes (0 = off).
+                property int slideshowMinutes: 0
                 // Online pictures are saved here before being set.
                 property string downloadDirectory: "~/Pictures/Wallpapers/online"
                 // Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one.

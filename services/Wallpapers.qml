@@ -81,6 +81,18 @@ Singleton {
         stiller.running = true;
     }
 
+    // The slideshow: a random picture from the folders every so often.
+    Timer {
+        running: root.options.slideshowMinutes > 0
+        interval: root.options.slideshowMinutes * 60000
+        repeat: true
+        onTriggered: {
+            if (root.local.length === 0)
+                root.scan();
+            root.random();
+        }
+    }
+
     function random() {
         const pool = local.filter(w => w.path !== current);
         if (pool.length)

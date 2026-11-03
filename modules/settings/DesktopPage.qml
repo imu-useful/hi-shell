@@ -23,6 +23,16 @@ ColumnLayout {
         icon: "desktop_windows"
         title: Translation.tr("Desktop")
 
+        StepperRow {
+            icon: "shuffle"
+            title: Translation.tr("Slideshow")
+            subtitle: Config.options.wallpapers.slideshowMinutes > 0 ? Translation.tr("A random wallpaper every %1 minutes").arg(Config.options.wallpapers.slideshowMinutes) : Translation.tr("Off: 0 minutes")
+            value: Config.options.wallpapers.slideshowMinutes
+            step: 5
+            from: 0
+            to: 180
+            onChanged: value => Config.options.wallpapers.slideshowMinutes = value
+        }
         SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
         SwitchRow { icon: "animated_images"; title: Translation.tr("Play live wallpapers"); subtitle: Translation.tr("A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture"); checked: Config.options.wallpapers.animate; onToggled: checked => Config.options.wallpapers.animate = checked }
         SwitchRow {
