@@ -964,5 +964,12 @@
     "Pin to the dock": "Закрепить в доке",
     "Move left": "Влево",
     "Move right": "Вправо",
-    "New window": "Новое окно"
+    "New window": "Новое окно",
+    "Content filter": "Фильтр контента",
+    "Block adult sites": "Блокировать сайты для взрослых",
+    "Changing /etc/hosts…": "Меняю /etc/hosts…",
+    "On in every browser and app here, until it's switched off. The list: services/adult_domains.txt": "Включено во всех браузерах и программах на этом компьютере, пока не выключите. Список: services/adult_domains.txt",
+    "Off. Switching it on or off asks for your password": "Выключено. Включение и выключение спрашивают пароль",
+    "Not changed: the password wasn't given": "Не изменено: пароль не введён",
+    "Couldn't change /etc/hosts (see the shell's log)": "Не удалось изменить /etc/hosts (см. лог оболочки)"
 }

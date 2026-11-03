@@ -10,6 +10,33 @@ ColumnLayout {
     spacing: 24
 
     Section {
+        icon: "shield"
+        title: Translation.tr("Content filter")
+
+        ListRow {
+            Layout.fillWidth: true
+            icon: "block"
+            title: Translation.tr("Block adult sites")
+            subtitle: AdultFilter.busy ? Translation.tr("Changing /etc/hosts…")
+                : AdultFilter.error !== "" ? AdultFilter.error
+                : AdultFilter.applied ? Translation.tr("On in every browser and app here, until it's switched off. The list: services/adult_domains.txt")
+                : Translation.tr("Off. Switching it on or off asks for your password")
+            M3Switch {
+                id: adultSwitch
+                enabled: !AdultFilter.busy
+                // The click changes the switch itself: when the change doesn't happen, it goes back to the real state.
+                Binding {
+                    target: adultSwitch
+                    property: "checked"
+                    value: AdultFilter.applied
+                    when: !AdultFilter.busy
+                }
+                onToggled: checked => AdultFilter.set(checked)
+            }
+        }
+    }
+
+    Section {
         icon: "partly_cloudy_day"
         title: Translation.tr("Weather")
 
