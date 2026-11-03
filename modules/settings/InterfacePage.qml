@@ -57,6 +57,13 @@ ColumnLayout {
             checked: Config.options.viewing.auto
             onToggled: checked => Config.options.viewing.auto = checked
         }
+        SwitchRow {
+            icon: "videogame_asset"
+            title: Translation.tr("Quiet mode in a fullscreen game")
+            subtitle: Translation.tr("A game on the whole screen hides the bar and holds notifications, and keeps the screen on")
+            checked: Config.options.quiet.auto
+            onToggled: checked => Config.options.quiet.auto = checked
+        }
         ChoiceRow {
             icon: "menu_open"
             title: Translation.tr("Context menus")
