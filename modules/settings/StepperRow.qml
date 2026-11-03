@@ -23,11 +23,14 @@ ListRow {
         enabled: root.value > root.from
         onClicked: root.changed(Math.max(root.from, +(root.value - root.step).toFixed(4)))
     }
-    StyledText {
-        Layout.preferredWidth: 60
-        horizontalAlignment: Text.AlignHCenter
-        text: root.value.toFixed(root.decimals)
-        font.features: { "tnum": 1 }
+    NumberField {
+        Layout.preferredWidth: 72
+        value: root.value
+        from: root.from
+        to: root.to
+        step: root.step
+        decimals: root.decimals
+        onCommitted: v => root.changed(v)
     }
     IconButton {
         implicitWidth: 34

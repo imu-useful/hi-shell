@@ -26,11 +26,18 @@ ListRow {
             root.moved(Math.round(raw / root.step) * root.step);
         }
     }
+    NumberField {
+        Layout.preferredWidth: 72
+        value: root.value
+        from: root.from
+        to: root.to
+        step: root.step
+        decimals: root.decimals
+        onCommitted: v => root.moved(v)
+    }
     StyledText {
-        Layout.preferredWidth: 56
-        horizontalAlignment: Text.AlignRight
-        text: root.value.toFixed(root.decimals) + root.suffix
-        font.features: { "tnum": 1 }
+        visible: root.suffix !== ""
+        text: root.suffix
         color: Colors.m3onSurfaceVariant
     }
 }
