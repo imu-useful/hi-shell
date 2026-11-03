@@ -8,7 +8,7 @@ import qs.services
 BarWidget {
     id: root
 
-    shown: Config.options.updates.enabled && (Updates.count > 0 || !Config.options.bar.updates.hideWhenNone)
+    shown: Config.options.updates.enabled && (Updates.count > 0 || Updates.shellBehind > 0 || !Config.options.bar.updates.hideWhenNone)
     clickable: true
     padding: 8
     contentWidth: grid.implicitWidth
@@ -57,6 +57,12 @@ BarWidget {
                     font.family: Appearance.font.mono
                     color: Colors.m3onSurfaceVariant
                 }
+            }
+            StyledText {
+                visible: Updates.shellBehind > 0
+                text: Translation.trn("The shell: %1 new change", "The shell: %1 new changes", Updates.shellBehind).arg(Updates.shellBehind)
+                font.pixelSize: Appearance.font.size.labelMedium
+                color: Colors.m3primary
             }
             StyledText {
                 visible: Updates.count > 15

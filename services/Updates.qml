@@ -23,17 +23,62 @@ Singleton {
     property real lastCheck: 0
     property string aurHelper: ""
 
+    // The shell itself: how many changes its update would bring (-1: not checked, or no network).
+    // A git checkout, so it's the repo's upstream (git channel) or its newest release tag (release).
+    readonly property string repo: Quickshell.shellDir
+    property int shellBehind: -1
+    readonly property bool shellChecking: shellChecker.running
+    readonly property bool upgradeRunning: upgrade.running
+
+    function checkShell() {
+        if (!shellChecker.running && !upgrade.running)
+            shellChecker.running = true;
+    }
+
     function refresh() {
         if (options.enabled && supported && !checker.running && !upgrade.running)
             checker.running = true;
+        checkShell();
     }
 
+    // The shell's update (update.sh in the terminal: pulls, restarts the shell).
+    function updateShell() {
+        runInTerminal(`"${repo}/update.sh"`);
+    }
+
+    // The upgrade of the packages, then the shell's update when there is one.
     function run() {
+        const packages = aurHelper && options.aur ? aurHelper : "sudo pacman -Syu";
+        const steps = [];
+        if (supported && count > 0)
+            steps.push(packages);
+        if (shellBehind !== 0)
+            steps.push(`"${repo}/update.sh"`);
+        runInTerminal(steps.join("; ") || "true");
+    }
+
+    function runInTerminal(cmd) {
         if (upgrade.running)
             return;
-        const cmd = aurHelper && options.aur ? aurHelper : "sudo pacman -Syu";
         upgrade.command = [Config.options.apps.terminal, "-e", "bash", "-c", `${cmd}; echo; read -n 1 -s -r -p 'Done. Press any key to close'`];
         upgrade.running = true;
+    }
+
+    Process {
+        id: shellChecker
+        command: ["sh", "-c", `cd "${root.repo}" && git fetch -q --tags 2>/dev/null || exit 1; ` + (Config.options.update.channel === "release"
+            ? `latest=$(git tag -l 'v*' --sort=-v:refname | head -1); current=$(git describe --tags --abbrev=0 2>/dev/null); [ "$latest" = "$current" ] && echo 0 || echo 1`
+            : `git rev-list --count HEAD..@{u}`)]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const n = parseInt(text.trim(), 10);
+                root.shellBehind = isNaN(n) ? -1 : n;
+            }
+        }
+        onExited: code => {
+            if (code !== 0)
+                root.shellBehind = -1;
+        }
     }
 
     // "name 1.0-1 -> 1.1-1"

@@ -12,6 +12,10 @@ ColumnLayout {
     id: root
 
     property string revision: ""
+    readonly property string shellStatus: Updates.shellChecking ? Translation.tr("Checking…")
+        : Updates.shellBehind > 0 ? Translation.trn("%1 new change", "%1 new changes", Updates.shellBehind).arg(Updates.shellBehind)
+        : Updates.shellBehind === 0 ? Translation.tr("Up to date")
+        : Translation.tr("Couldn't check for updates (no network?)")
     property string quickshell: ""
 
     spacing: 24
@@ -76,6 +80,24 @@ ColumnLayout {
             value: Config.options.update.channel
             options: [{ value: "release", text: Translation.tr("Release") }, { value: "git", text: "Git" }]
             onSelected: value => Config.options.update.channel = value
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "deployed_code"
+            title: Translation.tr("hi-shell")
+            subtitle: root.shellStatus
+            IconButton {
+                icon: "sync"
+                tooltip: Translation.tr("Check for updates")
+                enabled: !Updates.shellChecking
+                onClicked: Updates.checkShell()
+            }
+            M3Button {
+                text: Translation.tr("Update the shell")
+                icon: "system_update_alt"
+                enabled: !Updates.upgradeRunning
+                onClicked: Updates.updateShell()
+            }
         }
     }
 

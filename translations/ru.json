@@ -932,5 +932,13 @@
     "Screen time today": "Экранное время сегодня",
     "Nothing yet": "Пока ничего",
     "Logo": "Логотип",
-    "The button at the start of the bar. Auto is this system's distribution": "Кнопка в начале панели. «Авто» — дистрибутив этой системы"
+    "The button at the start of the bar. Auto is this system's distribution": "Кнопка в начале панели. «Авто» — дистрибутив этой системы",
+    "Checking…": "Проверяю…",
+    "%1 new change": "%1 новое изменение",
+    "%1 new changes": "%1 новых изменений",
+    "Up to date": "Актуально",
+    "Couldn't check for updates (no network?)": "Не удалось проверить обновления (нет сети?)",
+    "Update the shell": "Обновить оболочку",
+    "The shell: %1 new change": "Оболочка: %1 новое изменение",
+    "The shell: %1 new changes": "Оболочка: %1 новых изменений"
 }
