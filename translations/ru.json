@@ -971,5 +971,11 @@
     "On in every browser and app here, until it's switched off. The list: services/adult_domains.txt": "Включено во всех браузерах и программах на этом компьютере, пока не выключите. Список: services/adult_domains.txt",
     "Off. Switching it on or off asks for your password": "Выключено. Включение и выключение спрашивают пароль",
     "Not changed: the password wasn't given": "Не изменено: пароль не введён",
-    "Couldn't change /etc/hosts (see the shell's log)": "Не удалось изменить /etc/hosts (см. лог оболочки)"
+    "Couldn't change /etc/hosts (see the shell's log)": "Не удалось изменить /etc/hosts (см. лог оболочки)",
+    "Close tabs with these words in the title": "Закрывать вкладки с этими словами в заголовке",
+    "A browser tab whose title has one of the words is closed (Ctrl+W), and a notice says so": "Вкладка браузера, в заголовке которой есть одно из слов, закрывается (Ctrl+W), и появляется уведомление",
+    "Words": "Слова",
+    "Separated by commas. Matches anywhere in a title, in any case": "Через запятую. Ищется в любом месте заголовка, без учёта регистра",
+    "A tab was closed": "Вкладка закрыта",
+    "Its title has “%1”": "В её заголовке есть «%1»"
 }

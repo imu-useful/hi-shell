@@ -34,6 +34,21 @@ ColumnLayout {
                 onToggled: checked => AdultFilter.set(checked)
             }
         }
+        SwitchRow {
+            icon: "label"
+            title: Translation.tr("Close tabs with these words in the title")
+            subtitle: Translation.tr("A browser tab whose title has one of the words is closed (Ctrl+W), and a notice says so")
+            checked: o.contentFilter.keywordsOn
+            onToggled: checked => o.contentFilter.keywordsOn = checked
+        }
+        TextRow {
+            icon: "spellcheck"
+            title: Translation.tr("Words")
+            subtitle: Translation.tr("Separated by commas. Matches anywhere in a title, in any case")
+            value: o.contentFilter.keywords.join(", ")
+            fieldWidth: 320
+            onEdited: text => o.contentFilter.keywords = text.split(",").map(w => w.trim()).filter(w => w !== "")
+        }
     }
 
     Section {
