@@ -216,6 +216,11 @@ Singleton {
 
             // Power saving (services/PowerSaver.qml): turned on by hand. `saved` keeps the
             // values it changed, to put back when it's turned off.
+            property JsonObject viewing: JsonObject {
+                // Viewing mode by itself: a fullscreen window while something plays.
+                property bool auto: true
+            }
+
             property JsonObject powerSaving: JsonObject {
                 property bool enabled: false
                 property var saved: ({})

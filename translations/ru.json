@@ -304,7 +304,7 @@
     "Blocked": "Заблокировано",
     "Not connected": "Не подключено",
     "Unavailable": "Недоступно",
-    "On": "Вкл.",
+    "On": "Вкл",
     "Dark mode": "Тёмная тема",
     "Applying…": "Применение…",
     "Night light": "Ночной свет",
@@ -943,5 +943,9 @@
     "The shell: %1 new changes": "Оболочка: %1 новых изменений",
     "Slideshow": "Смена обоев по таймеру",
     "A random wallpaper every %1 minutes": "Случайные обои каждые %1 мин",
-    "Off: 0 minutes": "Выключено"
+    "Off: 0 minutes": "Выключено",
+    "Viewing": "Просмотр",
+    "On while fullscreen": "Вкл, пока на весь экран",
+    "Viewing mode when a video fills the screen": "Режим просмотра, когда видео на весь экран",
+    "A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on": "Окно на весь экран с играющим видео скрывает панель, придерживает уведомления и не даёт экрану погаснуть"
 }

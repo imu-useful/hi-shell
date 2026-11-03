@@ -50,6 +50,13 @@ ColumnLayout {
             checked: a.coverBackdrop
             onToggled: checked => a.coverBackdrop = checked
         }
+        SwitchRow {
+            icon: "movie"
+            title: Translation.tr("Viewing mode when a video fills the screen")
+            subtitle: Translation.tr("A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on")
+            checked: Config.options.viewing.auto
+            onToggled: checked => Config.options.viewing.auto = checked
+        }
         ChoiceRow {
             icon: "menu_open"
             title: Translation.tr("Context menus")
