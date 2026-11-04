@@ -29,6 +29,11 @@ Singleton {
 
     // The notification the island shows now (the newest one it handles), null when none.
     readonly property var notif: Notifications.popups.find(n => handles(n)) ?? null
+    // The hover card (the message and the buttons) is a window of its own. A window made, or moved every frame
+    // under an island that is still growing, stalls the animation; so it exists only while the island is still:
+    // not in the first second of a notification, and not in its last tenth, before everything moves back.
+    readonly property bool cardReady: enabled && notif !== null && notif.elapsed >= 1100 && notif.remaining > 0.1
+
     // Volume, brightness, microphone and keyboard layout changes (the on-screen display hands them over
     // instead of its own pill): shown for a moment, unless a notification has the island.
     property var osd: ({ icon: "", label: "", value: -1 })

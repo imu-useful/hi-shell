@@ -257,9 +257,9 @@ BarWidget {
         anchor.rect: Qt.rect(0, 0, root.width, root.height)
         anchor.edges: root.popupEdge
         anchor.gravity: root.popupEdge
-        // The window stays for as long as the notification does and only the content comes and goes:
-        // creating a window on every hover made it stutter. The mask keeps the empty part click-through.
-        visible: root.notifying
+        // Only while the island is still (Island.cardReady): a window made or moved under a growing island
+        // stalled its animation. The mask keeps the empty part click-through.
+        visible: Island.cardReady
         implicitWidth: 360
         implicitHeight: 280
         mask: Region { item: actionsPopup.shown ? card : null }
