@@ -40,8 +40,11 @@ BarWidget {
     onNotifyingChanged: {
         if (notifying)
             ball.restart();
-        else
+        else {
+            // Stopped mid-bounce it would stay off its place.
             ball.stop();
+            drop = 0;
+        }
     }
     NumberAnimation {
         id: ball
