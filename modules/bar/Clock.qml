@@ -37,7 +37,7 @@ BarWidget {
     contentHeight: music ? artSize : column.implicitHeight
     // A notification lands like a bouncing ball: the island drops in and bounces, and grows past its width.
     Behavior on contentWidth {
-        SpringAnim { overshoot: root.takenOver ? 2.6 : 1.2; duration: root.takenOver ? 700 : Appearance.anim.spatial }
+        SpringAnim { overshoot: 1.5; duration: Appearance.anim.spatial }
     }
     transform: Translate { y: Island.drop }
     // Hovering the island (with a notification) or its buttons holds the countdown.
@@ -91,7 +91,10 @@ BarWidget {
 
     RowLayout {
         id: row
-        visible: !root.vertical && !root.music && !root.takenOver
+        readonly property bool on: !root.vertical && !root.music && !root.takenOver
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: row.on } }
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         spacing: 8
@@ -122,7 +125,10 @@ BarWidget {
 
     ColumnLayout {
         id: column
-        visible: root.vertical && !root.music && !root.takenOver
+        readonly property bool on: root.vertical && !root.music && !root.takenOver
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: column.on } }
         anchors.centerIn: parent
         spacing: -2
 
@@ -142,7 +148,10 @@ BarWidget {
     // Music state: the cover, "title • artist", and the paused mark.
     RowLayout {
         id: musicRow
-        visible: root.music && !root.takenOver
+        readonly property bool on: root.music && !root.takenOver
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: musicRow.on } }
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: root.lead / 2
         spacing: 8
@@ -174,14 +183,20 @@ BarWidget {
 
     PrivacyPill {
         id: privacy
-        visible: Island.privacy && !root.takenOver && !root.vertical
+        readonly property bool on: Island.privacy && !root.takenOver && !root.vertical
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: privacy.on } }
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
     }
 
     IslandOsd {
         id: osdView
-        visible: root.osding
+        readonly property bool on: root.osding
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: osdView.on } }
         anchors.centerIn: parent
         compact: root.vertical
     }
@@ -190,7 +205,10 @@ BarWidget {
         id: notification
         parent: root
         anchors.fill: parent
-        visible: root.notifying
+        readonly property bool on: root.notifying
+        opacity: on ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { FadeAnim { incoming: notification.on } }
         compact: root.vertical
     }
 
