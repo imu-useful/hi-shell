@@ -103,6 +103,11 @@ Scope {
                         Layout.fillWidth: true
                     }
 
+                    // The player, when there is one.
+                    PlayerStrip {
+                        Layout.fillWidth: true
+                    }
+
                     // The screen time: today's total and apps, and the week's bars.
                     ScreenTimeStrip {
                         Layout.fillWidth: true
