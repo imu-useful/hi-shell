@@ -232,23 +232,16 @@ BarWidget {
             interval: 250
             onTriggered: actionsPopup.shown = false
         }
-        // The window outlives `shown` for the buttons to bounce out.
-        Timer {
-            id: keepAlive
-            interval: 400
-            running: !actionsPopup.shown
-            onTriggered: actionsPopup.alive = false
-        }
-        property bool alive: false
-        onShownChanged: if (shown) alive = true
-
         anchor.item: root
         anchor.rect: Qt.rect(0, 0, root.width, root.height)
         anchor.edges: root.popupEdge
         anchor.gravity: root.popupEdge
-        visible: alive && root.notifying
-        implicitWidth: Math.max(1, card.implicitWidth + 16)
-        implicitHeight: card.implicitHeight + 24
+        // The window stays for as long as the notification does and only the content comes and goes:
+        // creating a window on every hover made it stutter. The mask keeps the empty part click-through.
+        visible: root.notifying
+        implicitWidth: 360
+        implicitHeight: 280
+        mask: Region { item: actionsPopup.shown ? card : null }
         color: "transparent"
 
         HoverHandler {
@@ -258,7 +251,7 @@ BarWidget {
 
         IslandHoverCard {
             id: card
-            x: 8
+            x: (parent.width - width) / 2
             y: root.popupEdge === Edges.Top ? 0 : 14
             showMessage: actionsPopup.shown
             showButtons: actionsPopup.shown

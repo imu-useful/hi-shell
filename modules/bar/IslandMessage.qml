@@ -21,9 +21,9 @@ Rectangle {
     color: Appearance.translucent(Colors.m3surfaceContainerHighest, 0.05)
     border.width: 1
     border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
-    scale: Math.max(0, pop)
+    // Only the background grows: scaling the text would have it drawn again on every frame.
     opacity: Math.min(1, pop)
-    transformOrigin: Item.Top
+    transform: Translate { y: (1 - Math.min(1, root.pop)) * -12 }
 
     ColumnLayout {
         id: column

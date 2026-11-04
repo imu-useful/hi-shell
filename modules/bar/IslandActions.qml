@@ -50,9 +50,10 @@ Row {
             color: modelData.reply ? Colors.m3primary : Colors.m3secondaryContainer
             border.width: 1
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
-            scale: Math.max(0, pop)
+            visible: pop > 0.01
+            // Moves and fades in, with the overshoot as a hop; no scaling, which redraws the text each frame.
             opacity: Math.min(1, pop)
-            transform: Translate { y: button.bob }
+            transform: Translate { y: button.bob + (1 - pop) * 16 }
 
             StyledText {
                 id: label
