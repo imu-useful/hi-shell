@@ -31,7 +31,29 @@ BarWidget {
     contentWidth: vertical ? (music ? artSize : thickness)
                 : notifying ? notification.implicitWidth - padding * 2 : baseWidth + lead
     contentHeight: music ? artSize : column.implicitHeight
-    Behavior on contentWidth { SpatialAnim {} }
+    // A notification lands like a bouncing ball: the island drops in and bounces, and grows past its width.
+    Behavior on contentWidth {
+        SpringAnim { overshoot: root.notifying ? 2.6 : 1.2; duration: root.notifying ? 700 : Appearance.anim.spatial }
+    }
+    property real drop: 0
+    transform: Translate { y: root.drop }
+    onNotifyingChanged: {
+        if (notifying)
+            ball.restart();
+        else
+            ball.stop();
+    }
+    NumberAnimation {
+        id: ball
+        target: root
+        property: "drop"
+        from: -16
+        to: 0
+        duration: Appearance.anim.speed > 0 ? 900 : 0
+        easing.type: Easing.OutBounce
+    }
+    // Hovering the island (with a notification) or its buttons holds the countdown.
+    onHoveredChanged: Island.setHover("bar", hovered)
     onPressedDown: ShellState.startIslandHold()
     onPressedUp: ShellState.endIslandHold()
     onClicked: {
@@ -187,6 +209,58 @@ BarWidget {
         onCleared: {
             Island.expanded = false;
             closedAt = Date.now();
+        }
+    }
+
+    // Hover the island while it shows a notification with buttons: they pop out under it.
+    PopupWindow {
+        id: actionsPopup
+
+        readonly property bool wanted: root.notifying && Island.buttons.length > 0 && (root.hovered || popupHover.hovered)
+        property bool shown: false
+
+        onWantedChanged: {
+            if (wanted) {
+                closeTimer.stop();
+                shown = true;
+            } else {
+                closeTimer.restart();
+            }
+        }
+        Timer {
+            id: closeTimer
+            interval: 250
+            onTriggered: actionsPopup.shown = false
+        }
+        // The window outlives `shown` for the buttons to bounce out.
+        Timer {
+            id: keepAlive
+            interval: 400
+            running: !actionsPopup.shown
+            onTriggered: actionsPopup.alive = false
+        }
+        property bool alive: false
+        onShownChanged: if (shown) alive = true
+
+        anchor.item: root
+        anchor.rect: Qt.rect(0, 0, root.width, root.height)
+        anchor.edges: root.popupEdge
+        anchor.gravity: root.popupEdge
+        visible: alive && root.notifying
+        implicitWidth: Math.max(1, buttons.implicitWidth + 16)
+        implicitHeight: buttons.implicitHeight + 24
+        color: "transparent"
+
+        HoverHandler {
+            id: popupHover
+            onHoveredChanged: Island.setHover("barButtons", hovered)
+        }
+
+        IslandActions {
+            id: buttons
+            x: 8
+            y: root.popupEdge === Edges.Top ? 0 : 14
+            shown: actionsPopup.shown
         }
     }
 }

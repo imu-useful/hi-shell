@@ -37,12 +37,29 @@ Scope {
                     // Ignore the bar's reserved strip: the island sits at the very top of the screen.
                     exclusionMode: ExclusionMode.Ignore
                     implicitWidth: pill.width + 32
-                    implicitHeight: pill.height + 32
-                    mask: Region { item: pill }
+                    implicitHeight: pill.height + 32 + (Island.buttons.length > 0 ? 56 : 0)
+                    mask: Region {
+                        item: pill
+                        regions: [Region { item: actions }]
+                    }
                     color: "transparent"
 
                     WlrLayershell.namespace: "hi-shell-island"
                     WlrLayershell.layer: WlrLayer.Overlay
+
+                    // The notification's buttons float under the island, always out over a fullscreen window.
+                    IslandActions {
+                        id: actions
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: pill.y + pill.height + 10
+                        shown: loader.revealed && Island.notif !== null
+                        floating: true
+                        delay: 350
+
+                        HoverHandler {
+                            onHoveredChanged: Island.setHover("overlayButtons", hovered)
+                        }
+                    }
 
                     Rectangle {
                         id: pill
@@ -59,7 +76,17 @@ Scope {
                         color: Appearance.translucent(Colors.m3surfaceContainerHighest, 0.05)
                         border.width: 1
                         border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
-                        Behavior on slide { SpatialAnim {} }
+                        // Drops in and bounces like a ball, and goes back up quickly.
+                        Behavior on slide {
+                            NumberAnimation {
+                                duration: loader.revealed ? 900 : Appearance.anim.normal
+                                easing.type: loader.revealed ? Easing.OutBounce : Easing.InBack
+                            }
+                        }
+
+                        HoverHandler {
+                            onHoveredChanged: Island.setHover("overlay", hovered)
+                        }
 
                         RowLayout {
                             id: content
