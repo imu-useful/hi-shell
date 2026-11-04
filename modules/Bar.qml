@@ -63,6 +63,15 @@ PanelWindow {
     Behavior on collapse {
         NumberAnimation { duration: Appearance.anim.slow; easing.type: Easing.InOutCubic }
     }
+    // The island's place in the bar (content coordinates): the bar's background narrows to it.
+    readonly property var islandSec: islandSection === "left" ? left : islandSection === "center" ? center : islandSection === "right" ? right : null
+    readonly property Item islandLoader: islandSec?.islandLoader ?? null
+    readonly property bool islandKnown: islandLoader !== null && islandLoader.width > 0
+    readonly property real islandX: islandKnown ? content.x + islandSec.x + islandLoader.x : 0
+    readonly property real islandY: islandKnown ? content.y + islandSec.y + islandLoader.y : 0
+    readonly property real islandW: islandKnown ? islandLoader.width : 0
+    readonly property real islandH: islandKnown ? islandLoader.height : 0
+    readonly property real narrow: islandKnown ? collapse : 0
     // Which section holds the clock, and where (index in it).
     readonly property string islandSection: options.left.includes("clock") ? "left" : options.center.includes("clock") ? "center" : options.right.includes("clock") ? "right" : ""
 
@@ -151,10 +160,15 @@ PanelWindow {
                 y: root.vertical ? 0 : root.introShift
             }
 
+            // The bar's own background; while the island has the bar to itself it narrows to the island.
             Rectangle {
-                anchors.fill: parent
+                readonly property real pad: 6
+                x: root.vertical ? 0 : root.narrow * (root.islandX - pad)
+                y: root.vertical ? root.narrow * (root.islandY - pad) : 0
+                width: root.vertical ? parent.width : parent.width + root.narrow * (root.islandW + pad * 2 - parent.width)
+                height: root.vertical ? parent.height + root.narrow * (root.islandH + pad * 2 - parent.height) : parent.height
                 visible: root.style !== "islands"
-                radius: root.edgeToEdge ? 0 : Appearance.rounding.full
+                radius: (root.edgeToEdge ? 0 : Appearance.rounding.full) * (1 - root.narrow) + Math.min(width, height) / 2 * root.narrow
                 color: root.barColor
             }
 
@@ -228,7 +242,7 @@ PanelWindow {
 
                     Rectangle {
                         required property var modelData
-                        visible: modelData.widgets.length > 0 && (root.vertical ? modelData.height : modelData.width) > 0
+                        visible: modelData.widgets.length > 0 && (root.vertical ? modelData.height : modelData.width) > 2
                         x: modelData.x - 4
                         y: modelData.y - 4
                         width: modelData.width + 8
@@ -255,7 +269,7 @@ PanelWindow {
             flipY: root.vertical ? second : root.position === "bottom"
             size: root.cornerSize
             color: root.barColor
-            opacity: root.intro
+            opacity: root.intro * (1 - root.collapse)
             transform: Translate {
                 x: root.vertical ? root.introShift : 0
                 y: root.vertical ? 0 : root.introShift

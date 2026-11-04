@@ -18,6 +18,8 @@ GridLayout {
     property real collapse: 0
     property int side: 0
     property int islandIndex: -1
+    // The Loader of the island (the clock) when it is in this section.
+    property Item islandLoader: null
 
     flow: bar.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
     rows: bar.vertical ? -1 : 1
@@ -55,6 +57,8 @@ GridLayout {
 
             sourceComponent: root.registry[modelData] ?? null
             Component.onCompleted: {
+                if (isIsland)
+                    root.islandLoader = loader;
                 if (!root.registry[modelData])
                     console.warn(`Bar: unknown widget "${modelData}"`);
             }
