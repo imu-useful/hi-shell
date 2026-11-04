@@ -143,6 +143,7 @@ ColumnLayout {
             enabled: Config.options.wallpapers.frameDance
             icon: "shapes"
             title: Translation.tr("Change shape on the beat")
+            tag: Translation.tr("Beta")
             subtitle: Translation.tr("On every beat the frame morphs into another shape, and goes back to yours when the music stops")
             checked: Config.options.wallpapers.frameBeatShape
             onToggled: checked => Config.options.wallpapers.frameBeatShape = checked

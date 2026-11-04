@@ -10,6 +10,8 @@ Rectangle {
     property string icon: ""
     property string title: ""
     property string subtitle: ""
+    // A small label after the title ("Beta").
+    property string tag: ""
     property bool clickable: false
     default property alias trailing: trailingRow.data
 
@@ -42,9 +44,37 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 0
 
-            StyledText {
+            RowLayout {
                 Layout.fillWidth: true
-                text: root.title
+                spacing: 8
+
+                StyledText {
+                    Layout.fillWidth: !tagLabel.visible
+                    text: root.title
+                    elide: Text.ElideRight
+                }
+                Rectangle {
+                    id: tagLabel
+                    visible: root.tag !== ""
+                    Layout.fillWidth: false
+                    implicitWidth: tagText.implicitWidth + 12
+                    implicitHeight: 18
+                    radius: height / 2
+                    color: Colors.m3tertiaryContainer
+
+                    StyledText {
+                        id: tagText
+                        anchors.centerIn: parent
+                        text: root.tag
+                        font.pixelSize: Appearance.font.size.labelSmall
+                        font.weight: Font.Medium
+                        color: Colors.m3onTertiaryContainer
+                    }
+                }
+                Item {
+                    visible: tagLabel.visible
+                    Layout.fillWidth: true
+                }
             }
             StyledText {
                 Layout.fillWidth: true
