@@ -29,7 +29,7 @@ Scope {
             anchors.right: true
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
-            mask: Region { item: card }
+            mask: Region { item: hitbox }
 
             WlrLayershell.namespace: "hi-shell-display-confirm"
             WlrLayershell.layer: WlrLayer.Overlay
@@ -38,6 +38,17 @@ Scope {
             Shortcut {
                 sequence: "Escape"
                 onActivated: HyprlandSettings.revertPending()
+            }
+
+            // The input region: the card's own size, not the card (it scales while it opens, and the region would
+            // stay at the size it had then: a click near its edge fell outside it and closed the window).
+            Item {
+                id: hitbox
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: card.anchors.topMargin
+                width: card.width
+                height: card.height
             }
 
             Rectangle {

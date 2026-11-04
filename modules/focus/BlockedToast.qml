@@ -58,10 +58,19 @@ Scope {
             implicitWidth: card.width + 32
             implicitHeight: card.height + 32
             color: "transparent"
-            mask: Region { item: card }
+            mask: Region { item: hitbox }
 
             WlrLayershell.namespace: "hi-shell-focus-toast"
             WlrLayershell.layer: WlrLayer.Overlay
+
+            // The input region: the card's own size, not the card (it scales while it opens, and the region would
+            // stay at the size it had then: a click near its edge fell outside it and closed the window).
+            Item {
+                id: hitbox
+                anchors.centerIn: parent
+                width: card.width
+                height: card.height
+            }
 
             Rectangle {
                 id: card

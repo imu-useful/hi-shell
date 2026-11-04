@@ -43,7 +43,7 @@ Scope {
             anchors.right: true
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
-            mask: Region { item: card }
+            mask: Region { item: edge }
 
             WlrLayershell.namespace: "hi-shell-wallpapers"
             WlrLayershell.layer: WlrLayer.Overlay
@@ -58,6 +58,20 @@ Scope {
             Shortcut {
                 sequence: "Escape"
                 onActivated: root.setOpen(false)
+            }
+
+            // The input region: the card's own size, not the card (it scales while it opens, and the region would
+            // stay at the size it had then: a click near its edge fell outside it and closed the window).
+            Item {
+                id: edge
+                anchors.centerIn: parent
+                width: card.width + 24
+                height: card.height + 24
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                }
             }
 
             Rectangle {
