@@ -19,6 +19,10 @@ Singleton {
     property real bass: 0
     property real level: 0
     signal frame(real dt)
+    // A hit of the music: the bass jumps up (at most every 350 ms).
+    signal beat()
+    property real lastBeat: 0
+    property real prevBass: 0
 
     property real last: 0
 
@@ -46,6 +50,12 @@ Singleton {
                 const now = Date.now();
                 const dt = root.last ? Math.min(0.1, (now - root.last) / 1000) : 1 / 30;
                 root.last = now;
+                // Beat: the bass jumps up within a frame (an onset), not too soon after the last one.
+                if (root.bass - root.prevBass > 0.035 && root.bass > 0.1 && now - root.lastBeat > 350) {
+                    root.lastBeat = now;
+                    root.beat();
+                }
+                root.prevBass = root.bass;
                 root.frame(dt);
             }
         }
@@ -54,6 +64,7 @@ Singleton {
                 root.levels = [];
                 root.bass = root.level = 0;
                 root.last = 0;
+                root.prevBass = 0;
             }
         }
     }

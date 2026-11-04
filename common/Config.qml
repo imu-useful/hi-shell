@@ -181,6 +181,8 @@ Singleton {
                 property string frame: ""
                 // The frame turns and pulses to the music while something plays.
                 property bool frameDance: true
+                // On a beat the frame turns into another shape (it morphs), going through a set of shapes.
+                property bool frameBeatShape: true
                 // Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle).
                 // Moved by dragging it in the desktop's edit mode.
                 property real frameX: 0.5

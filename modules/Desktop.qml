@@ -187,7 +187,17 @@ Scope {
             Item {
                 id: frame
                 // In cover mode the cover always gets a frame (a square one without a chosen shape).
-                readonly property string shape: root.frame || (CoverMode.active ? "square" : "")
+                readonly property string baseShape: root.frame || (CoverMode.active ? "square" : "")
+                // On a beat the shape changes to the next of these (morphing), then back to the chosen one.
+                readonly property var beatShapes: ["cookie9", "sunny", "clover4", "star", "flower", "puffy", "softBurst", "clover8", "blob", "hexagon"]
+                property int beats: 0
+                readonly property bool beating: dancing && baseShape !== "" && Config.options.wallpapers.frameBeatShape
+                readonly property string shape: {
+                    if (!beating)
+                        return baseShape;
+                    const cycle = [baseShape, ...beatShapes.filter(x => x !== baseShape)];
+                    return cycle[beats % cycle.length];
+                }
                 visible: root.options.wallpaper && shape !== "" && window.reveal > 0
                 opacity: window.reveal * Math.min(1, window.frameIntro)
                 // Centered at (frameX, frameY) of the screen; `drag` is the offset while it's being moved.
@@ -214,6 +224,12 @@ Scope {
                 }
                 Component.onCompleted: if (dancing) { Beat.users++; counted = true; }
                 Component.onDestruction: if (counted) Beat.users--
+
+                Connections {
+                    target: Beat
+                    enabled: frame.beating
+                    function onBeat() { frame.beats++; }
+                }
 
                 Connections {
                     target: Beat

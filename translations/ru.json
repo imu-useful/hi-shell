@@ -1017,5 +1017,7 @@
     "While the island shows music or a notification the other widgets leave: the left ones go right, the right ones go left": "Пока остров показывает музыку или уведомление, остальные виджеты уходят: левые вправо, правые влево",
     "Earlier days": "Прошлые дни",
     "Volume and brightness": "Громкость и яркость",
-    "Volume, brightness, microphone and keyboard layout changes appear in the island, not as a separate pill": "Изменения громкости, яркости, микрофона и раскладки показываются в острове, а не отдельной плашкой"
+    "Volume, brightness, microphone and keyboard layout changes appear in the island, not as a separate pill": "Изменения громкости, яркости, микрофона и раскладки показываются в острове, а не отдельной плашкой",
+    "Change shape on the beat": "Менять форму в такт",
+    "On every beat the frame morphs into another shape, and goes back to yours when the music stops": "На каждый бит рамка перетекает в другую форму и возвращается к вашей, когда музыка останавливается"
 }
