@@ -14,6 +14,9 @@ Item {
 
     readonly property var notif: Island.notif
     property bool compact: false
+    // The time left in coarse steps: every change redraws the bar, and the compositor blurs it again
+    // behind it each time, which an integrated GPU feels. 24 steps are enough for a bar this short.
+    readonly property real timeLeft: Math.round((notif?.remaining ?? 0) * 24) / 24
 
     readonly property string iconSource: {
         const icon = notif?.appIcon ?? "";
@@ -66,7 +69,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 3
         x: parent.height / 2
-        width: Math.max(0, (parent.width - parent.height) * (root.notif?.remaining ?? 0))
+        width: Math.max(0, (parent.width - parent.height) * root.timeLeft)
         height: 3
         radius: 1.5
         color: Colors.m3primary
