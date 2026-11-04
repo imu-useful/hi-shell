@@ -15,7 +15,20 @@ ColumnLayout {
     readonly property int todayTotal: todays.reduce((sum, a) => sum + a.seconds, 0)
     readonly property int topSeconds: todays.length ? todays[0].seconds : 1
     readonly property var shownApps: todays.slice(0, 12)
-    readonly property var week: ScreenTime.week()
+    // The chart: how many weeks back (0 to 3) and the day picked in it ("" = none).
+    property int weeksAgo: 0
+    property string pickedDay: ""
+    readonly property var week: ScreenTime.week(weeksAgo)
+    readonly property var pickedApps: pickedDay ? ScreenTime.totals(pickedDay).slice(0, 12) : []
+    readonly property int pickedTotal: pickedApps.length ? ScreenTime.totals(pickedDay).reduce((sum, a) => sum + a.seconds, 0) : 0
+    function dayLabel(key, format) {
+        return new Date(key + "T12:00").toLocaleDateString(Translation.locale, format);
+    }
+    function weekTitle() {
+        if (weeksAgo === 0)
+            return Translation.tr("The last 7 days");
+        return `${dayLabel(week[0].key, "d MMM")} – ${dayLabel(week[6].key, "d MMM")}`;
+    }
     readonly property int weekPeak: Math.max(1, ...week.map(d => d.seconds))
 
     function duration(seconds) {
@@ -46,6 +59,57 @@ ColumnLayout {
         return AppIcons.path(app);
     }
 
+    // One app: icon, name, time and a bar against `peak` (the most used app's seconds).
+    component AppRow: RowLayout {
+        required property var modelData
+        property int peak: 1
+
+        Layout.fillWidth: true
+        Layout.leftMargin: 16
+        Layout.rightMargin: 16
+        spacing: 12
+
+        Image {
+            Layout.preferredWidth: 28
+            Layout.preferredHeight: 28
+            source: root.appIcon(modelData.app)
+            sourceSize.width: 28
+            sourceSize.height: 28
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+            visible: source !== ""
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 4
+            RowLayout {
+                Layout.fillWidth: true
+                StyledText {
+                    Layout.fillWidth: true
+                    text: root.appName(modelData.app)
+                    elide: Text.ElideRight
+                }
+                StyledText {
+                    text: root.duration(modelData.seconds)
+                    font.pixelSize: Appearance.font.size.labelMedium
+                    color: Colors.m3onSurfaceVariant
+                }
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 6
+                radius: 3
+                color: Colors.m3surfaceContainerHighest
+                Rectangle {
+                    width: parent.width * modelData.seconds / peak
+                    height: parent.height
+                    radius: 3
+                    color: Colors.m3primary
+                }
+            }
+        }
+    }
+
     Section {
         icon: "hourglass_top"
         title: Translation.tr("Today")
@@ -60,59 +124,46 @@ ColumnLayout {
         Repeater {
             model: root.shownApps
 
-            RowLayout {
-                required property var modelData
-                Layout.fillWidth: true
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-                spacing: 12
-
-                Image {
-                    Layout.preferredWidth: 28
-                    Layout.preferredHeight: 28
-                    source: root.appIcon(modelData.app)
-                    sourceSize.width: 28
-                    sourceSize.height: 28
-                    fillMode: Image.PreserveAspectFit
-                    asynchronous: true
-                    visible: source !== ""
-                }
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 4
-                    RowLayout {
-                        Layout.fillWidth: true
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: root.appName(modelData.app)
-                            elide: Text.ElideRight
-                        }
-                        StyledText {
-                            text: root.duration(modelData.seconds)
-                            font.pixelSize: Appearance.font.size.labelMedium
-                            color: Colors.m3onSurfaceVariant
-                        }
-                    }
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 6
-                        radius: 3
-                        color: Colors.m3surfaceContainerHighest
-                        Rectangle {
-                            width: parent.width * modelData.seconds / root.topSeconds
-                            height: parent.height
-                            radius: 3
-                            color: Colors.m3primary
-                        }
-                    }
-                }
+            AppRow {
+                peak: root.topSeconds
             }
         }
     }
 
     Section {
         icon: "calendar_view_week"
-        title: Translation.tr("The last 7 days")
+        title: Translation.tr("Earlier days")
+
+        // The week shown, with arrows to the weeks before it (up to three).
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 8
+            Layout.rightMargin: 8
+            spacing: 4
+
+            IconButton {
+                icon: "chevron_left"
+                enabled: root.weeksAgo < 3
+                onClicked: {
+                    root.weeksAgo++;
+                    root.pickedDay = "";
+                }
+            }
+            StyledText {
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                text: root.weekTitle()
+                font.weight: Font.Medium
+            }
+            IconButton {
+                icon: "chevron_right"
+                enabled: root.weeksAgo > 0
+                onClicked: {
+                    root.weeksAgo--;
+                    root.pickedDay = "";
+                }
+            }
+        }
 
         RowLayout {
             Layout.fillWidth: true
@@ -125,14 +176,18 @@ ColumnLayout {
                 model: root.week
 
                 ColumnLayout {
+                    id: day
+
                     required property var modelData
+                    readonly property bool picked: root.pickedDay === modelData.key
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: 4
 
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: modelData.seconds > 0 ? root.duration(modelData.seconds) : ""
+                        text: day.modelData.seconds > 0 ? root.duration(day.modelData.seconds) : ""
                         font.pixelSize: Appearance.font.size.labelSmall
                         color: Colors.m3onSurfaceVariant
                     }
@@ -142,17 +197,45 @@ ColumnLayout {
                         Rectangle {
                             anchors.bottom: parent.bottom
                             width: parent.width
-                            height: Math.max(modelData.seconds > 0 ? 4 : 0, parent.height * modelData.seconds / root.weekPeak)
+                            height: Math.max(day.modelData.seconds > 0 ? 4 : 0, parent.height * day.modelData.seconds / root.weekPeak)
                             radius: 6
-                            color: modelData.key === ScreenTime.today ? Colors.m3primary : Colors.m3primaryContainer
+                            color: day.modelData.key === ScreenTime.today ? Colors.m3primary : Colors.m3primaryContainer
+                            border.width: day.picked ? 2 : 0
+                            border.color: Colors.m3onSurface
+                            Behavior on height { EffectAnim {} }
                         }
                     }
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: new Date(modelData.key + "T12:00").toLocaleDateString(Translation.locale, "dd")
+                        text: root.dayLabel(day.modelData.key, "dd")
                         font.pixelSize: Appearance.font.size.labelSmall
+                        font.weight: day.picked ? Font.Bold : Font.Normal
+                    }
+
+                    // Tap a day for the apps it was spent in.
+                    TapHandler {
+                        onTapped: root.pickedDay = day.picked ? "" : day.modelData.key
+                    }
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
+            }
+        }
+
+        ListRow {
+            Layout.fillWidth: true
+            visible: root.pickedDay !== ""
+            icon: "event"
+            title: root.pickedDay ? root.dayLabel(root.pickedDay, "dddd, d MMMM") : ""
+            subtitle: root.pickedTotal > 0 ? root.duration(root.pickedTotal) : Translation.tr("Nothing counted yet")
+        }
+
+        Repeater {
+            model: root.pickedApps
+
+            AppRow {
+                peak: root.pickedApps.length ? root.pickedApps[0].seconds : 1
             }
         }
     }

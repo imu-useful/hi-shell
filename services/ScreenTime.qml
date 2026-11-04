@@ -40,12 +40,13 @@ Singleton {
         const day = data.days[key] ?? {};
         return Object.entries(day).map(([app, seconds]) => ({ app, seconds })).sort((a, b) => b.seconds - a.seconds);
     }
-    // The last 7 days, oldest first: [{ key, seconds }].
-    function week() {
+    // The last 7 days, oldest first: [{ key, seconds }]. `weeksAgo` moves it back by whole weeks
+    // (the data is kept for `daysKept` days, so up to 3 weeks back is whole).
+    function week(weeksAgo = 0) {
         const out = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
-            d.setDate(d.getDate() - i);
+            d.setDate(d.getDate() - i - 7 * weeksAgo);
             const key = dayKey(d);
             out.push({ key, seconds: Object.values(data.days[key] ?? {}).reduce((sum, s) => sum + s, 0) });
         }
