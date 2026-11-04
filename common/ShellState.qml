@@ -23,6 +23,8 @@ Singleton {
     property real islandHold: 0
     property int islandSwitches: 0
     property bool islandHeld: false
+    // Something for the island to show over a fullscreen window (a notification, the camera or mic in use).
+    property bool islandAlert: false
     function startIslandHold() {
         islandHeld = false;
         islandUnwind.stop();

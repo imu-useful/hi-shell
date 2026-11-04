@@ -14,7 +14,7 @@ ShellRoot {
 
     // Singletons load lazily; create the background services (and their IPC
     // handlers) at startup: palette, notification daemon, battery warnings, ...
-    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets, LockScreen, CoverMode, Displays, TerminalColors, Focus, FocusBlocker, FocusStats, PowerSaver, WaitMode, ScreenTime, Distro, Viewing, AdultFilter, KeywordFilter, DefaultApps]
+    readonly property list<QtObject> services: [Theme, Notifications, Battery, Brightness, Mpris, Weather, Updates, Tray, Fullscreen, HyprlandXkb, Toggles, Todo, Timers, Claude, Clipboard, Notes, WorldClock, Wallpapers, AutoMode, HyprlandSettings, Session, Presets, LockScreen, CoverMode, Displays, TerminalColors, Focus, FocusBlocker, FocusStats, PowerSaver, WaitMode, ScreenTime, Distro, Viewing, AdultFilter, KeywordFilter, DefaultApps]
 
     // Startup animation: everything comes in once the wallpaper is on screen (Desktop
     // starts it); this is the fallback when there's no wallpaper or it's slow to load.
@@ -33,6 +33,8 @@ ShellRoot {
 
         Bar {}
     }
+
+    IslandOverlay {}
 
     Launcher {}
 
