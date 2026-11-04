@@ -52,6 +52,7 @@ PanelWindow {
         notifications: notifications,
         visualizer: visualizer,
         divider: divider,
+        island: island,
         focus: focus
     })
 
@@ -92,6 +93,7 @@ PanelWindow {
     Component { id: notifications; NotificationsWidget {} }
     Component { id: visualizer; Visualizer {} }
     Component { id: divider; Divider {} }
+    Component { id: island; DynamicIsland {} }
     Component { id: focus; FocusWidget {} }
 
     anchors.top: position !== "bottom"

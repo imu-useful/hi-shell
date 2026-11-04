@@ -89,7 +89,7 @@ Singleton {
                 property int height: 40
                 property int margin: 6
                 // Widget ids: launcher, workspaces, activeWindow, media, resources, clock, weather, tray,
-                // systemIcons, notifications, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
+                // systemIcons, notifications, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider, island
                 property list<string> left: ["launcher", "activeWindow"]
                 property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
                 property list<string> right: ["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]
@@ -107,6 +107,10 @@ Singleton {
                     // Qt date format strings
                     property string timeFormat: "HH:mm"
                     property string dateFormat: "ddd, dd/MM"
+                }
+                property JsonObject island: JsonObject {
+                    // How long a press must be held to switch the island's state (ms).
+                    property int holdDuration: 2000
                 }
                 property JsonObject media: JsonObject {
                     property int maxWidth: 220
