@@ -3,10 +3,13 @@ import QtQuick.Layouts
 import Quickshell
 import qs.common
 import qs.common.widgets
+import qs.common.shapes
+import qs.services
 
 // Date and time (formats in bar.clock); click toggles the calendar popup. This pill is also the
 // Dynamic Island: held for bar.island.holdDuration it draws a ring along its border and switches
-// the island's state (ShellState.islandSwitches) instead of opening the calendar.
+// the island's state (Island.mode: the clock, or the music player) instead of opening the calendar.
+// In the music state it shows the cover and the track, and a tap opens the player's controls.
 BarWidget {
     id: root
 
@@ -15,13 +18,20 @@ BarWidget {
     clickable: true
     active: ShellState.calendarOpen
     padding: 4
-    contentWidth: vertical ? thickness : row.implicitWidth + 6
-    contentHeight: column.implicitHeight
+    readonly property bool music: Island.mode === "music"
+    readonly property int artSize: thickness - 6
+    contentWidth: vertical ? (music ? artSize : thickness) : (music ? musicRow.implicitWidth + 6 : row.implicitWidth + 6)
+    contentHeight: music ? artSize : column.implicitHeight
+    Behavior on contentWidth { SpatialAnim {} }
     onPressedDown: ShellState.startIslandHold()
     onPressedUp: ShellState.endIslandHold()
     onClicked: {
-        if (!ShellState.islandHeld)
-            ShellState.calendarOpen = !ShellState.calendarOpen;
+        if (!ShellState.islandHeld) {
+            if (music)
+                Island.expanded = !Island.expanded;
+            else
+                ShellState.calendarOpen = !ShellState.calendarOpen;
+        }
         ShellState.islandHeld = false;
     }
 
@@ -50,7 +60,7 @@ BarWidget {
 
     RowLayout {
         id: row
-        visible: !root.vertical
+        visible: !root.vertical && !root.music
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         spacing: 8
@@ -81,7 +91,7 @@ BarWidget {
 
     ColumnLayout {
         id: column
-        visible: root.vertical
+        visible: root.vertical && !root.music
         anchors.centerIn: parent
         spacing: -2
 
@@ -96,5 +106,46 @@ BarWidget {
                 font.weight: Font.DemiBold
             }
         }
+    }
+
+    // Music state: the cover, "title • artist", and the paused mark.
+    RowLayout {
+        id: musicRow
+        visible: root.music
+        anchors.centerIn: parent
+        spacing: 8
+
+        ShapeImage {
+            Layout.preferredWidth: root.artSize
+            Layout.preferredHeight: root.artSize
+            shape: "cookie7"
+            source: Mpris.artUrl
+            opacity: Mpris.playing ? 1 : 0.6
+        }
+
+        StyledText {
+            visible: !root.vertical
+            Layout.maximumWidth: Config.options.bar.media.maxWidth
+            text: Mpris.artist ? `${Mpris.title} • ${Mpris.artist}` : Mpris.title
+            font.pixelSize: Appearance.font.size.normal
+            elide: Text.ElideRight
+        }
+
+        MaterialIcon {
+            visible: !root.vertical && !Mpris.playing
+            icon: "pause"
+            fill: 1
+            iconSize: 16
+            color: Colors.m3onSurfaceVariant
+        }
+    }
+
+    // A tap in the music state opens the player's controls under the island.
+    StyledPopup {
+        target: root
+        pinned: Island.musicExpanded
+        edge: root.popupEdge
+
+        MediaControls {}
     }
 }
