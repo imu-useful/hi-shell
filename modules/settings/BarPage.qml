@@ -350,6 +350,14 @@ ColumnLayout {
         }
         SwitchRow {
             enabled: root.bar.island.enabled
+            icon: "volume_up"
+            title: Translation.tr("Volume and brightness")
+            subtitle: Translation.tr("Volume, brightness, microphone and keyboard layout changes appear in the island, not as a separate pill")
+            checked: root.bar.island.osd
+            onToggled: checked => root.bar.island.osd = checked
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
             icon: "mic"
             title: Translation.tr("Camera and microphone indicator")
             subtitle: Translation.tr("Green: microphone, orange: camera, yellow: both")

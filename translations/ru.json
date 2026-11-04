@@ -1015,5 +1015,7 @@
     "The island floats at the top of the screen for notifications and the indicator": "Остров парит вверху экрана для уведомлений и индикатора",
     "Clear the bar": "Очищать панель",
     "While the island shows music or a notification the other widgets leave: the left ones go right, the right ones go left": "Пока остров показывает музыку или уведомление, остальные виджеты уходят: левые вправо, правые влево",
-    "Earlier days": "Прошлые дни"
+    "Earlier days": "Прошлые дни",
+    "Volume and brightness": "Громкость и яркость",
+    "Volume, brightness, microphone and keyboard layout changes appear in the island, not as a separate pill": "Изменения громкости, яркости, микрофона и раскладки показываются в острове, а не отдельной плашкой"
 }

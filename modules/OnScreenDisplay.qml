@@ -26,6 +26,11 @@ Scope {
     function show(icon, label, value) {
         if (!armed)
             return;
+        // The Dynamic Island shows it, when it can.
+        if (Island.takesOsd) {
+            Island.showOsd(icon, label, value);
+            return;
+        }
         root.icon = icon;
         root.label = label;
         root.value = value;

@@ -100,6 +100,9 @@ Scope {
                                 visible: Island.privacy
                                 Layout.alignment: Qt.AlignVCenter
                             }
+                            IslandOsd {
+                                visible: Island.showsOsd
+                            }
                             IslandNotification {
                                 visible: Island.notif !== null
                                 Layout.preferredWidth: implicitWidth

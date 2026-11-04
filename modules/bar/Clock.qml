@@ -25,15 +25,19 @@ BarWidget {
     readonly property int artSize: thickness - 6
     property real closedAt: 0
     readonly property bool notifying: Island.notif !== null
+    // Volume / brightness for a moment (a notification comes first).
+    readonly property bool osding: Island.showsOsd
+    readonly property bool takenOver: notifying || osding
     // Room for the privacy pill at the start (horizontal bars only).
-    readonly property real lead: Island.privacy && !notifying && !vertical ? privacy.width + 8 : 0
+    readonly property real lead: Island.privacy && !takenOver && !vertical ? privacy.width + 8 : 0
     readonly property real baseWidth: music ? musicRow.implicitWidth + 6 : row.implicitWidth + 6
     contentWidth: vertical ? (music ? artSize : thickness)
-                : notifying ? notification.implicitWidth - padding * 2 : baseWidth + lead
+                : notifying ? notification.implicitWidth - padding * 2
+                : osding ? osdView.implicitWidth + 12 : baseWidth + lead
     contentHeight: music ? artSize : column.implicitHeight
     // A notification lands like a bouncing ball: the island drops in and bounces, and grows past its width.
     Behavior on contentWidth {
-        SpringAnim { overshoot: root.notifying ? 2.6 : 1.2; duration: root.notifying ? 700 : Appearance.anim.spatial }
+        SpringAnim { overshoot: root.takenOver ? 2.6 : 1.2; duration: root.takenOver ? 700 : Appearance.anim.spatial }
     }
     transform: Translate { y: Island.drop }
     // Hovering the island (with a notification) or its buttons holds the countdown.
@@ -87,7 +91,7 @@ BarWidget {
 
     RowLayout {
         id: row
-        visible: !root.vertical && !root.music && !root.notifying
+        visible: !root.vertical && !root.music && !root.takenOver
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         spacing: 8
@@ -118,7 +122,7 @@ BarWidget {
 
     ColumnLayout {
         id: column
-        visible: root.vertical && !root.music && !root.notifying
+        visible: root.vertical && !root.music && !root.takenOver
         anchors.centerIn: parent
         spacing: -2
 
@@ -138,7 +142,7 @@ BarWidget {
     // Music state: the cover, "title • artist", and the paused mark.
     RowLayout {
         id: musicRow
-        visible: root.music && !root.notifying
+        visible: root.music && !root.takenOver
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: root.lead / 2
         spacing: 8
@@ -170,9 +174,16 @@ BarWidget {
 
     PrivacyPill {
         id: privacy
-        visible: Island.privacy && !root.notifying && !root.vertical
+        visible: Island.privacy && !root.takenOver && !root.vertical
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
+    }
+
+    IslandOsd {
+        id: osdView
+        visible: root.osding
+        anchors.centerIn: parent
+        compact: root.vertical
     }
 
     IslandNotification {

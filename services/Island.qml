@@ -29,6 +29,31 @@ Singleton {
 
     // The notification the island shows now (the newest one it handles), null when none.
     readonly property var notif: Notifications.popups.find(n => handles(n)) ?? null
+    // Volume, brightness, microphone and keyboard layout changes (the on-screen display hands them over
+    // instead of its own pill): shown for a moment, unless a notification has the island.
+    property var osd: ({ icon: "", label: "", value: -1 })
+    property bool osdActive: false
+    readonly property bool takesOsd: enabled && options.osd && (options.fullscreen || !Fullscreen.on(Hyprland.focusedMonitor?.name ?? ""))
+    readonly property bool showsOsd: osdActive && notif === null
+    function showOsd(icon, label, value) {
+        osd = { icon, label, value };
+        osdActive = true;
+        osdTimer.restart();
+    }
+    Timer {
+        id: osdTimer
+        interval: 1500
+        onTriggered: root.osdActive = false
+    }
+    onShowsOsdChanged: {
+        if (showsOsd) {
+            ball.restart();
+        } else if (notif === null) {
+            ball.stop();
+            drop = 0;
+        }
+    }
+
     // A notification lands like a ball: this goes from above the island's place (negative, in px) down to 0,
     // bouncing. The clock and the bar's background under it move by it.
     property real drop: 0
@@ -81,7 +106,7 @@ Singleton {
     readonly property bool compact: enabled && options.hideBar && (mode === "music" || notif !== null)
     // Something to show over a fullscreen window.
     readonly property bool privacy: enabled && options.privacy && Privacy.active
-    readonly property bool alertActive: notif !== null || privacy
+    readonly property bool alertActive: notif !== null || privacy || osdActive
 
     // Notifications handed back to their popup card (the Reply button needs its text field).
     property var released: []

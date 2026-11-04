@@ -120,6 +120,8 @@ Singleton {
                     property bool music: true
                     // Show notifications in the island instead of as popup cards.
                     property bool notifications: true
+                    // Volume, brightness, microphone and keyboard layout changes, instead of the display's own pill.
+                    property bool osd: true
                     // The camera / microphone indicator.
                     property bool privacy: true
                     // Float at the top of the screen over a fullscreen window (the bar is hidden there).
