@@ -58,17 +58,20 @@ ColumnLayout {
             width: parent.width
             spacing: 12
 
-            // Empty state: a game to play (sidebar.game: Chrome's T-rex, snake or minesweeper).
+            // Empty state: a game to play (sidebar.game: Chrome's T-rex, snake, minesweeper, 2048, flappy or memory).
             Loader {
                 visible: Notifications.list.length === 0
                 active: visible
                 Layout.fillWidth: true
                 Layout.topMargin: 16
-                sourceComponent: ({ snake: snake, minesweeper: minesweeper })[Config.options.sidebar.game] ?? dino
+                sourceComponent: ({ snake: snake, minesweeper: minesweeper, game2048: game2048, flappy: flappy, memory: memory })[Config.options.sidebar.game] ?? dino
             }
             Component { id: dino; DinoGame {} }
             Component { id: snake; SnakeGame {} }
             Component { id: minesweeper; MinesweeperGame {} }
+            Component { id: game2048; Game2048 {} }
+            Component { id: flappy; FlappyGame {} }
+            Component { id: memory; MemoryGame {} }
 
             Repeater {
                 model: ScriptModel {

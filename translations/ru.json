@@ -1020,5 +1020,12 @@
     "Volume, brightness, microphone and keyboard layout changes appear in the island, not as a separate pill": "Изменения громкости, яркости, микрофона и раскладки показываются в острове, а не отдельной плашкой",
     "Change shape on the beat": "Менять форму в такт",
     "On every beat the frame morphs into another shape, and goes back to yours when the music stops": "На каждый бит рамка перетекает в другую форму и возвращается к вашей, когда музыка останавливается",
-    "Beta": "Бета"
+    "Beta": "Бета",
+    "Flappy": "Птичка",
+    "Score": "Счёт",
+    "Moves": "Ходы",
+    "No moves left": "Ходов больше нет",
+    "Click to play flappy": "Нажмите, чтобы сыграть в птичку",
+    "All pairs found in %1 moves": "Все пары найдены за %1 ходов",
+    "Click to play again": "Нажмите, чтобы сыграть снова"
 }
