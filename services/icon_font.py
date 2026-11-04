@@ -25,6 +25,8 @@ import re
 import subprocess
 import sys
 
+# The shell uses a few hundred; fewer than this means the scan is not of the shell.
+MIN_ICONS = 100
 WORD = re.compile(r"""["'`]([a-z][a-z0-9_]{1,60})["'`]""")
 TEMPLATE = re.compile(r"`([a-z0-9_]*\$\{[^`]*\}[a-z0-9_]*)`")
 
@@ -115,6 +117,11 @@ def main():
     font = TTFont(src)
     names = ligatures(font)
     used = pick(names)
+    # A scan that finds next to nothing is not the shell's own directory (a test config, a folder of symlinks):
+    # the font made from it would replace the good one in the shared cache and break the running shell's icons.
+    if len(used) < MIN_ICONS:
+        print(f"icon_font: only {len(used)} icons found in {args.scan}, the font is left alone", file=sys.stderr)
+        return 1
     key = key_of(used)
     os.makedirs(args.out, exist_ok=True)
     with open(names_cache, "w") as f:
