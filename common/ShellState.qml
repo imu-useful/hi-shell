@@ -17,13 +17,12 @@ Singleton {
     property bool calendarOpen: false
 
     // Dynamic Island hold-to-switch, shared because the clock widget drives it too: a press on
-    // the island or on the clock fills islandHold (0..1) over bar.island.holdDuration; when it
+    // the clock (the island) fills islandHold (0..1) over bar.island.holdDuration; when it
     // closes the islands move on (islandSwitches counts it) and the press is spent (islandHeld),
-    // so the release isn't also a tap. Only with an island in a bar (islandCount).
+    // so the release isn't also a tap.
     property real islandHold: 0
     property int islandSwitches: 0
     property bool islandHeld: false
-    property int islandCount: 0
     function startIslandHold() {
         islandHeld = false;
         islandUnwind.stop();

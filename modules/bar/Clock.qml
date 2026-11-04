@@ -4,7 +4,9 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 
-// Date and time (formats in bar.clock); click toggles the calendar popup.
+// Date and time (formats in bar.clock); click toggles the calendar popup. This pill is also the
+// Dynamic Island: held for bar.island.holdDuration it draws a ring along its border and switches
+// the island's state (ShellState.islandSwitches) instead of opening the calendar.
 BarWidget {
     id: root
 
@@ -15,17 +17,30 @@ BarWidget {
     padding: 4
     contentWidth: vertical ? thickness : row.implicitWidth + 6
     contentHeight: column.implicitHeight
-    // Held for the island's hold time, the clock switches the Dynamic Island instead of opening the calendar.
-    onPressedDown: {
-        ShellState.islandHeld = false;
-        if (ShellState.islandCount > 0)
-            ShellState.startIslandHold();
-    }
+    onPressedDown: ShellState.startIslandHold()
     onPressedUp: ShellState.endIslandHold()
     onClicked: {
         if (!ShellState.islandHeld)
             ShellState.calendarOpen = !ShellState.calendarOpen;
         ShellState.islandHeld = false;
+    }
+
+    Connections {
+        target: ShellState
+        function onIslandSwitchesChanged() { pulse.restart(); }
+    }
+
+    SequentialAnimation {
+        id: pulse
+        NumberAnimation { target: root; property: "scale"; to: 1.06; duration: Appearance.anim.fast; easing.type: Easing.OutCubic }
+        NumberAnimation { target: root; property: "scale"; to: 1; duration: Appearance.anim.normal; easing.type: Easing.OutBack }
+    }
+
+    HoldRing {
+        parent: root
+        anchors.fill: parent
+        z: 10
+        progress: ShellState.islandHold
     }
 
     SystemClock {
