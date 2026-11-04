@@ -983,5 +983,17 @@
     "Ask %1…": "Спросить %1…",
     "Claude CLI models": "Модели Claude CLI",
     "Loading the models…": "Загружаю модели…",
-    "Delete this language": "Удалить этот язык"
+    "Delete this language": "Удалить этот язык",
+    "Default apps": "Приложения по умолчанию",
+    "Web browser": "Браузер",
+    "File manager": "Файловый менеджер",
+    "Email": "Почта",
+    "Images": "Картинки",
+    "Videos": "Видео",
+    "Music": "Музыка",
+    "PDF": "PDF",
+    "Text": "Текст",
+    "Opens with": "Открывается в",
+    "Not set": "Не выбрано",
+    "No installed app opens this": "Нет установленных программ для этого"
 }
