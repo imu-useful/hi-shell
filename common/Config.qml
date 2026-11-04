@@ -112,6 +112,8 @@ Singleton {
                 // camera / microphone indicator, and floats over fullscreen windows.
                 property JsonObject island: JsonObject {
                     property bool enabled: true
+                    // While it shows music or a notification the other widgets leave the bar (they go towards the island and fade).
+                    property bool hideBar: true
                     // How long a press must be held to switch its state (ms).
                     property int holdDuration: 2000
                     // The music player state (a hold switches to it).

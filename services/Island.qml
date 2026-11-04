@@ -29,6 +29,8 @@ Singleton {
 
     // The notification the island shows now (the newest one it handles), null when none.
     readonly property var notif: Notifications.popups.find(n => handles(n)) ?? null
+    // The island takes the whole bar (the other widgets leave) while it shows music or a notification.
+    readonly property bool compact: enabled && options.hideBar && (mode === "music" || notif !== null)
     // Something to show over a fullscreen window.
     readonly property bool privacy: enabled && options.privacy && Privacy.active
     readonly property bool alertActive: notif !== null || privacy

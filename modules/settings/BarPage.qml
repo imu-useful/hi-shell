@@ -326,6 +326,14 @@ ColumnLayout {
         }
         SwitchRow {
             enabled: root.bar.island.enabled
+            icon: "unfold_less"
+            title: Translation.tr("Clear the bar")
+            subtitle: Translation.tr("While the island shows music or a notification the other widgets leave: the left ones go right, the right ones go left")
+            checked: root.bar.island.hideBar
+            onToggled: checked => root.bar.island.hideBar = checked
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
             icon: "music_note"
             title: Translation.tr("Music player")
             subtitle: Translation.tr("A hold switches between the clock and the player; a tap opens its controls")

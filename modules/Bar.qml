@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
 import qs.modules.bar
+import qs.services as Services
 
 // The bar, one per screen (Variants in shell.qml). Layout, position and style
 // come from Config bar.*: widget ids in left / center / right, position
@@ -54,6 +55,16 @@ PanelWindow {
         divider: divider,
         focus: focus
     })
+
+    // The Dynamic Island (the clock widget) takes the bar over while it shows music or a notification:
+    // the other widgets go towards it and fade out, and come back after.
+    readonly property bool compact: Services.Island.compact && hasClock
+    property real collapse: compact ? 1 : 0
+    Behavior on collapse {
+        NumberAnimation { duration: Appearance.anim.slow; easing.type: Easing.InOutCubic }
+    }
+    // Which section holds the clock, and where (index in it).
+    readonly property string islandSection: options.left.includes("clock") ? "left" : options.center.includes("clock") ? "center" : options.right.includes("clock") ? "right" : ""
 
     // Focus Mode keeps only workspaces, system icons and the clock, with the session's
     // timer next to the clock (or in the middle if the bar has no clock).
@@ -175,6 +186,9 @@ PanelWindow {
                     bar: root.context
                     widgets: root.section(root.options.left, false)
                     registry: root.registry
+                    collapse: root.collapse
+                    side: root.islandSection === "" || root.islandSection === "left" ? 0 : (0 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)
+                    islandIndex: root.islandSection === "left" ? widgets.indexOf("clock") : -1
                     // Fill up to the centered section; elidable widgets shrink.
                     width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.centerStart - 12))
                     height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.centerStart - 12)) : content.height
@@ -185,6 +199,9 @@ PanelWindow {
                     bar: root.context
                     widgets: root.section(root.options.center, true)
                     registry: root.registry
+                    collapse: root.collapse
+                    side: root.islandSection === "" || root.islandSection === "center" ? 0 : (1 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)
+                    islandIndex: root.islandSection === "center" ? widgets.indexOf("clock") : -1
                     x: root.vertical ? 0 : (content.width - width) / 2
                     y: root.vertical ? (content.height - height) / 2 : 0
                     width: root.vertical ? content.width : Math.min(implicitWidth, content.width)
@@ -196,6 +213,9 @@ PanelWindow {
                     bar: root.context
                     widgets: root.section(root.options.right, false)
                     registry: root.registry
+                    collapse: root.collapse
+                    side: root.islandSection === "" || root.islandSection === "right" ? 0 : (2 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)
+                    islandIndex: root.islandSection === "right" ? widgets.indexOf("clock") : -1
                     width: root.vertical ? content.width : Math.min(implicitWidth, Math.max(0, content.length - content.centerEnd - 12))
                     height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.length - content.centerEnd - 12)) : content.height
                     x: root.vertical ? 0 : content.width - width
