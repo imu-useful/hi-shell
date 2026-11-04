@@ -28,7 +28,7 @@ hl.on("input.keyboard.key", function(keycode, time, pressed)
             superTap = nil
             local moved = math.abs(now.cursor.x - tap.cursor.x) + math.abs(now.cursor.y - tap.cursor.y)
             if time - tap.time < 500 and now.ws == tap.ws and now.win == tap.win and moved < 8 then
-                hl.exec_cmd("qs -c hi-shell ipc call launcher toggle")
+                hl.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh launcher")
             end
         end
     elseif pressed == 1 then

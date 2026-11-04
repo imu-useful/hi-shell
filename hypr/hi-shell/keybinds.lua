@@ -35,7 +35,6 @@ if hl.unbind then
 end
 
 -- Launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh launcher"), { description = "hi-shell: Toggle app launcher" })
 hl.bind("SUPER + V", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher search ';'"), { description = "hi-shell: Clipboard history" })
 hl.bind("SUPER + Period", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher search ':'"), { description = "hi-shell: Emoji" })
 
