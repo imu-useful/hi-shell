@@ -225,11 +225,17 @@ Scope {
                 Component.onCompleted: if (dancing) { Beat.users++; counted = true; }
                 Component.onDestruction: if (counted) Beat.users--
 
+                // The shape changes on the beat of the tempo Beat has found (not before it has: a few seconds
+                // into a track), a little ahead of it, with a quick morph so it is done when the beat lands.
                 Connections {
                     target: Beat
-                    enabled: frame.beating
-                    function onBeat() { frame.beats++; }
+                    enabled: frame.beating && Beat.locked
+                    function onTick(count) {
+                        if (count % Beat.stride === 0)
+                            frame.beats++;
+                    }
                 }
+                readonly property int morphTime: beating && Beat.locked ? Beat.lead + 110 : Appearance.anim.spatial
 
                 Connections {
                     target: Beat
@@ -252,11 +258,15 @@ Scope {
                     anchors.margins: -6
                     rotation: frame.spin
                     shape: frame.shape || "circle"
+                    morphDuration: frame.morphTime
+                    morphCurve: frame.beating && Beat.locked ? Appearance.anim.emphasizedDecel : Appearance.anim.spatialFast
                     color: Qt.alpha(Colors.m3primary, 0.5 + 0.3 * (frame.dancing ? Beat.bass : 0))
                 }
                 ShapeImage {
                     anchors.fill: parent
                     shape: frame.shape || "circle"
+                    morphDuration: frame.morphTime
+                    morphCurve: frame.beating && Beat.locked ? Appearance.anim.emphasizedDecel : Appearance.anim.spatialFast
                     maskRotation: frame.spin
                     overscan: 0.21
                     source: wallpaper.source

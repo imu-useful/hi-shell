@@ -12,6 +12,8 @@ Item {
     property alias status: image.status
     property alias shape: mask.shape
     property alias shapeRotation: mask.shapeRotation
+    property alias morphDuration: mask.morphDuration
+    property alias morphCurve: mask.morphCurve
     // Turns only the outline (the picture stays upright); cheap to animate,
     // unlike shapeRotation, which recomputes the shape.
     property real maskRotation: 0

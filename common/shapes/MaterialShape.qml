@@ -15,6 +15,9 @@ Item {
     property color borderColor: "transparent"
     property real borderWidth: 0
     property bool animated: true
+    // How long a change of shape takes, and its curve (a spring by default).
+    property int morphDuration: Appearance.anim.spatial
+    property list<real> morphCurve: Appearance.anim.spatialFast
 
     implicitWidth: 48
     implicitHeight: 48
@@ -46,9 +49,9 @@ Item {
         property: "progress"
         from: 0
         to: 1
-        duration: Appearance.anim.spatial
+        duration: root.morphDuration
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: Appearance.anim.spatialFast
+        easing.bezierCurve: root.morphCurve
     }
 
     // Wrapped in an Item: Shape sets its own implicit size from the path, which
