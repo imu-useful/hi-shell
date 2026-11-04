@@ -4,7 +4,7 @@
 const pages = [
     { id: "quick", title: "Quick", icon: "tune", keywords: "wallpaper colors color scheme palette dark light mode auto transparency matugen theme" },
     { id: "general", title: "General", icon: "apps", keywords: "language russian english terminal claude ai model translator languages clipboard history cliphist" },
-    { id: "bar", title: "Bar", icon: "toolbar", keywords: "bar layout widgets position top bottom left right style hug float islands m3 height workspaces clock date format resources util buttons media" },
+    { id: "bar", title: "Bar", icon: "toolbar", keywords: "bar layout widgets position top bottom left right style hug float islands m3 height workspaces clock date format resources util buttons media dynamic island notifications music privacy camera microphone fullscreen" },
     { id: "desktop", title: "Desktop", icon: "desktop_windows", keywords: "desktop widgets wallpaper draw frame shape cover album art focus blur hide music dance pulse beat world clock time zones visualizer cava edit layout image" },
     { id: "lock", title: "Lock screen", icon: "lock", keywords: "lock screen clock date greeting avatar password battery keyboard layout caps lock now playing blur brightness wallpaper" },
     { id: "interface", title: "Interface", icon: "palette", keywords: "fonts font animation speed motion transparency opacity sidebar quick toggles night light temperature" },

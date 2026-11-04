@@ -299,4 +299,62 @@ ColumnLayout {
             onToggled: checked => root.bar.updates.hideWhenNone = checked
         }
     }
+
+    Section {
+        icon: "circle_notifications"
+        title: Translation.tr("Dynamic Island")
+
+        SwitchRow {
+            icon: "circle_notifications"
+            title: Translation.tr("Dynamic Island")
+            subtitle: Translation.tr("The clock in the bar also shows music, notifications and the camera or microphone, and floats over a fullscreen window")
+            checked: root.bar.island.enabled
+            onToggled: checked => root.bar.island.enabled = checked
+        }
+        SliderRow {
+            enabled: root.bar.island.enabled
+            icon: "timer"
+            title: Translation.tr("Hold to switch")
+            subtitle: Translation.tr("How long to hold the island (or the clock) to switch its state")
+            value: root.bar.island.holdDuration / 1000
+            from: 0.5
+            to: 5
+            step: 0.5
+            decimals: 1
+            suffix: Translation.tr(" s")
+            onMoved: value => root.bar.island.holdDuration = Math.round(value * 1000)
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
+            icon: "music_note"
+            title: Translation.tr("Music player")
+            subtitle: Translation.tr("A hold switches between the clock and the player; a tap opens its controls")
+            checked: root.bar.island.music
+            onToggled: checked => root.bar.island.music = checked
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
+            icon: "notifications"
+            title: Translation.tr("Notifications")
+            subtitle: Translation.tr("Instead of popup cards; hover for the message and buttons")
+            checked: root.bar.island.notifications
+            onToggled: checked => root.bar.island.notifications = checked
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
+            icon: "mic"
+            title: Translation.tr("Camera and microphone indicator")
+            subtitle: Translation.tr("Green: microphone, orange: camera, yellow: both")
+            checked: root.bar.island.privacy
+            onToggled: checked => root.bar.island.privacy = checked
+        }
+        SwitchRow {
+            enabled: root.bar.island.enabled
+            icon: "fullscreen"
+            title: Translation.tr("Over fullscreen windows")
+            subtitle: Translation.tr("The island floats at the top of the screen for notifications and the indicator")
+            checked: root.bar.island.fullscreen
+            onToggled: checked => root.bar.island.fullscreen = checked
+        }
+    }
 }

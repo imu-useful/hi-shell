@@ -26,7 +26,7 @@ BarWidget {
     property real closedAt: 0
     readonly property bool notifying: Island.notif !== null
     // Room for the privacy pill at the start (horizontal bars only).
-    readonly property real lead: Privacy.active && !notifying && !vertical ? privacy.width + 8 : 0
+    readonly property real lead: Island.privacy && !notifying && !vertical ? privacy.width + 8 : 0
     readonly property real baseWidth: music ? musicRow.implicitWidth + 6 : row.implicitWidth + 6
     contentWidth: vertical ? (music ? artSize : thickness)
                 : notifying ? notification.implicitWidth - padding * 2 : baseWidth + lead
@@ -54,7 +54,10 @@ BarWidget {
     }
     // Hovering the island (with a notification) or its buttons holds the countdown.
     onHoveredChanged: Island.setHover("bar", hovered)
-    onPressedDown: ShellState.startIslandHold()
+    onPressedDown: {
+        if (Island.canSwitch)
+            ShellState.startIslandHold();
+    }
     onPressedUp: ShellState.endIslandHold()
     onClicked: {
         if (!ShellState.islandHeld) {
@@ -178,7 +181,7 @@ BarWidget {
 
     PrivacyPill {
         id: privacy
-        visible: Privacy.active && !root.notifying && !root.vertical
+        visible: Island.privacy && !root.notifying && !root.vertical
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
     }

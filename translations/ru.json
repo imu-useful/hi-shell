@@ -1000,5 +1000,17 @@
     "Or type a program or command": "Или введите программу или команду",
     "No program called “%1”": "Нет программы «%1»",
     "Couldn't set it (see the shell's log)": "Не удалось задать (см. лог оболочки)",
-    "Config path copied": "Путь к настройкам скопирован"
+    "Config path copied": "Путь к настройкам скопирован",
+    "Dynamic Island": "Dynamic Island",
+    "The clock in the bar also shows music, notifications and the camera or microphone, and floats over a fullscreen window": "Часы в панели ещё показывают музыку, уведомления и камеру или микрофон и парят над полноэкранным окном",
+    "Hold to switch": "Удержание для переключения",
+    "How long to hold the island (or the clock) to switch its state": "Сколько удерживать остров (или часы), чтобы переключить его состояние",
+    " s": " с",
+    "Music player": "Музыкальный плеер",
+    "A hold switches between the clock and the player; a tap opens its controls": "Удержание переключает часы и плеер; нажатие открывает управление",
+    "Instead of popup cards; hover for the message and buttons": "Вместо всплывающих карточек; наведите — появятся текст и кнопки",
+    "Camera and microphone indicator": "Индикатор камеры и микрофона",
+    "Green: microphone, orange: camera, yellow: both": "Зелёный — микрофон, оранжевый — камера, жёлтый — оба",
+    "Over fullscreen windows": "Над полноэкранными окнами",
+    "The island floats at the top of the screen for notifications and the indicator": "Остров парит вверху экрана для уведомлений и индикатора"
 }

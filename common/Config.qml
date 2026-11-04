@@ -108,11 +108,20 @@ Singleton {
                     property string timeFormat: "HH:mm"
                     property string dateFormat: "ddd, dd/MM"
                 }
+                // Dynamic Island = the clock widget: it also shows the music player, notifications and the
+                // camera / microphone indicator, and floats over fullscreen windows.
                 property JsonObject island: JsonObject {
-                    // Dynamic Island = the clock widget: how long a press must be held to switch its state (ms).
+                    property bool enabled: true
+                    // How long a press must be held to switch its state (ms).
                     property int holdDuration: 2000
-                    // Show notifications in the island (and over a fullscreen window) instead of as popup cards.
+                    // The music player state (a hold switches to it).
+                    property bool music: true
+                    // Show notifications in the island instead of as popup cards.
                     property bool notifications: true
+                    // The camera / microphone indicator.
+                    property bool privacy: true
+                    // Float at the top of the screen over a fullscreen window (the bar is hidden there).
+                    property bool fullscreen: true
                 }
                 property JsonObject media: JsonObject {
                     property int maxWidth: 220

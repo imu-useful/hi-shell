@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import qs.common
 import qs.services
 
@@ -14,9 +15,14 @@ import qs.services
 Singleton {
     id: root
 
+    readonly property var options: Config.options.bar.island
+    readonly property bool enabled: options.enabled
+    // There is a state to switch to: a hold on the island does something.
+    readonly property bool canSwitch: enabled && options.music
+
     // The state asked for; `mode` is what is shown (music needs a player).
     property string wanted: "default"
-    readonly property string mode: wanted === "music" && Mpris.hasPlayer ? "music" : "default"
+    readonly property string mode: canSwitch && wanted === "music" && Mpris.hasPlayer ? "music" : "default"
     // The music state's full controls are open (a tap on the island).
     property bool expanded: false
     readonly property bool musicExpanded: expanded && mode === "music"
@@ -24,7 +30,8 @@ Singleton {
     // The notification the island shows now (the newest one it handles), null when none.
     readonly property var notif: Notifications.popups.find(n => handles(n)) ?? null
     // Something to show over a fullscreen window.
-    readonly property bool alertActive: notif !== null || Privacy.active
+    readonly property bool privacy: enabled && options.privacy && Privacy.active
+    readonly property bool alertActive: notif !== null || privacy
 
     // Notifications handed back to their popup card (the Reply button needs its text field).
     property var released: []
@@ -32,7 +39,10 @@ Singleton {
     // The island takes the notification instead of the popup card: every one that times out. Critical
     // ones, which stay until dismissed, keep their card, and so do the ones sent back with Reply.
     function handles(n) {
-        return Config.options.bar.island.notifications && !n.critical && n.timeout > 0 && !released.includes(n.uid);
+        if (!enabled || !options.notifications || n.critical || n.timeout <= 0 || released.includes(n.uid))
+            return false;
+        // The bar is hidden over a fullscreen window: without the overlay the popup card is the only way.
+        return options.fullscreen || !Fullscreen.on(Hyprland.focusedMonitor?.name ?? "");
     }
 
     // The buttons floating by the island for the notification: its actions ("default" is the body click,

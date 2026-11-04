@@ -22,7 +22,7 @@ Scope {
 
             required property var modelData
             readonly property bool fullscreen: Fullscreen.on(modelData.name)
-            readonly property bool wanted: fullscreen && Island.alertActive
+            readonly property bool wanted: Island.enabled && Island.options.fullscreen && fullscreen && Island.alertActive
 
             PanelLoader {
                 id: loader
@@ -97,7 +97,7 @@ Scope {
                             spacing: 8
 
                             PrivacyPill {
-                                visible: Privacy.active
+                                visible: Island.privacy
                                 Layout.alignment: Qt.AlignVCenter
                             }
                             IslandNotification {
@@ -116,7 +116,7 @@ Scope {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onPressed: ShellState.startIslandHold()
+                            onPressed: if (Island.canSwitch) ShellState.startIslandHold()
                             onReleased: ShellState.endIslandHold()
                             onCanceled: ShellState.endIslandHold()
                             onClicked: {
