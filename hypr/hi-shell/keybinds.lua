@@ -4,6 +4,7 @@
 -- Each bind is a plain hl.bind: the keys, what to run, and a description (the launcher lists
 -- it when you type "<", and `hyprctl binds` shows it). The commands are IPC calls to the shell,
 -- `qs -c hi-shell ipc call <target> <function>`; change the keys on the left to rebind.
+-- The keys of the common jobs go through fallback.sh: without the shell running they still do the job.
 
 -- Another shell's binds on the same keys (ii's, say) would fire alongside these. This drops them
 -- first; delete the block if you have none. Add a key here when you add a bind for it below.
@@ -34,7 +35,7 @@ if hl.unbind then
 end
 
 -- Launcher (Super+D is commonly bound to maximize, so Super+Space is the default)
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher toggle"), { description = "hi-shell: Toggle app launcher" })
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh launcher"), { description = "hi-shell: Toggle app launcher" })
 hl.bind("SUPER + V", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher search ';'"), { description = "hi-shell: Clipboard history" })
 hl.bind("SUPER + Period", hl.dsp.exec_cmd("qs -c hi-shell ipc call launcher search ':'"), { description = "hi-shell: Emoji" })
 
@@ -45,7 +46,7 @@ hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggl
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs -c hi-shell ipc call overview toggle"), { description = "hi-shell: Workspace overview" })
 hl.bind("SUPER + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call wallpaper toggleSelector"), { description = "hi-shell: Wallpaper picker" })
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call settings toggle"), { description = "hi-shell: Settings" })
-hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs -c hi-shell ipc call session toggleScreen"), { description = "hi-shell: Session menu" })
+hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh session"), { description = "hi-shell: Session menu" })
 -- The laptop's display key (Fn+F10 on Lenovo): display mode picker, again for the next mode.
 hl.bind("XF86Display", hl.dsp.exec_cmd("qs -c hi-shell ipc call display next"), { description = "hi-shell: Display mode" })
 
@@ -58,9 +59,9 @@ for _, key in ipairs({ "Alt_L", "Alt_R" }) do
 end
 
 -- Screenshots always go to ~/Pictures/Screenshots and the clipboard.
-hl.bind("Print", hl.dsp.exec_cmd("qs -c hi-shell ipc call region fullscreen"), { description = "hi-shell: Screenshot of the screen (file + clipboard)" })
-hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs -c hi-shell ipc call region screenshot"), { description = "hi-shell: Screenshot of a region or window (file + clipboard)" })
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("qs -c hi-shell ipc call region screenshot"), { description = "hi-shell: Screenshot / OCR / record a region" })
+hl.bind("Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh screen"), { description = "hi-shell: Screenshot of the screen (file + clipboard)" })
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { description = "hi-shell: Screenshot of a region or window (file + clipboard)" })
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { description = "hi-shell: Screenshot / OCR / record a region" })
 hl.bind("SUPER + SHIFT + X", hl.dsp.exec_cmd("qs -c hi-shell ipc call region ocr"), { description = "hi-shell: Copy text from a region (OCR)" })
 hl.bind("SUPER + SHIFT + T", hl.dsp.exec_cmd("qs -c hi-shell ipc call region translate"), { description = "hi-shell: Translate text from a region" })
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call region record"), { description = "hi-shell: Record a region (again to stop)" })
