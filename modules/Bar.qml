@@ -168,6 +168,7 @@ PanelWindow {
                 width: root.vertical ? parent.width : parent.width + root.narrow * (root.islandW + pad * 2 - parent.width)
                 height: root.vertical ? parent.height + root.narrow * (root.islandH + pad * 2 - parent.height) : parent.height
                 visible: root.style !== "islands"
+                transform: Translate { y: Services.Island.drop }
                 radius: (root.edgeToEdge ? 0 : Appearance.rounding.full) * (1 - root.narrow) + Math.min(width, height) / 2 * root.narrow
                 color: root.barColor
             }
@@ -250,6 +251,8 @@ PanelWindow {
                         z: -1
                         radius: Appearance.rounding.full
                         color: root.barColor
+                        // The island's own pill bounces with it.
+                        transform: Translate { y: modelData === root.islandSec ? Services.Island.drop : 0 }
                     }
                 }
             }

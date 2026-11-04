@@ -116,12 +116,17 @@ Scope {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onPressed: if (Island.canSwitch) ShellState.startIslandHold()
                             onReleased: ShellState.endIslandHold()
                             onCanceled: ShellState.endIslandHold()
-                            onClicked: {
-                                if (!ShellState.islandHeld && Island.notif)
-                                    Notifications.hidePopup(Island.notif.uid);
+                            onClicked: mouse => {
+                                if (!ShellState.islandHeld && Island.notif) {
+                                    if (mouse.button === Qt.RightButton)
+                                        Notifications.hidePopup(Island.notif.uid);
+                                    else
+                                        Island.open();
+                                }
                                 ShellState.islandHeld = false;
                             }
                         }

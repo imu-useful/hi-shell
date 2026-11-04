@@ -29,6 +29,46 @@ Singleton {
 
     // The notification the island shows now (the newest one it handles), null when none.
     readonly property var notif: Notifications.popups.find(n => handles(n)) ?? null
+    // A notification lands like a ball: this goes from above the island's place (negative, in px) down to 0,
+    // bouncing. The clock and the bar's background under it move by it.
+    property real drop: 0
+    onNotifChanged: {
+        if (notif !== null) {
+            ball.restart();
+        } else {
+            // Stopped mid-bounce it would stay off its place.
+            ball.stop();
+            drop = 0;
+        }
+    }
+    NumberAnimation {
+        id: ball
+        target: root
+        property: "drop"
+        from: -16
+        to: 0
+        duration: Appearance.anim.speed > 0 ? 900 : 0
+        easing.type: Easing.OutBounce
+    }
+
+    // A tap on the notification: what the app asked for ("default": most apps focus their window), else
+    // the first link in the text, else the app itself. Then the notification is done with.
+    function open() {
+        const n = notif;
+        if (!n)
+            return;
+        if (n.actions.some(a => a.identifier === "default")) {
+            Notifications.invoke(n.uid, "default");
+            return;
+        }
+        const url = /https?:\/\/[^\s"'<>]+/.exec(`${n.body} ${n.summary}`)?.[0];
+        if (url)
+            Qt.openUrlExternally(url);
+        else
+            DesktopEntries.heuristicLookup(n.appName)?.execute();
+        Notifications.hidePopup(n.uid);
+    }
+
     // The island takes the whole bar (the other widgets leave) while it shows music or a notification.
     readonly property bool compact: enabled && options.hideBar && (mode === "music" || notif !== null)
     // Something to show over a fullscreen window.
@@ -94,12 +134,15 @@ Singleton {
         }
     }
 
-    // `qs -c hi-shell ipc call island cycle` = a completed hold; `expand` = a tap in the music state.
+    // `qs -c hi-shell ipc call island cycle` = a completed hold; `expand` = a tap in the music state; `open` = a tap on a notification.
     IpcHandler {
         target: "island"
 
         function cycle(): void {
             ShellState.islandSwitches++;
+        }
+        function open(): void {
+            root.open();
         }
         function expand(): void {
             root.expanded = !root.expanded;

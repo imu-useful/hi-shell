@@ -35,26 +35,7 @@ BarWidget {
     Behavior on contentWidth {
         SpringAnim { overshoot: root.notifying ? 2.6 : 1.2; duration: root.notifying ? 700 : Appearance.anim.spatial }
     }
-    property real drop: 0
-    transform: Translate { y: root.drop }
-    onNotifyingChanged: {
-        if (notifying)
-            ball.restart();
-        else {
-            // Stopped mid-bounce it would stay off its place.
-            ball.stop();
-            drop = 0;
-        }
-    }
-    NumberAnimation {
-        id: ball
-        target: root
-        property: "drop"
-        from: -16
-        to: 0
-        duration: Appearance.anim.speed > 0 ? 900 : 0
-        easing.type: Easing.OutBounce
-    }
+    transform: Translate { y: Island.drop }
     // Hovering the island (with a notification) or its buttons holds the countdown.
     onHoveredChanged: Island.setHover("bar", hovered)
     onPressedDown: {
@@ -62,10 +43,15 @@ BarWidget {
             ShellState.startIslandHold();
     }
     onPressedUp: ShellState.endIslandHold()
-    onClicked: {
+    onClicked: mouse => {
         if (!ShellState.islandHeld) {
-            if (notifying)
-                Notifications.hidePopup(Island.notif.uid);
+            if (notifying) {
+                // A tap opens what the notification is about; a right click dismisses it.
+                if (mouse.button === Qt.RightButton)
+                    Notifications.hidePopup(Island.notif.uid);
+                else
+                    Island.open();
+            }
             else if (music) {
                 if (Date.now() - closedAt > 300)
                     Island.expanded = !Island.expanded;
