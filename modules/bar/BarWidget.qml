@@ -31,6 +31,9 @@ Item {
     default property alias content: container.data
 
     signal clicked(var mouse)
+    // The left button went down / up (released also when the press was cancelled).
+    signal pressedDown()
+    signal pressedUp()
     // Scrolling over the widget (with scrollable), in whole steps; up / right positive.
     signal scrolled(int steps)
 
@@ -55,6 +58,15 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         cursorShape: Qt.PointingHandCursor
         onClicked: mouse => root.clicked(mouse)
+        onPressed: mouse => {
+            if (mouse.button === Qt.LeftButton)
+                root.pressedDown();
+        }
+        onReleased: mouse => {
+            if (mouse.button === Qt.LeftButton)
+                root.pressedUp();
+        }
+        onCanceled: root.pressedUp()
 
         Rectangle {
             anchors.fill: parent

@@ -15,6 +15,47 @@ Singleton {
     // Left sidebar tab: home | claude | translator | clipboard
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
+
+    // Dynamic Island hold-to-switch, shared because the clock widget drives it too: a press on
+    // the island or on the clock fills islandHold (0..1) over bar.island.holdDuration; when it
+    // closes the islands move on (islandSwitches counts it) and the press is spent (islandHeld),
+    // so the release isn't also a tap. Only with an island in a bar (islandCount).
+    property real islandHold: 0
+    property int islandSwitches: 0
+    property bool islandHeld: false
+    property int islandCount: 0
+    function startIslandHold() {
+        islandHeld = false;
+        islandUnwind.stop();
+        islandFill.restart();
+    }
+    function endIslandHold() {
+        if (!islandFill.running)
+            return;
+        islandFill.stop();
+        islandUnwind.restart();
+    }
+    NumberAnimation {
+        id: islandFill
+        target: root
+        property: "islandHold"
+        from: 0
+        to: 1
+        duration: Math.max(200, Config.options.bar.island.holdDuration)
+        onFinished: {
+            root.islandHeld = true;
+            root.islandSwitches++;
+            islandUnwind.restart();
+        }
+    }
+    NumberAnimation {
+        id: islandUnwind
+        target: root
+        property: "islandHold"
+        to: 0
+        duration: Appearance.anim.normal
+        easing.type: Easing.OutCubic
+    }
     property bool weatherOpen: false
     property bool desktopEditing: false
     // Windows cover the desktop widgets (their screen's workspace has windows):

@@ -15,7 +15,18 @@ BarWidget {
     padding: 4
     contentWidth: vertical ? thickness : row.implicitWidth + 6
     contentHeight: column.implicitHeight
-    onClicked: ShellState.calendarOpen = !ShellState.calendarOpen
+    // Held for the island's hold time, the clock switches the Dynamic Island instead of opening the calendar.
+    onPressedDown: {
+        ShellState.islandHeld = false;
+        if (ShellState.islandCount > 0)
+            ShellState.startIslandHold();
+    }
+    onPressedUp: ShellState.endIslandHold()
+    onClicked: {
+        if (!ShellState.islandHeld)
+            ShellState.calendarOpen = !ShellState.calendarOpen;
+        ShellState.islandHeld = false;
+    }
 
     SystemClock {
         id: clock

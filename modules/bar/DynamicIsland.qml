@@ -6,7 +6,8 @@ import qs.common.widgets
 
 // Dynamic Island: a pill in the bar that shows one state at a time (for now only the clock).
 // Press and hold: a ring is drawn along the pill's border and, once it closes (bar.island.holdDuration),
-// the island moves to the next state. A short press toggles the calendar, like the clock.
+// the island moves to the next state (ShellState.startIslandHold; the clock widget does the same).
+// A short press toggles the calendar, like the clock.
 BarWidget {
     id: root
 
@@ -14,12 +15,11 @@ BarWidget {
 
     // The states the island cycles through; the later stages (music, notifications, privacy, updates) add theirs.
     readonly property var states: ["default"]
-    property int stateIndex: 0
+    readonly property int stateIndex: ShellState.islandSwitches % states.length
     readonly property string currentState: states[stateIndex % states.length]
 
-    // 0..1, how much of the hold has passed.
-    property real holdProgress: 0
-    property bool held: false
+    // 0..1, how much of the hold has passed (a hold on the clock widget fills it too).
+    readonly property real holdProgress: ShellState.islandHold
 
     padding: 4
     active: false
@@ -27,10 +27,13 @@ BarWidget {
     contentHeight: vertical ? column.implicitHeight : thickness
     Behavior on contentWidth { SpatialAnim {} }
 
-    function switchState() {
-        stateIndex = (stateIndex + 1) % states.length;
-        pulse.restart();
+    Connections {
+        target: ShellState
+        function onIslandSwitchesChanged() { pulse.restart(); }
     }
+
+    Component.onCompleted: ShellState.islandCount++
+    Component.onDestruction: ShellState.islandCount--
 
     SystemClock {
         id: clock
@@ -118,54 +121,19 @@ BarWidget {
         }
     }
 
-    // Filling while pressed; letting go before the end winds it back.
-    NumberAnimation {
-        id: fill
-        target: root
-        property: "holdProgress"
-        from: 0
-        to: 1
-        duration: Math.max(200, root.options.holdDuration)
-        onFinished: {
-            root.held = true;
-            root.switchState();
-            unwind.restart();
-        }
-    }
-
-    NumberAnimation {
-        id: unwind
-        target: root
-        property: "holdProgress"
-        to: 0
-        duration: Appearance.anim.normal
-        easing.type: Easing.OutCubic
-    }
-
     MouseArea {
         id: mouse
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         cursorShape: Qt.PointingHandCursor
 
-        onPressed: {
-            root.held = false;
-            unwind.stop();
-            fill.restart();
-        }
-        onReleased: {
-            if (!fill.running)
-                return;
-            fill.stop();
-            unwind.restart();
-        }
-        onCanceled: {
-            fill.stop();
-            unwind.restart();
-        }
+        onPressed: ShellState.startIslandHold()
+        onReleased: ShellState.endIslandHold()
+        onCanceled: ShellState.endIslandHold()
         onClicked: {
-            if (!root.held)
+            if (!ShellState.islandHeld)
                 ShellState.calendarOpen = !ShellState.calendarOpen;
+            ShellState.islandHeld = false;
         }
     }
 }
