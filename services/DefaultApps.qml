@@ -20,7 +20,7 @@ Singleton {
         { id: "video", title: "Videos", icon: "movie", mimes: ["video/mp4", "video/webm", "video/x-matroska"] },
         { id: "audio", title: "Music", icon: "music_note", mimes: ["audio/mpeg", "audio/flac", "audio/ogg"] },
         { id: "pdf", title: "PDF", icon: "picture_as_pdf", mimes: ["application/pdf"] },
-        { id: "text", title: "Text", icon: "description", mimes: ["text/plain"] },
+        { id: "text", title: "Text", icon: "description", mimes: ["text/plain", "application/json", "application/xml", "text/markdown"] },
         { id: "terminal", title: "Terminal", icon: "terminal", mimes: [] }
     ]
 
