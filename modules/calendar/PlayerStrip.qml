@@ -12,12 +12,6 @@ ColumnLayout {
     visible: Mpris.hasPlayer
     spacing: 8
 
-    Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Colors.m3outlineVariant
-    }
-
     RowLayout {
         Layout.fillWidth: true
         spacing: 12

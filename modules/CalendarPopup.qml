@@ -58,7 +58,7 @@ Scope {
             exclusiveZone: 0
             margins.top: Appearance.sizes.barMargin
             margins.bottom: Appearance.sizes.barMargin
-            implicitWidth: 340
+            implicitWidth: card.implicitWidth
             implicitHeight: card.implicitHeight
             color: "transparent"
 
@@ -81,6 +81,7 @@ Scope {
                 id: card
 
                 width: parent.width
+                implicitWidth: column.implicitWidth + 32
                 implicitHeight: column.implicitHeight + 32
                 radius: Appearance.rounding.extraLarge
                 color: Appearance.translucent(Colors.m3surfaceContainer)
@@ -93,24 +94,40 @@ Scope {
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
 
-                ColumnLayout {
+                // The month on the left; the player and the screen time on the right.
+                RowLayout {
                     id: column
                     anchors.fill: parent
                     anchors.margins: 16
-                    spacing: 12
+                    spacing: 16
 
                     MonthGrid {
-                        Layout.fillWidth: true
+                        Layout.preferredWidth: 308
+                        Layout.alignment: Qt.AlignTop
                     }
 
-                    // The player, when there is one.
-                    PlayerStrip {
-                        Layout.fillWidth: true
+                    Rectangle {
+                        Layout.fillHeight: true
+                        implicitWidth: 1
+                        color: Colors.m3outlineVariant
                     }
 
-                    // The screen time: today's total and apps, and the week's bars.
-                    ScreenTimeStrip {
-                        Layout.fillWidth: true
+                    ColumnLayout {
+                        Layout.preferredWidth: 300
+                        Layout.alignment: Qt.AlignTop
+                        spacing: 12
+
+                        // The player, when there is one.
+                        PlayerStrip {
+                            id: player
+                            Layout.fillWidth: true
+                        }
+
+                        // The screen time: today's total and apps, and the week's bars.
+                        ScreenTimeStrip {
+                            Layout.fillWidth: true
+                            topDivider: player.visible
+                        }
                     }
                 }
             }

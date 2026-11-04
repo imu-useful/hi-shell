@@ -14,9 +14,13 @@ ColumnLayout {
     readonly property var week: ScreenTime.week()
     readonly property int weekPeak: Math.max(1, ...week.map(d => d.seconds))
 
+    // The line above it (not wanted when it is the first thing in its column).
+    property bool topDivider: true
+
     spacing: 8
 
     Rectangle {
+        visible: root.topDivider
         Layout.fillWidth: true
         height: 1
         color: Colors.m3outlineVariant
