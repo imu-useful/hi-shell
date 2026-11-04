@@ -142,7 +142,7 @@ Scope {
 
                         Text {
                             Layout.fillWidth: true
-                            text: Translation.tr("Claude")
+                            text: Claude.providerName
                             font.family: Appearance.font.main
                             font.pixelSize: 16
                             font.weight: Font.Medium
