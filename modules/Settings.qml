@@ -179,6 +179,16 @@ Scope {
                                 root.setOpen(false);
                                 Qt.openUrlExternally(`file://${Config.path}`);
                             }
+
+                            // Right click copies the path of the config file.
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.RightButton
+                                onClicked: {
+                                    Quickshell.clipboardText = Config.path;
+                                    ShellState.osdMessage("content_copy", Translation.tr("Config path copied"));
+                                }
+                            }
                         }
 
                         Item { implicitHeight: 6 }

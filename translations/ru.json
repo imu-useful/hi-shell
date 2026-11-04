@@ -999,5 +999,6 @@
     "Defaults": "По умолчанию",
     "Or type a program or command": "Или введите программу или команду",
     "No program called “%1”": "Нет программы «%1»",
-    "Couldn't set it (see the shell's log)": "Не удалось задать (см. лог оболочки)"
+    "Couldn't set it (see the shell's log)": "Не удалось задать (см. лог оболочки)",
+    "Config path copied": "Путь к настройкам скопирован"
 }
