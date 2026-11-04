@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.common
@@ -7,9 +8,9 @@ import qs.modules.bar
 import qs.services
 
 // The Dynamic Island over a fullscreen window: the bar is hidden there, so the island detaches and
-// floats at the top centre of the screen. It slides down while it has something to show
-// (ShellState.islandAlert, set by the alerts of the later stages; for now also a short peek when
-// fullscreen starts) and slides back up when that is over. One per screen.
+// floats at the top centre of the screen. It slides down while there is an alert (a notification,
+// the camera or microphone in use: Island.alertActive) and slides back up when that is over.
+// One per screen.
 Scope {
     id: root
 
@@ -21,15 +22,7 @@ Scope {
 
             required property var modelData
             readonly property bool fullscreen: Fullscreen.on(modelData.name)
-            readonly property bool wanted: fullscreen && (ShellState.islandAlert || peek.running)
-
-            // Fullscreen just started: show the island for a moment.
-            onFullscreenChanged: if (fullscreen) peek.restart()
-
-            Timer {
-                id: peek
-                interval: 3000
-            }
+            readonly property bool wanted: fullscreen && Island.alertActive
 
             PanelLoader {
                 id: loader
@@ -59,26 +52,29 @@ Scope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         // Slides down from above the screen edge and back up.
                         y: 12 - (1 - slide) * (height + 24)
-                        width: Math.max(96, time.implicitWidth + 40)
-                        height: 36
+                        width: Math.max(48, content.implicitWidth + (Island.notif ? 0 : 24))
+                        Behavior on width { SpatialAnim {} }
+                        height: 38
                         radius: height / 2
                         color: Appearance.translucent(Colors.m3surfaceContainerHighest, 0.05)
                         border.width: 1
                         border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
                         Behavior on slide { SpatialAnim {} }
 
-                        SystemClock {
-                            id: clock
-                            precision: SystemClock.Minutes
-                        }
-
-                        StyledText {
-                            id: time
+                        RowLayout {
+                            id: content
                             anchors.centerIn: parent
-                            text: Qt.formatDateTime(clock.date, Config.options.bar.clock.timeFormat)
-                            font.pixelSize: Appearance.font.size.normal
-                            font.weight: Font.DemiBold
-                            font.features: { "tnum": 1 }
+                            spacing: 8
+
+                            PrivacyPill {
+                                visible: Privacy.active
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+                            IslandNotification {
+                                visible: Island.notif !== null
+                                Layout.preferredWidth: implicitWidth
+                                Layout.preferredHeight: implicitHeight
+                            }
                         }
 
                         HoldRing {
@@ -93,6 +89,11 @@ Scope {
                             onPressed: ShellState.startIslandHold()
                             onReleased: ShellState.endIslandHold()
                             onCanceled: ShellState.endIslandHold()
+                            onClicked: {
+                                if (!ShellState.islandHeld && Island.notif)
+                                    Notifications.hidePopup(Island.notif.uid);
+                                ShellState.islandHeld = false;
+                            }
                         }
                     }
                 }

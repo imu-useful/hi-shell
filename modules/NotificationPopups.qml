@@ -17,7 +17,8 @@ PanelWindow {
     readonly property int maxShown: 5
 
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    visible: Notifications.popups.length > 0
+    readonly property var cards: Notifications.popups.filter(n => !Island.handles(n))
+    visible: cards.length > 0
 
     anchors.top: !atBottom
     anchors.bottom: atBottom
@@ -49,7 +50,7 @@ PanelWindow {
             // ScriptModel diffs by object, so existing cards survive list changes.
             // Newest on top (bottom bar: newest nearest the bar).
             model: ScriptModel {
-                values: root.atBottom ? Notifications.popups.slice(0, root.maxShown).reverse() : Notifications.popups.slice(0, root.maxShown)
+                values: root.atBottom ? root.cards.slice(0, root.maxShown).reverse() : root.cards.slice(0, root.maxShown)
             }
 
             NotificationCard {

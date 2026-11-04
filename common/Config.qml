@@ -111,6 +111,8 @@ Singleton {
                 property JsonObject island: JsonObject {
                     // Dynamic Island = the clock widget: how long a press must be held to switch its state (ms).
                     property int holdDuration: 2000
+                    // Show notifications in the island (and over a fullscreen window) instead of as popup cards.
+                    property bool notifications: true
                 }
                 property JsonObject media: JsonObject {
                     property int maxWidth: 220

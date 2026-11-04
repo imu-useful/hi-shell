@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Hyprland
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -10,6 +11,8 @@ import qs.services
 // Dynamic Island: held for bar.island.holdDuration it draws a ring along its border and switches
 // the island's state (Island.mode: the clock, or the music player) instead of opening the calendar.
 // In the music state it shows the cover and the track, and a tap opens the player's controls.
+// A notification (Island.notif) takes the pill over until it times out (a tap dismisses it); the
+// camera / microphone indicator (PrivacyPill) sits at its start for as long as one is in use.
 BarWidget {
     id: root
 
@@ -20,15 +23,25 @@ BarWidget {
     padding: 4
     readonly property bool music: Island.mode === "music"
     readonly property int artSize: thickness - 6
-    contentWidth: vertical ? (music ? artSize : thickness) : (music ? musicRow.implicitWidth + 6 : row.implicitWidth + 6)
+    property real closedAt: 0
+    readonly property bool notifying: Island.notif !== null
+    // Room for the privacy pill at the start (horizontal bars only).
+    readonly property real lead: Privacy.active && !notifying && !vertical ? privacy.width + 8 : 0
+    readonly property real baseWidth: music ? musicRow.implicitWidth + 6 : row.implicitWidth + 6
+    contentWidth: vertical ? (music ? artSize : thickness)
+                : notifying ? notification.implicitWidth - padding * 2 : baseWidth + lead
     contentHeight: music ? artSize : column.implicitHeight
     Behavior on contentWidth { SpatialAnim {} }
     onPressedDown: ShellState.startIslandHold()
     onPressedUp: ShellState.endIslandHold()
     onClicked: {
         if (!ShellState.islandHeld) {
-            if (music)
-                Island.expanded = !Island.expanded;
+            if (notifying)
+                Notifications.hidePopup(Island.notif.uid);
+            else if (music) {
+                if (Date.now() - closedAt > 300)
+                    Island.expanded = !Island.expanded;
+            }
             else
                 ShellState.calendarOpen = !ShellState.calendarOpen;
         }
@@ -60,7 +73,7 @@ BarWidget {
 
     RowLayout {
         id: row
-        visible: !root.vertical && !root.music
+        visible: !root.vertical && !root.music && !root.notifying
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         spacing: 8
@@ -91,7 +104,7 @@ BarWidget {
 
     ColumnLayout {
         id: column
-        visible: root.vertical && !root.music
+        visible: root.vertical && !root.music && !root.notifying
         anchors.centerIn: parent
         spacing: -2
 
@@ -111,8 +124,9 @@ BarWidget {
     // Music state: the cover, "title • artist", and the paused mark.
     RowLayout {
         id: musicRow
-        visible: root.music
+        visible: root.music && !root.notifying
         anchors.centerIn: parent
+        anchors.horizontalCenterOffset: root.lead / 2
         spacing: 8
 
         ShapeImage {
@@ -140,12 +154,39 @@ BarWidget {
         }
     }
 
+    PrivacyPill {
+        id: privacy
+        visible: Privacy.active && !root.notifying && !root.vertical
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
+    IslandNotification {
+        id: notification
+        parent: root
+        anchors.fill: parent
+        visible: root.notifying
+        compact: root.vertical
+    }
+
     // A tap in the music state opens the player's controls under the island.
     StyledPopup {
         target: root
+        id: musicPopup
         pinned: Island.musicExpanded
         edge: root.popupEdge
 
         MediaControls {}
+    }
+
+    // A click anywhere else closes the player's controls. The tap on the island itself comes after
+    // this clears the grab; it would reopen them, hence the guard in onClicked.
+    HyprlandFocusGrab {
+        windows: [musicPopup]
+        active: Island.musicExpanded && musicPopup.visible
+        onCleared: {
+            Island.expanded = false;
+            closedAt = Date.now();
+        }
     }
 }
