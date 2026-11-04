@@ -48,7 +48,7 @@ BarWidget {
             if (notifying) {
                 // A tap opens what the notification is about; a right click dismisses it.
                 if (mouse.button === Qt.RightButton)
-                    Notifications.hidePopup(Island.notif.uid);
+                    Island.close(Island.notif);
                 else
                     Island.open();
             }

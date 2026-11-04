@@ -33,6 +33,7 @@ Singleton {
     // bouncing. The clock and the bar's background under it move by it.
     property real drop: 0
     onNotifChanged: {
+        hoverSpent = false;
         if (notif !== null) {
             ball.restart();
         } else {
@@ -59,14 +60,21 @@ Singleton {
             return;
         if (n.actions.some(a => a.identifier === "default")) {
             Notifications.invoke(n.uid, "default");
-            return;
+        } else {
+            const url = /https?:\/\/[^\s"'<>]+/.exec(`${n.body} ${n.summary}`)?.[0];
+            if (url)
+                Qt.openUrlExternally(url);
+            else
+                DesktopEntries.heuristicLookup(n.appName)?.execute();
         }
-        const url = /https?:\/\/[^\s"'<>]+/.exec(`${n.body} ${n.summary}`)?.[0];
-        if (url)
-            Qt.openUrlExternally(url);
-        else
-            DesktopEntries.heuristicLookup(n.appName)?.execute();
+        // Done with, even when the app keeps the notification (resident ones are not dismissed by invoke).
+        close(n);
+    }
+
+    // Hide the notification's popup now; the pointer resting on the island must not hold the next one.
+    function close(n) {
         Notifications.hidePopup(n.uid);
+        hovering = ({});
     }
 
     // The island takes the whole bar (the other widgets leave) while it shows music or a notification.
@@ -111,7 +119,16 @@ Singleton {
 
     // The pointer is over the island or its buttons: the notification's countdown waits.
     property var hovering: ({})
-    readonly property bool hovered: Object.values(hovering).some(v => v)
+    // Hovering holds the countdown, but not for ever: the island grows under a pointer that is just resting
+    // there, and a notification waiting for it would never go. Past holdLimit it goes on counting.
+    readonly property bool hovered: Object.values(hovering).some(v => v) && !hoverSpent
+    property bool hoverSpent: false
+    readonly property int holdLimit: 6000
+    Timer {
+        interval: root.holdLimit
+        running: Object.values(root.hovering).some(v => v) && root.notif !== null && !root.hoverSpent
+        onTriggered: root.hoverSpent = true
+    }
     function setHover(source, value) {
         if (hovering[source] === value)
             return;

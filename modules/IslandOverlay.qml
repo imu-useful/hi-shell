@@ -123,7 +123,7 @@ Scope {
                             onClicked: mouse => {
                                 if (!ShellState.islandHeld && Island.notif) {
                                     if (mouse.button === Qt.RightButton)
-                                        Notifications.hidePopup(Island.notif.uid);
+                                        Island.close(Island.notif);
                                     else
                                         Island.open();
                                 }
