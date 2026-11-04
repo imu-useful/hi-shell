@@ -328,7 +328,7 @@ ColumnLayout {
         }
         StyledText {
             Layout.alignment: Qt.AlignHCenter
-            text: Translation.tr("Ask Claude anything")
+            text: Translation.tr("Ask %1 anything").arg(Claude.modelName || Claude.providerName)
             font.pixelSize: Appearance.font.size.titleMedium
         }
         Flow {

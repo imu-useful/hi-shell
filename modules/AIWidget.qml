@@ -193,7 +193,7 @@ Scope {
                         Layout.fillWidth: true
                         Layout.margins: 8
                         visible: session.messages.count === 0
-                        text: Translation.tr("Ask Claude anything.  Enter to send · Esc to close · Ctrl+N for a new chat")
+                        text: Translation.tr("Ask %1 anything.  Enter to send · Esc to close · Ctrl+N for a new chat").arg(Claude.modelName || Claude.providerName)
                         wrapMode: Text.Wrap
                         font.family: Appearance.font.main
                         font.pixelSize: 12
@@ -238,7 +238,7 @@ Scope {
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: input.text === ""
-                                    text: session.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Ask Claude…")
+                                    text: session.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Ask %1…").arg(Claude.modelName || Claude.providerName)
                                     font: input.font
                                     color: Colors.m3onSurfaceVariant
                                 }

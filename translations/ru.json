@@ -977,5 +977,8 @@
     "Words": "Слова",
     "Separated by commas. Matches anywhere in a title, in any case": "Через запятую. Ищется в любом месте заголовка, без учёта регистра",
     "A tab was closed": "Вкладка закрыта",
-    "Its title has “%1”": "В её заголовке есть «%1»"
+    "Its title has “%1”": "В её заголовке есть «%1»",
+    "Ask %1 anything": "Спросите %1 о чём угодно",
+    "Ask %1 anything.  Enter to send · Esc to close · Ctrl+N for a new chat": "Спросите %1 о чём угодно.  Enter — отправить · Esc — закрыть · Ctrl+N — новый чат",
+    "Ask %1…": "Спросить %1…"
 }
