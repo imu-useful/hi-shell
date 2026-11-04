@@ -37,27 +37,30 @@ Scope {
                     // Ignore the bar's reserved strip: the island sits at the very top of the screen.
                     exclusionMode: ExclusionMode.Ignore
                     implicitWidth: pill.width + 32
-                    implicitHeight: pill.height + 32 + (Island.buttons.length > 0 ? 56 : 0)
+                    // Room for the message and the buttons; the mask keeps the rest click-through.
+                    implicitHeight: Island.notif ? 300 : pill.height + 32
                     mask: Region {
                         item: pill
-                        regions: [Region { item: actions }]
+                        regions: [Region { item: card }]
                     }
                     color: "transparent"
 
                     WlrLayershell.namespace: "hi-shell-island"
                     WlrLayershell.layer: WlrLayer.Overlay
 
-                    // The notification's buttons float under the island, always out over a fullscreen window.
-                    IslandActions {
-                        id: actions
+                    // Hover the island: the message pops out in a second island. The buttons float under it
+                    // all the time over a fullscreen window.
+                    IslandHoverCard {
+                        id: card
                         anchors.horizontalCenter: parent.horizontalCenter
                         y: pill.y + pill.height + 10
-                        shown: loader.revealed && Island.notif !== null
+                        showMessage: loader.revealed && Island.notif !== null && Island.hovered
+                        showButtons: loader.revealed && Island.notif !== null
                         floating: true
                         delay: 350
 
                         HoverHandler {
-                            onHoveredChanged: Island.setHover("overlayButtons", hovered)
+                            onHoveredChanged: Island.setHover("overlayCard", hovered)
                         }
                     }
 

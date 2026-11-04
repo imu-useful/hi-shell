@@ -212,11 +212,11 @@ BarWidget {
         }
     }
 
-    // Hover the island while it shows a notification with buttons: they pop out under it.
+    // Hover the island while it shows a notification: its message pops out in a second island, with the buttons under it.
     PopupWindow {
         id: actionsPopup
 
-        readonly property bool wanted: root.notifying && Island.buttons.length > 0 && (root.hovered || popupHover.hovered)
+        readonly property bool wanted: root.notifying && (root.hovered || popupHover.hovered)
         property bool shown: false
 
         onWantedChanged: {
@@ -247,8 +247,8 @@ BarWidget {
         anchor.edges: root.popupEdge
         anchor.gravity: root.popupEdge
         visible: alive && root.notifying
-        implicitWidth: Math.max(1, buttons.implicitWidth + 16)
-        implicitHeight: buttons.implicitHeight + 24
+        implicitWidth: Math.max(1, card.implicitWidth + 16)
+        implicitHeight: card.implicitHeight + 24
         color: "transparent"
 
         HoverHandler {
@@ -256,11 +256,12 @@ BarWidget {
             onHoveredChanged: Island.setHover("barButtons", hovered)
         }
 
-        IslandActions {
-            id: buttons
+        IslandHoverCard {
+            id: card
             x: 8
             y: root.popupEdge === Edges.Top ? 0 : 14
-            shown: actionsPopup.shown
+            showMessage: actionsPopup.shown
+            showButtons: actionsPopup.shown
         }
     }
 }
