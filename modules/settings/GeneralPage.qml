@@ -83,18 +83,6 @@ ColumnLayout {
         }
     }
 
-    Section {
-        icon: "apps"
-        title: Translation.tr("Apps")
-
-        TextRow {
-            icon: "terminal"
-            title: Translation.tr("Terminal")
-            subtitle: Translation.tr("For terminal apps and system upgrades")
-            value: o.apps.terminal
-            onEdited: text => o.apps.terminal = text.trim() || "kitty"
-        }
-    }
 
     Section {
         icon: "auto_awesome"

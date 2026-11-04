@@ -183,43 +183,57 @@ Scope {
 
                         Item { implicitHeight: 6 }
 
-                        Repeater {
-                            model: Pages.pages
+                        // The pages: scrolled when there are more than fit in the card.
+                        Flickable {
+                            id: navFlick
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            clip: true
+                            contentHeight: navList.implicitHeight
+                            boundsBehavior: Flickable.StopAtBounds
 
-                            Rectangle {
-                                required property var modelData
-                                readonly property bool active: ShellState.settingsPage === modelData.id
+                            ColumnLayout {
+                                id: navList
+                                width: navFlick.width
+                                spacing: 6
 
-                                Layout.fillWidth: true
-                                implicitHeight: 48
-                                radius: 24
-                                color: active ? Colors.m3secondaryContainer : "transparent"
-                                Behavior on color { ColorAnim {} }
+                            Repeater {
+                                model: Pages.pages
 
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    spacing: 14
-                                    MaterialIcon {
-                                        icon: modelData.icon
-                                        fill: active ? 1 : 0
-                                        iconSize: 20
-                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
+                                Rectangle {
+                                    required property var modelData
+                                    readonly property bool active: ShellState.settingsPage === modelData.id
+
+                                    Layout.fillWidth: true
+                                    implicitHeight: 48
+                                    radius: 24
+                                    color: active ? Colors.m3secondaryContainer : "transparent"
+                                    Behavior on color { ColorAnim {} }
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 16
+                                        spacing: 14
+                                        MaterialIcon {
+                                            icon: modelData.icon
+                                            fill: active ? 1 : 0
+                                            iconSize: 20
+                                            color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
+                                        }
+                                        StyledText {
+                                            Layout.fillWidth: true
+                                            text: Translation.tr(modelData.title)
+                                            font.weight: active ? Font.Medium : Font.Normal
+                                            color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                                        }
                                     }
-                                    StyledText {
-                                        Layout.fillWidth: true
-                                        text: Translation.tr(modelData.title)
-                                        font.weight: active ? Font.Medium : Font.Normal
-                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                                    StateLayer {
+                                        onClicked: ShellState.settingsPage = modelData.id
                                     }
-                                }
-                                StateLayer {
-                                    onClicked: ShellState.settingsPage = modelData.id
                                 }
                             }
+                            }
                         }
-
-                        Item { Layout.fillHeight: true }
                     }
 
                     // --- Page ---

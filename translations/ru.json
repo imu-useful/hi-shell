@@ -995,5 +995,9 @@
     "Text": "Текст",
     "Opens with": "Открывается в",
     "Not set": "Не выбрано",
-    "No installed app opens this": "Нет установленных программ для этого"
+    "No installed app opens this": "Нет установленных программ для этого",
+    "Defaults": "По умолчанию",
+    "Or type a program or command": "Или введите программу или команду",
+    "No program called “%1”": "Нет программы «%1»",
+    "Couldn't set it (see the shell's log)": "Не удалось задать (см. лог оболочки)"
 }
