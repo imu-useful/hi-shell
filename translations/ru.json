@@ -980,5 +980,8 @@
     "Its title has “%1”": "В её заголовке есть «%1»",
     "Ask %1 anything": "Спросите %1 о чём угодно",
     "Ask %1 anything.  Enter to send · Esc to close · Ctrl+N for a new chat": "Спросите %1 о чём угодно.  Enter — отправить · Esc — закрыть · Ctrl+N — новый чат",
-    "Ask %1…": "Спросить %1…"
+    "Ask %1…": "Спросить %1…",
+    "Claude CLI models": "Модели Claude CLI",
+    "Loading the models…": "Загружаю модели…",
+    "Delete this language": "Удалить этот язык"
 }

@@ -31,6 +31,19 @@ Singleton {
         maker.running = true;
     }
 
+    // Forgets a made language and deletes its file. The interface goes back to Auto if it was the one used.
+    function remove(code) {
+        Config.options.customLanguages = Config.options.customLanguages.filter(l => l.code !== code);
+        if (Config.options.language === code)
+            Config.options.language = "auto";
+        deleter.command = ["rm", "-f", `${Config.dir}/translations/${code}.json`];
+        deleter.running = true;
+    }
+
+    Process {
+        id: deleter
+    }
+
     Process {
         id: maker
         property var pending: ({})

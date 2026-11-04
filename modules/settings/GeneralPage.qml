@@ -9,6 +9,9 @@ ColumnLayout {
     readonly property var o: Config.options
     spacing: 24
 
+    // The model picked for the generated language (empty: the provider's default).
+    property string langModelId: ""
+
     Section {
         icon: "language"
         title: Translation.tr("Language")
@@ -43,15 +46,12 @@ ColumnLayout {
             fieldWidth: 160
             onEdited: text => langName.value = text.trim()
         }
-        TextRow {
+        ModelChoice {
             id: langModel
-            icon: "smart_toy"
             title: Translation.tr("Model")
-            subtitle: Config.options.ai.provider === "claude" ? Translation.tr("From the Claude CLI: sonnet, opus or haiku") : Config.options.ai.provider
-            placeholder: Config.options.ai.provider === "claude" ? "sonnet" : (Config.options.ai.models[Config.options.ai.provider] ?? "")
-            value: Config.options.ai.provider === "claude" ? "" : (Config.options.ai.models[Config.options.ai.provider] ?? "")
-            fieldWidth: 200
-            onEdited: text => langModel.value = text.trim()
+            current: langModelId
+            fallback: Config.options.ai.provider === "claude" ? "sonnet" : (Config.options.ai.models[Config.options.ai.provider] ?? "")
+            onPicked: id => langModelId = id
         }
         ListRow {
             Layout.fillWidth: true
@@ -62,7 +62,23 @@ ColumnLayout {
                 text: Translation.tr("Generate")
                 icon: "auto_awesome"
                 enabled: !LanguageMaker.running && /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(langCode.value) && langCode.value !== "en"
-                onClicked: LanguageMaker.generate(langCode.value, langName.value, langModel.value || (Config.options.ai.provider === "claude" ? "sonnet" : (Config.options.ai.models[Config.options.ai.provider] ?? "")))
+                onClicked: LanguageMaker.generate(langCode.value, langName.value, langModel.shown)
+            }
+        }
+        Repeater {
+            model: Config.options.customLanguages
+
+            ListRow {
+                required property var modelData
+                Layout.fillWidth: true
+                icon: "translate"
+                title: modelData.name
+                subtitle: modelData.code
+                IconButton {
+                    icon: "delete"
+                    tooltip: Translation.tr("Delete this language")
+                    onClicked: LanguageMaker.remove(modelData.code)
+                }
             }
         }
     }
