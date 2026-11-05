@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Shapes
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -23,28 +22,9 @@ DesktopCard {
             counted = lyricsShown;
         }
     }
-    // The wave on the progress bar kicks to the beat (services/Beat), only while playing in view.
-    readonly property bool waveOn: Config.options.desktop.waveProgress
-    readonly property bool beatWanted: lyricsShown && Mpris.playing && Appearance.anim.speed > 0 && waveOn && Config.options.desktop.waveBeat
-    property bool beatCounted: false
-    function syncBeat() {
-        if (beatWanted !== beatCounted) {
-            Beat.users += beatWanted ? 1 : -1;
-            beatCounted = beatWanted;
-        }
-    }
-    onBeatWantedChanged: syncBeat()
     onLyricsShownChanged: syncLyrics()
-    Component.onCompleted: {
-        syncLyrics();
-        syncBeat();
-    }
-    Component.onDestruction: {
-        if (counted)
-            Lyrics.users--;
-        if (beatCounted)
-            Beat.users--;
-    }
+    Component.onCompleted: syncLyrics()
+    Component.onDestruction: if (counted) Lyrics.users--
 
     // Smooth motion only while the card can be seen.
     readonly property bool animate: lyricsShown && Appearance.anim.speed > 0
@@ -192,59 +172,11 @@ DesktopCard {
                 color: Colors.m3secondaryContainer
                 Behavior on height { enabled: root.animate; SpatialAnim { duration: Appearance.anim.fast } }
             }
-            // The played part: a sine wave while playing that flattens when paused. The wave is
-            // drawn once, a wavelength wider than needed, and slid sideways, then clipped to the
-            // played width: no per-frame work in JS.
-            Item {
-                id: played
-                readonly property real wavelength: 26
-                property real amplitude: Mpris.playing && root.waveOn ? 2.6 : 0
-                readonly property real fill: track.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
-                // The wave's sideways position (0..wavelength). It drifts steadily and every rise of
-                // the bass (a drum hit) throws it forward, then the push dies away.
-                property real phase: 0
-                property real push: 0
-                property real lastBass: 0
-                FrameAnimation {
-                    running: Mpris.playing && root.animate && root.waveOn
-                    onTriggered: {
-                        const dt = Math.min(0.1, frameTime);
-                        const bass = Beat.bass;
-                        const rise = root.beatWanted ? Math.max(0, bass - played.lastBass) : 0;
-                        played.lastBass = bass;
-                        played.push = played.push * Math.exp(-dt * 7) + rise * 600;
-                        played.phase = (played.phase + (played.wavelength / 1.4 + played.push) * dt) % played.wavelength;
-                    }
-                }
-                Behavior on amplitude { enabled: root.animate; NumberAnimation { duration: Appearance.anim.spatial; easing.type: Easing.OutCubic } }
-
-                width: fill
-                height: 20
-                anchors.verticalCenter: parent.verticalCenter
-                clip: true
-
-                Shape {
-                    id: wave
-                    height: parent.height
-                    width: track.width + played.wavelength
-                    preferredRendererType: Shape.CurveRenderer
-                    ShapePath {
-                        strokeColor: Colors.m3primary
-                        strokeWidth: bar.height
-                        fillColor: "transparent"
-                        capStyle: ShapePath.RoundCap
-                        PathPolyline {
-                            path: {
-                                const pts = [];
-                                const mid = wave.height / 2;
-                                for (let x = 0; x <= wave.width; x += 2)
-                                    pts.push(Qt.point(x, mid + played.amplitude * Math.sin(x / played.wavelength * 2 * Math.PI)));
-                                return pts;
-                            }
-                        }
-                    }
-                    x: -played.phase
-                }
+            // The played part: a wave while playing (see WaveFill).
+            WaveFill {
+                fill: track.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
+                thickness: bar.height
+                playing: Mpris.playing && root.lyricsShown
             }
 
             // The handle, while the pointer is over the bar or it's being dragged, with the time it

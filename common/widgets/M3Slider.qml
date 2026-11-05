@@ -1,5 +1,6 @@
 import QtQuick
 import qs.common
+import qs.services
 
 // Material 3 slider: thick track, active part in primary, bar-shaped handle.
 // Emits moved(value) on drag / click / scroll; `value` is 0..1 and owned by the caller.
@@ -30,14 +31,12 @@ Item {
             return;
         }
         const step = clamped - shown;
-        if (playback && step >= 0 && step < 0.05) {
-            shown = clamped;
-            return;
-        }
+        // One position report while playing: run on at the speed of playback.
+        const tick = playback && Mpris.playing && step >= 0 && step < 0.05;
         glideAnim.from = shown;
         glideAnim.to = clamped;
-        glideAnim.duration = Appearance.anim.normal;
-        glideAnim.easing.type = Easing.OutCubic;
+        glideAnim.duration = tick ? 1000 : Appearance.anim.normal;
+        glideAnim.easing.type = tick ? Easing.Linear : Easing.OutCubic;
         glideAnim.start();
     }
     onClampedChanged: glide()
@@ -53,23 +52,34 @@ Item {
         root.moved(Math.max(0, Math.min(1, (x - handle.width / 2) / (width - handle.width))));
     }
 
+    // A player's progress: thin track with a wave for the played part.
+    readonly property bool wavy: playback && Config.options.desktop.waveProgress
+    readonly property int trackHeight: wavy ? 4 : 16
+
     // Inactive track
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         x: root.handleX + handle.width + 4
         width: Math.max(0, root.width - x)
-        height: 16
-        radius: 8
+        height: root.trackHeight
+        radius: height / 2
         color: Colors.m3secondaryContainer
     }
 
     // Active track
     Rectangle {
+        visible: !root.wavy
         anchors.verticalCenter: parent.verticalCenter
         width: Math.max(0, root.handleX - 4)
         height: 16
         radius: 8
         color: Colors.m3primary
+    }
+    WaveFill {
+        visible: root.wavy
+        fill: Math.max(0, root.handleX - 4)
+        thickness: root.trackHeight
+        playing: Mpris.playing
     }
 
     Rectangle {
