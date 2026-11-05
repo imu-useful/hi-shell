@@ -11,7 +11,7 @@ import qs.modules.dock
 
 // Dock (Config dock.*): pinned and running apps. Click: launch, or focus (cycles the app's windows).
 // Middle click: a new window. Wheel over an app: its windows in turn. Right click: a menu (pin,
-// move, new window, app actions, close). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom.
+// move, new window, app actions, close). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom, or when the workspace has no windows.
 Variants {
     // One dock: on dock.monitor, or the first screen.
     model: Config.options.dock.enabled ? Quickshell.screens.filter(s => !Config.options.dock.monitor || s.name === Config.options.dock.monitor).slice(0, 1) : []
@@ -22,7 +22,11 @@ Variants {
         required property ShellScreen modelData
         readonly property var options: Config.options.dock
         readonly property int iconSize: options.iconSize
+        // No window on the workspace this screen shows.
+        readonly property var monitor: Hyprland.monitorFor(modelData)
+        readonly property bool workspaceEmpty: !Hyprland.toplevels.values.some(t => t.workspace?.id === monitor?.activeWorkspace?.id)
         readonly property bool shown: !options.autoHide || hover.hovered || ShellState.overviewOpen || menu.open
+            || (options.showWhenEmpty && workspaceEmpty)
         readonly property int menuGap: 10
         // Which windows exist (app id + address) and the pins. A string, so it only changes when the
         // dock's contents do, not on every window title update.

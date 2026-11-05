@@ -343,6 +343,8 @@ Singleton {
                 property bool enabled: false
                 property bool autoHide: true
                 property bool magnify: true
+                // With auto-hide: also show the dock while the workspace has no windows.
+                property bool showWhenEmpty: true
                 property int iconSize: 44
                 // Screen name; empty = first screen.
                 property string monitor: ""
