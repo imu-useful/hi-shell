@@ -9,6 +9,7 @@ ColumnLayout {
 
     readonly property var l: Config.options.lock
     spacing: 24
+    readonly property bool builtin: l.mode === "builtin"
 
     // Chips for the elements, in the order they show on the screen (top to bottom).
     readonly property var elements: [
@@ -23,6 +24,41 @@ ColumnLayout {
     ]
 
     Section {
+        icon: "lock"
+        title: Translation.tr("Lock screen")
+
+        ChoiceRow {
+            icon: "tune"
+            title: Translation.tr("Type")
+            subtitle: Translation.tr("hi-shell's own, your hyprlock config, or another locker")
+            value: root.l.mode
+            options: [{ value: "builtin", text: "hi-shell" }, { value: "file", text: Translation.tr("My hyprlock config") }, { value: "command", text: Translation.tr("My command") }]
+            onSelected: value => root.l.mode = value
+        }
+        TextRow {
+            visible: root.l.mode === "file"
+            icon: "description"
+            title: Translation.tr("Config file")
+            subtitle: Translation.tr("Sourced by the lock screen, also when the screen locks by itself")
+            placeholder: "~/.config/hypr/hyprlock.conf"
+            value: root.l.customConfig
+            fieldWidth: 280
+            onEdited: text => root.l.customConfig = text.trim()
+        }
+        TextRow {
+            visible: root.l.mode === "command"
+            icon: "terminal"
+            title: Translation.tr("Lock command")
+            subtitle: Translation.tr("Run by Lock; the screen locking by itself (hypridle) still uses hyprlock")
+            placeholder: "swaylock"
+            value: root.l.customCommand
+            fieldWidth: 280
+            onEdited: text => root.l.customCommand = text.trim()
+        }
+    }
+
+    Section {
+        visible: root.builtin
         icon: "widgets"
         title: Translation.tr("On the lock screen")
 
@@ -51,6 +87,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.builtin
         icon: "palette"
         title: Translation.tr("Look")
 
@@ -116,6 +153,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.builtin
         icon: "schedule"
         title: Translation.tr("Clock")
 
@@ -142,6 +180,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.builtin
         icon: "calendar_today"
         title: Translation.tr("Date")
 
@@ -160,6 +199,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.builtin
         icon: "wallpaper"
         title: Translation.tr("Background")
 

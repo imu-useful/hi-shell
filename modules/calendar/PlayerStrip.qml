@@ -90,4 +90,23 @@ ColumnLayout {
             color: Colors.m3onSurfaceVariant
         }
     }
+
+    // Which player it is, and a way to the next one (with more than one).
+    RowLayout {
+        Layout.fillWidth: true
+        visible: Mpris.players.length > 1
+
+        StyledText {
+            Layout.fillWidth: true
+            text: Mpris.active?.identity ?? ""
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+            elide: Text.ElideRight
+        }
+        Chip {
+            icon: "swap_horiz"
+            text: Translation.tr("Switch player")
+            onClicked: Mpris.cyclePlayer()
+        }
+    }
 }

@@ -221,6 +221,11 @@ Singleton {
 
             // The lock screen (services/LockScreen.qml): what it shows and how it looks.
             property JsonObject lock: JsonObject {
+                // "builtin": hi-shell's own look; "file": your hyprlock config (sourced);
+                // "command": any other locker (swaylock, gtklock, ...), run by Lock.
+                property string mode: "builtin"
+                property string customConfig: ""
+                property string customCommand: ""
                 property bool clock: true
                 property bool date: true
                 property bool greeting: true

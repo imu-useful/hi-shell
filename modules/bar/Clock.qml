@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -23,7 +22,6 @@ BarWidget {
     padding: 4
     readonly property bool music: Island.mode === "music"
     readonly property int artSize: thickness - 6
-    property real closedAt: 0
     readonly property bool notifying: Island.notif !== null
     // Volume / brightness for a moment (a notification comes first).
     readonly property bool osding: Island.showsOsd
@@ -56,10 +54,8 @@ BarWidget {
                 else
                     Island.open();
             }
-            else if (music) {
-                if (Date.now() - closedAt > 300)
-                    Island.expanded = !Island.expanded;
-            }
+            else if (music)
+                Island.expanded = !Island.expanded;
             else
                 ShellState.calendarOpen = !ShellState.calendarOpen;
         }
@@ -226,25 +222,22 @@ BarWidget {
         compact: root.vertical
     }
 
-    // A tap in the music state opens the player's controls under the island.
+    // A tap in the music state opens the player's controls under the island; they stay while the pointer is on
+    // the island or on them, and go (and the state with them) when it leaves both. Another tap closes them too.
     StyledPopup {
-        target: root
         id: musicPopup
-        pinned: Island.musicExpanded
+        target: root
+        hovered: Island.musicExpanded && root.hovered
         edge: root.popupEdge
+        onShownChanged: if (!shown) Island.expanded = false
 
         MediaControls {}
     }
-
-    // A click anywhere else closes the player's controls. The tap on the island itself comes after
-    // this clears the grab; it would reopen them, hence the guard in onClicked.
-    HyprlandFocusGrab {
-        windows: [musicPopup]
-        active: Island.musicExpanded && musicPopup.visible
-        onCleared: {
-            Island.expanded = false;
-            closedAt = Date.now();
-        }
+    // Opened without the pointer on the island (over IPC): nothing would ever close it.
+    Timer {
+        interval: 1500
+        running: Island.musicExpanded && !musicPopup.shown
+        onTriggered: Island.expanded = false
     }
 
     // Hover the island while it shows a notification: its message pops out in a second island, with the buttons under it.
