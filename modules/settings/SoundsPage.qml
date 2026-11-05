@@ -19,7 +19,7 @@ ColumnLayout {
         SwitchRow {
             icon: "notifications_active"
             title: Translation.tr("Event sounds")
-            subtitle: Translation.tr("Notifications, timers, battery, screenshots")
+            subtitle: Translation.tr("Notifications, timers, battery, screenshots, volume")
             checked: s.enabled
             onToggled: checked => s.enabled = checked
         }
@@ -101,6 +101,13 @@ ColumnLayout {
             title: Translation.tr("Battery and charger")
             checked: s.battery
             onToggled: checked => s.battery = checked
+        }
+        SwitchRow {
+            icon: "volume_up"
+            title: Translation.tr("Volume change")
+            subtitle: Translation.tr("A tick when the volume changes")
+            checked: s.volumeTick
+            onToggled: checked => s.volumeTick = checked
         }
         SwitchRow {
             icon: "screenshot_region"

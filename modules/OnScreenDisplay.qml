@@ -73,7 +73,11 @@ Scope {
 
     Connections {
         target: root.sink?.audio ?? null
-        function onVolumeChanged() { root.showVolume(); }
+        function onVolumeChanged() {
+            if (root.armed)
+                Sounds.play("volume");
+            root.showVolume();
+        }
         function onMutedChanged() { root.showVolume(); }
     }
 

@@ -409,6 +409,7 @@ Singleton {
                 property bool timers: true
                 property bool battery: true
                 property bool capture: true
+                property bool volumeTick: true
             }
 
             property JsonObject capture: JsonObject {

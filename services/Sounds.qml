@@ -30,7 +30,8 @@ Singleton {
         batteryCritical: ["dialog-error", "battery", "Battery critical"],
         plugged: ["power-plug", "battery", "Charger plugged in"],
         unplugged: ["power-unplug", "battery", "Charger unplugged"],
-        screenshot: ["screen-capture", "capture", "Screenshot"]
+        screenshot: ["screen-capture", "capture", "Screenshot"],
+        volume: ["audio-volume-change", "volumeTick", "Volume change"]
     })
     // Packs shipped with the shell (besides the system theme).
     readonly property var downloadable: ["miui", "samsung", "iphone", "windows", "win7", "winxp", "android"]
@@ -39,10 +40,20 @@ Singleton {
     property string installing: ""
     property bool failed: false
 
+    // The volume tick comes at most this often, so dragging a slider doesn't machine-gun it.
+    readonly property int tickGap: 120
+    property real lastTick: 0
+
     function play(event, force) {
         const e = events[event];
         if (!e || !options.enabled || (!force && !options[e[1]]))
             return;
+        if (event === "volume") {
+            const now = Date.now();
+            if (now - lastTick < tickGap)
+                return;
+            lastTick = now;
+        }
         // The pack's file (the user's folder, then the shipped one) in any format pw-play reads, else the system theme's.
         Quickshell.execDetached(["sh", "-c", 'for f in "$1".* "$2".* "$3"; do [ -f "$f" ] && exec pw-play --volume "$4" "$f"; done',
             "sh", `${userDir}${options.pack}/${event}`, `${bundledDir}${options.pack}/${event}`, `${dir}${e[0]}.oga`, String(options.volume)]);

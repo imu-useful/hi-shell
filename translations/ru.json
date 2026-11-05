@@ -1085,7 +1085,6 @@
     "Presentation: hide the bar": "Презентация: прятать панель",
     "Sounds": "Звуки",
     "Event sounds": "Звуки событий",
-    "Notifications, timers, battery, screenshots": "Уведомления, таймеры, батарея, скриншоты",
     "Volume": "Громкость",
     "Timers and focus": "Таймеры и фокус",
     "Battery and charger": "Батарея и зарядка",
@@ -1103,5 +1102,8 @@
     "Charger plugged in": "Зарядку подключили",
     "Charger unplugged": "Зарядку отключили",
     "The sounds of these packs belong to their makers": "Звуки этих наборов принадлежат их авторам",
-    "They come with the shell for personal use, see sounds/NOTICE.md": "Они идут вместе с оболочкой для личного использования, см. sounds/NOTICE.md"
+    "They come with the shell for personal use, see sounds/NOTICE.md": "Они идут вместе с оболочкой для личного использования, см. sounds/NOTICE.md",
+    "Volume change": "Изменение громкости",
+    "A tick when the volume changes": "Щелчок при изменении громкости",
+    "Notifications, timers, battery, screenshots, volume": "Уведомления, таймеры, батарея, скриншоты, громкость"
 }
