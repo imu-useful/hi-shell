@@ -34,20 +34,25 @@ Singleton {
         return Qt.tint(base, Qt.alpha(Colors.m3primary, 0.18));
     }
 
-    // 0..15: black, red, green, yellow, blue, magenta, cyan, white, then bright ones.
+    // A green or cyan with the wallpaper's own saturation and lightness (the palette has no green role).
+    function harmonized(hue) {
+        const dark = Colors.dark;
+        return Qt.hsla(hue, Colors.m3primary.hslSaturation, dark ? 0.70 : 0.38, 1);
+    }
+
+    // 0..15: black, red, green, yellow, blue, magenta, cyan, white, then bright ones. The colors are the
+    // palette's own roles (error = red, tertiary = yellow, primary = blue, secondary = magenta), so the
+    // terminal reads as the wallpaper's palette; green and cyan are harmonized with the primary.
     readonly property var palette: {
-        const hues = [0, 0.0, 0.33, 0.13, 0.6, 0.83, 0.5, 0];
+        const green = harmonized(0.33);
+        const cyan = Qt.tint(harmonized(0.5), Qt.alpha(Colors.m3primary, 0.35));
+        const normal = [Colors.m3surfaceContainerHighest, Colors.m3error, green, Colors.m3tertiary, Colors.m3primary, Colors.m3secondary, cyan, Colors.m3onSurfaceVariant];
         const out = [];
-        for (const bright of [false, true]) {
-            for (let i = 0; i < 8; i++) {
-                if (i === 0)
-                    out.push(bright ? Colors.m3outline : Colors.m3surfaceContainerHighest);
-                else if (i === 7)
-                    out.push(bright ? Colors.m3onSurface : Colors.m3onSurfaceVariant);
-                else
-                    out.push(ansi(hues[i], bright));
-            }
-        }
+        normal.forEach((c, i) => out.push(i === 0 ? Colors.m3outline : c));
+        normal.forEach((c, i) => out.push(i === 0 ? Colors.m3outline : Qt.tint(c, Qt.alpha(Colors.m3onSurface, 0.18))));
+        out[0] = Colors.m3surfaceContainerHighest;
+        out[8] = Colors.m3outline;
+        out[15] = Colors.m3onSurface;
         return out;
     }
 
