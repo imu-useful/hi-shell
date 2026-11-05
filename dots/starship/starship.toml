@@ -1,0 +1,38 @@
+# Starship prompt from hi-shell. The colors are the wallpaper's palette: hi-shell appends the
+# [palettes.hi-shell] section (services/TerminalColors.qml) to ~/.local/state/hi-shell/terminal/starship.toml,
+# which fish points STARSHIP_CONFIG at. Edit the colors here by their roles (primary, on_surface, ...).
+palette = "hi-shell"
+add_newline = false
+
+format = """
+$cmd_duration$directory$git_branch
+$character"""
+
+[cmd_duration]
+min_time = 0
+format = "[ $duration ](fg:on_surface bg:surface_container_high)[](fg:surface_container_high)"
+
+[directory]
+style = "fg:on_primary bg:primary"
+format = "[ $path ]($style)[](fg:primary)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+
+[git_branch]
+symbol = "󰘬 "
+style = "fg:on_tertiary bg:tertiary"
+format = "[ $symbol$branch ]($style)[](fg:tertiary) "
+
+[character]
+success_symbol = "[ ](bold fg:primary)"
+error_symbol = "[ ](bold fg:error)"
+
+[package]
+disabled = true
+
+[time]
+disabled = true
+
+[memory_usage]
+disabled = true

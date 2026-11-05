@@ -27,6 +27,8 @@ if status is-interactive
 
     # --- Prompt ---
     if type -q starship; and test "$TERM" != linux
+        # The prompt's colors follow the wallpaper (hi-shell writes this file; see dots/starship).
+        test -f $hs/starship.toml; and set -gx STARSHIP_CONFIG $hs/starship.toml
         # Past prompts collapse to a single character.
         function starship_transient_prompt_func
             starship module character

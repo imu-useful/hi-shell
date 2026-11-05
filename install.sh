@@ -151,7 +151,7 @@ choose_channel
 PACMAN_PKGS=(
     matugen python pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
     libnotify hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
-    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools wtype ffmpeg qt6-multimedia-ffmpeg
+    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools wtype ffmpeg qt6-multimedia-ffmpeg starship
 )
 AUR_PKGS=(quickshell-git ttf-material-symbols-variable-git)
 

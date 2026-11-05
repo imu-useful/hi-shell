@@ -141,6 +141,20 @@ theme[main_bg]=""
           + grad("upload", Colors.m3secondary, Colors.m3primary, Colors.m3tertiary);
     }
 
+    // The palette's roles for starship.toml (its colors are named by role; see dots/starship/starship.toml).
+    readonly property string starship: `
+[palettes.hi-shell]
+primary = "${hex(Colors.m3primary)}"
+on_primary = "${hex(Colors.m3onPrimary)}"
+tertiary = "${hex(Colors.m3tertiary)}"
+on_tertiary = "${hex(Colors.m3onTertiary)}"
+error = "${hex(Colors.m3error)}"
+on_surface = "${hex(Colors.m3onSurface)}"
+surface_container_high = "${hex(Colors.m3surfaceContainerHigh)}"
+`
+
+    readonly property string starshipTemplate: Quickshell.shellDir + "/dots/starship/starship.toml"
+
     function write() {
         writeTimer.stop();
         writer.command = ["sh", "-c", `
@@ -148,6 +162,8 @@ theme[main_bg]=""
             printf %s "$2" > "$1/sequences.txt.tmp" && mv "$1/sequences.txt.tmp" "$1/sequences.txt"
             printf %s "$3" > "$1/colors.fish.tmp" && mv "$1/colors.fish.tmp" "$1/colors.fish"
             printf %s "$4" > "$1/kitty-theme.conf.tmp" && mv "$1/kitty-theme.conf.tmp" "$1/kitty-theme.conf"
+            # starship: the template from the repo, with the palette's roles appended.
+            { cat "$7" 2>/dev/null; printf %s "$6"; } > "$1/starship.toml.tmp" && mv "$1/starship.toml.tmp" "$1/starship.toml"
             # btop: only for people who use it (its config folder exists). SIGUSR2 reloads it.
             if [ -d "$HOME/.config/btop" ]; then
                 mkdir -p "$HOME/.config/btop/themes"
@@ -163,7 +179,7 @@ theme[main_bg]=""
                 t=/dev/$tty
                 [ -O "$t" ] && [ -w "$t" ] && printf %s "$2" > "$t" 2>/dev/null
             done
-        `, "sh", dir, sequences, fish, kitty, btop];
+        `, "sh", dir, sequences, fish, kitty, btop, starship, starshipTemplate];
         writer.running = true;
     }
 
