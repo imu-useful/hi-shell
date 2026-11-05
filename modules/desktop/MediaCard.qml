@@ -258,10 +258,36 @@ DesktopCard {
         ListView {
             id: lyrics
             readonly property int rowHeight: 24
+            readonly property bool available: Lyrics.synced && Lyrics.lines.length > 0
+            // 0..1: the block opens and closes instead of the card jumping in height.
+            property real reveal: available ? 1 : 0
+            Behavior on reveal { enabled: root.animate; NumberAnimation { duration: Appearance.anim.spatial; easing.type: Easing.OutCubic } }
+            // 0..1: a new song's lines fade in.
+            property real fresh: 1
 
             Layout.fillWidth: true
-            implicitHeight: rowHeight * 3 + spacing * 2
-            visible: Lyrics.synced && Lyrics.lines.length > 0
+            // The column's spacing goes away with the block.
+            Layout.topMargin: -10 * (1 - reveal)
+            implicitHeight: (rowHeight * 3 + spacing * 2) * reveal
+            visible: reveal > 0
+            opacity: reveal * fresh
+            onAvailableChanged: if (available && root.animate) freshAnim.restart()
+            Connections {
+                target: Lyrics
+                function onLinesChanged() {
+                    if (lyrics.available && root.animate)
+                        freshAnim.restart();
+                }
+            }
+            NumberAnimation {
+                id: freshAnim
+                target: lyrics
+                property: "fresh"
+                from: 0
+                to: 1
+                duration: Appearance.anim.slow
+                easing.type: Easing.OutCubic
+            }
             clip: true
             interactive: false
             spacing: 2

@@ -21,12 +21,30 @@ Rectangle {
 
     Behavior on color { ColorAnimation { duration: 120 } }
 
+    // Pressing squeezes the button a little and it springs back.
+    scale: mouse.pressed ? 0.9 : 1
+    Behavior on scale { enabled: Appearance.anim.speed > 0; SpringAnim { overshoot: 1.4 } }
+
     Text {
+        id: glyph
         anchors.centerIn: parent
         text: root.icon
         font.family: Appearance.font.icon
         font.pixelSize: 22
         color: root.iconColor
+        Behavior on color { ColorAnimation { duration: 120 } }
+
+        // A changed icon (play/pause) shrinks in instead of snapping.
+        onTextChanged: if (Appearance.anim.speed > 0) swap.restart()
+        NumberAnimation {
+            id: swap
+            target: glyph
+            property: "scale"
+            from: 0.5
+            to: 1
+            duration: Appearance.anim.normal
+            easing.type: Easing.OutBack
+        }
     }
 
     MouseArea {
