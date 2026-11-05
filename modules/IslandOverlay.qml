@@ -38,10 +38,10 @@ Scope {
                     exclusionMode: ExclusionMode.Ignore
                     implicitWidth: pill.width + 32
                     // Room for the message and the buttons; the mask keeps the rest click-through.
-                    implicitHeight: Island.notif ? 300 : pill.height + 32
+                    implicitHeight: Island.notif || Island.privacy ? 300 : pill.height + 32
                     mask: Region {
                         item: pill
-                        regions: [Region { item: card }]
+                        regions: [Region { item: card }, Region { item: privacyCard.visible ? privacyCard : null }]
                     }
                     color: "transparent"
 
@@ -61,6 +61,35 @@ Scope {
 
                         HoverHandler {
                             onHoveredChanged: Island.setHover("overlayCard", hovered)
+                        }
+                    }
+
+                    // Hover the indicator: who is using the camera or the microphone.
+                    Rectangle {
+                        id: privacyCard
+
+                        readonly property bool shown: loader.revealed && Island.privacy && Island.notif === null && Island.hovered
+
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: pill.y + pill.height + 10
+                        width: list.implicitWidth + 32
+                        height: list.implicitHeight + 28
+                        radius: Appearance.rounding.large
+                        color: Appearance.translucent(Colors.m3surfaceContainerHighest, 0.05)
+                        border.width: 1
+                        border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
+                        opacity: shown ? 1 : 0
+                        visible: opacity > 0.01
+                        Behavior on opacity { EffectAnim {} }
+
+                        PrivacyList {
+                            id: list
+                            x: 16
+                            y: 14
+                        }
+
+                        HoverHandler {
+                            onHoveredChanged: Island.setHover("overlayPrivacy", hovered)
                         }
                     }
 

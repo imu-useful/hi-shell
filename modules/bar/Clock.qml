@@ -191,6 +191,20 @@ BarWidget {
         anchors.verticalCenter: parent.verticalCenter
     }
 
+    // Hover the indicator: who is using the camera or the microphone.
+    HoverHandler {
+        id: privacyHover
+        parent: privacy
+        enabled: privacy.visible
+    }
+    StyledPopup {
+        target: privacy
+        hovered: privacyHover.hovered
+        edge: root.popupEdge
+
+        PrivacyList {}
+    }
+
     IslandOsd {
         id: osdView
         readonly property bool on: root.osding

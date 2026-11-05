@@ -1030,5 +1030,7 @@
     "No moves left": "Ходов больше нет",
     "Click to play flappy": "Нажмите, чтобы сыграть в птичку",
     "All pairs found in %1 moves": "Все пары найдены за %1 ходов",
-    "Click to play again": "Нажмите, чтобы сыграть снова"
+    "Click to play again": "Нажмите, чтобы сыграть снова",
+    "Camera": "Камера",
+    "In use now": "Сейчас используется"
 }

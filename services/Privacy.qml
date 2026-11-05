@@ -38,9 +38,32 @@ Singleton {
         return mediaClass(g.target) === streamClass && sourcePattern.test(mediaClass(g.source)) && !isEffects(g.target);
     }
 
+    // Colours that mean the same whatever the theme: microphone green, camera orange, both yellow.
+    readonly property color micColor: "#34c759"
+    readonly property color cameraColor: "#ff9500"
+    readonly property color bothColor: "#ffcc00"
+
+    // A readable name for a PipeWire stream's program.
+    function streamName(node) {
+        const p = node?.properties ?? {};
+        return p["application.name"] || p["node.description"] || p["node.name"] || "";
+    }
+    // A process name (from /proc) as the app's name when it has a desktop entry.
+    function processName(comm) {
+        return DesktopEntries.heuristicLookup(comm)?.name ?? comm;
+    }
+    function unique(list) {
+        return [...new Set(list.filter(n => n !== ""))];
+    }
+
+    // Who is using them, for the tooltip and the calendar.
+    readonly property var micApps: unique(groups.filter(g => captures(g, "Stream/Input/Audio", /^Audio\/Source/)).map(g => streamName(g.target)))
+    readonly property var cameraApps: unique([...groups.filter(g => captures(g, "Stream/Input/Video", /^Video\/Source/)).map(g => streamName(g.target)), ...directApps.map(processName)])
+
     readonly property bool mic: groups.some(g => captures(g, "Stream/Input/Audio", /^Audio\/Source/))
-    // A program has a camera device open.
-    property bool direct: false
+    // The programs that have a camera device open (their process names).
+    property var directApps: []
+    readonly property bool direct: directApps.length > 0
     readonly property bool camera: direct || groups.some(g => captures(g, "Stream/Input/Video", /^Video\/Source/))
     readonly property bool active: mic || camera
     // "mic" | "camera" | "both" | ""
@@ -66,14 +89,14 @@ Singleton {
         id: who
         command: ["sh", "-c", 'for p in $(fuser /dev/video* 2>/dev/null); do c=$(cat /proc/$p/comm 2>/dev/null); case "$c" in pipewire*|wireplumber*) ;; *) echo "$c";; esac; done']
         stdout: StdioCollector {
-            onStreamFinished: root.direct = text.trim() !== ""
+            onStreamFinished: root.directApps = root.unique(text.split("\n").map(l => l.trim()))
         }
     }
     onWatchingChanged: {
         if (watching)
             look.restart();
         else
-            direct = false;
+            directApps = [];
     }
     Component.onCompleted: if (watching) look.restart()
 }

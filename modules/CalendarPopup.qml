@@ -117,6 +117,11 @@ Scope {
                         Layout.alignment: Qt.AlignTop
                         spacing: 12
 
+                        // The camera / microphone, while in use.
+                        PrivacyStrip {
+                            Layout.fillWidth: true
+                        }
+
                         // The player, when there is one.
                         PlayerStrip {
                             id: player
