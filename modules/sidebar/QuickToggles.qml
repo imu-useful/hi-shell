@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "viewing", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession", "waitMode"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "viewing", "presentation", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession", "waitMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -111,6 +111,14 @@ ColumnLayout {
             active: Viewing.active,
             available: true,
             toggle: () => Viewing.toggle()
+        },
+        presentation: {
+            icon: "co_present",
+            label: Translation.tr("Presentation"),
+            subtitle: Presentation.active ? Translation.tr("On") : Translation.tr("Off"),
+            active: Presentation.active,
+            available: true,
+            toggle: () => Presentation.toggle()
         },
         vpn: {
             icon: "vpn_key",

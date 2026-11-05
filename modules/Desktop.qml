@@ -455,7 +455,7 @@ Scope {
                 id: widgets
                 anchors.fill: parent
                 // Gone during Focus Mode (still loaded, so they keep their state).
-                visible: window.hasWidgets && !ShellState.zen
+                visible: window.hasWidgets && !ShellState.zen && !Presentation.hideWidgets
                 // Hidden (not unloaded) behind windows, so widgets keep their state.
                 opacity: window.reveal
                 scale: 0.97 + 0.03 * window.reveal

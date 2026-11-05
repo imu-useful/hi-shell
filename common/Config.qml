@@ -253,6 +253,15 @@ Singleton {
                 property bool auto: true
             }
 
+            property JsonObject presentation: JsonObject {
+                // What Presentation mode does while it's on.
+                property bool holdNotifications: true
+                property bool keepAwake: true
+                property bool nightLightOff: true
+                property bool hideDesktopWidgets: true
+                property bool hideBar: false
+            }
+
             property JsonObject powerSaving: JsonObject {
                 property bool enabled: false
                 property var saved: ({})

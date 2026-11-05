@@ -1046,5 +1046,13 @@
     "All pairs found in %1 moves": "Все пары найдены за %1 ходов",
     "Click to play again": "Нажмите, чтобы сыграть снова",
     "Camera": "Камера",
-    "In use now": "Сейчас используется"
+    "In use now": "Сейчас используется",
+    "Presentation": "Презентация",
+    "Presentation mode": "Режим презентации",
+    "For sharing the screen: holds notifications, keeps the screen on, turns the night light off and hides the desktop widgets": "Для показа экрана: придерживает уведомления, не даёт экрану погаснуть, выключает ночной свет и прячет виджеты рабочего стола",
+    "Presentation: hold notifications": "Презентация: придерживать уведомления",
+    "Presentation: keep the screen on": "Презентация: не гасить экран",
+    "Presentation: night light off": "Презентация: выключать ночной свет",
+    "Presentation: hide the desktop widgets": "Презентация: прятать виджеты рабочего стола",
+    "Presentation: hide the bar": "Презентация: прятать панель"
 }
