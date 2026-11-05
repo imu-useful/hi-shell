@@ -217,6 +217,10 @@ Singleton {
                 property bool visualizer: true
                 // The big digital clock also shows the seconds (HH:MM:SS).
                 property bool clockSeconds: false
+                // The player card's progress bar: a travelling wave while playing (off: a plain bar),
+                // and the wave kicks to the beat (needs cava).
+                property bool waveProgress: true
+                property bool waveBeat: true
             }
 
             // The lock screen (services/LockScreen.qml): what it shows and how it looks.

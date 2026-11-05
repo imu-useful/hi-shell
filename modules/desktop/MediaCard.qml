@@ -24,7 +24,8 @@ DesktopCard {
         }
     }
     // The wave on the progress bar kicks to the beat (services/Beat), only while playing in view.
-    readonly property bool beatWanted: lyricsShown && Mpris.playing && Appearance.anim.speed > 0
+    readonly property bool waveOn: Config.options.desktop.waveProgress
+    readonly property bool beatWanted: lyricsShown && Mpris.playing && Appearance.anim.speed > 0 && waveOn && Config.options.desktop.waveBeat
     property bool beatCounted: false
     function syncBeat() {
         if (beatWanted !== beatCounted) {
@@ -197,7 +198,7 @@ DesktopCard {
             Item {
                 id: played
                 readonly property real wavelength: 26
-                property real amplitude: Mpris.playing ? 2.6 : 0
+                property real amplitude: Mpris.playing && root.waveOn ? 2.6 : 0
                 readonly property real fill: track.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
                 // The wave's sideways position (0..wavelength). It drifts steadily and every rise of
                 // the bass (a drum hit) throws it forward, then the push dies away.
@@ -205,11 +206,11 @@ DesktopCard {
                 property real push: 0
                 property real lastBass: 0
                 FrameAnimation {
-                    running: Mpris.playing && root.animate
+                    running: Mpris.playing && root.animate && root.waveOn
                     onTriggered: {
                         const dt = Math.min(0.1, frameTime);
                         const bass = Beat.bass;
-                        const rise = Math.max(0, bass - played.lastBass);
+                        const rise = root.beatWanted ? Math.max(0, bass - played.lastBass) : 0;
                         played.lastBass = bass;
                         played.push = played.push * Math.exp(-dt * 7) + rise * 600;
                         played.phase = (played.phase + (played.wavelength / 1.4 + played.push) * dt) % played.wavelength;

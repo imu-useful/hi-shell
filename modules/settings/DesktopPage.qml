@@ -52,6 +52,8 @@ ColumnLayout {
         SwitchRow { icon: "widgets"; title: Translation.tr("Widgets"); checked: root.d.widgets; onToggled: checked => root.d.widgets = checked }
         SwitchRow { icon: "graphic_eq"; title: Translation.tr("Visualizer while music plays"); subtitle: Translation.tr("Needs cava"); checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
         SwitchRow { icon: "timer"; title: Translation.tr("Seconds in the digital clock"); checked: root.d.clockSeconds; onToggled: checked => root.d.clockSeconds = checked }
+        SwitchRow { icon: "waves"; title: Translation.tr("Wavy progress bar in the player"); subtitle: Translation.tr("Off: a plain bar"); checked: root.d.waveProgress; onToggled: checked => root.d.waveProgress = checked }
+        SwitchRow { icon: "music_note"; title: Translation.tr("Wave kicks to the beat"); subtitle: Translation.tr("Needs cava"); enabled: root.d.waveProgress; checked: root.d.waveBeat; onToggled: checked => root.d.waveBeat = checked }
         ChoiceRow {
             icon: "monitor"
             title: Translation.tr("Widgets on")
