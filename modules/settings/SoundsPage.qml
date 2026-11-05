@@ -45,7 +45,7 @@ ColumnLayout {
                     : Sounds.failed ? Translation.tr("Couldn't download the pack")
                     : Sounds.downloadable.includes(s.pack) ? "" : Translation.tr("The system sound theme")
             value: s.pack
-            options: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" }, { value: "iphone", text: "iPhone" }, { value: "windows", text: "Windows 11" }]
+            options: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" }, { value: "iphone", text: "iPhone" }, { value: "windows", text: "Win 11" }, { value: "winxp", text: "Win XP" }]
             onSelected: value => {
                 if (value === "freedesktop" || Sounds.installed.includes(value)) {
                     s.pack = value;
