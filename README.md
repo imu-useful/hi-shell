@@ -293,7 +293,7 @@ Sections:
 - `notifications`: default popup timeout, history size
 - `updates`: check interval, include AUR (via `yay` or `paru`)
 - `tray.hidden`: tray item ids to hide
-- `dock`: enabled (off by default), auto-hide, show on an empty workspace, magnify (and its amount), icon size, gap, corner radius, edge margin, window dots, running apps, pinned app ids
+- `dock`: enabled (off by default), position (bottom, top, left, right), auto-hide, show on an empty workspace, magnify (and its amount), icon size, gap, corner radius, edge margin, window dots, running apps, pinned app ids
 - `capture`: OCR languages (`auto` = every installed tesseract language, or e.g. `eng+rus`); `recordSound` for screen recordings: `off`, `system` (what plays through the speakers) or `mic` (also the buttons under the mode switcher in Record mode)
 - `appearance.screenCorners`: rounded screen corner radius (0 = off)
 - `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default), `caelestia` (the same menus in the look of [caelestia's shell](https://github.com/caelestia-dots/shell): compact pill rows, a Back pill under a submenu) or `standard` (the system's menus); also in Settings › Interface

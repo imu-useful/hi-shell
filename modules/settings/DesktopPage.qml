@@ -94,7 +94,14 @@ ColumnLayout {
         title: Translation.tr("Dock")
 
         SwitchRow { icon: "dock_to_bottom"; title: Translation.tr("Dock"); checked: Config.options.dock.enabled; onToggled: checked => Config.options.dock.enabled = checked }
-        SwitchRow { icon: "visibility_off"; title: Translation.tr("Hide until the pointer reaches the bottom edge"); checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
+        ChoiceRow {
+            icon: "open_with"
+            title: Translation.tr("Dock position")
+            value: Config.options.dock.position
+            options: [{ value: "bottom", text: Translation.tr("Bottom") }, { value: "top", text: Translation.tr("Top") }, { value: "left", text: Translation.tr("Left") }, { value: "right", text: Translation.tr("Right") }]
+            onSelected: value => Config.options.dock.position = value
+        }
+        SwitchRow { icon: "visibility_off"; title: Translation.tr("Hide until the pointer reaches the screen edge"); checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
         SwitchRow { icon: "desktop_windows"; title: Translation.tr("Show on an empty workspace"); checked: Config.options.dock.showWhenEmpty; onToggled: checked => Config.options.dock.showWhenEmpty = checked }
         SwitchRow { icon: "apps"; title: Translation.tr("Show running apps that aren't pinned"); checked: Config.options.dock.showRunning; onToggled: checked => Config.options.dock.showRunning = checked }
         SwitchRow { icon: "more_horiz"; title: Translation.tr("Window dots under the icons"); checked: Config.options.dock.showIndicators; onToggled: checked => Config.options.dock.showIndicators = checked }

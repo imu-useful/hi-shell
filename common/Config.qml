@@ -341,6 +341,8 @@ Singleton {
 
             property JsonObject dock: JsonObject {
                 property bool enabled: false
+                // Screen edge: "bottom", "top", "left" or "right".
+                property string position: "bottom"
                 property bool autoHide: true
                 property bool magnify: true
                 // With auto-hide: also show the dock while the workspace has no windows.

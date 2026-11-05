@@ -11,6 +11,8 @@ Rectangle {
     property bool canMoveLeft: false
     property bool canMoveRight: false
     property bool canOpen: false
+    // A dock on the left or right: "move" goes up and down.
+    property bool vertical: false
     // The .desktop actions of the app ("New private window", ...) and how many windows it has.
     property var actions: []
     property int windowCount: 0
@@ -75,14 +77,14 @@ Rectangle {
         }
         MenuRow {
             visible: root.canMoveLeft
-            icon: "west"
-            label: Translation.tr("Move left")
+            icon: root.vertical ? "north" : "west"
+            label: root.vertical ? Translation.tr("Move up") : Translation.tr("Move left")
             onChosen: root.move(-1)
         }
         MenuRow {
             visible: root.canMoveRight
-            icon: "east"
-            label: Translation.tr("Move right")
+            icon: root.vertical ? "south" : "east"
+            label: root.vertical ? Translation.tr("Move down") : Translation.tr("Move right")
             onChosen: root.move(1)
         }
         MenuRow {

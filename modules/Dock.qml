@@ -28,6 +28,12 @@ Variants {
         readonly property bool shown: !options.autoHide || hover.hovered || ShellState.overviewOpen || menu.open
             || (options.showWhenEmpty && workspaceEmpty)
         readonly property int menuGap: 10
+        readonly property string position: ["top", "left", "right"].includes(options.position) ? options.position : "bottom"
+        readonly property bool vertical: position === "left" || position === "right"
+        readonly property int edgeMargin: options.edgeMargin
+        function mix(a, b, t) {
+            return a + (b - a) * t;
+        }
         // Which windows exist (app id + address) and the pins. A string, so it only changes when the
         // dock's contents do, not on every window title update.
         readonly property string appsKey: options.pinned.join(",") + "|" + options.showRunning + "|"
@@ -100,11 +106,12 @@ Variants {
 
         // The menu of an app, opened above its icon.
         property var menuApp: null
-        property real menuX: 0
+        // The icon's centre along the dock, in the window's coordinates.
+        property real menuAlong: 0
         readonly property bool menuOpen: menuApp !== null
         function openMenu(app, item) {
-            const p = item.mapToItem(dock, item.width / 2, 0);
-            menuX = Math.max(8, Math.min(width - menu.width - 8, dock.x + p.x - menu.width / 2));
+            const p = item.mapToItem(null, item.width / 2, item.height / 2);
+            menuAlong = vertical ? p.y : p.x;
             menuApp = app;
         }
         function closeMenu() {
@@ -112,11 +119,16 @@ Variants {
         }
 
         screen: modelData
-        anchors.bottom: true
-        exclusiveZone: options.autoHide ? 0 : dock.height + options.edgeMargin + 4
-        implicitWidth: Math.max(dock.width + 40, menu.width + 16)
-        implicitHeight: iconSize * 1.6 + 32 + options.edgeMargin + (menuOpen ? menu.height + menuGap : 0)
-        // Only the dock (or, hidden, a thin strip at the bottom edge) and the open menu take input.
+        anchors.bottom: position === "bottom"
+        anchors.top: position === "top"
+        anchors.left: position === "left"
+        anchors.right: position === "right"
+        exclusiveZone: options.autoHide ? 0 : (vertical ? dock.width : dock.height) + edgeMargin + 4
+        implicitWidth: vertical ? iconSize * 1.6 + 32 + edgeMargin + (menuOpen ? menu.width + menuGap : 0)
+            : Math.max(dock.width + 40, menu.width + 16)
+        implicitHeight: vertical ? Math.max(dock.height + 40, menu.height + 16)
+            : iconSize * 1.6 + 32 + edgeMargin + (menuOpen ? menu.height + menuGap : 0)
+        // Only the dock (or, hidden, a thin strip at the screen edge) and the open menu take input.
         mask: Region {
             Region { item: window.shown ? dock : trigger }
             Region { item: menu }
@@ -135,9 +147,10 @@ Variants {
 
         Item {
             id: trigger
-            anchors.bottom: parent.bottom
-            width: parent.width
-            height: 3
+            x: window.position === "right" ? parent.width - width : 0
+            y: window.position === "bottom" ? parent.height - height : 0
+            width: window.vertical ? 3 : parent.width
+            height: window.vertical ? parent.height : 3
         }
 
         HoverHandler {
@@ -147,29 +160,34 @@ Variants {
         Rectangle {
             id: dock
 
-            // The pointer's x in the row (-1000 when it's not over the dock): the icons grow toward it.
-            readonly property real pointerX: dockHover.hovered ? dockHover.point.position.x - row.x : -1000
+            // The pointer's position along the dock (-1000 when it's not over it): the icons grow toward it.
+            readonly property real pointerAlong: !dockHover.hovered ? -1000
+                : window.vertical ? dockHover.point.position.y - row.y : dockHover.point.position.x - row.x
+            // 0 = tucked away behind the edge, 1 = shown.
+            property real reveal: window.shown ? 1 : 0
+            Behavior on reveal { SpatialAnim { duration: Appearance.anim.normal } }
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: window.shown ? parent.height - height - window.options.edgeMargin : parent.height + 4
-            width: row.implicitWidth + 20
-            height: window.iconSize + 20
-            radius: Math.min(window.options.cornerRadius, height / 2)
+            x: !window.vertical ? (parent.width - width) / 2
+                : window.position === "left" ? window.mix(-width - 4, window.edgeMargin, reveal)
+                : window.mix(parent.width + 4, parent.width - width - window.edgeMargin, reveal)
+            y: window.vertical ? (parent.height - height) / 2
+                : window.position === "top" ? window.mix(-height - 4, window.edgeMargin, reveal)
+                : window.mix(parent.height + 4, parent.height - height - window.edgeMargin, reveal)
+            width: window.vertical ? window.iconSize + 20 : row.implicitWidth + 20
+            height: window.vertical ? row.implicitHeight + 20 : window.iconSize + 20
+            radius: Math.min(window.options.cornerRadius, Math.min(width, height) / 2)
             color: Appearance.translucent(Colors.m3surfaceContainer)
             border.width: 1
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
-
-            Behavior on y { SpatialAnim { duration: Appearance.anim.normal } }
 
             HoverHandler {
                 id: dockHover
             }
 
-            Row {
+            Grid {
                 id: row
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 10
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.centerIn: parent
+                columns: window.vertical ? 1 : Math.max(1, window.apps.length)
                 spacing: window.options.spacing
 
                 Repeater {
@@ -181,7 +199,8 @@ Variants {
                         required property int index
                         app: modelData
                         iconSize: window.iconSize
-                        pointer: dock.pointerX
+                        pointer: dock.pointerAlong
+                        position: window.position
                         magnifies: window.options.magnify
                         magnifyAmount: window.options.magnifyAmount / 100
                         showIndicators: window.options.showIndicators
@@ -205,8 +224,13 @@ Variants {
 
         DockMenu {
             id: menu
-            x: window.menuX
-            y: dock.y - height - window.menuGap
+            vertical: window.vertical
+            x: !window.vertical ? Math.max(8, Math.min(window.width - width - 8, window.menuAlong - width / 2))
+                : window.position === "left" ? dock.x + dock.width + window.menuGap
+                : dock.x - width - window.menuGap
+            y: window.vertical ? Math.max(8, Math.min(window.height - height - 8, window.menuAlong - height / 2))
+                : window.position === "top" ? dock.y + dock.height + window.menuGap
+                : dock.y - height - window.menuGap
             visible: window.menuOpen
             app: window.menuApp
             canMoveLeft: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) > 0
