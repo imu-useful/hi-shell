@@ -965,6 +965,8 @@
     "Move left": "Влево",
     "Move right": "Вправо",
     "New window": "Новое окно",
+    "Close window": "Закрыть окно",
+    "Close all windows": "Закрыть все окна",
     "Content filter": "Фильтр контента",
     "Block adult sites": "Блокировать сайты для взрослых",
     "Changing /etc/hosts…": "Меняю /etc/hosts…",

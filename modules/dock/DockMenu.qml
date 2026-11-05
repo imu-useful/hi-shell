@@ -11,7 +11,12 @@ Rectangle {
     property bool canMoveLeft: false
     property bool canMoveRight: false
     property bool canOpen: false
+    // The .desktop actions of the app ("New private window", ...) and how many windows it has.
+    property var actions: []
+    property int windowCount: 0
     signal pin()
+    signal runAction(var action)
+    signal closeWindows()
     signal move(int step)
     signal open()
 
@@ -85,6 +90,21 @@ Rectangle {
             icon: "add_box"
             label: Translation.tr("New window")
             onChosen: root.open()
+        }
+        Repeater {
+            model: root.actions
+            MenuRow {
+                required property var modelData
+                icon: "arrow_outward"
+                label: modelData.name
+                onChosen: root.runAction(modelData)
+            }
+        }
+        MenuRow {
+            visible: root.windowCount > 0
+            icon: "close"
+            label: root.windowCount > 1 ? Translation.tr("Close all windows") : Translation.tr("Close window")
+            onChosen: root.closeWindows()
         }
     }
 }

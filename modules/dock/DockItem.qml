@@ -25,6 +25,11 @@ Item {
     signal wheeled(int step)
 
     readonly property real magnify: magnifies ? Math.max(0, 1 - Math.abs(pointer - x - width / 2) / (iconSize * 2.5)) * 0.45 : 0
+    // Called by the dock when the app is launched from here: the icon jumps while it starts.
+    function bounce() {
+        jump.restart();
+    }
+
     readonly property bool focused: app.windows.includes(Hyprland.activeToplevel)
 
     width: iconSize + 8
@@ -37,6 +42,14 @@ Item {
         size: root.iconSize
         transformOrigin: Item.Bottom
         scale: 1 + root.magnify
+        anchors.bottomMargin: lift
+        property real lift: 0
+        SequentialAnimation {
+            id: jump
+            loops: 3
+            NumberAnimation { target: icon; property: "lift"; to: root.iconSize * 0.35; duration: 180; easing.type: Easing.OutQuad }
+            NumberAnimation { target: icon; property: "lift"; to: 0; duration: 180; easing.type: Easing.InQuad }
+        }
         source: Quickshell.iconPath(root.app.entry?.icon ?? root.app.id, "application-x-executable")
     }
 

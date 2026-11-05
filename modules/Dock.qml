@@ -11,7 +11,7 @@ import qs.modules.dock
 
 // Dock (Config dock.*): pinned and running apps. Click: launch, or focus (cycles the app's windows).
 // Middle click: a new window. Wheel over an app: its windows in turn. Right click: a menu (pin,
-// move, new window). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom.
+// move, new window, app actions, close). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom.
 Variants {
     // One dock: on dock.monitor, or the first screen.
     model: Config.options.dock.enabled ? Quickshell.screens.filter(s => !Config.options.dock.monitor || s.name === Config.options.dock.monitor).slice(0, 1) : []
@@ -86,6 +86,11 @@ Variants {
                 return;
             [pins[i], pins[j]] = [pins[j], pins[i]];
             options.pinned = pins;
+        }
+
+        function closeWindows(app) {
+            for (const t of app.windows)
+                Hyprland.dispatch(`hl.dsp.window.close({ window = "address:0x${t.address}" })`);
         }
 
         // The menu of an app, opened above its icon.
@@ -182,6 +187,8 @@ Variants {
                                 window.launch(app);
                             else
                                 window.cycle(app, 1);
+                            if (button !== Qt.RightButton && (app.windows.length === 0 || button === Qt.MiddleButton))
+                                dockItem.bounce();
                         }
                         onWheeled: step => window.cycle(app, step)
                     }
@@ -198,6 +205,16 @@ Variants {
             canMoveLeft: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) > 0
             canMoveRight: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) < window.options.pinned.length - 1
             canOpen: window.menuApp?.entry !== null && window.menuApp?.entry !== undefined
+            actions: window.menuApp?.entry?.actions ?? []
+            windowCount: window.menuApp?.windows.length ?? 0
+            onRunAction: action => {
+                action.execute();
+                window.closeMenu();
+            }
+            onCloseWindows: {
+                window.closeWindows(window.menuApp);
+                window.closeMenu();
+            }
             onPin: {
                 window.togglePin(window.menuApp);
                 window.closeMenu();
