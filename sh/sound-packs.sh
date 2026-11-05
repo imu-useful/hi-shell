@@ -3,12 +3,12 @@
 # MIUI: p0358/magisk-miui-sounds; Samsung One UI: Magisk-Modules-Repo/OneUISounds;
 # iPhone: antoniomalheirs/Sound_And_Emoji_IOS; Windows 11: MCPlayer2015/all-windows-sounds (Windows 11, 7 and XP);
 # Android: AOSP (aosp-mirror/platform_frameworks_base, Apache-2.0).
-# The sounds belong to Xiaomi, Samsung, Apple and Microsoft and have no licence, so they are fetched to the user's
-# folder on request (Settings > Sounds) and are not part of this repository. Each pack lands in
-# <data>/hi-shell/sounds/<pack>/<event>.<ext> (events: services/Sounds.qml); remove the folder to drop a pack.
+# The packs are kept in the repository's sounds/ folder (see sounds/NOTICE.md); this script is how they
+# were fetched, and fetches a pack again into ~/.local/share/hi-shell/sounds/<pack>/<event>.<ext>
+# (events: services/Sounds.qml) or, with SOUNDS_DIR=<dir> set, into <dir>/<pack>/.
 set -e
 pack="$1"
-dest="${XDG_DATA_HOME:-$HOME/.local/share}/hi-shell/sounds/$pack"
+dest="${SOUNDS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/hi-shell/sounds}/$pack"
 case "$pack" in
     miui) base="https://raw.githubusercontent.com/p0358/magisk-miui-sounds/master/system/media/audio"
           list="notification=notifications/Fresh.ogg urgent=notifications/Reminder.ogg timer=notifications/Timer.ogg phase=notifications/SMSComplete.ogg

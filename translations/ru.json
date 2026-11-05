@@ -1095,7 +1095,6 @@
     "Downloading…": "Скачивается…",
     "Couldn't download the pack": "Не удалось скачать набор",
     "The system sound theme": "Системная тема звуков",
-    "They are downloaded to ~/.local/share/hi-shell/sounds when picked, not shipped with the shell": "Они скачиваются в ~/.local/share/hi-shell/sounds при выборе и не входят в оболочку",
     "Events": "События",
     "Listen": "Прослушать",
     "Notification": "Уведомление",
@@ -1103,5 +1102,6 @@
     "Focus or break begins": "Начался фокус или перерыв",
     "Charger plugged in": "Зарядку подключили",
     "Charger unplugged": "Зарядку отключили",
-    "The sounds of these packs belong to their makers": "Звуки этих наборов принадлежат их авторам"
+    "The sounds of these packs belong to their makers": "Звуки этих наборов принадлежат их авторам",
+    "They come with the shell for personal use, see sounds/NOTICE.md": "Они идут вместе с оболочкой для личного использования, см. sounds/NOTICE.md"
 }

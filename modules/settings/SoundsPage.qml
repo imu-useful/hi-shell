@@ -75,7 +75,7 @@ ColumnLayout {
             visible: Sounds.downloadable.includes(s.pack) || Sounds.installing !== ""
             icon: "info"
             title: Translation.tr("The sounds of these packs belong to their makers")
-            subtitle: Translation.tr("They are downloaded to ~/.local/share/hi-shell/sounds when picked, not shipped with the shell")
+            subtitle: Translation.tr("They come with the shell for personal use, see sounds/NOTICE.md")
         }
     }
 
