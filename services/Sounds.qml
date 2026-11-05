@@ -8,7 +8,7 @@ import qs.common
 // Event sounds of the shell, played through PipeWire (pw-play). Everything that makes a sound asks
 // for it by event here, so one switch, one pack and one volume (Settings > Sounds) rule them all.
 // Packs: "freedesktop" (the system theme, always there) or one downloaded by sh/sound-packs.sh into
-// ~/.local/share/hi-shell/sounds/<pack>/<event>.ogg (any folder of .ogg files named like the events works).
+// ~/.local/share/hi-shell/sounds/<pack>/<event>.ogg (any folder of .ogg files named like the events works; wav, flac and mp3 too).
 // A pack without a file for an event falls back to the system theme; no pw-play: silence.
 Singleton {
     id: root
@@ -30,7 +30,7 @@ Singleton {
         screenshot: ["screen-capture", "capture", "Screenshot"]
     })
     // Packs that can be downloaded (sh/sound-packs.sh).
-    readonly property var downloadable: ["miui", "samsung", "iphone"]
+    readonly property var downloadable: ["miui", "samsung", "iphone", "windows"]
     // Packs found in the sounds folder.
     property list<string> installed: []
     property string installing: ""
@@ -40,8 +40,9 @@ Singleton {
         const e = events[event];
         if (!e || !options.enabled || (!force && !options[e[1]]))
             return;
-        Quickshell.execDetached(["sh", "-c", 'f="$1"; [ -f "$f" ] || f="$2"; exec pw-play --volume "$3" "$f"', "sh",
-            `${userDir}${options.pack}/${event}.ogg`, `${dir}${e[0]}.oga`, String(options.volume)]);
+        // The pack's file in any format pw-play reads (ogg, wav, flac, mp3), else the system theme's.
+        Quickshell.execDetached(["sh", "-c", 'for f in "$1".ogg "$1".wav "$1".flac "$1".mp3 "$2"; do [ -f "$f" ] && exec pw-play --volume "$3" "$f"; done',
+            "sh", `${userDir}${options.pack}/${event}`, `${dir}${e[0]}.oga`, String(options.volume)]);
     }
 
     function install(pack) {

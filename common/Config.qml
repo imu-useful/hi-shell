@@ -402,7 +402,7 @@ Singleton {
             property JsonObject sounds: JsonObject {
                 // Event sounds (services/Sounds.qml): the freedesktop theme through pw-play.
                 property bool enabled: true
-                // "freedesktop" (the system theme) or a downloaded pack: miui, samsung, iphone
+                // "freedesktop" (the system theme) or a downloaded pack: miui, samsung, iphone, windows
                 property string pack: "freedesktop"
                 property real volume: 0.7
                 property bool notifications: true
