@@ -30,7 +30,7 @@ Variants {
         readonly property int menuGap: 10
         // Which windows exist (app id + address) and the pins. A string, so it only changes when the
         // dock's contents do, not on every window title update.
-        readonly property string appsKey: options.pinned.join(",") + "|"
+        readonly property string appsKey: options.pinned.join(",") + "|" + options.showRunning + "|"
             + Hyprland.toplevels.values.map(t => `${t.wayland?.appId ?? ""}@${t.address}`).join(",")
 
         // Pinned ids first (in their order), then running apps that aren't pinned.
@@ -57,7 +57,8 @@ Variants {
                 running.get(id).push(t);
             }
             const pinned = options.pinned.map(id => id.toLowerCase());
-            const ids = [...pinned, ...[...running.keys()].filter(id => !pinned.includes(id))];
+            const extra = options.showRunning ? [...running.keys()].filter(id => !pinned.includes(id)) : [];
+            const ids = [...pinned, ...extra];
             return ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
         }
 
@@ -112,9 +113,9 @@ Variants {
 
         screen: modelData
         anchors.bottom: true
-        exclusiveZone: options.autoHide ? 0 : dock.height + 12
+        exclusiveZone: options.autoHide ? 0 : dock.height + options.edgeMargin + 4
         implicitWidth: Math.max(dock.width + 40, menu.width + 16)
-        implicitHeight: iconSize * 1.6 + 40 + (menuOpen ? menu.height + menuGap : 0)
+        implicitHeight: iconSize * 1.6 + 32 + options.edgeMargin + (menuOpen ? menu.height + menuGap : 0)
         // Only the dock (or, hidden, a thin strip at the bottom edge) and the open menu take input.
         mask: Region {
             Region { item: window.shown ? dock : trigger }
@@ -150,10 +151,10 @@ Variants {
             readonly property real pointerX: dockHover.hovered ? dockHover.point.position.x - row.x : -1000
 
             anchors.horizontalCenter: parent.horizontalCenter
-            y: window.shown ? parent.height - height - 8 : parent.height + 4
+            y: window.shown ? parent.height - height - window.options.edgeMargin : parent.height + 4
             width: row.implicitWidth + 20
             height: window.iconSize + 20
-            radius: Appearance.rounding.extraLarge
+            radius: Math.min(window.options.cornerRadius, height / 2)
             color: Appearance.translucent(Colors.m3surfaceContainer)
             border.width: 1
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
@@ -169,7 +170,7 @@ Variants {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 2
+                spacing: window.options.spacing
 
                 Repeater {
                     model: window.apps
@@ -182,6 +183,8 @@ Variants {
                         iconSize: window.iconSize
                         pointer: dock.pointerX
                         magnifies: window.options.magnify
+                        magnifyAmount: window.options.magnifyAmount / 100
+                        showIndicators: window.options.showIndicators
                         dividerAfter: window.pinnedCount > 0 && index === window.pinnedCount - 1 && window.apps.length > window.pinnedCount
 
                         onClicked: button => {

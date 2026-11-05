@@ -18,13 +18,16 @@ Item {
     // The pointer's x in the dock's row (-1000 when it's not over the dock), and how much to grow (0 = off).
     property real pointer: -1000
     property bool magnifies: true
+    // How much the icon grows at most (0.45 = 45%), and whether the window dots show.
+    property real magnifyAmount: 0.45
+    property bool showIndicators: true
     // A thin line after this item (between the pinned apps and the running ones).
     property bool dividerAfter: false
 
     signal clicked(int button)
     signal wheeled(int step)
 
-    readonly property real magnify: magnifies ? Math.max(0, 1 - Math.abs(pointer - x - width / 2) / (iconSize * 2.5)) * 0.45 : 0
+    readonly property real magnify: magnifies ? Math.max(0, 1 - Math.abs(pointer - x - width / 2) / (iconSize * 2.5)) * magnifyAmount : 0
     // Called by the dock when the app is launched from here: the icon jumps while it starts.
     function bounce() {
         jump.restart();
@@ -55,6 +58,7 @@ Item {
 
     // The windows of the app: one dot per window (up to 3), the focused app's dots are longer.
     Row {
+        visible: root.showIndicators
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.bottom
         anchors.topMargin: 3

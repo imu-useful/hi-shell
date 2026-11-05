@@ -345,6 +345,16 @@ Singleton {
                 property bool magnify: true
                 // With auto-hide: also show the dock while the workspace has no windows.
                 property bool showWhenEmpty: true
+                // Running apps that aren't pinned get an icon too.
+                property bool showRunning: true
+                // The dots under an icon, one per window.
+                property bool showIndicators: true
+                // How much an icon grows toward the pointer (percent), the gap between icons,
+                // the corner radius and the distance from the screen edge (px).
+                property int magnifyAmount: 45
+                property int spacing: 2
+                property int cornerRadius: 28
+                property int edgeMargin: 8
                 property int iconSize: 44
                 // Screen name; empty = first screen.
                 property string monitor: ""
