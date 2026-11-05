@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import qs.common
 import qs.common.widgets
 import qs.common.shapes
@@ -112,9 +113,9 @@ DesktopCard {
             }
         }
 
-        // Progress: players report the position about once a second. Those small steps
-        // (a pixel or two) are set directly: gliding between them would redraw the whole
-        // desktop at 60 fps for as long as music plays. Seeks and track changes ease.
+        // Progress: players report the position about once a second. While playing, each
+        // report is glided to linearly over that second, so the bar moves continuously;
+        // seeks and track changes ease. The played part is a travelling wave while playing.
         Rectangle {
             id: track
             Layout.fillWidth: true
@@ -140,15 +141,12 @@ DesktopCard {
                     shown = to;
                     return;
                 }
-                // One position report while playing.
-                if (Mpris.playing && step >= 0 && step * Mpris.length < 2.5) {
-                    shown = to;
-                    return;
-                }
                 glideAnim.from = shown;
                 glideAnim.to = to;
-                glideAnim.duration = Appearance.anim.normal;
-                glideAnim.easing.type = Easing.OutCubic;
+                // One position report while playing: run on at the speed of playback.
+                const tick = Mpris.playing && step >= 0 && step * Mpris.length < 2.5;
+                glideAnim.duration = tick ? 1000 : Appearance.anim.normal;
+                glideAnim.easing.type = tick ? Easing.Linear : Easing.OutCubic;
                 glideAnim.start();
             }
 
@@ -175,12 +173,49 @@ DesktopCard {
                 color: Colors.m3secondaryContainer
                 Behavior on height { enabled: root.animate; SpatialAnim { duration: Appearance.anim.fast } }
             }
-            Rectangle {
-                width: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
-                height: bar.height
+            // The played part: a sine wave while playing that flattens when paused. The wave is
+            // drawn once, a wavelength wider than needed, and slid sideways, then clipped to the
+            // played width: no per-frame work in JS.
+            Item {
+                id: played
+                readonly property real wavelength: 26
+                property real amplitude: Mpris.playing ? 2.6 : 0
+                readonly property real fill: track.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
+                Behavior on amplitude { enabled: root.animate; NumberAnimation { duration: Appearance.anim.spatial; easing.type: Easing.OutCubic } }
+
+                width: fill
+                height: 20
                 anchors.verticalCenter: parent.verticalCenter
-                radius: height / 2
-                color: Colors.m3primary
+                clip: true
+
+                Shape {
+                    id: wave
+                    height: parent.height
+                    width: track.width + played.wavelength
+                    preferredRendererType: Shape.CurveRenderer
+                    ShapePath {
+                        strokeColor: Colors.m3primary
+                        strokeWidth: bar.height
+                        fillColor: "transparent"
+                        capStyle: ShapePath.RoundCap
+                        PathPolyline {
+                            path: {
+                                const pts = [];
+                                const mid = wave.height / 2;
+                                for (let x = 0; x <= wave.width; x += 2)
+                                    pts.push(Qt.point(x, mid + played.amplitude * Math.sin(x / played.wavelength * 2 * Math.PI)));
+                                return pts;
+                            }
+                        }
+                    }
+                    NumberAnimation on x {
+                        running: Mpris.playing && root.animate
+                        loops: Animation.Infinite
+                        from: 0
+                        to: -played.wavelength
+                        duration: 1400
+                    }
+                }
             }
 
             // The handle, while the pointer is over the bar or it's being dragged, with the time it
@@ -188,8 +223,9 @@ DesktopCard {
             Rectangle {
                 id: handle
                 visible: opacity > 0
-                opacity: track.expanded ? 1 : 0
-                scale: track.expanded ? 1 : 0.3
+                // Always there: it caps the wave. Taller while the pointer is on the bar.
+                opacity: 1
+                scale: track.expanded ? 1.15 : 1
                 Behavior on opacity { enabled: root.animate; EffectAnim { duration: Appearance.anim.fast } }
                 Behavior on scale { enabled: root.animate; SpringAnim { overshoot: 1.6 } }
                 x: parent.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown)) - width / 2
