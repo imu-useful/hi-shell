@@ -14,6 +14,8 @@ Singleton {
     property bool focusRunning: false
     property bool onBreak: false
     property real focusLeft: focusMinutes * 60
+    // The length of a focus period in seconds: from the settings' minutes, or typed in the sidebar.
+    property real focusTotal: focusMinutes * 60
 
     function toggleFocus() {
         focusRunning = !focusRunning;
@@ -21,7 +23,14 @@ Singleton {
     function resetFocus() {
         focusRunning = false;
         onBreak = false;
-        focusLeft = focusMinutes * 60;
+        focusLeft = focusTotal;
+    }
+    // A new length for the focus period, while it isn't running.
+    function setFocusTime(seconds) {
+        if (focusRunning || onBreak || seconds <= 0)
+            return;
+        focusTotal = seconds;
+        focusLeft = seconds;
     }
 
     // --- Stopwatch ---
@@ -46,6 +55,13 @@ Singleton {
     property real countdownLeft: 0
     property bool countdownRunning: false
 
+    // A new length for the countdown, while it isn't running.
+    function setCountdownTime(seconds) {
+        if (countdownRunning || seconds <= 0)
+            return;
+        countdownTotal = seconds;
+        countdownLeft = seconds;
+    }
     function addCountdown(seconds) {
         countdownTotal = countdownLeft + seconds;
         countdownLeft += seconds;
@@ -58,6 +74,25 @@ Singleton {
         countdownRunning = false;
         countdownLeft = 0;
         countdownTotal = 0;
+    }
+
+    // Typed times: "25" (minutes), "25:30" (minutes:seconds), "1:02:03", "25m", "30s". -1 when it isn't one.
+    function parse(text) {
+        const t = text.trim().toLowerCase();
+        let m = /^(\d+)\s*m(in)?$/.exec(t);
+        if (m)
+            return Number(m[1]) * 60;
+        m = /^(\d+)\s*s(ec)?$/.exec(t);
+        if (m)
+            return Number(m[1]);
+        if (!/^\d+(:\d{1,2}){0,2}$/.test(t))
+            return -1;
+        const parts = t.split(":").map(Number);
+        if (parts.length === 1)
+            return parts[0] * 60;
+        if (parts.length === 2)
+            return parts[0] * 60 + parts[1];
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
     }
 
     // "4:05", "1:02:03"

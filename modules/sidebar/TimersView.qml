@@ -17,8 +17,11 @@ StyledFlickable {
         property string time
         property real progress: -1
         property bool running: false
+        // The time can be typed (click it): minutes, "mm:ss", "h:mm:ss", "25m" or "30s".
+        property bool editable: false
         default property alias buttons: buttonRow.data
         signal toggle
+        signal edited(string text)
 
         Layout.fillWidth: true
         implicitHeight: layout.implicitHeight + 28
@@ -59,12 +62,48 @@ StyledFlickable {
                     color: card.running ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
                 }
                 StyledText {
+                    id: shownTime
                     Layout.fillWidth: true
+                    visible: !typing.visible
                     text: card.time
                     font.pixelSize: Appearance.font.size.headlineSmall
                     font.weight: Font.Medium
                     font.features: { "tnum": 1 }
                     color: card.running ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: card.editable
+                        cursorShape: Qt.IBeamCursor
+                        onClicked: {
+                            typing.text = card.time;
+                            typing.visible = true;
+                            typing.forceActiveFocus();
+                            typing.selectAll();
+                        }
+                    }
+                }
+                TextInput {
+                    id: typing
+                    Layout.fillWidth: true
+                    visible: false
+                    font.pixelSize: Appearance.font.size.headlineSmall
+                    font.weight: Font.Medium
+                    font.features: { "tnum": 1 }
+                    color: Colors.m3primary
+                    selectByMouse: true
+                    onAccepted: {
+                        card.edited(text);
+                        visible = false;
+                        focus = false;
+                    }
+                    Keys.onEscapePressed: {
+                        visible = false;
+                        focus = false;
+                    }
+                    onActiveFocusChanged: if (!activeFocus && visible) {
+                        card.edited(text);
+                        visible = false;
+                    }
                 }
                 RowLayout {
                     id: buttonRow
@@ -91,11 +130,13 @@ StyledFlickable {
 
         TimerCard {
             icon: Timers.onBreak ? "coffee" : "self_improvement"
-            title: (Timers.onBreak ? Translation.tr("Break") : Translation.tr("Focus")) + " · " + Translation.tr("%1 min").arg(Timers.onBreak ? Timers.breakMinutes : Timers.focusMinutes)
+            title: (Timers.onBreak ? Translation.tr("Break") : Translation.tr("Focus")) + " · " + Translation.tr("%1 min").arg(Math.round((Timers.onBreak ? Timers.breakMinutes * 60 : Timers.focusTotal) / 60))
             time: Timers.format(Timers.focusLeft)
-            progress: 1 - Timers.focusLeft / ((Timers.onBreak ? Timers.breakMinutes : Timers.focusMinutes) * 60)
+            progress: 1 - Timers.focusLeft / (Timers.onBreak ? Timers.breakMinutes * 60 : Timers.focusTotal)
             running: Timers.focusRunning
+            editable: !Timers.focusRunning && !Timers.onBreak
             onToggle: Timers.toggleFocus()
+            onEdited: text => Timers.setFocusTime(Timers.parse(text))
 
             Chip { text: Translation.tr("Reset"); implicitHeight: 26; onClicked: Timers.resetFocus() }
         }
@@ -118,7 +159,9 @@ StyledFlickable {
             time: Timers.format(Timers.countdownLeft)
             progress: Timers.countdownTotal > 0 ? 1 - Timers.countdownLeft / Timers.countdownTotal : 0
             running: Timers.countdownRunning
+            editable: !Timers.countdownRunning
             onToggle: Timers.toggleCountdown()
+            onEdited: text => Timers.setCountdownTime(Timers.parse(text))
 
             Chip { text: "+1 m"; implicitHeight: 26; onClicked: Timers.addCountdown(60) }
             Chip { text: "+5 m"; implicitHeight: 26; onClicked: Timers.addCountdown(300) }
