@@ -57,6 +57,9 @@ DesktopCard {
                 Layout.fillWidth: true
                 text: root.phrase(parent.hour)
                 elide: Text.ElideRight
+                // A long phrase shrinks to fit the line instead of being cut off.
+                fontSizeMode: Text.HorizontalFit
+                minimumPixelSize: 9
                 font.italic: true
                 font.pixelSize: Appearance.font.size.labelMedium + 1
                 color: Colors.m3onSurfaceVariant
