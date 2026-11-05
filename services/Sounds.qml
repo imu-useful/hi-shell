@@ -30,7 +30,7 @@ Singleton {
         screenshot: ["screen-capture", "capture", "Screenshot"]
     })
     // Packs that can be downloaded (sh/sound-packs.sh).
-    readonly property var downloadable: ["miui", "samsung", "iphone", "windows", "winxp"]
+    readonly property var downloadable: ["miui", "samsung", "iphone", "windows", "win7", "winxp", "android"]
     // Packs found in the sounds folder.
     property list<string> installed: []
     property string installing: ""

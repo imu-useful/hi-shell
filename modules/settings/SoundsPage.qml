@@ -38,20 +38,36 @@ ColumnLayout {
         icon: "library_music"
         title: Translation.tr("Sound pack")
 
-        ChoiceRow {
+        ListRow {
             icon: "graphic_eq"
             title: Translation.tr("Pack")
             subtitle: Sounds.installing !== "" ? Translation.tr("Downloading…")
                     : Sounds.failed ? Translation.tr("Couldn't download the pack")
                     : Sounds.downloadable.includes(s.pack) ? "" : Translation.tr("The system sound theme")
-            value: s.pack
-            options: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" }, { value: "iphone", text: "iPhone" }, { value: "windows", text: "Win 11" }, { value: "winxp", text: "Win XP" }]
-            onSelected: value => {
-                if (value === "freedesktop" || Sounds.installed.includes(value)) {
-                    s.pack = value;
-                    Sounds.play("notification", true);
-                } else {
-                    Sounds.install(value);
+        }
+        Flow {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            Layout.bottomMargin: 8
+            spacing: 6
+            Repeater {
+                model: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" },
+                        { value: "iphone", text: "iPhone" }, { value: "android", text: "Android" }, { value: "windows", text: "Windows 11" },
+                        { value: "win7", text: "Windows 7" }, { value: "winxp", text: "Windows XP" }]
+                Chip {
+                    required property var modelData
+                    text: modelData.text
+                    selected: s.pack === modelData.value
+                    enabled: Sounds.installing === ""
+                    onClicked: {
+                        if (modelData.value === "freedesktop" || Sounds.installed.includes(modelData.value)) {
+                            s.pack = modelData.value;
+                            Sounds.play("notification", true);
+                        } else {
+                            Sounds.install(modelData.value);
+                        }
+                    }
                 }
             }
         }

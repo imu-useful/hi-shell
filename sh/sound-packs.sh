@@ -1,7 +1,8 @@
 #!/bin/sh
-# Downloads an event sound pack for the shell: `sound-packs.sh miui`, `samsung`, `iphone`, `windows` (11) or `winxp`.
+# Downloads an event sound pack for the shell: `sound-packs.sh miui`, `samsung`, `iphone`, `windows` (11), `win7`, `winxp` or `android`.
 # MIUI: p0358/magisk-miui-sounds; Samsung One UI: Magisk-Modules-Repo/OneUISounds;
-# iPhone: antoniomalheirs/Sound_And_Emoji_IOS; Windows 11: MCPlayer2015/all-windows-sounds (Windows 11 and XP).
+# iPhone: antoniomalheirs/Sound_And_Emoji_IOS; Windows 11: MCPlayer2015/all-windows-sounds (Windows 11, 7 and XP);
+# Android: AOSP (aosp-mirror/platform_frameworks_base, Apache-2.0).
 # The sounds belong to Xiaomi, Samsung, Apple and Microsoft and have no licence, so they are fetched to the user's
 # folder on request (Settings > Sounds) and are not part of this repository. Each pack lands in
 # <data>/hi-shell/sounds/<pack>/<event>.<ext> (events: services/Sounds.qml); remove the folder to drop a pack.
@@ -26,7 +27,15 @@ case "$pack" in
           list="notification=Windows%20XP%20Notify.wav urgent=Windows%20XP%20Exclamation.wav timer=Windows%20XP%20Ringin.wav phase=Windows%20XP%20Ding.wav
                 batteryLow=Windows%20XP%20Battery%20Low.wav batteryCritical=Windows%20XP%20Battery%20Critical.wav plugged=Windows%20XP%20Hardware%20Insert.wav
                 unplugged=Windows%20XP%20Hardware%20Remove.wav screenshot=Windows%20XP%20Minimize.wav" ;;
-    *) echo "usage: $0 miui|samsung|iphone|windows|winxp" >&2; exit 2 ;;
+    win7) base="https://raw.githubusercontent.com/MCPlayer2015/all-windows-sounds/main/(2009)%20Windows%207"
+          list="notification=Windows%20Notify.wav urgent=Windows%20Exclamation.wav timer=Windows%20Ringin.wav phase=Windows%20Ding.wav
+                batteryLow=Windows%20Battery%20Low.wav batteryCritical=Windows%20Battery%20Critical.wav plugged=Windows%20Hardware%20Insert.wav
+                unplugged=Windows%20Hardware%20Remove.wav screenshot=Windows%20Restore.wav" ;;
+    android) base="https://raw.githubusercontent.com/aosp-mirror/platform_frameworks_base/master/data/sounds"
+          list="notification=notifications/pixiedust.ogg urgent=notifications/ShortCircuit.ogg timer=Alarm_Beep_01.ogg phase=notifications/TaDa.ogg
+                batteryLow=effects/LowBattery.ogg batteryCritical=effects/LowBattery.ogg plugged=effects/ChargingStarted.ogg
+                unplugged=effects/Undock.ogg screenshot=effects/camera_click.ogg" ;;
+    *) echo "usage: $0 miui|samsung|iphone|windows|win7|winxp|android" >&2; exit 2 ;;
 esac
 tmp="$dest.part"
 rm -rf "$tmp"; mkdir -p "$tmp"
