@@ -99,6 +99,20 @@ ColumnLayout {
             options: [{ value: "round", text: Translation.tr("Rounded") }, { value: "square", text: Translation.tr("Square") }]
             onSelected: value => root.l.fieldShape = value
         }
+        SliderRow {
+            icon: "line_weight"
+            title: Translation.tr("Password field outline")
+            value: root.l.fieldOutline
+            from: 0; to: 8; step: 1; suffix: " px"
+            onMoved: value => root.l.fieldOutline = value
+        }
+        SwitchRow {
+            icon: "more_horiz"
+            title: Translation.tr("Dots while typing")
+            subtitle: Translation.tr("Off: nothing shows as you type")
+            checked: root.l.fieldDots
+            onToggled: checked => root.l.fieldDots = checked
+        }
     }
 
     Section {
@@ -123,6 +137,24 @@ ColumnLayout {
                 const f = text.trim();
                 if (/^[%A-Za-z0-9:.\- ]{1,24}$/.test(f))
                     root.l.clockFormat = f;
+            }
+        }
+    }
+
+    Section {
+        icon: "calendar_today"
+        title: Translation.tr("Date")
+
+        TextRow {
+            icon: "event"
+            title: Translation.tr("Date format")
+            subtitle: Translation.tr("date format, e.g. %A, %-d %B or %d.%m.%Y")
+            value: root.l.dateFormat
+            fieldWidth: 160
+            onEdited: text => {
+                const f = text.trim();
+                if (/^[%A-Za-z0-9:.,\- ]{1,32}$/.test(f))
+                    root.l.dateFormat = f;
             }
         }
     }

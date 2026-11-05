@@ -49,6 +49,7 @@ Singleton {
         const block = (on, text) => on ? text : "";
         // The clock format goes into a shell command: only plain date directives reach it.
         const fmt = /^[%A-Za-z0-9:.\- ]{1,24}$/.test(l.clockFormat) ? l.clockFormat : "%H:%M";
+        const dateFmt = /^[%A-Za-z0-9:.,\- ]{1,32}$/.test(l.dateFormat) ? l.dateFormat : "%A, %-d %B";
         const size = Math.max(40, Math.min(300, l.clockSize));
 
         // The column: centered, or hugging a side (x offset from that edge).
@@ -105,7 +106,7 @@ ${block(l.clock, `label {
 }`)}
 ${block(l.date, `label {
     monitor =
-    text = cmd[update:30000] LC_TIME=${lc} date +'%A, %-d %B' | sed 's/^./\\U&/'
+    text = cmd[update:30000] LC_TIME=${lc} date +'${dateFmt}' | sed 's/^./\\U&/'
     color = ${onSurface}
     font_size = 22
     font_family = ${font}
@@ -159,7 +160,8 @@ input-field {
     monitor =
     size = ${fieldW}, 56
     rounding = ${fieldRound}
-    outline_thickness = 2
+    outline_thickness = ${Math.max(0, Math.min(8, l.fieldOutline))}
+    hide_input = ${l.fieldDots ? "false" : "true"}
     outer_color = ${rgba(Colors.m3outline, 0.6)}
     inner_color = ${rgba(Colors.m3surfaceContainerHigh, 0.85)}
     font_color = ${onSurface}
