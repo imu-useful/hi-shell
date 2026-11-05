@@ -410,6 +410,8 @@ Singleton {
                 property bool battery: true
                 property bool capture: true
                 property bool volumeTick: true
+                // Silent while Do Not Disturb, Presentation or Wait mode is on, and in Focus Mode (but for the timers).
+                property bool quiet: true
             }
 
             property JsonObject capture: JsonObject {

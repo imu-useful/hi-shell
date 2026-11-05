@@ -44,9 +44,15 @@ Singleton {
     readonly property int tickGap: 120
     property real lastTick: 0
 
+    // Do Not Disturb, Presentation and Wait mode silence everything; Focus Mode (its work periods) everything
+    // but the timers, whose sounds are the point of it.
+    readonly property bool silenced: options.quiet && (Notifications.dnd || Presentation.active || WaitMode.active)
+    readonly property bool focusing: options.quiet && Focus.restricted
+
+    // `force`: a button in Settings, to hear it whatever the rest says.
     function play(event, force) {
         const e = events[event];
-        if (!e || !options.enabled || (!force && !options[e[1]]))
+        if (!e || !options.enabled || (!force && (!options[e[1]] || silenced || (focusing && e[1] !== "timers"))))
             return;
         if (event === "volume") {
             const now = Date.now();

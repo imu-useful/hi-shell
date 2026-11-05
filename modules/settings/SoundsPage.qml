@@ -23,6 +23,14 @@ ColumnLayout {
             checked: s.enabled
             onToggled: checked => s.enabled = checked
         }
+        SwitchRow {
+            visible: s.enabled
+            icon: "do_not_disturb_on"
+            title: Translation.tr("Keep quiet when disturbing is off")
+            subtitle: Translation.tr("Silent in Do Not Disturb, Presentation, Wait mode and Focus Mode (timers still sound)")
+            checked: s.quiet
+            onToggled: checked => s.quiet = checked
+        }
         SliderRow {
             visible: s.enabled
             icon: "volume_down"

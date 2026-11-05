@@ -1105,5 +1105,7 @@
     "They come with the shell for personal use, see sounds/NOTICE.md": "Они идут вместе с оболочкой для личного использования, см. sounds/NOTICE.md",
     "Volume change": "Изменение громкости",
     "A tick when the volume changes": "Щелчок при изменении громкости",
-    "Notifications, timers, battery, screenshots, volume": "Уведомления, таймеры, батарея, скриншоты, громкость"
+    "Notifications, timers, battery, screenshots, volume": "Уведомления, таймеры, батарея, скриншоты, громкость",
+    "Keep quiet when disturbing is off": "Молчать, когда не беспокоить",
+    "Silent in Do Not Disturb, Presentation, Wait mode and Focus Mode (timers still sound)": "Без звуков при «Не беспокоить», презентации, режиме ожидания и режиме фокуса (таймеры звучат)"
 }
