@@ -23,9 +23,27 @@ DesktopCard {
             counted = lyricsShown;
         }
     }
+    // The wave on the progress bar kicks to the beat (services/Beat), only while playing in view.
+    readonly property bool beatWanted: lyricsShown && Mpris.playing && Appearance.anim.speed > 0
+    property bool beatCounted: false
+    function syncBeat() {
+        if (beatWanted !== beatCounted) {
+            Beat.users += beatWanted ? 1 : -1;
+            beatCounted = beatWanted;
+        }
+    }
+    onBeatWantedChanged: syncBeat()
     onLyricsShownChanged: syncLyrics()
-    Component.onCompleted: syncLyrics()
-    Component.onDestruction: if (counted) Lyrics.users--
+    Component.onCompleted: {
+        syncLyrics();
+        syncBeat();
+    }
+    Component.onDestruction: {
+        if (counted)
+            Lyrics.users--;
+        if (beatCounted)
+            Beat.users--;
+    }
 
     // Smooth motion only while the card can be seen.
     readonly property bool animate: lyricsShown && Appearance.anim.speed > 0
@@ -181,6 +199,22 @@ DesktopCard {
                 readonly property real wavelength: 26
                 property real amplitude: Mpris.playing ? 2.6 : 0
                 readonly property real fill: track.width * Math.max(0, Math.min(1, track.seeking ? track.seekValue : track.shown))
+                // The wave's sideways position (0..wavelength). It drifts steadily and every rise of
+                // the bass (a drum hit) throws it forward, then the push dies away.
+                property real phase: 0
+                property real push: 0
+                property real lastBass: 0
+                FrameAnimation {
+                    running: Mpris.playing && root.animate
+                    onTriggered: {
+                        const dt = Math.min(0.1, frameTime);
+                        const bass = Beat.bass;
+                        const rise = Math.max(0, bass - played.lastBass);
+                        played.lastBass = bass;
+                        played.push = played.push * Math.exp(-dt * 7) + rise * 600;
+                        played.phase = (played.phase + (played.wavelength / 1.4 + played.push) * dt) % played.wavelength;
+                    }
+                }
                 Behavior on amplitude { enabled: root.animate; NumberAnimation { duration: Appearance.anim.spatial; easing.type: Easing.OutCubic } }
 
                 width: fill
@@ -208,13 +242,7 @@ DesktopCard {
                             }
                         }
                     }
-                    NumberAnimation on x {
-                        running: Mpris.playing && root.animate
-                        loops: Animation.Infinite
-                        from: 0
-                        to: -played.wavelength
-                        duration: 1400
-                    }
+                    x: -played.phase
                 }
             }
 
