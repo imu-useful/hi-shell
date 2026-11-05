@@ -92,9 +92,7 @@ Scope {
                 anchors.rightMargin: 80
                 spacing: 36
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.96
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { SpringAnim {} }
 
                 // The search field.
                 Rectangle {
@@ -199,6 +197,7 @@ Scope {
                             ThemedIcon {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 size: 56
+                                asynchronous: true
                                 source: Quickshell.iconPath(cell.modelData.icon, "application-x-executable")
                             }
                             StyledText {
