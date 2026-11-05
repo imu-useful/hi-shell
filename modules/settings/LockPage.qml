@@ -51,6 +51,57 @@ ColumnLayout {
     }
 
     Section {
+        icon: "palette"
+        title: Translation.tr("Look")
+
+        ChoiceRow {
+            icon: "align_horizontal_center"
+            title: Translation.tr("Layout")
+            value: root.l.align
+            options: [{ value: "left", text: Translation.tr("Left") }, { value: "center", text: Translation.tr("Center") }, { value: "right", text: Translation.tr("Right") }]
+            onSelected: value => root.l.align = value
+        }
+        ChoiceRow {
+            icon: "colorize"
+            title: Translation.tr("Accent color")
+            subtitle: Translation.tr("The clock, the avatar ring and the now playing icon")
+            value: root.l.accent
+            options: [{ value: "primary", text: Translation.tr("Primary") }, { value: "secondary", text: Translation.tr("Secondary") }, { value: "tertiary", text: Translation.tr("Tertiary") }]
+            onSelected: value => root.l.accent = value
+        }
+        TextRow {
+            icon: "edit_note"
+            title: Translation.tr("Message")
+            subtitle: Translation.tr("A line of your own under the date")
+            value: root.l.message
+            fieldWidth: 240
+            onEdited: text => root.l.message = text.trim()
+        }
+        SliderRow {
+            visible: root.l.avatar
+            icon: "account_circle"
+            title: Translation.tr("Avatar size")
+            value: root.l.avatarSize
+            from: 64; to: 180; step: 4; suffix: " px"
+            onMoved: value => root.l.avatarSize = value
+        }
+        SliderRow {
+            icon: "password"
+            title: Translation.tr("Password field width")
+            value: root.l.fieldWidth
+            from: 200; to: 600; step: 10; suffix: " px"
+            onMoved: value => root.l.fieldWidth = value
+        }
+        ChoiceRow {
+            icon: "rounded_corner"
+            title: Translation.tr("Password field corners")
+            value: root.l.fieldShape
+            options: [{ value: "round", text: Translation.tr("Rounded") }, { value: "square", text: Translation.tr("Square") }]
+            onSelected: value => root.l.fieldShape = value
+        }
+    }
+
+    Section {
         icon: "schedule"
         title: Translation.tr("Clock")
 
@@ -94,6 +145,14 @@ ColumnLayout {
             value: root.l.blurPasses
             from: 0; to: 6; step: 1
             onMoved: value => root.l.blurPasses = value
+        }
+        SliderRow {
+            visible: root.l.wallpaper && root.l.blurPasses > 0
+            icon: "lens_blur"
+            title: Translation.tr("Blur radius")
+            value: root.l.blurSize
+            from: 1; to: 20; step: 1
+            onMoved: value => root.l.blurSize = value
         }
         SliderRow {
             visible: root.l.wallpaper

@@ -232,6 +232,16 @@ Singleton {
                 // Clock height in px, and its format for `date` (letters and % only).
                 property int clockSize: 120
                 property string clockFormat: "%H:%M"
+                // Where the column sits: "center", "left" or "right".
+                property string align: "center"
+                // The color of the clock and the accents: "primary", "secondary" or "tertiary".
+                property string accent: "primary"
+                // A line of your own under the date (empty = none).
+                property string message: ""
+                property int avatarSize: 116
+                // The password field: width in px, and "round" or "square" corners.
+                property int fieldWidth: 320
+                property string fieldShape: "round"
                 // The wallpaper behind the lock screen (off: the plain surface color).
                 property bool wallpaper: true
                 property int blurPasses: 3
