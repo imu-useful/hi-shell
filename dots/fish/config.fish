@@ -1,6 +1,7 @@
 # fish config from hi-shell (install.sh puts it in ~/.config/fish; your previous
 # config.fish is kept next to it as config.fish.backup-<date>). Edit freely: install.sh
-# won't overwrite it without asking. Every tool below is optional.
+# won't overwrite it without asking. Every tool below is optional, and nothing here
+# assumes a particular distribution.
 
 if status is-interactive
     set -g fish_greeting
@@ -66,15 +67,25 @@ if status is-interactive
     abbr -a gp 'git push'
     abbr -a gd 'git diff'
     abbr -a gl 'git log --oneline --graph -20'
-    abbr -a pamcan pacman
-    abbr -a hs 'qs -c hi-shell'
+    # `up` updates the system with whatever this distribution uses (paru / yay on Arch, apt, dnf,
+    # zypper, xbps; NixOS is updated with nixos-rebuild, so it's left out).
     if type -q paru
         abbr -a up 'paru -Syu'
     else if type -q yay
         abbr -a up 'yay -Syu'
-    else
+    else if type -q pacman
         abbr -a up 'sudo pacman -Syu'
+    else if type -q apt
+        abbr -a up 'sudo apt update; and sudo apt upgrade'
+    else if type -q dnf
+        abbr -a up 'sudo dnf upgrade'
+    else if type -q zypper
+        abbr -a up 'sudo zypper dup'
+    else if type -q xbps-install
+        abbr -a up 'sudo xbps-install -Su'
     end
+    # hi-shell's shell, when it's installed.
+    type -q qs; and abbr -a hs 'qs -c hi-shell'
 end
 
 # Make a directory and go into it.

@@ -1,10 +1,11 @@
-// fastfetch config from hi-shell (install.sh puts it in ~/.config/fastfetch; your
-// previous config.jsonc is kept next to it as config.jsonc.backup-<date>).
-// Colors are the terminal's ANSI colors, which hi-shell sets from the wallpaper.
+// fastfetch config from hi-shell (install.sh puts it in ~/.config/fastfetch; your previous
+// config.jsonc is kept next to it as config.jsonc.backup-<date>). Edit freely.
+// Works on any distribution: the logo is the system's own (source "auto"). The colors are the
+// terminal's ANSI colors, which hi-shell sets from the wallpaper.
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {
-        "source": "arch_small",
+        "source": "auto",
         "color": { "1": "blue", "2": "cyan" },
         "padding": { "top": 1, "left": 2, "right": 3 }
     },
@@ -22,12 +23,7 @@
         { "type": "kernel", "key": "\u001b[90m│\u001b[34m  kernel", "keyColor": "blue" },
         { "type": "packages", "key": "\u001b[90m│\u001b[34m 󰏗 packages", "keyColor": "blue" },
         { "type": "wm", "key": "\u001b[90m│\u001b[34m  wm", "keyColor": "blue", "format": "{pretty-name} {version}" },
-        {
-            "type": "command",
-            "key": "\u001b[90m│\u001b[34m 󰖲 shell",
-            "keyColor": "blue",
-            "text": "echo \"hi-shell $(git -C ~/.config/quickshell/hi-shell log -1 --format=%h 2>/dev/null)\""
-        },
+        { "type": "shell", "key": "\u001b[90m│\u001b[34m 󰖲 shell", "keyColor": "blue" },
         { "type": "terminal", "key": "\u001b[90m│\u001b[34m  terminal", "keyColor": "blue" },
         { "type": "terminalfont", "key": "\u001b[90m│\u001b[34m  font", "keyColor": "blue" },
         { "type": "custom", "format": "\u001b[90m├──── \u001b[36mhardware" },
