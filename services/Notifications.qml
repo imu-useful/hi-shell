@@ -117,6 +117,9 @@ Singleton {
         // Focus Mode holds the ordinary ones until the break; the shell's own (focus and timer messages) pass.
         item.held = options.holdInFocus && Focus.restricted && !item.critical && item.appName !== "hi-shell";
         item.popup = (!dnd || item.critical) && !item.held;
+        // The shell's own messages (timers, battery, screenshots) come with a sound of their own.
+        if (item.popup && item.appName !== "hi-shell")
+            Sounds.play(item.critical ? "urgent" : "notification");
         if (!existing)
             list = [item, ...list].slice(0, Math.max(1, options.historyLimit));
         save();

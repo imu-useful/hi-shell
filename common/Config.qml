@@ -399,6 +399,16 @@ Singleton {
                 property list<string> pinned: ["firefox", "kitty", "org.gnome.Nautilus"]
             }
 
+            property JsonObject sounds: JsonObject {
+                // Event sounds (services/Sounds.qml): the freedesktop theme through pw-play.
+                property bool enabled: true
+                property real volume: 0.7
+                property bool notifications: true
+                property bool timers: true
+                property bool battery: true
+                property bool capture: true
+            }
+
             property JsonObject capture: JsonObject {
                 // tesseract languages for OCR, e.g. "eng+rus"; auto = every installed one
                 // (install tesseract-data-rus for Russian)

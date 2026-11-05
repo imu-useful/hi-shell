@@ -147,4 +147,53 @@ ColumnLayout {
             onMoved: value => Config.options.sidebar.nightLightTemperature = value
         }
     }
+
+    Section {
+        icon: "volume_up"
+        title: Translation.tr("Sounds")
+
+        SwitchRow {
+            icon: "notifications_active"
+            title: Translation.tr("Event sounds")
+            subtitle: Translation.tr("Notifications, timers, battery, screenshots")
+            checked: Config.options.sounds.enabled
+            onToggled: checked => Config.options.sounds.enabled = checked
+        }
+        SliderRow {
+            visible: Config.options.sounds.enabled
+            icon: "volume_down"
+            title: Translation.tr("Volume")
+            value: Config.options.sounds.volume
+            from: 0.1; to: 1; step: 0.05; decimals: 2
+            onMoved: value => Config.options.sounds.volume = value
+        }
+        SwitchRow {
+            visible: Config.options.sounds.enabled
+            icon: "notifications"
+            title: Translation.tr("Notifications")
+            checked: Config.options.sounds.notifications
+            onToggled: checked => Config.options.sounds.notifications = checked
+        }
+        SwitchRow {
+            visible: Config.options.sounds.enabled
+            icon: "timer"
+            title: Translation.tr("Timers and focus")
+            checked: Config.options.sounds.timers
+            onToggled: checked => Config.options.sounds.timers = checked
+        }
+        SwitchRow {
+            visible: Config.options.sounds.enabled
+            icon: "battery_alert"
+            title: Translation.tr("Battery and charger")
+            checked: Config.options.sounds.battery
+            onToggled: checked => Config.options.sounds.battery = checked
+        }
+        SwitchRow {
+            visible: Config.options.sounds.enabled
+            icon: "screenshot_region"
+            title: Translation.tr("Screenshots")
+            checked: Config.options.sounds.capture
+            onToggled: checked => Config.options.sounds.capture = checked
+        }
+    }
 }

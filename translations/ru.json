@@ -1082,5 +1082,12 @@
     "Presentation: keep the screen on": "Презентация: не гасить экран",
     "Presentation: night light off": "Презентация: выключать ночной свет",
     "Presentation: hide the desktop widgets": "Презентация: прятать виджеты рабочего стола",
-    "Presentation: hide the bar": "Презентация: прятать панель"
+    "Presentation: hide the bar": "Презентация: прятать панель",
+    "Sounds": "Звуки",
+    "Event sounds": "Звуки событий",
+    "Notifications, timers, battery, screenshots": "Уведомления, таймеры, батарея, скриншоты",
+    "Volume": "Громкость",
+    "Timers and focus": "Таймеры и фокус",
+    "Battery and charger": "Батарея и зарядка",
+    "Screenshots": "Скриншоты"
 }

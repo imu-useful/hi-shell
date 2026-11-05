@@ -64,6 +64,7 @@ Scope {
         const stamp = Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss");
 
         if (mode === "screenshot") {
+            Sounds.play("screenshot");
             const file = `${Paths.home}/Pictures/Screenshots/${stamp}.png`;
             run(['mkdir -p "$(dirname "$3")" && magick "$1" -crop "$2" +repage "$3" && wl-copy --type image/png < "$3" && notify-send -a hi-shell -i "$3" "$4" "$5"', frozen, crop, file, Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").arg(file)]);
         } else if (mode === "ocr") {

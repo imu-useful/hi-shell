@@ -46,6 +46,13 @@ Singleton {
             Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-u", urgency, "-i", "battery-caution", title, `${percent}% remaining${timeLeftText ? ", " + timeLeftText : ""}`]);
     }
 
-    onLowChanged: if (low && !critical) warn("normal", Translation.tr("Battery low"))
-    onCriticalChanged: if (critical) warn("critical", Translation.tr("Battery critical"))
+    onLowChanged: if (low && !critical) { Sounds.play("batteryLow"); warn("normal", Translation.tr("Battery low")); }
+    onCriticalChanged: if (critical) { Sounds.play("batteryCritical"); warn("critical", Translation.tr("Battery critical")); }
+    // The charger plugged in or out (not at startup: the first value is just the state found).
+    property bool powerKnown: false
+    onOnBatteryChanged: {
+        if (available && powerKnown)
+            Sounds.play(onBattery ? "unplugged" : "plugged");
+    }
+    Component.onCompleted: powerKnown = true
 }

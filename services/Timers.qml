@@ -126,6 +126,7 @@ Singleton {
                 if (root.countdownLeft === 0) {
                     root.countdownRunning = false;
                     root.countdownTotal = 0;
+                    Sounds.play("timer");
                     root.notify(Translation.tr("Timer finished"), Translation.tr("Countdown is over"));
                 }
             }
@@ -135,6 +136,7 @@ Singleton {
                 if (root.focusLeft <= 0) {
                     root.onBreak = !root.onBreak;
                     root.focusLeft = (root.onBreak ? root.breakMinutes : root.focusMinutes) * 60;
+                    Sounds.play("phase");
                     root.notify(root.onBreak ? Translation.tr("Time for a break") : Translation.tr("Back to focus"),
                                 root.onBreak ? Translation.trn("%1 minute break", "%1 minute break", root.breakMinutes) : Translation.trn("%1 minute of focus", "%1 minutes of focus", root.focusMinutes));
                 }
