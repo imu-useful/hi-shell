@@ -103,6 +103,7 @@ ColumnLayout {
         }
         SwitchRow { icon: "visibility_off"; title: Translation.tr("Hide until the pointer reaches the screen edge"); checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
         SwitchRow { icon: "desktop_windows"; title: Translation.tr("Show on an empty workspace"); checked: Config.options.dock.showWhenEmpty; onToggled: checked => Config.options.dock.showWhenEmpty = checked }
+        SwitchRow { icon: "apps"; title: Translation.tr("Apps button"); subtitle: Translation.tr("Opens the full-screen list of every app"); checked: Config.options.dock.appsButton; onToggled: checked => Config.options.dock.appsButton = checked }
         SwitchRow { icon: "apps"; title: Translation.tr("Show running apps that aren't pinned"); checked: Config.options.dock.showRunning; onToggled: checked => Config.options.dock.showRunning = checked }
         SwitchRow { icon: "more_horiz"; title: Translation.tr("Window dots under the icons"); checked: Config.options.dock.showIndicators; onToggled: checked => Config.options.dock.showIndicators = checked }
         SwitchRow { icon: "zoom_in"; title: Translation.tr("Magnify on hover"); checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }

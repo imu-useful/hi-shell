@@ -10,7 +10,7 @@ import qs.services
 import qs.modules.dock
 
 // Dock (Config dock.*): pinned and running apps. Click: launch, or focus (cycles the app's windows).
-// Middle click: a new window. Wheel over an app: its windows in turn. Right click: a menu (pin,
+// Middle click: a new window. The first button opens the full-screen list of every app. Wheel over an app: its windows in turn. Right click: a menu (pin,
 // move, new window, app actions, close). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom, or when the workspace has no windows.
 Variants {
     // One dock: on dock.monitor, or the first screen.
@@ -187,8 +187,21 @@ Variants {
             Grid {
                 id: row
                 anchors.centerIn: parent
-                columns: window.vertical ? 1 : Math.max(1, window.apps.length)
+                columns: window.vertical ? 1 : Math.max(1, window.apps.length + (window.options.appsButton ? 1 : 0))
                 spacing: window.options.spacing
+
+                DockButton {
+                    visible: window.options.appsButton
+                    iconSize: window.iconSize
+                    pointer: dock.pointerAlong
+                    position: window.position
+                    magnifies: window.options.magnify
+                    magnifyAmount: window.options.magnifyAmount / 100
+                    onClicked: {
+                        ShellState.launcherOpen = false;
+                        ShellState.appGridOpen = !ShellState.appGridOpen;
+                    }
+                }
 
                 Repeater {
                     model: window.apps

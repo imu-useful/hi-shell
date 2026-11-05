@@ -349,6 +349,8 @@ Singleton {
                 property bool showWhenEmpty: true
                 // Running apps that aren't pinned get an icon too.
                 property bool showRunning: true
+                // A button first in the dock that opens the full-screen list of every app.
+                property bool appsButton: true
                 // The dots under an icon, one per window.
                 property bool showIndicators: true
                 // How much an icon grows toward the pointer (percent), the gap between icons,

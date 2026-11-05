@@ -2,7 +2,7 @@
 
 -- Blur behind the translucent panels; ignore_alpha keeps their fully transparent parts unblurred.
 for _, name in ipairs({
-    "launcher", "ai", "switcher", "display", "overview", "session", "dock", "settings",
+    "launcher", "ai", "switcher", "display", "overview", "session", "appgrid", "dock", "settings",
     "wallpapers", "sidebar", "calendar", "bar", "notifications", "osd",
 }) do
     hl.layer_rule({ match = { namespace = "hi-shell-" .. name }, blur = true })

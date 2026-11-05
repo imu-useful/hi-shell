@@ -38,6 +38,8 @@ ShellRoot {
 
     Launcher {}
 
+    AppGrid {}
+
     AIWidget {}
 
     SidebarRight {}

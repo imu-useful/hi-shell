@@ -69,6 +69,8 @@ Singleton {
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "quick"
     property bool launcherOpen: false
+    // The full-screen list of every app (the dock's apps button).
+    property bool appGridOpen: false
     // Set shortly after startup: the bar, wallpaper, frame and widgets animate in.
     property bool started: false
 
