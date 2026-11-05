@@ -45,7 +45,7 @@ ColumnLayout {
                     : Sounds.failed ? Translation.tr("Couldn't download the pack")
                     : Sounds.downloadable.includes(s.pack) ? "" : Translation.tr("The system sound theme")
             value: s.pack
-            options: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" }]
+            options: [{ value: "freedesktop", text: Translation.tr("System") }, { value: "miui", text: "MIUI" }, { value: "samsung", text: "Samsung" }, { value: "iphone", text: "iPhone" }]
             onSelected: value => {
                 if (value === "freedesktop" || Sounds.installed.includes(value)) {
                     s.pack = value;
@@ -58,7 +58,7 @@ ColumnLayout {
         ListRow {
             visible: Sounds.downloadable.includes(s.pack) || Sounds.installing !== ""
             icon: "info"
-            title: Translation.tr("MIUI and Samsung sounds belong to Xiaomi and Samsung")
+            title: Translation.tr("MIUI, Samsung and iPhone sounds belong to Xiaomi, Samsung and Apple")
             subtitle: Translation.tr("They are downloaded to ~/.local/share/hi-shell/sounds when picked, not shipped with the shell")
         }
     }

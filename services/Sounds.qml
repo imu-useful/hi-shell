@@ -29,8 +29,8 @@ Singleton {
         unplugged: ["power-unplug", "battery", "Charger unplugged"],
         screenshot: ["screen-capture", "capture", "Screenshot"]
     })
-    // Packs that can be downloaded.
-    readonly property var downloadable: ["miui", "samsung"]
+    // Packs that can be downloaded (sh/sound-packs.sh).
+    readonly property var downloadable: ["miui", "samsung", "iphone"]
     // Packs found in the sounds folder.
     property list<string> installed: []
     property string installing: ""

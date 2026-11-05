@@ -1095,7 +1095,6 @@
     "Downloading…": "Скачивается…",
     "Couldn't download the pack": "Не удалось скачать набор",
     "The system sound theme": "Системная тема звуков",
-    "MIUI and Samsung sounds belong to Xiaomi and Samsung": "Звуки MIUI и Samsung принадлежат Xiaomi и Samsung",
     "They are downloaded to ~/.local/share/hi-shell/sounds when picked, not shipped with the shell": "Они скачиваются в ~/.local/share/hi-shell/sounds при выборе и не входят в оболочку",
     "Events": "События",
     "Listen": "Прослушать",
@@ -1103,5 +1102,6 @@
     "Urgent notification": "Срочное уведомление",
     "Focus or break begins": "Начался фокус или перерыв",
     "Charger plugged in": "Зарядку подключили",
-    "Charger unplugged": "Зарядку отключили"
+    "Charger unplugged": "Зарядку отключили",
+    "MIUI, Samsung and iPhone sounds belong to Xiaomi, Samsung and Apple": "Звуки MIUI, Samsung и iPhone принадлежат Xiaomi, Samsung и Apple"
 }
