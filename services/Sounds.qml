@@ -4,7 +4,9 @@ import QtQuick
 import Quickshell
 import qs.common
 
-// Event sounds of the shell: the freedesktop sound theme played through PipeWire (pw-play).
+// Event sounds of the shell, played through PipeWire (pw-play): a file named after the event in
+// ~/.local/share/hi-shell/sounds/ (sh/miui-sounds.sh fills it with MIUI sounds; any .ogg named like
+// the events below works), else the freedesktop sound theme.
 // Everything that makes a sound asks for it by event here, so one switch and one volume
 // (Settings > Interface > Sounds) rule them all. Missing sound files or no pw-play: silence.
 Singleton {
@@ -12,6 +14,7 @@ Singleton {
 
     readonly property var options: Config.options.sounds
     readonly property string dir: "/usr/share/sounds/freedesktop/stereo/"
+    readonly property string userDir: `${Paths.home}/.local/share/hi-shell/sounds/`
 
     // event -> [the file in the theme, the option group that switches it]
     readonly property var events: ({
@@ -30,6 +33,7 @@ Singleton {
         const e = events[event];
         if (!options.enabled || !e || !options[e[1]])
             return;
-        Quickshell.execDetached(["pw-play", "--volume", String(options.volume), `${dir}${e[0]}.oga`]);
+        Quickshell.execDetached(["sh", "-c", 'f="$1"; [ -f "$f" ] || f="$2"; exec pw-play --volume "$3" "$f"', "sh",
+            `${userDir}${event}.ogg`, `${dir}${e[0]}.oga`, String(options.volume)]);
     }
 }
