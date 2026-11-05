@@ -2,13 +2,14 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.common
 
-// Event sounds of the shell, played through PipeWire (pw-play): a file named after the event in
-// ~/.local/share/hi-shell/sounds/ (sh/miui-sounds.sh fills it with MIUI sounds; any .ogg named like
-// the events below works), else the freedesktop sound theme.
-// Everything that makes a sound asks for it by event here, so one switch and one volume
-// (Settings > Interface > Sounds) rule them all. Missing sound files or no pw-play: silence.
+// Event sounds of the shell, played through PipeWire (pw-play). Everything that makes a sound asks
+// for it by event here, so one switch, one pack and one volume (Settings > Sounds) rule them all.
+// Packs: "freedesktop" (the system theme, always there) or one downloaded by sh/sound-packs.sh into
+// ~/.local/share/hi-shell/sounds/<pack>/<event>.ogg (any folder of .ogg files named like the events works).
+// A pack without a file for an event falls back to the system theme; no pw-play: silence.
 Singleton {
     id: root
 
@@ -16,24 +17,67 @@ Singleton {
     readonly property string dir: "/usr/share/sounds/freedesktop/stereo/"
     readonly property string userDir: `${Paths.home}/.local/share/hi-shell/sounds/`
 
-    // event -> [the file in the theme, the option group that switches it]
+    // event -> [the file in the system theme, the option that switches it, a title for Settings]
     readonly property var events: ({
-        notification: ["message-new-instant", "notifications"],
-        urgent: ["dialog-warning", "notifications"],
-        timer: ["alarm-clock-elapsed", "timers"],
-        phase: ["complete", "timers"],
-        batteryLow: ["dialog-warning", "battery"],
-        batteryCritical: ["dialog-error", "battery"],
-        plugged: ["power-plug", "battery"],
-        unplugged: ["power-unplug", "battery"],
-        screenshot: ["screen-capture", "capture"]
+        notification: ["message-new-instant", "notifications", "Notification"],
+        urgent: ["dialog-warning", "notifications", "Urgent notification"],
+        timer: ["alarm-clock-elapsed", "timers", "Timer finished"],
+        phase: ["complete", "timers", "Focus or break begins"],
+        batteryLow: ["dialog-warning", "battery", "Battery low"],
+        batteryCritical: ["dialog-error", "battery", "Battery critical"],
+        plugged: ["power-plug", "battery", "Charger plugged in"],
+        unplugged: ["power-unplug", "battery", "Charger unplugged"],
+        screenshot: ["screen-capture", "capture", "Screenshot"]
     })
+    // Packs that can be downloaded.
+    readonly property var downloadable: ["miui", "samsung"]
+    // Packs found in the sounds folder.
+    property list<string> installed: []
+    property string installing: ""
+    property bool failed: false
 
-    function play(event) {
+    function play(event, force) {
         const e = events[event];
-        if (!options.enabled || !e || !options[e[1]])
+        if (!e || !options.enabled || (!force && !options[e[1]]))
             return;
         Quickshell.execDetached(["sh", "-c", 'f="$1"; [ -f "$f" ] || f="$2"; exec pw-play --volume "$3" "$f"', "sh",
-            `${userDir}${event}.ogg`, `${dir}${e[0]}.oga`, String(options.volume)]);
+            `${userDir}${options.pack}/${event}.ogg`, `${dir}${e[0]}.oga`, String(options.volume)]);
     }
+
+    function install(pack) {
+        if (installing !== "")
+            return;
+        failed = false;
+        installing = pack;
+        installer.command = ["sh", `${Quickshell.shellDir}/sh/sound-packs.sh`, pack];
+        installer.running = true;
+    }
+
+    function refresh() {
+        lister.running = true;
+    }
+
+    Process {
+        id: lister
+        command: ["sh", "-c", 'for d in "$1"/*/; do [ -d "$d" ] && basename "$d"; done; true', "sh", root.userDir]
+        stdout: StdioCollector {
+            onStreamFinished: root.installed = text.split("\n").filter(l => l)
+        }
+    }
+
+    Process {
+        id: installer
+        onExited: code => {
+            const pack = root.installing;
+            root.installing = "";
+            root.failed = code !== 0;
+            root.refresh();
+            if (code === 0) {
+                root.options.pack = pack;
+                root.play("notification", true);
+            }
+        }
+    }
+
+    Component.onCompleted: refresh()
 }
