@@ -36,7 +36,7 @@ Variants {
         }
         // Which windows exist (app id + address) and the pins. A string, so it only changes when the
         // dock's contents do, not on every window title update.
-        readonly property string appsKey: options.pinned.join(",") + "|" + options.showRunning + "|"
+        readonly property string appsKey: options.pinned.join(",") + "|" + options.showRunning + "|" + DesktopEntries.applications.values.length + "|"
             + Hyprland.toplevels.values.map(t => `${t.wayland?.appId ?? ""}@${t.address}`).join(",")
 
         // Pinned ids first (in their order), then running apps that aren't pinned.
@@ -45,11 +45,20 @@ Variants {
         Component.onCompleted: apps = buildApps()
         readonly property int pinnedCount: apps.filter(a => a.pinned).length
 
+        // The app's .desktop entry. Ids are compared without case (Happ.desktop, class "happ"), and
+        // a miss isn't kept: the entries may not be loaded yet.
         property var entryCache: ({})
         function entryFor(id) {
-            if (!(id in entryCache))
-                entryCache[id] = DesktopEntries.heuristicLookup(id);
-            return entryCache[id];
+            if (entryCache[id])
+                return entryCache[id];
+            const apps = DesktopEntries.applications.values;
+            const entry = DesktopEntries.heuristicLookup(id)
+                ?? apps.find(a => a.id.toLowerCase() === id || a.id.toLowerCase() === `${id}.desktop` || a.startupClass?.toLowerCase() === id)
+                ?? apps.find(a => a.name.toLowerCase() === id)
+                ?? null;
+            if (entry)
+                entryCache[id] = entry;
+            return entry;
         }
 
         function buildApps() {
