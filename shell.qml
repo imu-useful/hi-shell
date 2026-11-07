@@ -21,7 +21,7 @@ ShellRoot {
     Timer {
         running: true
         interval: 2500
-        onTriggered: ShellState.started = true
+        onTriggered: ShellState.ready = true
     }
 
     Desktop {}

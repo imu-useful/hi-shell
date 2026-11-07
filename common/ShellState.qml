@@ -72,7 +72,11 @@ Singleton {
     // The full-screen list of every app (the dock's apps button).
     property bool appGridOpen: false
     // Set shortly after startup: the bar, wallpaper, frame and widgets animate in.
-    property bool started: false
+    // The shell is ready to show (wallpaper loaded, or the fallback timer); `started` also waits
+    // for the startup greeting to end, so the intro animations play after it, not under it.
+    property bool ready: false
+    property bool greeting: false
+    readonly property bool started: ready && !greeting
 
     // Open the first-run welcome again (five taps on the avatar in Settings).
     signal showWelcome()

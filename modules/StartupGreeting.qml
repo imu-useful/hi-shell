@@ -4,30 +4,49 @@ import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
 
-// "Welcome back!" at startup: the letters rise in one after another, the line stays a moment
-// and fades away; then the window is gone. Starts with the rest of the startup animation.
+// Startup: a black screen, then "Welcome back!" (the letters rise in one after another), then the
+// black and the text fade away together, and the shell's own intro animation plays underneath.
 Scope {
     id: root
 
     readonly property string text: "Welcome back!"
     readonly property int letterDelay: 55
-    // 0..1 for the whole line, drives the exit fade
+    readonly property int blackHold: 500 // black alone, before the text
+    readonly property int textHold: 1500 // text fully shown, before everything fades
+    readonly property int fadeDuration: 700
+
+    property bool lettersIn: false
+    // 0..1, the exit fade of the black and the text
     property real outro: 0
     property bool done: false
 
-    Connections {
-        target: ShellState
-        function onStartedChanged() {
-            if (ShellState.started && !root.done)
-                holdTimer.start();
+    Component.onCompleted: {
+        // Without animations (or in Focus Mode) there's no greeting; don't hold the intro.
+        if (Appearance.anim.speed <= 0) {
+            done = true;
+            return;
+        }
+        ShellState.greeting = true;
+        textTimer.start();
+    }
+
+    Timer {
+        id: textTimer
+        interval: root.blackHold
+        onTriggered: {
+            root.lettersIn = true;
+            fadeTimer.start();
         }
     }
 
-    // Letters come in over text.length * letterDelay + a letter's own animation, then a hold.
     Timer {
-        id: holdTimer
-        interval: root.text.length * root.letterDelay + 400 + 1400
-        onTriggered: fadeOut.start()
+        id: fadeTimer
+        interval: root.text.length * root.letterDelay + 400 + root.textHold
+        onTriggered: {
+            // The desktop starts coming in as the black fades.
+            ShellState.greeting = false;
+            fadeOut.start();
+        }
     }
 
     NumberAnimation {
@@ -35,13 +54,13 @@ Scope {
         target: root
         property: "outro"
         to: 1
-        duration: 600
+        duration: root.fadeDuration
         easing.type: Easing.InOutCubic
         onFinished: root.done = true
     }
 
     LazyLoader {
-        active: Appearance.anim.speed > 0 && !root.done
+        active: !root.done
 
         Variants {
             model: Quickshell.screens
@@ -63,35 +82,38 @@ Scope {
                 WlrLayershell.namespace: "hi-shell-greeting"
                 WlrLayershell.layer: WlrLayer.Overlay
 
-                Row {
-                    id: line
-                    anchors.centerIn: parent
+                Rectangle {
+                    anchors.fill: parent
+                    color: "black"
                     opacity: 1 - root.outro
-                    scale: 1 + root.outro * 0.06
 
-                    Repeater {
-                        model: root.text.length
+                    Row {
+                        anchors.centerIn: parent
+                        scale: 1 + root.outro * 0.06
 
-                        StyledText {
-                            id: letter
+                        Repeater {
+                            model: root.text.length
 
-                            required property int index
-                            readonly property bool shown: ShellState.started
+                            StyledText {
+                                id: letter
 
-                            text: root.text[index]
-                            font.family: Appearance.font.title
-                            font.pixelSize: 64
-                            font.weight: Font.DemiBold
-                            color: Colors.m3onSurface
-                            elide: Text.ElideNone
-                            property real rise: shown ? 1 : 0
-                            opacity: rise
-                            transform: Translate { y: (1 - letter.rise) * 28 }
+                                required property int index
 
-                            Behavior on rise {
-                                SequentialAnimation {
-                                    PauseAnimation { duration: letter.index * root.letterDelay }
-                                    NumberAnimation { duration: 400; easing.type: Easing.OutCubic }
+                                text: root.text[index]
+                                font.family: Appearance.font.title
+                                font.pixelSize: 64
+                                font.weight: Font.DemiBold
+                                color: "white"
+                                elide: Text.ElideNone
+                                property real rise: root.lettersIn ? 1 : 0
+                                opacity: rise
+                                transform: Translate { y: (1 - letter.rise) * 28 }
+
+                                Behavior on rise {
+                                    SequentialAnimation {
+                                        PauseAnimation { duration: letter.index * root.letterDelay }
+                                        NumberAnimation { duration: 400; easing.type: Easing.OutCubic }
+                                    }
                                 }
                             }
                         }

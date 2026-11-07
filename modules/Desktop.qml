@@ -67,7 +67,7 @@ Scope {
             Timer {
                 id: introStart
                 interval: 80
-                onTriggered: ShellState.started = true
+                onTriggered: ShellState.ready = true
             }
 
             // Startup: the wallpaper fades in, then the frame pops in.
@@ -150,7 +150,7 @@ Scope {
                 Image {
                     id: a
                     anchors.fill: parent
-                    onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
+                    onStatusChanged: if (status === Image.Ready && !ShellState.ready) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     // Not in the image cache: a wallpaper is shown once, then replaced.
@@ -162,7 +162,7 @@ Scope {
                 Image {
                     id: b
                     anchors.fill: parent
-                    onStatusChanged: if (status === Image.Ready && !ShellState.started) introStart.restart()
+                    onStatusChanged: if (status === Image.Ready && !ShellState.ready) introStart.restart()
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     // Not in the image cache: a wallpaper is shown once, then replaced.
