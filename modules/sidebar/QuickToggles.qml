@@ -22,7 +22,7 @@ ColumnLayout {
 
     readonly property var options: Config.options.sidebar.quickToggles
     readonly property bool android: options.style !== "classic"
-    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "viewing", "presentation", "vpn", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession", "waitMode"]
+    readonly property list<string> allIds: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "viewing", "presentation", "vpn", "tailscale", "colorPicker", "screenshot", "coverMode", "focusMode", "displayMode", "focusSession", "waitMode"]
     readonly property list<string> ids: editing ? [...options.shown.filter(i => allIds.includes(i)), ...allIds.filter(i => !options.shown.includes(i))]
                                                 : options.shown.filter(i => allIds.includes(i) && (toggles[i]?.available ?? false))
 
@@ -127,6 +127,14 @@ ColumnLayout {
             active: Toggles.vpnActive,
             available: Toggles.vpnAvailable,
             toggle: () => Toggles.setVpn(!Toggles.vpnActive)
+        },
+        tailscale: {
+            icon: "lan",
+            label: "Tailscale",
+            subtitle: Toggles.tailscaleActive ? (Toggles.tailnet || Translation.tr("On")) : Translation.tr("Off"),
+            active: Toggles.tailscaleActive,
+            available: Toggles.tailscaleAvailable,
+            toggle: () => Toggles.setTailscale(!Toggles.tailscaleActive)
         },
         displayMode: {
             icon: "screenshot_monitor",
