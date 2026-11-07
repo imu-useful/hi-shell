@@ -218,6 +218,12 @@ ColumnLayout {
         options.shown = list;
     }
 
+    // Android style shows 6 tiles (2 x 3) per page; the rest go to further pages.
+    readonly property int pageSize: !android ? 10 : options.perPage > 0 ? options.perPage : 1000
+    readonly property int pageCount: editing ? 1 : Math.max(1, Math.ceil(ids.length / pageSize))
+    property int page: 0
+    readonly property int currentPage: Math.min(page, pageCount - 1)
+
     spacing: 10
 
     RowLayout {
@@ -226,12 +232,6 @@ ColumnLayout {
 
         StyledText {
             Layout.fillWidth: true
-    // Android style shows 6 tiles (2 x 3) per page; the rest go to further pages.
-    readonly property int pageSize: !android ? 10 : options.perPage > 0 ? options.perPage : 1000
-    readonly property int pageCount: editing ? 1 : Math.max(1, Math.ceil(ids.length / pageSize))
-    property int page: 0
-    readonly property int currentPage: Math.min(page, pageCount - 1)
-
             text: Translation.tr("Tap to add or remove")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
@@ -268,14 +268,6 @@ ColumnLayout {
                 SpatialAnim { duration: Appearance.anim.normal }
             }
 
-
-        Repeater {
-            model: root.editing ? root.ids : root.ids.slice(pageGrid.index * root.pageSize, (pageGrid.index + 1) * root.pageSize)
-
-            Item {
-                id: tile
-
-                required property string modelData
             Repeater {
                 model: root.pageCount
 
@@ -288,14 +280,14 @@ ColumnLayout {
                     columns: viewport.cols
                     columnSpacing: 8
                     rowSpacing: 8
-                Rectangle {
-                    id: body
-                    anchors.fill: parent
-                    anchors.margins: root.android ? 0 : 2
-                    radius: root.android ? (tile.t.active ? Appearance.rounding.full : Appearance.rounding.extraLarge) : height / 2
-                    color: tile.t.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
-                    border.width: root.editing ? 1 : 0
-                    border.color: Colors.m3outline
+
+        Repeater {
+            model: root.editing ? root.ids : root.ids.slice(pageGrid.index * root.pageSize, (pageGrid.index + 1) * root.pageSize)
+
+            Item {
+                id: tile
+
+                required property string modelData
                 readonly property var t: root.toggles[modelData]
                 readonly property bool included: root.options.shown.includes(modelData)
 
@@ -304,6 +296,14 @@ ColumnLayout {
                 implicitHeight: root.android ? 64 : 56
                 opacity: root.editing && !included ? 0.45 : 1
 
+                Rectangle {
+                    id: body
+                    anchors.fill: parent
+                    anchors.margins: root.android ? 0 : 2
+                    radius: root.android ? (tile.t.active ? Appearance.rounding.full : Appearance.rounding.extraLarge) : height / 2
+                    color: tile.t.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
+                    border.width: root.editing ? 1 : 0
+                    border.color: Colors.m3outline
 
                     Behavior on color { ColorAnim {} }
                     Behavior on radius { SpatialAnim { duration: Appearance.anim.normal } }
@@ -421,6 +421,9 @@ ColumnLayout {
                 }
             }
         }
+                }
+            }
+        }
     }
 
     Row {
@@ -428,9 +431,6 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         spacing: 6
 
-        }
-                }
-            }
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: 28
@@ -450,13 +450,6 @@ ColumnLayout {
             }
         }
 
-                color: index === root.currentPage ? Colors.m3primary : Colors.m3outlineVariant
-                Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
-                Behavior on color { ColorAnim {} }
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -4
-                    onClicked: root.page = parent.index
         Repeater {
             model: root.pageCount
 
@@ -466,6 +459,13 @@ ColumnLayout {
                 width: index === root.currentPage ? 18 : 8
                 height: 8
                 radius: 4
+                color: index === root.currentPage ? Colors.m3primary : Colors.m3outlineVariant
+                Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
+                Behavior on color { ColorAnim {} }
+                MouseArea {
+                    anchors.fill: parent
+                    anchors.margins: -4
+                    onClicked: root.page = parent.index
                 }
             }
         }
@@ -488,5 +488,5 @@ ColumnLayout {
                 onClicked: root.page = root.currentPage + 1
             }
         }
-}
     }
+}
