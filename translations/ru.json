@@ -1162,5 +1162,7 @@
     "Other times on battery": "Другое время от батареи",
     "On battery: lock after, minutes": "От батареи: блокировать через, мин",
     "On battery: screen off after, minutes": "От батареи: выключить экран через, мин",
-    "On battery: suspend after, minutes": "От батареи: сон через, мин"
+    "On battery: suspend after, minutes": "От батареи: сон через, мин",
+    "Reboot to…": "Перезагрузить в…",
+    "Firmware setup (BIOS / UEFI)": "Настройки прошивки (BIOS / UEFI)"
 }
