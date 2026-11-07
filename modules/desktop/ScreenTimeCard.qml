@@ -44,6 +44,26 @@ DesktopCard {
             }
         }
 
+        // A line about the total, once there is something to say.
+        RowLayout {
+            Layout.fillWidth: true
+            visible: root.total >= 60
+            spacing: 8
+
+            MaterialIcon {
+                icon: ScreenTime.verdict(root.total).icon
+                iconSize: 20
+                color: Colors.m3primary
+            }
+            StyledText {
+                Layout.fillWidth: true
+                text: ScreenTime.verdict(root.total).text
+                wrapMode: Text.WordWrap
+                font.pixelSize: Appearance.font.size.labelMedium
+                color: Colors.m3onSurfaceVariant
+            }
+        }
+
         Repeater {
             model: root.apps
 

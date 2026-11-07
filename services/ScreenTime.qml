@@ -69,6 +69,19 @@ Singleton {
         return h ? (m % 60 ? Translation.tr("%1 h %2 min").arg(h).arg(m % 60) : Translation.tr("%1 h").arg(h)) : Translation.tr("%1 min").arg(m);
     }
 
+    // A line about a day's total, by how long it is; one of a few for each range, the same all day.
+    readonly property var phrases: [
+        { upTo: 1, icon: "sentiment_very_satisfied", set: [Translation.tr("Barely any screen time. Well done!"), Translation.tr("Light day so far, great."), Translation.tr("Plenty of time left for real life.")] },
+        { upTo: 3, icon: "thumb_up", set: [Translation.tr("A solid hour or two. Nice job!"), Translation.tr("A healthy amount, keep it up."), Translation.tr("Good balance today, well done.")] },
+        { upTo: 6, icon: "visibility", set: [Translation.tr("That's a fair bit. Maybe a break?"), Translation.tr("Rest your eyes for a minute."), Translation.tr("Stand up, stretch, look out of the window.")] },
+        { upTo: Infinity, icon: "bedtime", set: [Translation.tr("Over six hours. Try to use less."), Translation.tr("That's a lot of screen. Go outside for a bit."), Translation.tr("Your eyes need a rest. Try less tomorrow.")] }
+    ]
+    function verdict(seconds) {
+        const range = phrases.find(p => seconds / 3600 < p.upTo);
+        const dayNumber = Math.floor(new Date() / 86400000);
+        return { icon: range.icon, text: range.set[dayNumber % range.set.length] };
+    }
+
     function limitOf(app) {
         return data.limits[app] ?? 0;
     }
