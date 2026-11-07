@@ -1,11 +1,14 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
 
 // Startup: a black screen, then "Welcome back!" (the letters rise in one after another), then the
 // black and the text fade away together, and the shell's own intro animation plays underneath.
+// The very first start gets another one: "Welcome to", half a second later the animated logo, and
+// a second after the logo has finished waving everything fades away.
 Scope {
     id: root
 
@@ -25,6 +28,15 @@ Scope {
     readonly property int edgeMargin: 120
     property int style: Math.floor(Math.random() * styles)
 
+    // 0 not known yet (the marker file is being read), 1 returning user, 2 first start
+    property int mode: 0
+    readonly property bool firstRun: mode === 2
+    readonly property int logoDelay: 500 // "Welcome to" -> the logo
+    readonly property int logoPlay: 2100 // the wave of the logo
+    readonly property int logoHold: 1000 // after the wave, before the window closes
+    property bool welcomeIn: false
+    property bool logoIn: false
+
     property bool lettersIn: false
     // 0..1, the exit fade of the black and the text
     property real outro: 0
@@ -37,6 +49,30 @@ Scope {
             return;
         }
         ShellState.greeting = true;
+    }
+
+    // Has the shell been started before? The marker is written on the first start.
+    FileView {
+        id: marker
+        path: `${Paths.state}/greeted`
+        printErrors: false
+        onLoaded: root.begin(1)
+        onLoadFailed: error => {
+            root.begin(error === FileViewError.FileNotFound ? 2 : 1);
+        }
+    }
+
+    Process {
+        id: writeMarker
+        command: ["sh", "-c", `mkdir -p "$(dirname "$1")" && date -Is > "$1"`, "sh", marker.path]
+    }
+
+    function begin(newMode: int): void {
+        if (done || mode !== 0)
+            return;
+        mode = newMode;
+        if (firstRun)
+            writeMarker.running = true;
         textTimer.start();
     }
 
@@ -44,14 +80,29 @@ Scope {
         id: textTimer
         interval: root.blackHold
         onTriggered: {
+            if (root.firstRun) {
+                root.welcomeIn = true;
+                logoTimer.start();
+                return;
+            }
             root.lettersIn = true;
+            fadeTimer.interval = root.text.length * root.letterDelay + 400 + root.textHold;
+            fadeTimer.start();
+        }
+    }
+
+    Timer {
+        id: logoTimer
+        interval: root.logoDelay
+        onTriggered: {
+            root.logoIn = true;
+            fadeTimer.interval = root.logoPlay + root.logoHold;
             fadeTimer.start();
         }
     }
 
     Timer {
         id: fadeTimer
-        interval: root.text.length * root.letterDelay + 400 + root.textHold
         onTriggered: {
             // The desktop starts coming in as the black fades.
             ShellState.greeting = false;
@@ -97,9 +148,39 @@ Scope {
                     color: "black"
                     opacity: 1 - root.outro
 
-                    // The logo and the line of text (the logo above it; below it when the text is at the top)
+                    // First start: "Welcome to" with the logo under it
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 24
+                        visible: root.firstRun
+                        scale: 1 + root.outro * 0.06
+
+                        StyledText {
+                            id: welcomeTo
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "Welcome to"
+                            font.family: Appearance.font.title
+                            font.pixelSize: 56
+                            font.weight: Font.DemiBold
+                            color: "white"
+                            elide: Text.ElideNone
+                            property real rise: root.welcomeIn ? 1 : 0
+                            opacity: rise
+                            transform: Translate { y: (1 - welcomeTo.rise) * 24 }
+                            Behavior on rise { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        }
+
+                        AnimatedLogo {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            height: Math.min(240, window.height * 0.3)
+                            playing: root.logoIn
+                        }
+                    }
+
+                    // Returning: the logo and the line of text (the logo above it; below it when the text is at the top)
                     Grid {
                         id: block
+                        visible: !root.firstRun
                         anchors.horizontalCenter: parent.horizontalCenter
                         y: root.style === 1 ? root.edgeMargin
                             : root.style === 0 ? parent.height - height - root.edgeMargin
