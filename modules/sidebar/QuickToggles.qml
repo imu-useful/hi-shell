@@ -226,6 +226,13 @@ ColumnLayout {
 
         StyledText {
             Layout.fillWidth: true
+    // Android style shows 6 tiles (2 x 3) per page; the rest go to further pages.
+    readonly property int pageSize: android ? 6 : 10
+    readonly property int pageCount: editing ? 1 : Math.max(1, Math.ceil(ids.length / pageSize))
+    property int page: 0
+    readonly property int currentPage: Math.min(page, pageCount - 1)
+    readonly property list<string> pageIds: editing ? ids : ids.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+
             text: Translation.tr("Tap to add or remove")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
@@ -244,18 +251,27 @@ ColumnLayout {
         rowSpacing: 8
 
         Repeater {
-            model: root.ids
+            model: root.pageIds
 
             Item {
                 id: tile
 
                 required property string modelData
+        // Keep the height of a full page so the sidebar doesn't jump between pages.
+        Layout.minimumHeight: root.pageCount > 1 ? Math.ceil(root.pageSize / columns) * ((root.android ? 64 : 56) + rowSpacing) - rowSpacing : 0
+        Layout.alignment: Qt.AlignTop
+
+        WheelHandler {
+            enabled: root.pageCount > 1
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: event => root.page = Math.max(0, Math.min(root.pageCount - 1, root.currentPage + (event.angleDelta.y < 0 ? 1 : -1)))
+        }
                 readonly property var t: root.toggles[modelData]
                 readonly property bool included: root.options.shown.includes(modelData)
 
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
-                implicitHeight: root.android ? 48 : 48
+                implicitHeight: root.android ? 64 : 56
                 opacity: root.editing && !included ? 0.45 : 1
 
                 Rectangle {
@@ -274,20 +290,20 @@ ColumnLayout {
                     RowLayout {
                         visible: root.android
                         anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
-                        spacing: 8
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 12
+                        spacing: 10
 
                         Rectangle {
-                            implicitWidth: 32
-                            implicitHeight: 32
-                            radius: 16
+                            implicitWidth: 40
+                            implicitHeight: 40
+                            radius: 20
                             color: tile.t.active ? Colors.m3onPrimary : Colors.m3surfaceContainerHigh
                             MaterialIcon {
                                 anchors.centerIn: parent
                                 icon: tile.t.icon
                                 fill: tile.t.active ? 1 : 0
-                                iconSize: 18
+                                iconSize: 20
                                 color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
                             }
                         }
@@ -303,14 +319,14 @@ ColumnLayout {
                             StyledText {
                                 Layout.fillWidth: true
                                 text: tile.t.subtitle
-                                font.pixelSize: Appearance.font.size.labelSmall
+                                font.pixelSize: Appearance.font.size.labelMedium
                                 color: tile.t.active ? Qt.alpha(Colors.m3onPrimary, 0.8) : Colors.m3onSurfaceVariant
                             }
                         }
                         MaterialIcon {
                             visible: (!!tile.t.page || !!tile.t.more) && !root.editing
                             icon: "chevron_right"
-                            iconSize: 16
+                            iconSize: 18
                             color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
                         }
                     }
@@ -331,7 +347,7 @@ ColumnLayout {
                         onClicked: mouse => {
                             if (root.editing)
                                 root.setShown(tile.modelData, !tile.included);
-                            else if ((tile.t.page || tile.t.more) && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 36)))
+                            else if ((tile.t.page || tile.t.more) && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 44)))
                                 tile.t.more ? tile.t.more() : root.openPage(tile.t.page);
                             else
                                 tile.t.toggle();
@@ -385,3 +401,28 @@ ColumnLayout {
         }
     }
 }
+
+    Row {
+        visible: root.pageCount > 1
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 6
+
+        Repeater {
+            model: root.pageCount
+
+            Rectangle {
+                required property int index
+                width: index === root.currentPage ? 18 : 8
+                height: 8
+                radius: 4
+                color: index === root.currentPage ? Colors.m3primary : Colors.m3outlineVariant
+                Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
+                Behavior on color { ColorAnim {} }
+                MouseArea {
+                    anchors.fill: parent
+                    anchors.margins: -4
+                    onClicked: root.page = parent.index
+                }
+            }
+        }
+    }
