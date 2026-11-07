@@ -110,15 +110,9 @@ Scope {
                         verticalItemAlignment: Grid.AlignVCenter
                         scale: 1 + root.outro * 0.06
 
-                        component Logo: Image {
-                            readonly property real logoHeight: root.vertical ? Math.min(220, window.height * 0.25) : 150
-                            source: Quickshell.shellPath("common/icons/logo-dark.png")
-                            sourceSize.height: logoHeight * 2
-                            height: logoHeight
-                            width: logoHeight * implicitWidth / Math.max(1, implicitHeight)
-                            smooth: true
-                            opacity: root.lettersIn ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+                        component Logo: AnimatedLogo {
+                            height: root.vertical ? Math.min(220, window.height * 0.25) : 150
+                            playing: root.lettersIn
                         }
 
                         Logo { visible: root.style !== 1 }
