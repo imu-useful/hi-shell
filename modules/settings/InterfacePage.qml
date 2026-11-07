@@ -228,13 +228,35 @@ ColumnLayout {
             checked: Config.options.sidebar.quickToggles.slide
             onToggled: checked => Config.options.sidebar.quickToggles.slide = checked
         }
-        ChoiceRow {
-            icon: "sports_esports"
-            title: Translation.tr("Game")
-            subtitle: Translation.tr("In the empty notification center")
-            value: Config.options.sidebar.game
-            options: [{ value: "dino", text: Translation.tr("Dino") }, { value: "snake", text: Translation.tr("Snake") }, { value: "minesweeper", text: Translation.tr("Minesweeper") }, { value: "game2048", text: "2048" }, { value: "flappy", text: Translation.tr("Flappy") }, { value: "memory", text: Translation.tr("Memory") }, { value: "tictactoe", text: Translation.tr("Tic-tac-toe") }, { value: "puzzle", text: Translation.tr("15 puzzle") }, { value: "lightsout", text: Translation.tr("Lights out") }]
-            onSelected: value => Config.options.sidebar.game = value
+        // Too many games for one segmented button: the title row, then the games wrapped below it.
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 0
+
+            ListRow {
+                Layout.fillWidth: true
+                icon: "sports_esports"
+                title: Translation.tr("Game")
+                subtitle: Translation.tr("In the empty notification center")
+            }
+            Flow {
+                Layout.fillWidth: true
+                Layout.leftMargin: 50
+                Layout.rightMargin: 12
+                Layout.bottomMargin: 10
+                spacing: 6
+
+                Repeater {
+                    model: [{ value: "dino", text: Translation.tr("Dino") }, { value: "snake", text: Translation.tr("Snake") }, { value: "minesweeper", text: Translation.tr("Minesweeper") }, { value: "game2048", text: "2048" }, { value: "flappy", text: Translation.tr("Flappy") }, { value: "memory", text: Translation.tr("Memory") }, { value: "tictactoe", text: Translation.tr("Tic-tac-toe") }, { value: "puzzle", text: Translation.tr("15 puzzle") }, { value: "lightsout", text: Translation.tr("Lights out") }]
+
+                    Chip {
+                        required property var modelData
+                        text: modelData.text
+                        selected: Config.options.sidebar.game === modelData.value
+                        onClicked: Config.options.sidebar.game = modelData.value
+                    }
+                }
+            }
         }
         SliderRow {
             icon: "nightlight"
