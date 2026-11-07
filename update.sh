@@ -8,6 +8,7 @@
 # release. Either way, local edits that conflict stop the update instead of being overwritten.
 # Reloads Hyprland when hypr/ changed.
 set -euo pipefail
+export GIT_PAGER=cat # no pager: the output goes to a log or a terminal that may not have less
 
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
