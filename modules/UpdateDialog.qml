@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
@@ -15,11 +16,27 @@ Scope {
 
     readonly property bool release: Config.options.update.channel === "release"
     property bool dismissed: false
-    readonly property bool open: Config.options.update.notify && !dismissed && Updates.shellChecked && Updates.shellBehind > 0
+    // `qs -c hi-shell ipc call updateDialog preview` shows it with sample text
+    property bool preview: false
+    readonly property bool open: preview || (Config.options.update.notify && !dismissed && Updates.shellChecked && Updates.shellBehind > 0)
+    readonly property string notes: preview ? "Update window: what the update brings, Update and Later\nSettings: the window can be turned off in About" : Updates.shellNotes
 
-    readonly property string title: release ? Translation.tr("New release %1").arg(Updates.shellRelease)
-        : Updates.shellBehind > 1 ? Translation.tr("%1 new commits are out").arg(Updates.shellBehind)
+    IpcHandler {
+        target: "updateDialog"
+
+        function preview(): void {
+            root.preview = true;
+        }
+    }
+
+    readonly property string title: release ? Translation.tr("New release %1").arg(Updates.shellRelease || "v1.7.0")
+        : (preview || Updates.shellBehind > 1) ? Translation.tr("%1 new commits are out").arg(preview ? 2 : Updates.shellBehind)
         : Translation.tr("A new commit is out")
+
+    function close(): void {
+        dismissed = true;
+        preview = false;
+    }
 
     PanelLoader {
         id: loader
@@ -43,7 +60,7 @@ Scope {
 
             Shortcut {
                 sequence: "Escape"
-                onActivated: root.dismissed = true
+                onActivated: root.close()
             }
 
             Rectangle {
@@ -101,7 +118,7 @@ Scope {
                     StyledText {
                         Layout.fillWidth: true
                         visible: text !== ""
-                        text: Updates.shellNotes
+                        text: root.notes
                         maximumLineCount: 10
                         elide: Text.ElideRight
                         wrapMode: Text.Wrap
@@ -115,13 +132,13 @@ Scope {
                         M3Button {
                             tonal: true
                             text: Translation.tr("Later")
-                            onClicked: root.dismissed = true
+                            onClicked: root.close()
                         }
                         M3Button {
                             icon: "system_update_alt"
                             text: Translation.tr("Update")
                             onClicked: {
-                                root.dismissed = true;
+                                root.close();
                                 Updates.updateShell();
                             }
                         }
