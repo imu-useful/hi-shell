@@ -249,14 +249,6 @@ ColumnLayout {
         columns: root.android ? 2 : 5
         columnSpacing: 8
         rowSpacing: 8
-
-        Repeater {
-            model: root.pageIds
-
-            Item {
-                id: tile
-
-                required property string modelData
         // Keep the height of a full page so the sidebar doesn't jump between pages.
         Layout.minimumHeight: root.pageCount > 1 ? Math.ceil(root.pageSize / columns) * ((root.android ? 64 : 56) + rowSpacing) - rowSpacing : 0
         Layout.alignment: Qt.AlignTop
@@ -274,6 +266,14 @@ ColumnLayout {
                 implicitHeight: root.android ? 64 : 56
                 opacity: root.editing && !included ? 0.45 : 1
 
+
+        Repeater {
+            model: root.pageIds
+
+            Item {
+                id: tile
+
+                required property string modelData
                 Rectangle {
                     id: body
                     anchors.fill: parent
@@ -400,7 +400,6 @@ ColumnLayout {
             }
         }
     }
-}
 
     Row {
         visible: root.pageCount > 1
@@ -415,14 +414,54 @@ ColumnLayout {
                 width: index === root.currentPage ? 18 : 8
                 height: 8
                 radius: 4
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 28
+            height: 28
+            radius: 14
+            color: Colors.m3secondaryContainer
+            opacity: root.currentPage > 0 ? 1 : 0.4
+            MaterialIcon {
+                anchors.centerIn: parent
+                icon: "chevron_left"
+                iconSize: 18
+                color: Colors.m3onSecondaryContainer
+            }
+            StateLayer {
+                enabled: root.currentPage > 0
+                onClicked: root.page = root.currentPage - 1
+            }
+        }
+
                 color: index === root.currentPage ? Colors.m3primary : Colors.m3outlineVariant
                 Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
                 Behavior on color { ColorAnim {} }
                 MouseArea {
                     anchors.fill: parent
+                anchors.verticalCenter: parent.verticalCenter
                     anchors.margins: -4
                     onClicked: root.page = parent.index
                 }
             }
         }
     }
+
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 28
+            height: 28
+            radius: 14
+            color: Colors.m3secondaryContainer
+            opacity: root.currentPage < root.pageCount - 1 ? 1 : 0.4
+            MaterialIcon {
+                anchors.centerIn: parent
+                icon: "chevron_right"
+                iconSize: 18
+                color: Colors.m3onSecondaryContainer
+            }
+            StateLayer {
+                enabled: root.currentPage < root.pageCount - 1
+                onClicked: root.page = root.currentPage + 1
+            }
+        }
+}
