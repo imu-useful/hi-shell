@@ -150,7 +150,7 @@ Singleton {
                     // android: two-column pills with labels | classic: round icon buttons
                     property string style: "android"
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
-                    // gameMode, vpn, tailscale, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
+                    // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
                     // waitMode (hidden by default: add it in the sidebar's tile editor)
                     property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]
                 }

@@ -121,53 +121,10 @@ Singleton {
         onExited: root.refreshVpns()
     }
 
-    // Tailscale: shown when the `tailscale` command exists. Running = connected to the tailnet.
-    property bool tailscaleAvailable: false
-    property bool tailscaleActive: false
-    property string tailnet: ""
-
-    function refreshTailscale() {
-        if (!tailscaleStatus.running)
-            tailscaleStatus.running = true;
-    }
-
-    function setTailscale(on) {
-        tailscaleToggle.command = ["tailscale", on ? "up" : "down"];
-        tailscaleToggle.running = true;
-    }
-
-    Process {
-        id: tailscaleStatus
-        running: true
-        command: ["tailscale", "status", "--json"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const st = JSON.parse(text);
-                    root.tailscaleAvailable = true;
-                    root.tailscaleActive = st.BackendState === "Running";
-                    root.tailnet = st.CurrentTailnet?.Name ?? st.Self?.HostName ?? "";
-                } catch (e) {
-                    // Installed but the daemon is stopped prints no JSON: still offer the toggle.
-                    root.tailscaleActive = false;
-                }
-            }
-        }
-        // A missing command fails to start; leave it unavailable.
-    }
-
-    Process {
-        id: tailscaleToggle
-        onExited: root.refreshTailscale()
-    }
-
     Timer {
         interval: 15000
         running: true
         repeat: true
-        onTriggered: {
-            root.refreshVpns();
-            root.refreshTailscale();
-        }
+        onTriggered: root.refreshVpns()
     }
 }
