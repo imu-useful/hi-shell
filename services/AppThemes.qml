@@ -1,0 +1,109 @@
+pragma Singleton
+
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import qs.common
+
+// The wallpaper's palette for other apps, each one opt-in (Settings > Interface > App themes):
+//   gtk     a block of named colors in ~/.config/gtk-3.0/gtk.css and gtk-4.0/gtk.css (libadwaita and
+//           GTK3 apps pick them up); only the block between the "hi-shell begin/end" markers is
+//           touched, the rest of those files stays as it is. Switched off, the block is removed.
+//   neovim  ~/.config/nvim/colors/hi-shell.lua, then `:colorscheme hi-shell` in Neovim.
+// (Terminals, btop, fish and starship follow the palette on their own: services/TerminalColors.qml.)
+Singleton {
+    id: root
+
+    readonly property var o: Config.options.appThemes
+    readonly property string script: `${Quickshell.shellDir}/services/app_themes.py`
+
+    function hex(c) {
+        const h = v => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, "0");
+        return `#${h(c.r)}${h(c.g)}${h(c.b)}`;
+    }
+
+    readonly property string gtkCss: {
+        const c = {
+            accent_color: Colors.m3primary, accent_bg_color: Colors.m3primary, accent_fg_color: Colors.m3onPrimary,
+            window_bg_color: Colors.m3surface, window_fg_color: Colors.m3onSurface,
+            view_bg_color: Colors.m3surfaceContainerLow, view_fg_color: Colors.m3onSurface,
+            headerbar_bg_color: Colors.m3surfaceContainer, headerbar_fg_color: Colors.m3onSurface,
+            headerbar_border_color: Colors.m3outlineVariant,
+            card_bg_color: Colors.m3surfaceContainerHigh, card_fg_color: Colors.m3onSurface,
+            popover_bg_color: Colors.m3surfaceContainerHigh, popover_fg_color: Colors.m3onSurface,
+            sidebar_bg_color: Colors.m3surfaceContainerLow, sidebar_fg_color: Colors.m3onSurface,
+            dialog_bg_color: Colors.m3surfaceContainerHigh, dialog_fg_color: Colors.m3onSurface,
+            destructive_bg_color: Colors.m3error, destructive_fg_color: Colors.m3surface, destructive_color: Colors.m3error,
+            error_color: Colors.m3error, error_bg_color: Colors.m3error, error_fg_color: Colors.m3surface,
+            // GTK3 apps and themes that use the older names.
+            theme_bg_color: Colors.m3surface, theme_fg_color: Colors.m3onSurface,
+            theme_base_color: Colors.m3surfaceContainerLow, theme_text_color: Colors.m3onSurface,
+            theme_selected_bg_color: Colors.m3primary, theme_selected_fg_color: Colors.m3onPrimary
+        };
+        return Object.keys(c).map(k => `@define-color ${k} ${hex(c[k])};`).join("\n");
+    }
+
+    readonly property string nvimLua: {
+        const h = hex;
+        const bg = h(Colors.m3surface), fg = h(Colors.m3onSurface);
+        const groups = {
+            Normal: [fg, bg], NormalFloat: [fg, h(Colors.m3surfaceContainer)], FloatBorder: [h(Colors.m3outline), h(Colors.m3surfaceContainer)],
+            Cursor: [h(Colors.m3onPrimary), h(Colors.m3primary)], CursorLine: [null, h(Colors.m3surfaceContainerLow)], CursorLineNr: [h(Colors.m3primary), null],
+            LineNr: [h(Colors.m3outline), null], SignColumn: [null, bg], ColorColumn: [null, h(Colors.m3surfaceContainerLow)],
+            Visual: [h(Colors.m3onPrimaryContainer), h(Colors.m3primaryContainer)], Search: [h(Colors.m3onTertiaryContainer), h(Colors.m3tertiaryContainer)], IncSearch: [h(Colors.m3onPrimary), h(Colors.m3primary)],
+            StatusLine: [fg, h(Colors.m3surfaceContainer)], StatusLineNC: [h(Colors.m3outline), h(Colors.m3surfaceContainerLow)],
+            VertSplit: [h(Colors.m3outlineVariant), null], WinSeparator: [h(Colors.m3outlineVariant), null],
+            Pmenu: [fg, h(Colors.m3surfaceContainer)], PmenuSel: [h(Colors.m3onPrimaryContainer), h(Colors.m3primaryContainer)],
+            Comment: [h(Colors.m3outline), null], Constant: [h(Colors.m3tertiary), null], String: [h(TerminalColors.palette[2]), null],
+            Identifier: [fg, null], Function: [h(Colors.m3primary), null], Statement: [h(Colors.m3secondary), null],
+            Keyword: [h(Colors.m3secondary), null], Type: [h(Colors.m3tertiary), null], PreProc: [h(Colors.m3secondary), null],
+            Special: [h(Colors.m3tertiary), null], Operator: [h(Colors.m3onSurfaceVariant), null], Delimiter: [h(Colors.m3onSurfaceVariant), null],
+            Error: [h(Colors.m3error), null], ErrorMsg: [h(Colors.m3error), null], WarningMsg: [h(Colors.m3tertiary), null],
+            DiagnosticError: [h(Colors.m3error), null], DiagnosticWarn: [h(Colors.m3tertiary), null], DiagnosticInfo: [h(Colors.m3primary), null], DiagnosticHint: [h(Colors.m3outline), null],
+            DiffAdd: [null, h(Qt.alpha(TerminalColors.palette[2], 0.25))], DiffDelete: [null, h(Qt.alpha(Colors.m3error, 0.25))], DiffChange: [null, h(Qt.alpha(Colors.m3primary, 0.2))],
+            MatchParen: [h(Colors.m3primary), null], Directory: [h(Colors.m3primary), null], Title: [h(Colors.m3primary), null]
+        };
+        let s = `-- Generated by hi-shell (services/AppThemes.qml) from the wallpaper's palette.\n-- Use it with :colorscheme hi-shell\nvim.cmd("highlight clear")\nvim.g.colors_name = "hi-shell"\nvim.o.termguicolors = true\nlocal set = vim.api.nvim_set_hl\n`;
+        for (const name in groups) {
+            const [f, b] = groups[name];
+            s += `set(0, "${name}", { ${f ? `fg = "${f}"` : ""}${f && b ? ", " : ""}${b ? `bg = "${b}"` : ""} })\n`;
+        }
+        return s + `set(0, "Comment", { fg = "${h(Colors.m3outline)}", italic = true })\n`;
+    }
+
+    // The text goes as the last argument.
+    function run(args, text) {
+        runner.createObject(root, { command: ["python3", "-I", script, ...args, text] }).running = true;
+    }
+
+    function apply() {
+        applyTimer.stop();
+        for (const dir of ["gtk-3.0", "gtk-4.0"])
+            run(["block", `~/.config/${dir}/gtk.css`, "/*", "*/"], o.gtk ? gtkCss : "");
+        run(["file", "~/.config/nvim/colors/hi-shell.lua"], o.neovim ? nvimLua : "");
+    }
+
+    Component {
+        id: runner
+        Process {
+            onExited: destroy()
+            stderr: StdioCollector {
+                onStreamFinished: if (text.trim() !== "") console.warn("AppThemes:", text.trim())
+            }
+        }
+    }
+
+    // The palette changes a role at a time when the wallpaper changes; write once.
+    onGtkCssChanged: applyTimer.restart()
+    onNvimLuaChanged: applyTimer.restart()
+    Connections {
+        target: root.o
+        function onGtkChanged() { applyTimer.restart(); }
+        function onNeovimChanged() { applyTimer.restart(); }
+    }
+    Timer {
+        id: applyTimer
+        interval: 1000
+        onTriggered: root.apply()
+    }
+}

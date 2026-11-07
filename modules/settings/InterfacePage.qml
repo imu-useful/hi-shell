@@ -10,6 +10,35 @@ ColumnLayout {
     spacing: 24
 
     Section {
+        icon: "format_paint"
+        title: Translation.tr("App themes")
+
+        SwitchRow {
+            icon: "web_asset"
+            title: Translation.tr("GTK apps")
+            subtitle: Translation.tr("The wallpaper's colors in GTK 3 / 4 apps (a block in ~/.config/gtk-3.0 and gtk-4.0 gtk.css; off removes it)")
+            checked: Config.options.appThemes.gtk
+            onToggled: checked => Config.options.appThemes.gtk = checked
+        }
+        SwitchRow {
+            icon: "terminal"
+            title: Translation.tr("Neovim")
+            subtitle: Translation.tr("Writes the hi-shell color scheme: use :colorscheme hi-shell in Neovim")
+            checked: Config.options.appThemes.neovim
+            onToggled: checked => Config.options.appThemes.neovim = checked
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.topMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Terminals, btop, fish and starship follow the palette without a switch.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+    }
+
+    Section {
         icon: "text_fields"
         title: Translation.tr("Fonts")
 

@@ -223,6 +223,12 @@ Singleton {
                 property bool waveBeat: true
             }
 
+            // The palette for other apps (services/AppThemes.qml), each one opt-in.
+            property JsonObject appThemes: JsonObject {
+                property bool gtk: false
+                property bool neovim: false
+            }
+
             // Idle (services/Idle.qml): when off, your own hypridle config is left alone. When on, hi-shell
             // runs hypridle with a config made from these minutes (0 = never), on battery too if asked.
             property JsonObject idle: JsonObject {

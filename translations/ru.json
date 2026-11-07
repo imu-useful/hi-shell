@@ -1165,5 +1165,11 @@
     "On battery: suspend after, minutes": "От батареи: сон через, мин",
     "Reboot to…": "Перезагрузить в…",
     "Firmware setup (BIOS / UEFI)": "Настройки прошивки (BIOS / UEFI)",
-    "Files": "Файлы"
+    "Files": "Файлы",
+    "App themes": "Темы приложений",
+    "GTK apps": "GTK-приложения",
+    "The wallpaper's colors in GTK 3 / 4 apps (a block in ~/.config/gtk-3.0 and gtk-4.0 gtk.css; off removes it)": "Цвета обоев в GTK 3 / 4 приложениях (блок в gtk.css в ~/.config/gtk-3.0 и gtk-4.0; выключение убирает его)",
+    "Neovim": "Neovim",
+    "Writes the hi-shell color scheme: use :colorscheme hi-shell in Neovim": "Пишет цветовую схему hi-shell: в Neovim выполните :colorscheme hi-shell",
+    "Terminals, btop, fish and starship follow the palette without a switch.": "Терминалы, btop, fish и starship следуют палитре без переключателя."
 }
