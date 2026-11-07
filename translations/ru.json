@@ -1180,5 +1180,13 @@
     "Opens": "Открывает",
     "My program": "Моя программа",
     "For example btop, htop or resources": "Например btop, htop или resources",
-    "For programs that draw in the terminal (btop, htop)": "Для программ, которые рисуют в терминале (btop, htop)"
+    "For programs that draw in the terminal (btop, htop)": "Для программ, которые рисуют в терминале (btop, htop)",
+    "Tic-tac-toe": "Крестики-нолики",
+    "15 puzzle": "Пятнашки",
+    "Lights out": "Выключи свет",
+    "You won": "Вы выиграли",
+    "You lost": "Вы проиграли",
+    "Draw": "Ничья",
+    "Solved in %1 moves": "Собрано за %1 ходов",
+    "All lights out in %1 moves": "Весь свет погашен за %1 ходов"
 }

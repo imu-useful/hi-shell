@@ -160,7 +160,7 @@ Singleton {
                 }
                 // Night light color temperature (K) for hyprsunset.
                 property int nightLightTemperature: 4500
-                // The game in the empty notification center: dino, snake, minesweeper, game2048, flappy or memory
+                // The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout
                 property string game: "dino"
             }
 

@@ -233,7 +233,7 @@ ColumnLayout {
             title: Translation.tr("Game")
             subtitle: Translation.tr("In the empty notification center")
             value: Config.options.sidebar.game
-            options: [{ value: "dino", text: Translation.tr("Dino") }, { value: "snake", text: Translation.tr("Snake") }, { value: "minesweeper", text: Translation.tr("Minesweeper") }, { value: "game2048", text: "2048" }, { value: "flappy", text: Translation.tr("Flappy") }, { value: "memory", text: Translation.tr("Memory") }]
+            options: [{ value: "dino", text: Translation.tr("Dino") }, { value: "snake", text: Translation.tr("Snake") }, { value: "minesweeper", text: Translation.tr("Minesweeper") }, { value: "game2048", text: "2048" }, { value: "flappy", text: Translation.tr("Flappy") }, { value: "memory", text: Translation.tr("Memory") }, { value: "tictactoe", text: Translation.tr("Tic-tac-toe") }, { value: "puzzle", text: Translation.tr("15 puzzle") }, { value: "lightsout", text: Translation.tr("Lights out") }]
             onSelected: value => Config.options.sidebar.game = value
         }
         SliderRow {
