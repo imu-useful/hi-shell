@@ -1,0 +1,93 @@
+#!/bin/sh
+# hi-shell command line.
+#
+#   hi-shell doctor            check the shell is running and its programs are installed
+#   hi-shell qr [text]         a QR code in the terminal (no text: the clipboard)
+#   hi-shell keybinds [word]   the keybinds, optionally only those matching a word
+#   hi-shell ipc <target> <function> [args]   call a panel (same as qs -c hi-shell ipc call ...)
+#   hi-shell ipc               list every target and function
+#   hi-shell help
+#
+# install.sh links this file to ~/.local/bin/hi-shell.
+set -u
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; }
+
+doctor() {
+    bad=0
+    row() { # status, name, note
+        printf '  %s %-14s %s\n' "$1" "$2" "$3"
+    }
+    echo "Shell"
+    if qs -c hi-shell list 2>/dev/null | grep -q 'Process ID'; then
+        row "✔" "running" ""
+        errors=$(qs -c hi-shell log 2>/dev/null | grep -c ' ERROR')
+        if [ "$errors" -gt 0 ]; then row "✘" "log" "$errors errors: qs -c hi-shell log | grep ERROR"; bad=1; else row "✔" "log" "no errors"; fi
+    else
+        row "✘" "running" "not running: start it with run.sh or log in again"; bad=1
+    fi
+    echo "Required"
+    for p in qs hyprctl python3; do
+        if have "$p"; then row "✔" "$p" ""; else row "✘" "$p" "missing"; bad=1; fi
+    done
+    echo "Optional (the feature that needs it)"
+    for pair in "matugen:colors from the wallpaper" "claude:AI chat with Claude" "cliphist:clipboard history" \
+        "wl-copy:clipboard" "qalc:calculator" "grim:screenshots" "slurp:screenshots" "tesseract:OCR" \
+        "wf-recorder:screen recording" "cava:visualizer" "hyprlock:lock screen" "hypridle:idle lock and sleep" \
+        "hyprsunset:night light" "hyprpicker:color picker" "brightnessctl:brightness" "magick:wallpaper thumbnails" \
+        "fd:file search in the launcher (~)" "qrencode:hi-shell qr" "bootctl:Reboot to…" "trans:translator"; do
+        p=${pair%%:*}
+        if have "$p"; then row "✔" "$p" ""; else row "–" "$p" "missing: ${pair#*:}"; fi
+    done
+    [ "$bad" -eq 0 ] && echo "All good." || echo "Something needs attention (✘ above)."
+    return "$bad"
+}
+
+qr() {
+    have qrencode || { echo "qrencode isn't installed (pacman -S qrencode)" >&2; return 1; }
+    if [ $# -gt 0 ]; then
+        text="$*"
+    elif have wl-paste; then
+        text=$(wl-paste --no-newline 2>/dev/null)
+    else
+        text=""
+    fi
+    [ -n "$text" ] || { echo "Nothing to encode: give some text or copy it first." >&2; return 1; }
+    qrencode -t ansiutf8 -m 1 -- "$text"
+}
+
+keybinds() {
+    have hyprctl || { echo "hyprctl not found" >&2; return 1; }
+    have python3 || { echo "python3 not found" >&2; return 1; }
+    hyprctl binds -j | python3 -I -c '
+import json, sys
+word = " ".join(sys.argv[1:]).lower()
+mods = [(64, "Super"), (4, "Ctrl"), (8, "Alt"), (1, "Shift")]
+rows = []
+for b in json.load(sys.stdin):
+    if b.get("submap"):
+        continue
+    keys = " + ".join([n for bit, n in mods if b.get("modmask", 0) & bit] + [b.get("key") or "code:%s" % b.get("keycode")])
+    desc = b.get("description") or b.get("dispatcher", "")
+    if word in (keys + " " + desc).lower():
+        rows.append((keys, desc))
+width = max([len(k) for k, _ in rows] or [0])
+for keys, desc in sorted(rows):
+    print("%-*s  %s" % (width, keys, desc))
+' "$@"
+}
+
+case "${1:-help}" in
+    doctor) doctor ;;
+    qr) shift; qr "$@" ;;
+    keybinds) shift; keybinds "$@" ;;
+    ipc)
+        shift
+        if [ $# -eq 0 ]; then exec qs -c hi-shell ipc show; fi
+        exec qs -c hi-shell ipc call "$@"
+        ;;
+    help | -h | --help) usage ;;
+    *) echo "Unknown command: $1" >&2; usage >&2; exit 1 ;;
+esac

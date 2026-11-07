@@ -307,6 +307,16 @@ else
 fi
 echo "$target -> $REPO"
 
+# The command line (hi-shell doctor, qr, keybinds, ipc) in ~/.local/bin, if nothing else uses that name.
+cli="$HOME/.local/bin/hi-shell"
+mkdir -p "$HOME/.local/bin"
+if [[ ! -e "$cli" || -L "$cli" ]]; then
+    ln -sfn "$REPO/sh/hi-shell" "$cli"
+    echo "$cli -> $REPO/sh/hi-shell"
+else
+    warn "$cli exists and isn't a link, left alone"
+fi
+
 # --- Hyprland integration ---
 # hypr/hi-shell/ (startup, keybinds, window and layer rules, ...) is copied into your Hyprland
 # folder, so it's right there to edit, and loaded from your config with one line.

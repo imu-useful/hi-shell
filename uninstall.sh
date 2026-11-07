@@ -26,6 +26,13 @@ done
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 
+# The command line link (only a link into this repo).
+cli="$HOME/.local/bin/hi-shell"
+if [[ -L "$cli" && "$(readlink "$cli")" == */sh/hi-shell ]]; then
+    rm -f "$cli"
+    echo "Removed $cli"
+fi
+
 step "Stopping hi-shell"
 qs -c hi-shell kill &>/dev/null && echo "Stopped." || echo "Not running."
 
