@@ -1,6 +1,9 @@
 <div align="center">
 
-# 👋 hi-shell
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.png">
+  <img src="docs/logo.png" alt="hi-shell" width="260">
+</picture>
 
 **A Material 3 Expressive desktop shell for Hyprland — with AI built in.**
 
