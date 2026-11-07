@@ -18,7 +18,11 @@ Scope {
     // One of five ways for the letters to come in, picked at random on each start:
     // 0 rise from below, 1 drop from above, 2 pop (scale, springy), 3 slide in from alternating
     // sides, 4 spin.
+    // Each also has its own place on the screen, always centered horizontally: 0 bottom, 1 top,
+    // 2 middle, 3 middle with the letters stacked vertically, 4 middle.
     readonly property int styles: 5
+    readonly property bool vertical: style === 3
+    readonly property int edgeMargin: 120
     property int style: Math.floor(Math.random() * styles)
 
     property bool lettersIn: false
@@ -93,8 +97,15 @@ Scope {
                     color: "black"
                     opacity: 1 - root.outro
 
-                    Row {
-                        anchors.centerIn: parent
+                    Grid {
+                        id: grid
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        // Top, middle or bottom of the screen
+                        y: root.style === 1 ? root.edgeMargin
+                            : root.style === 0 ? parent.height - height - root.edgeMargin
+                            : (parent.height - height) / 2
+                        columns: root.vertical ? 1 : root.text.length
+                        horizontalItemAlignment: Grid.AlignHCenter
                         scale: 1 + root.outro * 0.06
 
                         Repeater {
@@ -107,7 +118,8 @@ Scope {
 
                                 text: root.text[index]
                                 font.family: Appearance.font.title
-                                font.pixelSize: 64
+                                // A column of letters has to fit the screen height
+                                font.pixelSize: root.vertical ? Math.min(64, Math.floor(window.height * 0.8 / root.text.length / 1.3)) : 64
                                 font.weight: Font.DemiBold
                                 color: "white"
                                 elide: Text.ElideNone
