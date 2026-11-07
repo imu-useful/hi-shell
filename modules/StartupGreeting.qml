@@ -15,6 +15,12 @@ Scope {
     readonly property int textHold: 1500 // text fully shown, before everything fades
     readonly property int fadeDuration: 700
 
+    // One of five ways for the letters to come in, picked at random on each start:
+    // 0 rise from below, 1 drop from above, 2 pop (scale, springy), 3 slide in from alternating
+    // sides, 4 spin.
+    readonly property int styles: 5
+    property int style: Math.floor(Math.random() * styles)
+
     property bool lettersIn: false
     // 0..1, the exit fade of the black and the text
     property real outro: 0
@@ -105,14 +111,25 @@ Scope {
                                 font.weight: Font.DemiBold
                                 color: "white"
                                 elide: Text.ElideNone
+                                // 0 (hidden) -> 1 (in place); the style decides what that looks like
                                 property real rise: root.lettersIn ? 1 : 0
-                                opacity: rise
-                                transform: Translate { y: (1 - letter.rise) * 28 }
+                                readonly property real away: 1 - rise
+                                opacity: Math.min(1, rise)
+                                transformOrigin: Item.Center
+                                scale: root.style === 2 ? 0.2 + 0.8 * rise : 1
+                                rotation: root.style === 4 ? away * -120 : 0
+                                transform: Translate {
+                                    x: root.style === 3 ? letter.away * (letter.index % 2 ? 90 : -90) : 0
+                                    y: root.style === 0 ? letter.away * 28 : root.style === 1 ? letter.away * -36 : 0
+                                }
 
                                 Behavior on rise {
                                     SequentialAnimation {
                                         PauseAnimation { duration: letter.index * root.letterDelay }
-                                        NumberAnimation { duration: 400; easing.type: Easing.OutCubic }
+                                        NumberAnimation {
+                                            duration: root.style === 2 || root.style === 4 ? 550 : 400
+                                            easing.type: root.style === 2 ? Easing.OutBack : Easing.OutCubic
+                                        }
                                     }
                                 }
                             }
