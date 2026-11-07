@@ -310,12 +310,23 @@ DesktopCard {
                 font.pixelSize: Appearance.font.size.bodyLarge
                 font.weight: current ? Font.DemiBold : Font.Normal
                 color: current ? Colors.m3primary : Colors.m3onSurfaceVariant
-                opacity: current ? 1 : 0.55
+                opacity: current ? 1 : lineArea.containsMouse ? 0.9 : 0.55
                 scale: current ? 1 : 0.84
 
                 Behavior on scale { SpatialAnim { duration: Appearance.anim.spatial } }
                 Behavior on opacity { EffectAnim { duration: Appearance.anim.slow } }
                 Behavior on color { ColorAnim { duration: Appearance.anim.slow } }
+
+                // Click a line to jump there (not while widgets are being edited: then a drag
+                // moves the widget).
+                MouseArea {
+                    id: lineArea
+                    anchors.fill: parent
+                    enabled: (Mpris.active?.canSeek ?? false) && Mpris.length > 0 && !ShellState.desktopEditing
+                    hoverEnabled: true
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    onClicked: Mpris.seekTo(parent.modelData.time / Mpris.length)
+                }
             }
         }
     }
