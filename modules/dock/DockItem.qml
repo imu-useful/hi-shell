@@ -30,6 +30,15 @@ Item {
     signal clicked(int button)
     signal wheeled(int step)
 
+    // The magnify and the press, eased so the icons follow the pointer smoothly; `appear` pops a new icon in.
+    property real appear: 0
+    Behavior on appear { SpringAnim { overshoot: 2 } }
+    Component.onCompleted: appear = 1
+    property real eased: magnify
+    Behavior on eased { NumberAnimation { duration: 90 * Appearance.anim.speed; easing.type: Easing.OutCubic } }
+    property real press: area.pressed ? 0.86 : 1
+    Behavior on press { NumberAnimation { duration: 90 * Appearance.anim.speed; easing.type: Easing.OutCubic } }
+
     readonly property real magnify: magnifies ? Math.max(0, 1 - Math.abs(pointer - (vertical ? y + height / 2 : x + width / 2)) / (iconSize * 2.5)) * magnifyAmount : 0
     // Called by the dock when the app is launched from here: the icon jumps while it starts.
     function bounce() {
@@ -51,7 +60,8 @@ Item {
         size: root.iconSize
         transformOrigin: root.position === "left" ? Item.Left : root.position === "right" ? Item.Right
             : root.position === "top" ? Item.Top : Item.Bottom
-        scale: 1 + root.magnify
+        scale: (1 + root.eased) * root.press * root.appear
+        opacity: Math.min(1, root.appear * 2)
         property real lift: 0
         transform: Translate {
             x: icon.lift * root.towardX
@@ -81,6 +91,8 @@ Item {
                 height: root.vertical ? (root.focused ? 10 : 5) : 4
                 radius: 2
                 color: Colors.m3primary
+                Behavior on width { SpatialAnim { duration: Appearance.anim.fast } }
+                Behavior on height { SpatialAnim { duration: Appearance.anim.fast } }
             }
         }
     }

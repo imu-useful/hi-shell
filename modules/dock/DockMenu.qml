@@ -13,6 +13,8 @@ Rectangle {
     property bool canOpen: false
     // A dock on the left or right: "move" goes up and down.
     property bool vertical: false
+    // The dock's edge: the menu grows out of the side that faces the dock.
+    property string position: "bottom"
     // The .desktop actions of the app ("New private window", ...) and how many windows it has.
     property var actions: []
     property int windowCount: 0
@@ -23,6 +25,18 @@ Rectangle {
     signal open()
 
     readonly property bool open: app !== null
+
+    // 0 -> 1 as the menu opens (it closes at once: its rows depend on the app that just went).
+    property real reveal: open ? 1 : 0
+    Behavior on reveal {
+        enabled: root.open
+        SpringAnim { overshoot: 1.2 }
+    }
+    visible: reveal > 0
+    opacity: Math.min(1, reveal * 1.5)
+    scale: 0.88 + 0.12 * reveal
+    transformOrigin: position === "top" ? Item.Top : position === "left" ? Item.Left
+        : position === "right" ? Item.Right : Item.Bottom
 
     width: 200
     implicitHeight: column.implicitHeight + 12

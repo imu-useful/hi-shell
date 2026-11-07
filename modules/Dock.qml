@@ -43,6 +43,36 @@ Variants {
         property var apps: []
         onAppsKeyChanged: apps = buildApps()
         Component.onCompleted: apps = buildApps()
+        onAppsChanged: syncModel()
+
+        // The icons' delegates live in a model of ids that is edited in place, so an icon that stays
+        // keeps its item (and its animations) when another app opens, closes or is pinned.
+        readonly property ListModel appIds: ListModel {}
+        // The last data seen for every id: a closing delegate reads it for the moment it is still there.
+        property var known: ({})
+        function appFor(id) {
+            return apps.find(a => a.id === id) ?? known[id];
+        }
+        function syncModel() {
+            const ids = apps.map(a => a.id);
+            for (let i = appIds.count - 1; i >= 0; i--) {
+                if (!ids.includes(appIds.get(i).appId))
+                    appIds.remove(i);
+            }
+            ids.forEach((id, i) => {
+                if (i < appIds.count && appIds.get(i).appId === id)
+                    return;
+                let from = -1;
+                for (let k = i + 1; k < appIds.count && from < 0; k++) {
+                    if (appIds.get(k).appId === id)
+                        from = k;
+                }
+                if (from >= 0)
+                    appIds.move(from, i, 1);
+                else
+                    appIds.insert(i, { appId: id });
+            });
+        }
         readonly property int pinnedCount: apps.filter(a => a.pinned).length
 
         // The app's .desktop entry. Ids are compared without case (Happ.desktop, class "happ"), and
@@ -74,7 +104,10 @@ Variants {
             const pinned = options.pinned.map(id => id.toLowerCase());
             const extra = options.showRunning ? [...running.keys()].filter(id => !pinned.includes(id)) : [];
             const ids = [...pinned, ...extra];
-            return ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
+            const built = ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
+            for (const a of built)
+                known[a.id] = a;
+            return built;
         }
 
         // Focus the app's next window (step -1 for the previous one); a closed app is launched.
@@ -132,10 +165,10 @@ Variants {
         anchors.top: position === "top"
         anchors.left: position === "left"
         anchors.right: position === "right"
-        exclusiveZone: options.autoHide ? 0 : (vertical ? dock.width : dock.height) + edgeMargin + 4
+        exclusiveZone: options.autoHide ? 0 : (vertical ? dock.targetWidth : dock.targetHeight) + edgeMargin + 4
         implicitWidth: vertical ? iconSize * 1.6 + 32 + edgeMargin + (menuOpen ? menu.width + menuGap : 0)
-            : Math.max(dock.width + 40, menu.width + 16)
-        implicitHeight: vertical ? Math.max(dock.height + 40, menu.height + 16)
+            : Math.max(dock.targetWidth + 40, menu.width + 16)
+        implicitHeight: vertical ? Math.max(dock.targetHeight + 40, menu.height + 16)
             : iconSize * 1.6 + 32 + edgeMargin + (menuOpen ? menu.height + menuGap : 0)
         // Only the dock (or, hidden, a thin strip at the screen edge) and the open menu take input.
         mask: Region {
@@ -182,8 +215,13 @@ Variants {
             y: window.vertical ? (parent.height - height) / 2
                 : window.position === "top" ? window.mix(-height - 4, window.edgeMargin, reveal)
                 : window.mix(parent.height + 4, parent.height - height - window.edgeMargin, reveal)
-            width: window.vertical ? window.iconSize + 20 : row.implicitWidth + 20
-            height: window.vertical ? row.implicitHeight + 20 : window.iconSize + 20
+            // Where the size is going: the window follows this, the dock itself glides there.
+            readonly property real targetWidth: window.vertical ? window.iconSize + 20 : row.implicitWidth + 20
+            readonly property real targetHeight: window.vertical ? row.implicitHeight + 20 : window.iconSize + 20
+            width: targetWidth
+            height: targetHeight
+            Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
+            Behavior on height { SpatialAnim { duration: Appearance.anim.normal } }
             radius: Math.min(window.options.cornerRadius, Math.min(width, height) / 2)
             color: Appearance.translucent(Colors.m3surfaceContainer)
             border.width: 1
@@ -196,8 +234,13 @@ Variants {
             Grid {
                 id: row
                 anchors.centerIn: parent
-                columns: window.vertical ? 1 : Math.max(1, window.apps.length + (window.options.appsButton ? 1 : 0))
+                columns: window.vertical ? 1 : Math.max(1, window.appIds.count + (window.options.appsButton ? 1 : 0))
                 spacing: window.options.spacing
+
+                // The icons slide aside for one that comes or goes.
+                move: Transition {
+                    SpatialAnim { properties: "x,y"; duration: Appearance.anim.normal }
+                }
 
                 DockButton {
                     visible: window.options.appsButton
@@ -213,13 +256,13 @@ Variants {
                 }
 
                 Repeater {
-                    model: window.apps
+                    model: window.appIds
 
                     DockItem {
                         id: dockItem
-                        required property var modelData
+                        required property string appId
                         required property int index
-                        app: modelData
+                        app: window.appFor(appId)
                         iconSize: window.iconSize
                         pointer: dock.pointerAlong
                         position: window.position
@@ -253,7 +296,7 @@ Variants {
             y: window.vertical ? Math.max(8, Math.min(window.height - height - 8, window.menuAlong - height / 2))
                 : window.position === "top" ? dock.y + dock.height + window.menuGap
                 : dock.y - height - window.menuGap
-            visible: window.menuOpen
+            position: window.position
             app: window.menuApp
             canMoveLeft: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) > 0
             canMoveRight: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) < window.options.pinned.length - 1

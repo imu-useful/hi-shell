@@ -17,6 +17,11 @@ Item {
 
     signal clicked
 
+    property real eased: magnify
+    Behavior on eased { NumberAnimation { duration: 90 * Appearance.anim.speed; easing.type: Easing.OutCubic } }
+    property real press: area.pressed ? 0.86 : 1
+    Behavior on press { NumberAnimation { duration: 90 * Appearance.anim.speed; easing.type: Easing.OutCubic } }
+
     readonly property real magnify: magnifies ? Math.max(0, 1 - Math.abs(pointer - (vertical ? y + height / 2 : x + width / 2)) / (iconSize * 2.5)) * magnifyAmount : 0
 
     width: vertical ? iconSize : iconSize + 8
@@ -31,7 +36,7 @@ Item {
         color: area.containsMouse || ShellState.appGridOpen ? Colors.m3primary : Colors.m3primaryContainer
         transformOrigin: root.position === "left" ? Item.Left : root.position === "right" ? Item.Right
             : root.position === "top" ? Item.Top : Item.Bottom
-        scale: 1 + root.magnify
+        scale: (1 + root.eased) * root.press
         Behavior on color { ColorAnim {} }
 
         MaterialIcon {
