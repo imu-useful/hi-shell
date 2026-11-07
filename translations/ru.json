@@ -1149,5 +1149,8 @@
     "Stand up, stretch, look out of the window.": "Встаньте, разомнитесь, посмотрите в окно.",
     "Over six hours. Try to use less.": "Больше шести часов. Попробуйте меньше.",
     "That's a lot of screen. Go outside for a bit.": "Это много экрана. Выйдите ненадолго на улицу.",
-    "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше."
+    "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше.",
+    "Processes": "Процессы",
+    "CPU %1% · RAM %2%": "ЦП %1% · ОЗУ %2%",
+    "Search by name or PID": "Поиск по имени или PID"
 }

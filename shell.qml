@@ -72,6 +72,8 @@ ShellRoot {
 
     WeatherPopup {}
 
+    ProcessManager {}
+
     NotificationPopups {}
 
     OnScreenDisplay {}
