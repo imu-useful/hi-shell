@@ -81,6 +81,13 @@ ColumnLayout {
             options: [{ value: "release", text: Translation.tr("Release") }, { value: "git", text: "Git" }]
             onSelected: value => Config.options.update.channel = value
         }
+        SwitchRow {
+            icon: "notifications_active"
+            title: Translation.tr("Window about a new version")
+            subtitle: Translation.tr("At startup, when an update is available")
+            checked: Config.options.update.notify
+            onToggled: checked => Config.options.update.notify = checked
+        }
         ListRow {
             Layout.fillWidth: true
             icon: "deployed_code"

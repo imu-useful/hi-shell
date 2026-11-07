@@ -27,6 +27,11 @@ Singleton {
     // A git checkout, so it's the repo's upstream (git channel) or its newest release tag (release).
     readonly property string repo: Quickshell.shellDir
     property int shellBehind: -1
+    // What the update brings: the release's tag and notes, or the new commits (git)
+    property string shellRelease: ""
+    property string shellNotes: ""
+    // True once the first check has finished (the update window waits for it)
+    property bool shellChecked: false
     readonly property bool shellChecking: shellChecker.running
     readonly property bool upgradeRunning: upgrade.running
 
@@ -66,13 +71,19 @@ Singleton {
 
     Process {
         id: shellChecker
+        // Line 1: how many changes. Release: line 2 is the tag, then its notes. Git: the new commits ("hash subject").
         command: ["sh", "-c", `cd "${root.repo}" && git fetch -q --tags 2>/dev/null || exit 1; ` + (Config.options.update.channel === "release"
-            ? `latest=$(git tag -l 'v*' --sort=-v:refname | head -1); current=$(git describe --tags --abbrev=0 2>/dev/null); [ "$latest" = "$current" ] && echo 0 || echo 1`
-            : `git rev-list --count HEAD..@{u}`)]
+            ? `latest=$(git tag -l 'v*' --sort=-v:refname | head -1); current=$(git describe --tags --abbrev=0 2>/dev/null); if [ "$latest" = "$current" ]; then echo 0; else echo 1; echo "$latest"; git for-each-ref --format='%(contents)' "refs/tags/$latest" | head -30; fi`
+            : `git rev-list --count HEAD..@{u} || exit 1; git log -10 --format='%h %s' HEAD..@{u}`)]
         stdout: StdioCollector {
             onStreamFinished: {
-                const n = parseInt(text.trim(), 10);
+                const lines = text.trim().split("\n");
+                const n = parseInt(lines[0], 10);
+                const release = Config.options.update.channel === "release";
+                root.shellRelease = release && n > 0 ? (lines[1] ?? "") : "";
+                root.shellNotes = (n > 0 ? lines.slice(release ? 2 : 1) : []).join("\n").trim();
                 root.shellBehind = isNaN(n) ? -1 : n;
+                root.shellChecked = true;
             }
         }
         onExited: code => {

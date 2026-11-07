@@ -80,6 +80,8 @@ ShellRoot {
 
     StartupGreeting {}
 
+    UpdateDialog {}
+
     FocusSettingsWindow {}
 
     BlockedToast {}

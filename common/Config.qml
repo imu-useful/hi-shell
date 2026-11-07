@@ -437,6 +437,8 @@ Singleton {
             // Chosen at install (install.sh --channel); installs from before this one follow git.
             property JsonObject update: JsonObject {
                 property string channel: "git"
+                // The window about a new version when the shell starts
+                property bool notify: true
             }
 
             property JsonObject apps: JsonObject {
