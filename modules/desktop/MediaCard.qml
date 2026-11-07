@@ -306,6 +306,10 @@ DesktopCard {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 text: modelData.text || "♪"
+                // A long line shrinks to fit the card instead of being cut off.
+                fontSizeMode: Text.HorizontalFit
+                minimumPixelSize: 9
+                elide: Text.ElideRight
                 // One size for every row (rows keep their height); the current one is scaled up.
                 font.pixelSize: Appearance.font.size.bodyLarge
                 font.weight: current ? Font.DemiBold : Font.Normal
