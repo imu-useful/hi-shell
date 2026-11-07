@@ -45,6 +45,7 @@ hl.bind("SUPER + U", hl.dsp.exec_cmd("qs -c hi-shell ipc call sidebarRight toggl
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs -c hi-shell ipc call overview toggle"), { description = "hi-shell: Workspace overview" })
 hl.bind("SUPER + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call wallpaper toggleSelector"), { description = "hi-shell: Wallpaper picker" })
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call settings toggle"), { description = "hi-shell: Settings" })
+hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("qs -c hi-shell ipc call processes toggle"), { description = "hi-shell: Process manager" })
 hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh session"), { description = "hi-shell: Session menu" })
 -- The laptop's display key (Fn+F10 on Lenovo): display mode picker, again for the next mode.
 hl.bind("XF86Display", hl.dsp.exec_cmd("qs -c hi-shell ipc call display next"), { description = "hi-shell: Display mode" })

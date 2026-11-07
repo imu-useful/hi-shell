@@ -207,6 +207,7 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | <kbd>Super</kbd>+<kbd>Y</kbd> | AI palette |
 | <kbd>Super</kbd>+<kbd>U</kbd> | Right sidebar (also the system icons on the bar) |
 | <kbd>Super</kbd>+<kbd>Escape</kbd> | Settings |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Escape</kbd> | Process manager: search, sort by CPU / RAM, end or force-kill (`ipc call processes toggle`) |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | Workspace overview |
 | <kbd>Alt</kbd>+<kbd>Tab</kbd> | Switch windows: hold Alt, Tab / Shift+Tab through recent windows (with previews), release to switch; a quick tap goes to the previous window |
 | <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Region screenshot / OCR / recording (also the bar's screenshot button) |
