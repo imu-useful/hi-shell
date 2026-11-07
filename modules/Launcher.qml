@@ -14,7 +14,8 @@ import "launcher/Expression.js" as Expression
 // Spotlight-style launcher. Plain text searches apps (and settings pages);
 // a calculation typed as it is ("12*(3+4)") is answered above the apps, no prefix needed;
 // prefixes switch the source:  = calculator · > run a command · < keybinds ·
-// : emoji · ; clipboard · / settings.
+// : emoji · ; clipboard · / settings · ~ files in your home folder (fd).
+// Open windows whose title or app match the text are listed too; Enter focuses one.
 // Toggle: Hyprland keybind (hypr/hi-shell/keybinds.lua) or `qs -c hi-shell ipc call launcher toggle`.
 Scope {
     id: root
@@ -28,7 +29,8 @@ Scope {
         { key: "<", icon: "keyboard", name: Translation.tr("Keybinds") },
         { key: ":", icon: "mood", name: Translation.tr("Emoji") },
         { key: ";", icon: "content_paste", name: Translation.tr("Clipboard") },
-        { key: "/", icon: "settings", name: Translation.tr("Settings") }
+        { key: "/", icon: "settings", name: Translation.tr("Settings") },
+        { key: "~", icon: "folder", name: Translation.tr("Files") }
     ]
     readonly property string mode: prefixes.some(p => p.key === query[0]) ? query[0] : ""
     readonly property string term: mode ? query.slice(1).trim() : query.trim()
@@ -40,6 +42,8 @@ Scope {
     property string inlineResult: ""
     property var binds: []
     property var emoji: []
+    property var files: []
+    property string filesFor: ""
 
     // Items are DesktopEntry apps or plain objects { name, comment, materialIcon | glyph, run() }.
     readonly property var results: {
@@ -67,10 +71,17 @@ Scope {
             // Images match by their description ("png 1920x1080") and the word "image".
             return [...Clipboard.pinnedEntries, ...Clipboard.history].filter(e => (e.image ? `${e.text} image` : e.text).toLowerCase().includes(term.toLowerCase())).slice(0, 40)
                 .map(e => e.image ? imageItem(e) : { name: e.text.replace(/\s+/g, " "), comment: Translation.tr("Copy"), materialIcon: "content_paste", run: () => Clipboard.copy(e) });
+        case "~":
+            return term === "" || filesFor !== term ? [] : files.map(f => ({
+                name: f.replace(/\/$/, "").split("/").pop(),
+                comment: f.replace(Paths.home, "~"),
+                materialIcon: f.endsWith("/") ? "folder" : "draft",
+                run: () => Quickshell.execDetached(["xdg-open", f])
+            }));
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return [...inlineMath(), ...focusMatches(term), ...settingsMatches(term), ...filterApps(term), ...emojiMatches(term)];
+            return [...inlineMath(), ...focusMatches(term), ...windowMatches(term), ...settingsMatches(term), ...filterApps(term), ...emojiMatches(term)];
         }
     }
 
@@ -116,6 +127,33 @@ Scope {
                 ShellState.settingsOpen = true;
             }
         };
+    }
+
+    // Open windows by title or app class; Enter focuses one (a moment later: the launcher
+    // holds the keyboard until it has closed, and Hyprland ignores a focus request meanwhile).
+    function windowMatches(text) {
+        const q = text.toLowerCase();
+        if (q.length < 2)
+            return [];
+        return Hyprland.toplevels.values
+            .filter(t => t.title && `${t.title} ${t.lastIpcObject?.class ?? ""}`.toLowerCase().includes(q))
+            .slice(0, 5)
+            .map(t => ({
+                name: t.title,
+                comment: `${Translation.tr("Window")} · ${t.lastIpcObject?.class ?? ""}`,
+                materialIcon: "web_asset",
+                run: () => {
+                    focusLater.code = `hl.dsp.focus({ window = "address:0x${t.address}" })`;
+                    focusLater.restart();
+                }
+            }));
+    }
+
+    Timer {
+        id: focusLater
+        property string code: ""
+        interval: 150
+        onTriggered: Hyprland.dispatch(code)
     }
 
     function settingsMatches(text) {
@@ -191,8 +229,46 @@ Scope {
         close();
     }
 
+    // Files: fd over the home folder, debounced (hidden and ignored files are skipped).
+    Timer {
+        id: fileTimer
+        interval: 200
+        onTriggered: {
+            finder.running = false;
+            if (root.term === "") {
+                root.files = [];
+                return;
+            }
+            finder.asked = root.term;
+            finder.command = ["fd", "--max-results", "40", "--ignore-case", "--follow", "--type", "f", "--type", "d", "--", root.term, Paths.home];
+            finder.running = true;
+        }
+    }
+    Process {
+        id: finder
+        property string asked: ""
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.files = text.split("\n").filter(l => l !== "");
+                root.filesFor = finder.asked;
+            }
+        }
+        onExited: code => {
+            // fd isn't installed: nothing is found.
+            if (code === 127) {
+                root.files = [];
+                root.filesFor = finder.asked;
+            }
+        }
+    }
+
     // Calculator: qalc, debounced.
-    onTermChanged: if (mode === "=" || (mode === "" && Expression.isMath(term))) calcTimer.restart()
+    onTermChanged: {
+        if (mode === "=" || (mode === "" && Expression.isMath(term)))
+            calcTimer.restart();
+        if (mode === "~")
+            fileTimer.restart();
+    }
     Timer {
         id: calcTimer
         interval: 150
