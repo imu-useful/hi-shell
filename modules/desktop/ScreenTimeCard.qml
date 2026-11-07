@@ -34,7 +34,7 @@ DesktopCard {
             StyledText {
                 Layout.fillWidth: true
                 text: Translation.tr("Screen time")
-                font.pixelSize: Appearance.font.size.labelLarge
+                font.pixelSize: Appearance.font.size.bodyMedium
                 color: Colors.m3onSurfaceVariant
             }
             StyledText {
