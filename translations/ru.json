@@ -15,7 +15,7 @@
     "Settings": "Настройки",
     "Enter copies the result": "Enter копирует результат",
     "Run": "Выполнить",
-    "Run in a terminal": "Выполнить в терминале",
+    "Run in a terminal": "Запускать в терминале",
     "Enter copies it": "Enter копирует",
     "Copy": "Копировать",
     "Search apps, or type = > < : ; /": "Поиск приложений, или введите = > < : ; /",
@@ -1171,5 +1171,10 @@
     "The wallpaper's colors in GTK 3 / 4 apps (a block in ~/.config/gtk-3.0 and gtk-4.0 gtk.css; off removes it)": "Цвета обоев в GTK 3 / 4 приложениях (блок в gtk.css в ~/.config/gtk-3.0 и gtk-4.0; выключение убирает его)",
     "Neovim": "Neovim",
     "Writes the hi-shell color scheme: use :colorscheme hi-shell in Neovim": "Пишет цветовую схему hi-shell: в Neovim выполните :colorscheme hi-shell",
-    "Terminals, btop, fish and starship follow the palette without a switch.": "Терминалы, btop, fish и starship следуют палитре без переключателя."
+    "Terminals, btop, fish and starship follow the palette without a switch.": "Терминалы, btop, fish и starship следуют палитре без переключателя.",
+    "Task manager (Ctrl+Shift+Esc)": "Диспетчер задач (Ctrl+Shift+Esc)",
+    "Opens": "Открывает",
+    "My program": "Моя программа",
+    "For example btop, htop or resources": "Например btop, htop или resources",
+    "For programs that draw in the terminal (btop, htop)": "Для программ, которые рисуют в терминале (btop, htop)"
 }

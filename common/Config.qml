@@ -223,6 +223,14 @@ Singleton {
                 property bool waveBeat: true
             }
 
+            // What Ctrl+Shift+Escape opens: hi-shell's process manager, or a program of your own
+            // (btop in a terminal, a system monitor...).
+            property JsonObject processes: JsonObject {
+                property string mode: "builtin" // builtin | command
+                property string command: "btop"
+                property bool inTerminal: true
+            }
+
             // The palette for other apps (services/AppThemes.qml), each one opt-in.
             property JsonObject appThemes: JsonObject {
                 property bool gtk: false

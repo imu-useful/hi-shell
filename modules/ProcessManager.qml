@@ -9,7 +9,8 @@ import qs.common.widgets
 import qs.services
 
 // Process manager: a searchable list sorted by CPU / memory / name / PID, end or force-kill.
-// Toggle: `qs -c hi-shell ipc call processes toggle`.
+// Toggle: Ctrl+Shift+Escape or `qs -c hi-shell ipc call processes toggle`; Settings > General can
+// point the key at another program (btop...) instead.
 Scope {
     id: root
 
@@ -25,6 +26,18 @@ Scope {
         ShellState.processesOpen = value;
     }
 
+    // The key / IPC: hi-shell's own manager, or the program chosen in Settings > General.
+    readonly property var o: Config.options.processes
+    readonly property bool custom: o.mode === "command" && o.command.trim() !== ""
+    function request() {
+        if (!custom) {
+            setOpen(!open);
+            return;
+        }
+        const cmd = o.command.trim();
+        Quickshell.execDetached(o.inTerminal ? [Config.options.apps.terminal, "-e", "sh", "-c", cmd] : ["sh", "-c", cmd]);
+    }
+
     onOpenChanged: {
         Processes.active = open;
         if (!open)
@@ -35,10 +48,13 @@ Scope {
         target: "processes"
 
         function toggle(): void {
-            root.setOpen(!root.open);
+            root.request();
         }
         function open(): void {
-            root.setOpen(true);
+            if (root.custom)
+                root.request();
+            else
+                root.setOpen(true);
         }
         function close(): void {
             root.setOpen(false);
