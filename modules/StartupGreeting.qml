@@ -97,55 +97,78 @@ Scope {
                     color: "black"
                     opacity: 1 - root.outro
 
+                    // The logo and the line of text (the logo above it; below it when the text is at the top)
                     Grid {
-                        id: grid
+                        id: block
                         anchors.horizontalCenter: parent.horizontalCenter
-                        // Top, middle or bottom of the screen
                         y: root.style === 1 ? root.edgeMargin
                             : root.style === 0 ? parent.height - height - root.edgeMargin
                             : (parent.height - height) / 2
-                        columns: root.vertical ? 1 : root.text.length
+                        columns: root.vertical ? 2 : 1
+                        spacing: 32
                         horizontalItemAlignment: Grid.AlignHCenter
+                        verticalItemAlignment: Grid.AlignVCenter
                         scale: 1 + root.outro * 0.06
 
-                        Repeater {
-                            model: root.text.length
+                        component Logo: Image {
+                            readonly property real logoHeight: root.vertical ? Math.min(220, window.height * 0.25) : 150
+                            source: Quickshell.shellPath("common/icons/logo-dark.png")
+                            sourceSize.height: logoHeight * 2
+                            height: logoHeight
+                            width: logoHeight * implicitWidth / Math.max(1, implicitHeight)
+                            smooth: true
+                            opacity: root.lettersIn ? 1 : 0
+                            Behavior on opacity { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+                        }
 
-                            StyledText {
-                                id: letter
+                        Logo { visible: root.style !== 1 }
 
-                                required property int index
+                        Grid {
+                            id: grid
+                            columns: root.vertical ? 1 : root.text.length
+                            horizontalItemAlignment: Grid.AlignHCenter
 
-                                text: root.text[index]
-                                font.family: Appearance.font.title
-                                // A column of letters has to fit the screen height
-                                font.pixelSize: root.vertical ? Math.min(64, Math.floor(window.height * 0.8 / root.text.length / 1.3)) : 64
-                                font.weight: Font.DemiBold
-                                color: "white"
-                                elide: Text.ElideNone
-                                // 0 (hidden) -> 1 (in place); the style decides what that looks like
-                                property real rise: root.lettersIn ? 1 : 0
-                                readonly property real away: 1 - rise
-                                opacity: Math.min(1, rise)
-                                transformOrigin: Item.Center
-                                scale: root.style === 2 ? 0.2 + 0.8 * rise : 1
-                                rotation: root.style === 4 ? away * -120 : 0
-                                transform: Translate {
-                                    x: root.style === 3 ? letter.away * (letter.index % 2 ? 90 : -90) : 0
-                                    y: root.style === 0 ? letter.away * 28 : root.style === 1 ? letter.away * -36 : 0
-                                }
+                            Repeater {
+                                model: root.text.length
 
-                                Behavior on rise {
-                                    SequentialAnimation {
-                                        PauseAnimation { duration: letter.index * root.letterDelay }
-                                        NumberAnimation {
-                                            duration: root.style === 2 || root.style === 4 ? 550 : 400
-                                            easing.type: root.style === 2 ? Easing.OutBack : Easing.OutCubic
+                                StyledText {
+                                    id: letter
+
+                                    required property int index
+
+                                    text: root.text[index]
+                                    font.family: Appearance.font.title
+                                    // A column of letters has to fit the screen height
+                                    font.pixelSize: root.vertical ? Math.min(64, Math.floor(window.height * 0.8 / root.text.length / 1.3)) : 64
+                                    font.weight: Font.DemiBold
+                                    color: "white"
+                                    elide: Text.ElideNone
+                                    // 0 (hidden) -> 1 (in place); the style decides what that looks like
+                                    property real rise: root.lettersIn ? 1 : 0
+                                    readonly property real away: 1 - rise
+                                    opacity: Math.min(1, rise)
+                                    transformOrigin: Item.Center
+                                    scale: root.style === 2 ? 0.2 + 0.8 * rise : 1
+                                    rotation: root.style === 4 ? away * -120 : 0
+                                    transform: Translate {
+                                        x: root.style === 3 ? letter.away * (letter.index % 2 ? 90 : -90) : 0
+                                        y: root.style === 0 ? letter.away * 28 : root.style === 1 ? letter.away * -36 : 0
+                                    }
+
+                                    Behavior on rise {
+                                        SequentialAnimation {
+                                            PauseAnimation { duration: letter.index * root.letterDelay }
+                                            NumberAnimation {
+                                                duration: root.style === 2 || root.style === 4 ? 550 : 400
+                                                easing.type: root.style === 2 ? Easing.OutBack : Easing.OutCubic
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+
+                        Logo { visible: root.style === 1 }
                     }
                 }
             }
