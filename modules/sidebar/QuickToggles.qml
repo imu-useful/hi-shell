@@ -255,7 +255,7 @@ ColumnLayout {
 
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
-                implicitHeight: root.android ? 64 : 56
+                implicitHeight: root.android ? 48 : 48
                 opacity: root.editing && !included ? 0.45 : 1
 
                 Rectangle {
@@ -274,20 +274,20 @@ ColumnLayout {
                     RowLayout {
                         visible: root.android
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 12
-                        spacing: 10
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        spacing: 8
 
                         Rectangle {
-                            implicitWidth: 40
-                            implicitHeight: 40
-                            radius: 20
+                            implicitWidth: 32
+                            implicitHeight: 32
+                            radius: 16
                             color: tile.t.active ? Colors.m3onPrimary : Colors.m3surfaceContainerHigh
                             MaterialIcon {
                                 anchors.centerIn: parent
                                 icon: tile.t.icon
                                 fill: tile.t.active ? 1 : 0
-                                iconSize: 20
+                                iconSize: 18
                                 color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
                             }
                         }
@@ -303,14 +303,14 @@ ColumnLayout {
                             StyledText {
                                 Layout.fillWidth: true
                                 text: tile.t.subtitle
-                                font.pixelSize: Appearance.font.size.labelMedium
+                                font.pixelSize: Appearance.font.size.labelSmall
                                 color: tile.t.active ? Qt.alpha(Colors.m3onPrimary, 0.8) : Colors.m3onSurfaceVariant
                             }
                         }
                         MaterialIcon {
                             visible: (!!tile.t.page || !!tile.t.more) && !root.editing
                             icon: "chevron_right"
-                            iconSize: 18
+                            iconSize: 16
                             color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
                         }
                     }
@@ -331,7 +331,7 @@ ColumnLayout {
                         onClicked: mouse => {
                             if (root.editing)
                                 root.setShown(tile.modelData, !tile.included);
-                            else if ((tile.t.page || tile.t.more) && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 44)))
+                            else if ((tile.t.page || tile.t.more) && (mouse.button === Qt.RightButton || (root.android && mouse.x > width - 36)))
                                 tile.t.more ? tile.t.more() : root.openPage(tile.t.page);
                             else
                                 tile.t.toggle();
