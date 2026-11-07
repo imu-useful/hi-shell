@@ -121,6 +121,57 @@ ColumnLayout {
     }
 
     Section {
+        icon: "waving_hand"
+        title: Translation.tr("Startup greeting")
+
+        SwitchRow {
+            icon: "waving_hand"
+            title: Translation.tr("Greeting at startup")
+            subtitle: Translation.tr("A black screen and a line of text when the shell starts. The very first start always has its own animation")
+            checked: Config.options.greeting.enabled
+            onToggled: checked => Config.options.greeting.enabled = checked
+        }
+        TextRow {
+            visible: Config.options.greeting.enabled
+            icon: "edit"
+            title: Translation.tr("Text")
+            placeholder: "Welcome back!"
+            value: Config.options.greeting.text
+            onEdited: text => Config.options.greeting.text = text.trim() || "Welcome back!"
+        }
+        ChoiceRow {
+            visible: Config.options.greeting.enabled
+            icon: "animation"
+            title: Translation.tr("Animation")
+            value: Config.options.greeting.style
+            options: [
+                { value: "random", text: Translation.tr("Random") },
+                { value: "rise", text: Translation.tr("Rise") },
+                { value: "drop", text: Translation.tr("Drop") },
+                { value: "pop", text: Translation.tr("Pop") },
+                { value: "slide", text: Translation.tr("Slide") },
+                { value: "spin", text: Translation.tr("Spin") }
+            ]
+            onSelected: value => Config.options.greeting.style = value
+        }
+        SwitchRow {
+            visible: Config.options.greeting.enabled
+            icon: "emoji_symbols"
+            title: Translation.tr("Logo")
+            checked: Config.options.greeting.logo
+            onToggled: checked => Config.options.greeting.logo = checked
+        }
+        ListRow {
+            visible: Config.options.greeting.enabled
+            icon: "play_arrow"
+            title: Translation.tr("Preview")
+            subtitle: Translation.tr("Play it now")
+            clickable: true
+            onClicked: ShellState.previewGreeting()
+        }
+    }
+
+    Section {
         icon: "side_navigation"
         title: Translation.tr("Sidebars")
 

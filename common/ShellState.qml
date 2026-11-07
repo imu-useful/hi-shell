@@ -80,6 +80,8 @@ Singleton {
 
     // Open the first-run welcome again (five taps on the avatar in Settings).
     signal showWelcome()
+    // Play the startup greeting once more (Settings › Interface).
+    signal previewGreeting()
 
     // Display mode picker (the display key, the quick toggle, Settings).
     property bool displayModeOpen: false

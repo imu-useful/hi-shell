@@ -12,7 +12,9 @@ import qs.common.widgets
 Scope {
     id: root
 
-    readonly property string text: "Welcome back!"
+    readonly property var cfg: Config.options.greeting
+    readonly property string defaultText: "Welcome back!"
+    readonly property string text: (cfg.text ?? "").trim().slice(0, 40) || defaultText
     readonly property int letterDelay: 55
     readonly property int blackHold: 500 // black alone, before the text
     readonly property int textHold: 1500 // text fully shown, before everything fades
@@ -26,7 +28,10 @@ Scope {
     readonly property int styles: 5
     readonly property bool vertical: style === 3
     readonly property int edgeMargin: 120
-    property int style: Math.floor(Math.random() * styles)
+    readonly property var styleNames: ["rise", "drop", "pop", "slide", "spin"]
+    // The random pick, rolled again for every showing
+    property int rolled: Math.floor(Math.random() * styles)
+    readonly property int style: styleNames.indexOf(cfg.style) >= 0 ? styleNames.indexOf(cfg.style) : rolled
 
     // 0 not known yet (the marker file is being read), 1 returning user, 2 first start
     property int mode: 0
@@ -67,9 +72,32 @@ Scope {
         command: ["sh", "-c", `mkdir -p "$(dirname "$1")" && date -Is > "$1"`, "sh", marker.path]
     }
 
+    // Settings › Interface › Preview
+    Connections {
+        target: ShellState
+        function onPreviewGreeting() {
+            if (!root.done && root.mode !== 0)
+                return; // already playing
+            root.outro = 0;
+            root.lettersIn = false;
+            root.welcomeIn = false;
+            root.logoIn = false;
+            root.rolled = Math.floor(Math.random() * root.styles);
+            root.mode = 1;
+            root.done = false;
+            textTimer.restart();
+        }
+    }
+
     function begin(newMode: int): void {
         if (done || mode !== 0)
             return;
+        // Turned off in Settings: nothing to show (the first start always has its own)
+        if (newMode === 1 && !cfg.enabled) {
+            done = true;
+            ShellState.greeting = false;
+            return;
+        }
         mode = newMode;
         if (firstRun)
             writeMarker.running = true;
@@ -121,7 +149,7 @@ Scope {
     }
 
     LazyLoader {
-        active: !root.done
+        active: !root.done && root.mode !== 0
 
         Variants {
             model: Quickshell.screens
@@ -196,7 +224,7 @@ Scope {
                             playing: root.lettersIn
                         }
 
-                        Logo { visible: root.style !== 1 }
+                        Logo { visible: root.cfg.logo && root.style !== 1 }
 
                         Grid {
                             id: grid
@@ -214,7 +242,8 @@ Scope {
                                     text: root.text[index]
                                     font.family: Appearance.font.title
                                     // A column of letters has to fit the screen height
-                                    font.pixelSize: root.vertical ? Math.min(64, Math.floor(window.height * 0.8 / root.text.length / 1.3)) : 64
+                                    font.pixelSize: root.vertical ? Math.min(64, Math.floor(window.height * 0.8 / root.text.length / 1.3))
+                                    : Math.min(64, Math.floor(window.width * 0.9 / root.text.length / 0.62))
                                     font.weight: Font.DemiBold
                                     color: "white"
                                     elide: Text.ElideNone
@@ -243,7 +272,7 @@ Scope {
                             }
                         }
 
-                        Logo { visible: root.style === 1 }
+                        Logo { visible: root.cfg.logo && root.style === 1 }
                     }
                 }
             }

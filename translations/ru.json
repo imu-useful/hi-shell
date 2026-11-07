@@ -1139,5 +1139,15 @@
     "Stand up, stretch, look out of the window.": "Встаньте, разомнитесь, посмотрите в окно.",
     "Over six hours. Try to use less.": "Больше шести часов. Попробуйте меньше.",
     "That's a lot of screen. Go outside for a bit.": "Это много экрана. Выйдите ненадолго на улицу.",
-    "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше."
+    "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше.",
+    "Startup greeting": "Приветствие при запуске",
+    "Greeting at startup": "Приветствие при запуске",
+    "A black screen and a line of text when the shell starts. The very first start always has its own animation": "Чёрный экран и строка текста при запуске оболочки. У самого первого запуска всегда своя анимация",
+    "Animation": "Анимация",
+    "Rise": "Подъём",
+    "Drop": "Падение",
+    "Pop": "Всплеск",
+    "Spin": "Вращение",
+    "Preview": "Просмотр",
+    "Play it now": "Показать сейчас"
 }

@@ -272,6 +272,16 @@ Singleton {
                 property list<string> keywords: ["porn", "hentai", "порно", "хентай"]
             }
 
+            // The "Welcome back!" at every start (the very first start always plays its own animation).
+            property JsonObject greeting: JsonObject {
+                property bool enabled: true
+                property string text: "Welcome back!"
+                // random, or one of: rise, drop, pop, slide, spin
+                property string style: "random"
+                // The animated logo with the text
+                property bool logo: true
+            }
+
             property JsonObject viewing: JsonObject {
                 // Viewing mode by itself: a fullscreen window while something plays.
                 property bool auto: true

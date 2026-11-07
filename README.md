@@ -277,6 +277,7 @@ Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
 - `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`
+- `greeting`: the "Welcome back!" at every start: `enabled`, `text`, `style` (`random`, `rise`, `drop`, `pop`, `slide`, `spin`), `logo`; the very first start always plays its own animation
 - `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape, `frameDance` (the frame turns and pulses to the music)
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget
   lists `left` / `center` / `right`. Widgets: `launcher`, `workspaces`, `activeWindow`, `media`, `resources`, `clock`,
