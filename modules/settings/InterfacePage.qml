@@ -211,6 +211,23 @@ ColumnLayout {
             options: [{ value: "android", text: Translation.tr("Android") }, { value: "classic", text: Translation.tr("Classic") }]
             onSelected: value => Config.options.sidebar.quickToggles.style = value
         }
+        StepperRow {
+            visible: Config.options.sidebar.quickToggles.style !== "classic"
+            icon: "pages"
+            title: Translation.tr("Tiles per page")
+            subtitle: Config.options.sidebar.quickToggles.perPage > 0 ? Translation.tr("The rest go to the next page") : Translation.tr("Off: 0, all on one page")
+            value: Config.options.sidebar.quickToggles.perPage
+            step: 2
+            from: 0
+            to: 20
+            onChanged: value => Config.options.sidebar.quickToggles.perPage = value
+        }
+        SwitchRow {
+            icon: "swipe"
+            title: Translation.tr("Slide between pages")
+            checked: Config.options.sidebar.quickToggles.slide
+            onToggled: checked => Config.options.sidebar.quickToggles.slide = checked
+        }
         ChoiceRow {
             icon: "sports_esports"
             title: Translation.tr("Game")

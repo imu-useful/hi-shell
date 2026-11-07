@@ -227,7 +227,7 @@ ColumnLayout {
         StyledText {
             Layout.fillWidth: true
     // Android style shows 6 tiles (2 x 3) per page; the rest go to further pages.
-    readonly property int pageSize: android ? 6 : 10
+    readonly property int pageSize: !android ? 10 : options.perPage > 0 ? options.perPage : 1000
     readonly property int pageCount: editing ? 1 : Math.max(1, Math.ceil(ids.length / pageSize))
     property int page: 0
     readonly property int currentPage: Math.min(page, pageCount - 1)
@@ -263,7 +263,10 @@ ColumnLayout {
 
         Row {
             x: -root.currentPage * viewport.width
-            Behavior on x { SpatialAnim { duration: Appearance.anim.normal } }
+            Behavior on x {
+                enabled: root.options.slide
+                SpatialAnim { duration: Appearance.anim.normal }
+            }
 
 
         Repeater {

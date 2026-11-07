@@ -149,6 +149,10 @@ Singleton {
                 property JsonObject quickToggles: JsonObject {
                     // android: two-column pills with labels | classic: round icon buttons
                     property string style: "android"
+                    // Tiles per page in the android style (the rest go to further pages); 0 = all on one page
+                    property int perPage: 6
+                    // Slide between pages (off: switch instantly)
+                    property bool slide: true
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
                     // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
                     // waitMode (hidden by default: add it in the sidebar's tile editor)

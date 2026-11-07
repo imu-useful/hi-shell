@@ -294,7 +294,7 @@ Sections:
   `weather`, `tray`, `systemIcons`, `notifications`, `utilButtons`, `networkSpeed`, `battery`, `updates`, `keyboardLayout`, `power`,
   `visualizer` (needs `cava`), `divider`. Per-widget options: `bar.workspaces`, `bar.clock`, `bar.media`,
   `bar.resources`, `bar.utilButtons`, `bar.updates`; `bar.media.spinArt` spins the cover art like a record while playing (on by default)
-- `sidebar`: `quickToggles.style` (android, classic) and `quickToggles.shown` (order; also editable with the ✎ button
+- `sidebar`: `quickToggles.style` (android, classic), `quickToggles.perPage` (tiles per page, 6 by default, 0 = one page), `quickToggles.slide` (animate page changes) and `quickToggles.shown` (order; also editable with the ✎ button
   in the sidebar), night light temperature
 - `desktop`: `clockSeconds` (seconds in the big digital clock), `focusMode` (with windows open: sharp wallpaper, widgets and frame hidden; on by default), `coverMode` (the playing track's cover instead of the wallpaper, colors included; also a quick toggle and
   `qs -c hi-shell ipc call coverMode toggle`), draw the `wallpaper`, show `widgets`, `monitor` for them (empty = first screen), `layout` (written by edit
