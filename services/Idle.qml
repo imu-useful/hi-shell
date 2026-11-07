@@ -49,15 +49,13 @@ general {
         if (!o.manage) {
             if (started) {
                 started = false;
-                stopper.command = ["sh", "-c", "pkill -x hypridle; sleep 0.3; hypridle"];
-                stopper.running = true;
+                Quickshell.execDetached(["sh", "-c", "pkill -x hypridle; sleep 0.3; exec hypridle"]);
             }
             return;
         }
         started = true;
         writer.setText(text);
-        stopper.command = ["sh", "-c", `pkill -x hypridle; sleep 0.3; exec hypridle -c '${path.replace(/'/g, "'\\''")}'`];
-        stopper.running = true;
+        Quickshell.execDetached(["sh", "-c", `pkill -x hypridle; sleep 0.3; exec hypridle -c '${path.replace(/'/g, "'\\''")}'`]);
     }
 
     // One restart for a burst of changes (typing minutes, the battery state flipping).
@@ -83,14 +81,5 @@ general {
         path: root.path
         atomicWrites: true
         printErrors: false
-    }
-
-    // Runs hypridle (or, when switched off, puts the default one back); detached from the shell's lifetime
-    // is not needed: it ends with the session.
-    Process {
-        id: stopper
-        stderr: StdioCollector {
-            onStreamFinished: if (text.trim() !== "") console.warn("Idle:", text.trim())
-        }
     }
 }
