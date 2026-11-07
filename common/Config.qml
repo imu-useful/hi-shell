@@ -223,6 +223,19 @@ Singleton {
                 property bool waveBeat: true
             }
 
+            // Idle (services/Idle.qml): when off, your own hypridle config is left alone. When on, hi-shell
+            // runs hypridle with a config made from these minutes (0 = never), on battery too if asked.
+            property JsonObject idle: JsonObject {
+                property bool manage: false
+                property int lockMin: 5
+                property int screenOffMin: 10
+                property int suspendMin: 15
+                property bool separateBattery: false
+                property int batLockMin: 2
+                property int batScreenOffMin: 3
+                property int batSuspendMin: 5
+            }
+
             // The lock screen (services/LockScreen.qml): what it shows and how it looks.
             property JsonObject lock: JsonObject {
                 // "builtin": hi-shell's own look; "file": your hyprlock config (sourced);

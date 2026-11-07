@@ -1152,5 +1152,15 @@
     "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше.",
     "Processes": "Процессы",
     "CPU %1% · RAM %2%": "ЦП %1% · ОЗУ %2%",
-    "Search by name or PID": "Поиск по имени или PID"
+    "Search by name or PID": "Поиск по имени или PID",
+    "Idle": "Простой",
+    "Lock, turn the screen off and sleep by itself": "Блокировка, выключение экрана и сон по таймеру",
+    "Off: your own hypridle config decides. On: hi-shell runs hypridle with the times below": "Выкл: решает ваш конфиг hypridle. Вкл: hi-shell запускает hypridle с временем ниже",
+    "Lock after, minutes (0 = never)": "Блокировать через, мин (0 — никогда)",
+    "Screen off after, minutes": "Выключить экран через, мин",
+    "Suspend after, minutes": "Уйти в сон через, мин",
+    "Other times on battery": "Другое время от батареи",
+    "On battery: lock after, minutes": "От батареи: блокировать через, мин",
+    "On battery: screen off after, minutes": "От батареи: выключить экран через, мин",
+    "On battery: suspend after, minutes": "От батареи: сон через, мин"
 }

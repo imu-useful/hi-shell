@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.common
 import qs.common.widgets
+import qs.services
 
 // Lock screen: which parts show, the clock, and the background.
 ColumnLayout {
@@ -55,6 +56,34 @@ ColumnLayout {
             fieldWidth: 280
             onEdited: text => root.l.customCommand = text.trim()
         }
+    }
+
+    Section {
+        id: idleSection
+        readonly property var i: Config.options.idle
+        icon: "bedtime"
+        title: Translation.tr("Idle")
+
+        SwitchRow {
+            icon: "timer"
+            title: Translation.tr("Lock, turn the screen off and sleep by itself")
+            subtitle: Translation.tr("Off: your own hypridle config decides. On: hi-shell runs hypridle with the times below")
+            checked: idleSection.i.manage
+            onToggled: checked => idleSection.i.manage = checked
+        }
+        StepperRow { visible: idleSection.i.manage; icon: "lock_clock"; title: Translation.tr("Lock after, minutes (0 = never)"); value: idleSection.i.lockMin; from: 0; to: 600; onChanged: v => idleSection.i.lockMin = v }
+        StepperRow { visible: idleSection.i.manage; icon: "desktop_access_disabled"; title: Translation.tr("Screen off after, minutes"); value: idleSection.i.screenOffMin; from: 0; to: 600; onChanged: v => idleSection.i.screenOffMin = v }
+        StepperRow { visible: idleSection.i.manage; icon: "bedtime"; title: Translation.tr("Suspend after, minutes"); value: idleSection.i.suspendMin; from: 0; to: 600; onChanged: v => idleSection.i.suspendMin = v }
+        SwitchRow {
+            visible: idleSection.i.manage && Battery.available
+            icon: "battery_android_5"
+            title: Translation.tr("Other times on battery")
+            checked: idleSection.i.separateBattery
+            onToggled: checked => idleSection.i.separateBattery = checked
+        }
+        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "lock_clock"; title: Translation.tr("On battery: lock after, minutes"); value: idleSection.i.batLockMin; from: 0; to: 600; onChanged: v => idleSection.i.batLockMin = v }
+        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "desktop_access_disabled"; title: Translation.tr("On battery: screen off after, minutes"); value: idleSection.i.batScreenOffMin; from: 0; to: 600; onChanged: v => idleSection.i.batScreenOffMin = v }
+        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "bedtime"; title: Translation.tr("On battery: suspend after, minutes"); value: idleSection.i.batSuspendMin; from: 0; to: 600; onChanged: v => idleSection.i.batSuspendMin = v }
     }
 
     Section {
