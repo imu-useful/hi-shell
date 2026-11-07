@@ -231,7 +231,6 @@ ColumnLayout {
     readonly property int pageCount: editing ? 1 : Math.max(1, Math.ceil(ids.length / pageSize))
     property int page: 0
     readonly property int currentPage: Math.min(page, pageCount - 1)
-    readonly property list<string> pageIds: editing ? ids : ids.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
 
             text: Translation.tr("Tap to add or remove")
             font.pixelSize: Appearance.font.size.labelMedium
@@ -244,36 +243,48 @@ ColumnLayout {
         }
     }
 
-    GridLayout {
+    // Pages sit side by side in a clipped strip; changing page slides the strip.
+    Item {
+        id: viewport
+
+        readonly property real tileHeight: root.android ? 64 : 56
+        readonly property int cols: root.android ? 2 : 5
+        readonly property int rows: Math.max(1, Math.ceil((root.pageCount > 1 ? root.pageSize : root.ids.length) / cols))
+
         Layout.fillWidth: true
-        columns: root.android ? 2 : 5
-        columnSpacing: 8
-        rowSpacing: 8
-        // Keep the height of a full page so the sidebar doesn't jump between pages.
-        Layout.minimumHeight: root.pageCount > 1 ? Math.ceil(root.pageSize / columns) * ((root.android ? 64 : 56) + rowSpacing) - rowSpacing : 0
-        Layout.alignment: Qt.AlignTop
+        implicitHeight: rows * (tileHeight + 8) - 8
+        clip: true
 
         WheelHandler {
             enabled: root.pageCount > 1
             acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
             onWheel: event => root.page = Math.max(0, Math.min(root.pageCount - 1, root.currentPage + (event.angleDelta.y < 0 ? 1 : -1)))
         }
-                readonly property var t: root.toggles[modelData]
-                readonly property bool included: root.options.shown.includes(modelData)
 
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                implicitHeight: root.android ? 64 : 56
-                opacity: root.editing && !included ? 0.45 : 1
+        Row {
+            x: -root.currentPage * viewport.width
+            Behavior on x { SpatialAnim { duration: Appearance.anim.normal } }
 
 
         Repeater {
-            model: root.pageIds
+            model: root.editing ? root.ids : root.ids.slice(pageGrid.index * root.pageSize, (pageGrid.index + 1) * root.pageSize)
 
             Item {
                 id: tile
 
                 required property string modelData
+            Repeater {
+                model: root.pageCount
+
+                GridLayout {
+                    id: pageGrid
+
+                    required property int index
+
+                    width: viewport.width
+                    columns: viewport.cols
+                    columnSpacing: 8
+                    rowSpacing: 8
                 Rectangle {
                     id: body
                     anchors.fill: parent
@@ -282,6 +293,14 @@ ColumnLayout {
                     color: tile.t.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
                     border.width: root.editing ? 1 : 0
                     border.color: Colors.m3outline
+                readonly property var t: root.toggles[modelData]
+                readonly property bool included: root.options.shown.includes(modelData)
+
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                implicitHeight: root.android ? 64 : 56
+                opacity: root.editing && !included ? 0.45 : 1
+
 
                     Behavior on color { ColorAnim {} }
                     Behavior on radius { SpatialAnim { duration: Appearance.anim.normal } }
@@ -406,14 +425,9 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         spacing: 6
 
-        Repeater {
-            model: root.pageCount
-
-            Rectangle {
-                required property int index
-                width: index === root.currentPage ? 18 : 8
-                height: 8
-                radius: 4
+        }
+                }
+            }
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: 28
@@ -438,13 +452,20 @@ ColumnLayout {
                 Behavior on color { ColorAnim {} }
                 MouseArea {
                     anchors.fill: parent
-                anchors.verticalCenter: parent.verticalCenter
                     anchors.margins: -4
                     onClicked: root.page = parent.index
+        Repeater {
+            model: root.pageCount
+
+            Rectangle {
+                required property int index
+                anchors.verticalCenter: parent.verticalCenter
+                width: index === root.currentPage ? 18 : 8
+                height: 8
+                radius: 4
                 }
             }
         }
-    }
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
@@ -465,3 +486,4 @@ ColumnLayout {
             }
         }
 }
+    }
