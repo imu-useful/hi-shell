@@ -24,6 +24,7 @@ ws_info() { hyprctl activeworkspace -j | python3 -c "import json,sys;d=json.load
 focus_ws() { hyprctl dispatch "hl.dsp.focus({ workspace = $1 })" >/dev/null; sleep 1.2; }
 monitor() { hyprctl monitors -j | python3 -c "import json,sys;print(json.load(sys.stdin)[0]['name'])"; }
 
+WAIT_MODE="$(cd "$(dirname "$0")/.." && pwd)/wait-mode/wait-mode.sh"
 ORIG_WS=${BACK_TO:-$(ws_info | cut -d" " -f1)}
 DND_WAS=$(python3 -c "import json;print(json.load(open('$HOME/.local/state/hi-shell/notifications.json')).get('dnd',False))" 2>/dev/null || echo False)
 OUTPUT=$(monitor)
@@ -36,6 +37,7 @@ cleanup() {
     "${QS[@]}" calendar close >/dev/null 2>&1
     "${QS[@]}" overview close >/dev/null 2>&1
     "${QS[@]}" welcome close >/dev/null 2>&1
+    "$WAIT_MODE" stop >/dev/null 2>&1
     [ "$DND_WAS" = False ] && "${QS[@]}" notifications toggleDnd >/dev/null 2>&1
     focus_ws "$ORIG_WS"
     rm -rf "$TMP"
@@ -119,5 +121,12 @@ clip_calendar() {
     "${QS[@]}" calendar close; sleep 0.8
 }
 
-ALL=(launcher sidebar settings wallpapers display session desktop_edit overview calendar)
+# Wait Mode locks the keyboard and the mouse while it is on; the trap above always stops it
+# (and the way out for a person is Esc three times).
+clip_wait_mode() {
+    "$WAIT_MODE" start; sleep 6
+    "$WAIT_MODE" stop; sleep 1
+}
+
+ALL=(launcher sidebar settings wallpapers display session desktop_edit overview calendar wait_mode)
 for name in "${@:-${ALL[@]}}"; do record "$name"; done

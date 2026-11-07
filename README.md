@@ -52,19 +52,17 @@ and the audio spectrum is drawn by a single shader.
 
 ## Screenshots
 
-Short screen recordings of the shell (the AI palette, the welcome and Wait Mode are still pictures).
+Short screen recordings of the shell.
 
 | | |
 | :---: | :---: |
 | <img src="docs/demos/launcher.webp" alt="App launcher"> | <img src="docs/demos/sidebar.webp" alt="Right sidebar"> |
-| **App launcher** — apps, settings, calculator, emoji, clipboard | **Right sidebar** — quick toggles, sliders, notifications |
-| <img src="docs/demos/settings.webp" alt="Settings"> | <img src="docs/screenshots/claude.webp" alt="AI palette"> |
-| **Settings** — every option, searchable from the launcher | **AI palette** — ask anything, answers stream in |
-| <img src="docs/demos/wallpapers.webp" alt="Wallpaper picker"> | <img src="docs/demos/display.webp" alt="Display mode"> |
-| **Wallpapers** — local and online, scheme, mode, 28 frames | **Display mode** — duplicate or extend to a second screen |
-| <img src="docs/screenshots/welcome.webp" alt="Welcome"> | <img src="docs/demos/session.webp" alt="Session screen"> |
-| **First-run welcome** — language, look and shortcuts | **Session screen** — lock, log out, suspend, reboot, power off |
-| <img src="docs/demos/desktop_edit.webp" alt="Desktop edit mode"> | <img src="docs/screenshots/wait-mode.webp" alt="Wait Mode"> |
+| **App launcher** — apps, settings, calculator, emoji, clipboard | **Right sidebar** — quick toggles, sliders, calendar, todo, timers |
+| <img src="docs/demos/settings.webp" alt="Settings"> | <img src="docs/demos/wallpapers.webp" alt="Wallpaper picker"> |
+| **Settings** — every option, searchable from the launcher | **Wallpapers** — local and online, scheme, mode, 28 frames |
+| <img src="docs/demos/display.webp" alt="Display mode"> | <img src="docs/demos/session.webp" alt="Session screen"> |
+| **Display mode** — duplicate or extend to a second screen | **Session screen** — lock, log out, suspend, reboot, power off |
+| <img src="docs/demos/desktop_edit.webp" alt="Desktop edit mode"> | <img src="docs/demos/wait_mode.webp" alt="Wait Mode"> |
 | **Desktop edit mode** — drag, scale and stretch widgets | **Wait Mode** — a locked screen with the player and the queue |
 | <img src="docs/demos/overview.webp" alt="Workspace overview"> | <img src="docs/demos/calendar.webp" alt="Calendar"> |
 | **Workspace overview** — every workspace and its windows | **Calendar** — the month at a glance |
