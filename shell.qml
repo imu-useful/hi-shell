@@ -78,6 +78,8 @@ ShellRoot {
 
     Welcome {}
 
+    StartupGreeting {}
+
     FocusSettingsWindow {}
 
     BlockedToast {}
