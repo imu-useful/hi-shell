@@ -119,4 +119,35 @@ ColumnLayout {
             }
         }
     }
+
+    Section {
+        icon: "memory"
+        title: Translation.tr("Task manager (Ctrl+Shift+Esc)")
+
+        ChoiceRow {
+            icon: "tune"
+            title: Translation.tr("Opens")
+            value: Config.options.processes.mode
+            options: [{ value: "builtin", text: "hi-shell" }, { value: "command", text: Translation.tr("My program") }]
+            onSelected: value => Config.options.processes.mode = value
+        }
+        TextRow {
+            visible: Config.options.processes.mode === "command"
+            icon: "terminal"
+            title: Translation.tr("Command")
+            subtitle: Translation.tr("For example btop, htop or resources")
+            placeholder: "btop"
+            value: Config.options.processes.command
+            fieldWidth: 240
+            onEdited: text => Config.options.processes.command = text.trim()
+        }
+        SwitchRow {
+            visible: Config.options.processes.mode === "command"
+            icon: "keyboard_command_key"
+            title: Translation.tr("Run in a terminal")
+            subtitle: Translation.tr("For programs that draw in the terminal (btop, htop)")
+            checked: Config.options.processes.inTerminal
+            onToggled: checked => Config.options.processes.inTerminal = checked
+        }
+    }
 }

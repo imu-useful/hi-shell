@@ -170,37 +170,6 @@ ColumnLayout {
     }
 
     Section {
-        icon: "memory"
-        title: Translation.tr("Task manager (Ctrl+Shift+Esc)")
-
-        ChoiceRow {
-            icon: "tune"
-            title: Translation.tr("Opens")
-            value: o.processes.mode
-            options: [{ value: "builtin", text: "hi-shell" }, { value: "command", text: Translation.tr("My program") }]
-            onSelected: value => o.processes.mode = value
-        }
-        TextRow {
-            visible: o.processes.mode === "command"
-            icon: "terminal"
-            title: Translation.tr("Command")
-            subtitle: Translation.tr("For example btop, htop or resources")
-            placeholder: "btop"
-            value: o.processes.command
-            fieldWidth: 240
-            onEdited: text => o.processes.command = text.trim()
-        }
-        SwitchRow {
-            visible: o.processes.mode === "command"
-            icon: "keyboard_command_key"
-            title: Translation.tr("Run in a terminal")
-            subtitle: Translation.tr("For programs that draw in the terminal (btop, htop)")
-            checked: o.processes.inTerminal
-            onToggled: checked => o.processes.inTerminal = checked
-        }
-    }
-
-    Section {
         icon: "translate"
         title: Translation.tr("Translator")
 
