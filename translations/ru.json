@@ -1127,5 +1127,17 @@
     "A tick when the volume changes": "Щелчок при изменении громкости",
     "Notifications, timers, battery, screenshots, volume": "Уведомления, таймеры, батарея, скриншоты, громкость",
     "Keep quiet when disturbing is off": "Молчать, когда не беспокоить",
-    "Silent in Do Not Disturb, Presentation, Wait mode and Focus Mode (timers still sound)": "Без звуков при «Не беспокоить», презентации, режиме ожидания и режиме фокуса (таймеры звучат)"
+    "Silent in Do Not Disturb, Presentation, Wait mode and Focus Mode (timers still sound)": "Без звуков при «Не беспокоить», презентации, режиме ожидания и режиме фокуса (таймеры звучат)",
+    "Barely any screen time. Well done!": "Почти нет экранного времени. Молодец!",
+    "Light day so far, great.": "Пока лёгкий день, отлично.",
+    "Plenty of time left for real life.": "Ещё много времени для настоящей жизни.",
+    "A solid hour or two. Nice job!": "Час-другой — хороший результат. Молодец!",
+    "A healthy amount, keep it up.": "Нормальная доза, так держать.",
+    "Good balance today, well done.": "Сегодня хороший баланс, молодец.",
+    "That's a fair bit. Maybe a break?": "Уже довольно много. Может, перерыв?",
+    "Rest your eyes for a minute.": "Дайте глазам отдохнуть минутку.",
+    "Stand up, stretch, look out of the window.": "Встаньте, разомнитесь, посмотрите в окно.",
+    "Over six hours. Try to use less.": "Больше шести часов. Попробуйте меньше.",
+    "That's a lot of screen. Go outside for a bit.": "Это много экрана. Выйдите ненадолго на улицу.",
+    "Your eyes need a rest. Try less tomorrow.": "Глазам нужен отдых. Завтра постарайтесь меньше."
 }
