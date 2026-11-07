@@ -100,10 +100,39 @@ ColumnLayout {
                 onClicked: Updates.checkShell()
             }
             M3Button {
-                text: Translation.tr("Update the shell")
+                text: Updates.updating ? Translation.tr("Updating…") : Translation.tr("Update the shell")
                 icon: "system_update_alt"
-                enabled: !Updates.upgradeRunning
+                enabled: !Updates.updating
                 onClicked: Updates.updateShell()
+            }
+        }
+        // The output of the update: the shell restarts when it's done
+        Rectangle {
+            Layout.fillWidth: true
+            visible: Updates.updating || Updates.updateLog !== ""
+            implicitHeight: Math.min(260, updateText.implicitHeight + 28)
+            radius: Appearance.rounding.large
+            color: Updates.updateFailed ? Colors.m3errorContainer : Colors.m3surfaceContainer
+            clip: true
+
+            Flickable {
+                id: updateFlick
+                anchors.fill: parent
+                anchors.margins: 14
+                contentHeight: updateText.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                onContentHeightChanged: contentY = Math.max(0, contentHeight - height)
+
+                StyledText {
+                    id: updateText
+                    width: parent.width
+                    text: Updates.updateLog || Translation.tr("Updating…")
+                    font.family: Appearance.font.mono
+                    font.pixelSize: Appearance.font.size.labelMedium
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideNone
+                    color: Updates.updateFailed ? Colors.m3onErrorContainer : Colors.m3onSurface
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ import qs.services
 
 // A new version of the shell is out: shown once per start, after the first update check.
 // Release channel: the release and its notes. Git channel: a new commit (the list of them).
-// Update opens update.sh in a terminal; Later (or Esc) closes it until the next start.
+// Update runs update.sh and opens Settings > About, where its output shows; Later (or Esc) closes it until the next start.
 // Turned off in Settings > About.
 Scope {
     id: root
@@ -164,6 +164,8 @@ Scope {
                             onClicked: {
                                 root.close();
                                 Updates.updateShell();
+                                ShellState.settingsPage = "about";
+                                ShellState.settingsOpen = true;
                             }
                         }
                     }

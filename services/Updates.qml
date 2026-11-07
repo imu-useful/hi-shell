@@ -46,9 +46,39 @@ Singleton {
         checkShell();
     }
 
-    // The shell's update (update.sh in the terminal: pulls, restarts the shell).
+    // The shell's update: update.sh in the background, its output in Settings > About. It runs in a session of its
+    // own and writes to a file, not to the shell: update.sh restarts the shell at the end, and a pipe to a shell
+    // that is gone would stop the script half way.
+    readonly property string logPath: `${Paths.state}/update.log`
+    readonly property bool updating: shellUpdate.running
+    property bool updateFailed: false
+    // The output so far, without the colors
+    property string updateLog: ""
+
     function updateShell() {
-        runInTerminal(`"${repo}/update.sh"`);
+        if (shellUpdate.running)
+            return;
+        updateFailed = false;
+        updateLog = "";
+        shellUpdate.running = true;
+    }
+
+    Process {
+        id: shellUpdate
+        command: ["sh", "-c", 'mkdir -p "$(dirname "$2")"; exec setsid -w "$1" >"$2" 2>&1', "sh", `${root.repo}/update.sh`, root.logPath]
+        onExited: code => {
+            root.updateFailed = code !== 0;
+            log.reload();
+        }
+    }
+
+    FileView {
+        id: log
+        path: shellUpdate.running || root.updateFailed ? root.logPath : ""
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.updateLog = text().replace(/\x1b\[[0-9;]*m/g, "").trim()
     }
 
     // The upgrade of the packages, then the shell's update when there is one.
@@ -150,6 +180,9 @@ Singleton {
 
         function refresh(): void {
             root.refresh();
+        }
+        function updateShell(): void {
+            root.updateShell();
         }
         function count(): int {
             return root.count;
