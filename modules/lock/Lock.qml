@@ -29,10 +29,12 @@ Scope {
         lock: sessionLock
     }
 
-    Binding {
-        target: ShellState
-        property: "locked"
-        value: sessionLock.locked
+    // What the rest of the shell checks (a region screenshot can't show its overlay over a lock).
+    Connections {
+        target: sessionLock
+        function onLockedChanged() {
+            ShellState.locked = sessionLock.locked;
+        }
     }
 
     Connections {
