@@ -42,7 +42,7 @@ ColumnLayout {
                     text: modelData.title
                     selected: Displays.current === modelData.id
                     enabled: Displays.hasExternal || modelData.id === "internal"
-                    opacity: enabled ? 1 : 0.38
+                    opacity: enabled ? 1 : Appearance.state.disabledContent
                     onClicked: Displays.apply(modelData.id)
                 }
             }

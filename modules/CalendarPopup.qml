@@ -83,9 +83,9 @@ Scope {
                 width: parent.width
                 implicitWidth: column.implicitWidth + 32
                 implicitHeight: column.implicitHeight + 32
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Appearance.translucent(Colors.m3surfaceContainer)
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Colors.m3outlineVariant
 
                 opacity: loader.revealed ? 1 : 0

@@ -60,9 +60,9 @@ Scope {
                 width: 400
                 implicitHeight: content.implicitHeight + 40
                 height: implicitHeight
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Colors.m3surfaceContainerHigh
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0

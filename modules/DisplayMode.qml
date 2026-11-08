@@ -133,9 +133,9 @@ Scope {
                 anchors.centerIn: parent
                 width: content.implicitWidth + 40
                 height: content.implicitHeight + 40
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Appearance.translucent(Colors.m3surfaceContainerLow)
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0

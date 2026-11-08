@@ -126,7 +126,7 @@ PopupWindow {
             radius: root.pill ? height / 2 : Appearance.rounding.medium
             // The caelestia look: the back row is a filled pill.
             color: root.pill && back ? Colors.m3secondaryContainer : "transparent"
-            opacity: enabled ? 1 : 0.38
+            opacity: enabled ? 1 : Appearance.state.disabledContent
 
             Item {
                 id: lead
