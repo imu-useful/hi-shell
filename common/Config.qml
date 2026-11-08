@@ -154,7 +154,7 @@ Singleton {
                     // Slide between pages (off: switch instantly)
                     property bool slide: true
                     // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
-                    // gameMode, vpn, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
+                    // gameMode, vpn, happ, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
                     // waitMode (hidden by default: add it in the sidebar's tile editor)
                     property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]
                 }

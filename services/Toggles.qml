@@ -7,7 +7,7 @@ import qs.common
 
 // State behind quick toggles that aren't covered by another service:
 // night light (hyprsunset), keep awake (logind idle inhibitor, which
-// hypridle respects), game mode (Hyprland eye candy off) and NetworkManager VPNs.
+// hypridle respects), game mode (Hyprland eye candy off), NetworkManager VPNs and Happ.
 Singleton {
     id: root
 
@@ -126,5 +126,46 @@ Singleton {
         running: true
         repeat: true
         onTriggered: root.refreshVpns()
+    }
+
+    // --- Happ (proxy client with no CLI: its xray core runs while connected; the app takes happ:// links) ---
+    property bool happInstalled: false
+    property bool happActive: false
+
+    function refreshHapp() {
+        happProbe.running = true;
+    }
+
+    function setHapp(on) {
+        // Asks the running Happ (or starts it) to connect / disconnect.
+        Quickshell.execDetached(["happ", on ? "happ://connect" : "happ://disconnect"]);
+        happRefresh.restart();
+    }
+
+    Process {
+        id: happProbe
+        running: true
+        // Prints "<installed> <connected>" as 0/1
+        command: ["sh", "-c", "i=0; command -v happ >/dev/null && i=1; c=0; pgrep -f /opt/happ/bin/core/xray >/dev/null && c=1; echo $i $c"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const f = text.trim().split(" ");
+                root.happInstalled = f[0] === "1";
+                root.happActive = f[1] === "1";
+            }
+        }
+    }
+
+    Timer {
+        id: happRefresh
+        interval: 2500
+        onTriggered: root.refreshHapp()
+    }
+
+    Timer {
+        interval: 15000
+        running: true
+        repeat: true
+        onTriggered: root.refreshHapp()
     }
 }
