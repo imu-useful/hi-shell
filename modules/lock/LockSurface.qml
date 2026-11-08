@@ -34,6 +34,8 @@ WlSessionLockSurface {
             NumberAnimation { target: backdrop; property: "opacity"; to: 0; duration: Appearance.anim.slow; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.effects }
         }
         PropertyAction { target: root.lock; property: "locked"; value: false }
+        // lockedChanged doesn't always reach the shell's own flag.
+        ScriptAction { script: ShellState.locked = false }
     }
 
     ParallelAnimation {
