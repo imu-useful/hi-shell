@@ -459,7 +459,7 @@ Scope {
                 radius: Appearance.rounding.extraLarge
                 // Translucent so the compositor blur (see hypr/hi-shell/layer-rules.lua) shows through.
                 color: Appearance.translucent(Colors.m3surfaceContainer)
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Colors.m3outlineVariant
 
                 // The window's offsetScale is already animated; a second animation here would lag it.
@@ -584,7 +584,7 @@ Scope {
                 height: card.implicitHeight
                 radius: Appearance.rounding.extraLarge
                 color: Appearance.translucent(Colors.m3surfaceContainer)
-                border.width: width > 0 ? 1 : 0
+                border.width: width > 0 ? Appearance.edge : 0
                 border.color: Colors.m3outlineVariant
                 clip: true
                 opacity: window.showPreview && loader.revealed ? 1 : 0

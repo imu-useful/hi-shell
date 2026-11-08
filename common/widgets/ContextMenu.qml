@@ -89,7 +89,7 @@ PopupWindow {
         height: column.implicitHeight + (root.pill ? 8 : 16)
         radius: Appearance.rounding.large
         color: root.pill ? Colors.m3surfaceContainerLow : Colors.m3surfaceContainer
-        border.width: root.pill ? 0 : 1
+        border.width: root.pill ? 0 : Appearance.edge
         border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
         opacity: root.shown ? 1 : 0

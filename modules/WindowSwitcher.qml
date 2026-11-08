@@ -195,7 +195,7 @@ Scope {
                 height: grid.implicitHeight + 32
                 radius: Appearance.rounding.extraLarge
                 color: Appearance.translucent(Colors.m3surfaceContainerLow)
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0

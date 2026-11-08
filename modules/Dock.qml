@@ -238,7 +238,7 @@ Variants {
             Behavior on height { SpatialAnim { duration: Appearance.anim.normal } }
             radius: Math.min(window.options.cornerRadius, Math.min(width, height) / 2)
             color: Appearance.translucent(Colors.m3surfaceContainer)
-            border.width: 1
+            border.width: Appearance.edge
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
             HoverHandler {

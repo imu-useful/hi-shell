@@ -97,7 +97,7 @@ PopupWindow {
             height: implicitHeight
             radius: Appearance.rounding.large
             color: Colors.m3surfaceContainer
-            border.width: 1
+            border.width: Appearance.edge
             border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
             opacity: root.shown ? 1 : 0

@@ -138,7 +138,7 @@ Scope {
                 height: 56
                 radius: height / 2
                 color: Appearance.translucent(Colors.m3surfaceContainer, 0.05)
-                border.width: 1
+                border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 opacity: loader.revealed ? 1 : 0

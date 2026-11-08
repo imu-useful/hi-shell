@@ -23,6 +23,10 @@ Singleton {
         readonly property int full: 9999
     }
 
+    // Outline width for floating surfaces: depth comes from tone, so the outline is only
+    // there when the surface is see-through (otherwise its edge would dissolve into the wallpaper).
+    readonly property int edge: options.transparency && !ShellState.zen ? 1 : 0
+
     // Spacing scale (px); use these instead of loose numbers in layouts.
     readonly property QtObject space: QtObject {
         readonly property int xxs: 2
