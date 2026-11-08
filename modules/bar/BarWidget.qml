@@ -43,7 +43,9 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.pill || root.active
-        radius: Appearance.rounding.full
+        // Pressing a clickable widget morphs its pill into a rounded rectangle, and it springs back.
+        radius: root.clickable && area.pressed ? Appearance.rounding.medium : Appearance.shape.button
+        Behavior on radius { SpatialAnim {} }
         color: root.active ? Colors.m3secondaryContainer : (root.bar?.style === "m3" ? Colors.m3surfaceContainerHighest : Colors.m3surfaceContainerHigh)
         Behavior on color { ColorAnim {} }
     }
@@ -53,6 +55,7 @@ Item {
     }
 
     MouseArea {
+        id: area
         anchors.fill: parent
         visible: root.clickable
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -70,9 +73,9 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: Appearance.rounding.full
+            radius: root.clickable && area.pressed ? Appearance.rounding.medium : Appearance.shape.button
             color: Colors.m3onSurface
-            opacity: parent.pressed ? 0.12 : root.hovered ? 0.06 : 0
+            opacity: parent.pressed ? Appearance.state.press + 0.02 : root.hovered ? Appearance.state.hover : 0
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
         }
     }

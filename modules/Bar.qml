@@ -130,7 +130,7 @@ PanelWindow {
     WlrLayershell.namespace: "hi-shell-bar"
     WlrLayershell.layer: WlrLayer.Top
 
-    readonly property color barColor: Appearance.translucent(style === "m3" ? Colors.m3surfaceContainer : Colors.m3surface)
+    readonly property color barColor: Appearance.translucent(style === "m3" ? Colors.m3surfaceContainer : Colors.m3surfaceContainerLow)
 
     // Startup: the bar slides in from its edge with a spring.
     property real intro: ShellState.started ? 1 : 0
