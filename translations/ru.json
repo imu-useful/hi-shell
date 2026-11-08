@@ -1202,5 +1202,14 @@
     "Unlock for notifications": "Разблокируйте, чтобы увидеть уведомления",
     "Hide notifications": "Скрывать уведомления",
     "Only how many came in shows, not what they say": "Показывается только их число, без содержимого",
-    "hi-shell's own screen, hyprlock in hi-shell's look, your hyprlock config, or another locker": "свой экран hi-shell, hyprlock в стиле hi-shell, ваш конфиг hyprlock или другой локер"
+    "hi-shell's own screen, hyprlock in hi-shell's look, your hyprlock config, or another locker": "свой экран hi-shell, hyprlock в стиле hi-shell, ваш конфиг hyprlock или другой локер",
+    "Processor": "Процессор",
+    "Graphics": "Графика",
+    "GiB": "ГиБ",
+    "Feels like": "Ощущается",
+    "High / low": "Макс. / мин.",
+    "Humidity": "Влажность",
+    "Wind": "Ветер",
+    "Rain chance": "Вероятность осадков",
+    "Sunrise · sunset": "Восход · закат"
 }

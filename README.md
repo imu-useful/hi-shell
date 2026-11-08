@@ -352,7 +352,7 @@ color), the date, your avatar (`~/.face`) in a ring, a greeting and the password
 blurred wallpaper (every typed character is a dot of a different shape; Enter or the arrow checks it, Ctrl+Backspace
 clears it); under it, the reason a password was refused, or a hint about Caps Lock and the keyboard layout. Small pills
 float around: CPU, RAM and disk rings (top left), weather, battery and keyboard layout (top right), the player with
-cover and controls (bottom, while something plays) and the notifications that came in (right). It follows the palette,
+cover and controls (bottom, while something plays) and the notifications that came in (right). The clock shows the seconds next to HH:mm. Hovering the resources, the weather or the player opens their details (load, memory and disk sizes; feels like, wind, humidity, sunrise and the next hours; the cover, album and a seek bar). It follows the palette,
 the font, the transparency setting and the language.
 
 The password is checked by PAM with `modules/lock/pam.d/hi-shell-lock` (pam_unix and faillock).

@@ -18,18 +18,21 @@ Item {
     }
 
     Resources {
+        z: 5
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: Appearance.space.xxl
     }
 
     WeatherInfo {
+        z: 5
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: Appearance.space.xxl
     }
 
     Media {
+        z: 5
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Appearance.space.xxl

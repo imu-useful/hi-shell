@@ -17,19 +17,37 @@ ColumnLayout {
 
     SystemClock {
         id: clock
-        precision: SystemClock.Minutes
+        precision: SystemClock.Seconds
     }
 
-    StyledText {
+    // HH:mm stays in the middle; the seconds hang off its right edge, smaller, in the secondary color.
+    Item {
         Layout.alignment: Qt.AlignHCenter
-        text: Qt.formatTime(clock.date, "HH:mm")
-        color: Colors.m3primary
-        font.family: Appearance.font.title
-        font.pixelSize: 168 * root.scaleFactor
-        font.weight: Font.Black
-        font.features: { "tnum": 1 }
-        style: Text.Outline
-        styleColor: Qt.alpha("black", 0.12)
+        implicitWidth: time.implicitWidth
+        implicitHeight: time.implicitHeight
+
+        StyledText {
+            id: time
+            text: Qt.formatTime(clock.date, "HH:mm")
+            color: Colors.m3primary
+            font.family: Appearance.font.title
+            font.pixelSize: 168 * root.scaleFactor
+            font.weight: Font.Black
+            font.features: { "tnum": 1 }
+            style: Text.Outline
+            styleColor: Qt.alpha("black", 0.12)
+        }
+        StyledText {
+            anchors.left: time.right
+            anchors.leftMargin: Appearance.space.sm
+            anchors.baseline: time.baseline
+            text: Qt.formatTime(clock.date, "ss")
+            color: Colors.m3secondary
+            font.family: Appearance.font.title
+            font.pixelSize: 64 * root.scaleFactor
+            font.weight: Font.Black
+            font.features: { "tnum": 1 }
+        }
     }
 
     StyledText {
