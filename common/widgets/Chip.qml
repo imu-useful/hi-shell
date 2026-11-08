@@ -18,10 +18,12 @@ Rectangle {
 
     implicitHeight: 32
     implicitWidth: row.implicitWidth + 24
-    radius: Appearance.rounding.full
+    // Selecting morphs the chip from a soft rectangle into a pill.
+    radius: selected ? Appearance.shape.button : Appearance.shape.chip
     color: selected ? Colors.m3secondaryContainer : Colors.m3surfaceContainerHigh
-    opacity: enabled ? 1 : 0.38
+    opacity: enabled ? 1 : Appearance.state.disabledContent
 
+    Behavior on radius { SpatialAnim {} }
     Behavior on color { ColorAnim {} }
 
     StateLayer {

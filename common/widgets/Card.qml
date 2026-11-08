@@ -5,6 +5,6 @@ import qs.common
 Rectangle {
     property color baseColor: Colors.m3surfaceContainer
 
-    radius: Appearance.rounding.extraLarge
+    radius: Appearance.shape.panel
     color: Appearance.translucent(baseColor)
 }

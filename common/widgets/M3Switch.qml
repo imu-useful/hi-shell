@@ -13,9 +13,9 @@ Rectangle {
     implicitHeight: 32
     radius: height / 2
     color: checked ? Colors.m3primary : Colors.m3surfaceContainerHighest
-    border.width: checked ? 0 : 2
-    border.color: Colors.m3outline
-    opacity: enabled ? 1 : 0.38
+    border.width: checked ? 0 : 1
+    border.color: Colors.m3outlineVariant
+    opacity: enabled ? 1 : Appearance.state.disabledContent
 
     Behavior on color { ColorAnim {} }
 

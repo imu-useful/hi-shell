@@ -14,15 +14,16 @@ Rectangle {
 
     implicitWidth: 40
     implicitHeight: 40
-    radius: Appearance.rounding.full
-    color: filled ? (mouse.containsMouse ? Qt.lighter(Colors.m3primary, 1.08) : Colors.m3primary)
-                  : (mouse.containsMouse ? Colors.m3surfaceContainerHighest : "transparent")
-    opacity: enabled ? 1 : 0.38
+    // Pressing morphs the circle into a rounded square, and it springs back.
+    radius: layer.pressed ? Appearance.rounding.medium : Appearance.shape.button
+    color: filled ? Colors.m3primary : "transparent"
+    opacity: enabled ? 1 : Appearance.state.disabledContent
 
-    Behavior on color { ColorAnimation { duration: 120 } }
+    Behavior on radius { SpatialAnim {} }
+    Behavior on color { ColorAnim {} }
 
     // Pressing squeezes the button a little and it springs back.
-    scale: mouse.pressed ? 0.9 : 1
+    scale: layer.pressed ? 0.9 : 1
     Behavior on scale { enabled: Appearance.anim.speed > 0; SpringAnim { overshoot: 1.4 } }
 
     Text {
@@ -47,11 +48,9 @@ Rectangle {
         }
     }
 
-    MouseArea {
-        id: mouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+    StateLayer {
+        id: layer
+        tint: root.iconColor
         onClicked: root.clicked()
     }
 }
