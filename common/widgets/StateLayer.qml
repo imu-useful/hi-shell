@@ -27,7 +27,7 @@ MouseArea {
         bottomLeftRadius: root.bottomLeftRadius >= 0 ? root.bottomLeftRadius : root.radius
         bottomRightRadius: root.bottomRightRadius >= 0 ? root.bottomRightRadius : root.radius
         color: root.tint
-        opacity: !root.enabled ? 0 : root.pressed ? 0.12 : root.containsMouse ? 0.08 : 0
+        opacity: !root.enabled ? 0 : root.pressed ? Appearance.state.press + 0.02 : root.containsMouse ? Appearance.state.hover : 0
         Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
     }
 }

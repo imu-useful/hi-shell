@@ -23,6 +23,38 @@ Singleton {
         readonly property int full: 9999
     }
 
+    // Spacing scale (px); use these instead of loose numbers in layouts.
+    readonly property QtObject space: QtObject {
+        readonly property int xxs: 2
+        readonly property int xs: 4
+        readonly property int sm: 8
+        readonly property int md: 12
+        readonly property int lg: 16
+        readonly property int xl: 24
+        readonly property int xxl: 32
+    }
+
+    // M3 state layer opacities (hover / focus / press / drag / disabled content).
+    readonly property QtObject state: QtObject {
+        readonly property real hover: 0.08
+        readonly property real focus: 0.10
+        readonly property real press: 0.10
+        readonly property real drag: 0.16
+        readonly property real disabledContent: 0.38
+        readonly property real disabledContainer: 0.12
+    }
+
+    // Corner radius per component kind; the "Soft Tonal" look is tuned here.
+    readonly property QtObject shape: QtObject {
+        readonly property int panel: rounding.extraLarge
+        readonly property int card: rounding.large
+        readonly property int button: rounding.full
+        readonly property int chip: rounding.small
+        readonly property int field: rounding.full
+        readonly property int tile: rounding.largeIncreased
+        readonly property int popup: rounding.large
+    }
+
     readonly property QtObject font: QtObject {
         readonly property string main: root.options.fonts.main
         readonly property string title: root.options.fonts.title
