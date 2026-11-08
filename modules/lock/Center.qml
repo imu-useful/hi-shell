@@ -6,94 +6,95 @@ import qs.common.widgets
 import qs.common.shapes
 import qs.services
 
-// The middle column: the time (hours in the primary color, minutes in the secondary), the date,
-// the avatar in a clamshell, the password pill and the message under it.
+// The middle: the time on one line, the date, the avatar in a ring, a greeting and the password pill.
 ColumnLayout {
     id: root
 
     required property var lock
     required property real scaleFactor
 
-    Layout.preferredWidth: 420 * scaleFactor
-    Layout.fillWidth: false
-    Layout.fillHeight: true
-    spacing: Appearance.space.lg
+    spacing: Appearance.space.sm
 
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
     }
 
-    Row {
+    StyledText {
         Layout.alignment: Qt.AlignHCenter
-        Layout.topMargin: Appearance.space.lg
-        spacing: Appearance.space.sm
-
-        StyledText {
-            text: Qt.formatTime(clock.date, "HH")
-            color: Colors.m3primary
-            font.family: Appearance.font.title
-            font.pixelSize: 120 * root.scaleFactor
-            font.weight: Font.Black
-            font.features: { "tnum": 1 }
-        }
-        StyledText {
-            text: Qt.formatTime(clock.date, "mm")
-            color: Colors.m3secondary
-            font.family: Appearance.font.title
-            font.pixelSize: 120 * root.scaleFactor
-            font.weight: Font.Black
-            font.features: { "tnum": 1 }
-        }
+        text: Qt.formatTime(clock.date, "HH:mm")
+        color: Colors.m3primary
+        font.family: Appearance.font.title
+        font.pixelSize: 168 * root.scaleFactor
+        font.weight: Font.Black
+        font.features: { "tnum": 1 }
+        style: Text.Outline
+        styleColor: Qt.alpha("black", 0.12)
     }
 
     StyledText {
         Layout.alignment: Qt.AlignHCenter
-        text: Translation.locale.toString(clock.date, "dddd • d MMM").toUpperCase()
+        Layout.topMargin: -Appearance.space.lg
+        text: Translation.locale.toString(clock.date, "dddd, d MMMM")
         font.family: Appearance.font.title
-        font.pixelSize: Appearance.font.size.titleLarge * root.scaleFactor
-        font.weight: Font.DemiBold
+        font.pixelSize: Appearance.font.size.headlineSmall
+        font.weight: Font.Medium
     }
 
     Item {
         Layout.alignment: Qt.AlignHCenter
-        Layout.topMargin: Appearance.space.xl * root.scaleFactor
-        implicitWidth: 200 * root.scaleFactor
-        implicitHeight: implicitWidth
+        Layout.topMargin: Appearance.space.xxl * root.scaleFactor
+        implicitWidth: 112
+        implicitHeight: 112
 
-        MaterialShape {
+        Rectangle {
             anchors.fill: parent
-            shape: "cookie9"
+            radius: width / 2
+            color: "transparent"
+            border.width: 3
+            border.color: Colors.m3primary
+        }
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: 6
+            radius: width / 2
             color: Colors.m3surfaceContainerHighest
         }
         MaterialIcon {
             anchors.centerIn: parent
             icon: "person"
             fill: 1
-            iconSize: parent.width / 3
+            iconSize: 48
             visible: face.status !== Image.Ready
         }
         ShapeImage {
             id: face
             anchors.fill: parent
-            shape: "cookie9"
+            anchors.margins: 6
+            shape: "circle"
             source: `file://${Paths.home}/.face`
         }
     }
 
-    Item { Layout.fillHeight: true }
+    StyledText {
+        Layout.alignment: Qt.AlignHCenter
+        readonly property int hour: Number(Qt.formatTime(clock.date, "H"))
+        text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Quickshell.env("USER")}`
+        font.pixelSize: Appearance.font.size.titleMedium
+        color: Colors.m3onSurfaceVariant
+    }
 
     PasswordInput {
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredWidth: root.width * 0.85
+        Layout.topMargin: Appearance.space.md
+        Layout.preferredWidth: 340
         lock: root.lock
     }
 
     StateMessage {
-        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
+        Layout.preferredWidth: 340
         Layout.preferredHeight: implicitHeight
         pam: root.lock.pam
     }
-
-    Item { Layout.fillHeight: true }
 }

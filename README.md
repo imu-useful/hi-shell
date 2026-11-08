@@ -347,14 +347,13 @@ the palette changes.
 
 ## Lock screen
 
-hi-shell locks with its own Wayland session lock (`modules/lock`), laid out like the lock screen of
-[caelestia-dots/shell](https://github.com/caelestia-dots/shell): a card over the blurred wallpaper with three columns.
-Left: the weather, a fetch-style block about the system, and the player (cover, title, previous / play / next).
-Middle: the time (hours in the primary color, minutes in the secondary), the date, your avatar (`~/.face`) in a
-cookie shape, and the password pill (every typed character is a dot of a different shape; Enter or the arrow checks it,
-Ctrl+Backspace clears it). Under it the reason a password was refused, or a hint about Caps Lock and the keyboard layout.
-Right: CPU, RAM and disk use, and the notifications that came in. The card follows the palette, the font, the
-transparency setting and the language.
+hi-shell locks with its own Wayland session lock (`modules/lock`). No card: the clock (`HH:mm`, big, in the primary
+color), the date, your avatar (`~/.face`) in a ring, a greeting and the password pill stand in the middle of the
+blurred wallpaper (every typed character is a dot of a different shape; Enter or the arrow checks it, Ctrl+Backspace
+clears it); under it, the reason a password was refused, or a hint about Caps Lock and the keyboard layout. Small pills
+float around: CPU, RAM and disk rings (top left), weather, battery and keyboard layout (top right), the player with
+cover and controls (bottom, while something plays) and the notifications that came in (right). It follows the palette,
+the font, the transparency setting and the language.
 
 The password is checked by PAM with `modules/lock/pam.d/hi-shell-lock` (pam_unix and faillock).
 Settings › Lock screen › Type picks the lock: **hi-shell** (this one), **hyprlock** (hyprlock with a config generated

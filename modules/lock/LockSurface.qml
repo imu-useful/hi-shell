@@ -6,8 +6,8 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// One screen of the lock: the wallpaper blurred and dimmed, and the card (Content) in the middle.
-// The card grows in when the lock starts and fades out before the session is let go.
+// One screen of the lock: the wallpaper blurred and dimmed, and the floating content (Content) over it.
+// The content eases in when the lock starts and fades out before the session is let go.
 WlSessionLockSurface {
     id: root
 
@@ -15,8 +15,6 @@ WlSessionLockSurface {
     required property var pam
 
     readonly property alias unlocking: unlockAnim.running
-    readonly property real cardHeight: Math.min(760, (screen?.height ?? 900) * 0.72)
-    readonly property real cardWidth: Math.min(cardHeight * 16 / 9, (screen?.width ?? 1600) - 64)
 
     color: Colors.m3surface
 
@@ -31,7 +29,7 @@ WlSessionLockSurface {
         id: unlockAnim
 
         ParallelAnimation {
-            NumberAnimation { target: card; property: "scale"; to: 0.92; duration: Appearance.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.emphasizedAccel }
+            NumberAnimation { target: card; property: "scale"; to: 1.03; duration: Appearance.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.emphasizedAccel }
             NumberAnimation { target: card; property: "opacity"; to: 0; duration: Appearance.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.emphasizedAccel }
             NumberAnimation { target: backdrop; property: "opacity"; to: 0; duration: Appearance.anim.slow; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.effects }
         }
@@ -71,29 +69,15 @@ WlSessionLockSurface {
         }
     }
 
-    Rectangle {
+    Item {
         id: card
 
-        anchors.centerIn: parent
-        width: root.cardWidth
-        height: root.cardHeight
-        radius: Appearance.rounding.extraLargeIncreased
-        color: Appearance.translucent(Colors.m3surface)
-        border.width: Appearance.edge
-        border.color: Colors.m3outlineVariant
+        anchors.fill: parent
         opacity: 0
-        scale: 0.85
-
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowBlur: 1
-            shadowColor: Qt.alpha("black", 0.5)
-        }
+        scale: 0.96
 
         Content {
             anchors.fill: parent
-            anchors.margins: Appearance.space.xl
             lock: root
         }
     }

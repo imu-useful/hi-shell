@@ -3,39 +3,42 @@ import QtQuick.Layouts
 import qs.common
 import qs.services
 
-// The card: the weather, system info and player on the left; the clock, avatar and password in
-// the middle; the resources and notifications on the right.
-RowLayout {
+// No card: the clock, avatar and password stand in the middle of the blurred wallpaper; around them float the
+// resources (top left), the weather, battery and layout (top right), the player (bottom) and the notifications (right).
+Item {
     id: root
 
     required property var lock
-    readonly property real scaleFactor: Math.min(1, (lock.screen?.height ?? 1440) / 1440)
-
-    spacing: Appearance.space.xl
-
-    ColumnLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.preferredWidth: 1
-        spacing: Appearance.space.md
-
-        WeatherInfo { Layout.fillWidth: true }
-        Fetch { Layout.fillWidth: true }
-        Media { Layout.fillWidth: true; Layout.fillHeight: true }
-    }
+    readonly property real scaleFactor: Math.min(1, (lock.screen?.height ?? 1080) / 1080)
 
     Center {
+        anchors.centerIn: parent
         lock: root.lock
         scaleFactor: root.scaleFactor
     }
 
-    ColumnLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.preferredWidth: 1
-        spacing: Appearance.space.md
+    Resources {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: Appearance.space.xxl
+    }
 
-        Resources { Layout.fillWidth: true }
-        NotifDock { Layout.fillWidth: true; Layout.fillHeight: true }
+    WeatherInfo {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Appearance.space.xxl
+    }
+
+    Media {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Appearance.space.xxl
+    }
+
+    NotifDock {
+        anchors.right: parent.right
+        anchors.rightMargin: Appearance.space.xxl
+        anchors.verticalCenter: parent.verticalCenter
+        height: Math.min(implicitHeight, parent.height * 0.6)
     }
 }
