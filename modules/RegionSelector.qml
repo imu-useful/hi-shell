@@ -40,7 +40,18 @@ Scope {
         + 'l="$3"; [ "$l" = auto ] && l=$(tesseract --list-langs 2>/dev/null | tail -n +2 | grep -vx osd | paste -sd+); '
         + 't=$(magick "$img" $neg -resize 200% png:- | tesseract stdin - -l "${l:-eng}" 2>/dev/null); rm -f "$img"; '
 
+    // The whole focused screen to clipboard + file, no selection.
+    function fullscreen() {
+        Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy --type image/png < "$f" && notify-send -a hi-shell -i "$f" "$1" "$(printf "$2" "$f")"', "sh", Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").replace("%1", "%s")]);
+    }
+
     function start(newMode) {
+        // The selection overlay can't show over a session lock (and a lock is no place for OCR or recording).
+        if (ShellState.locked) {
+            if (newMode === "screenshot")
+                fullscreen();
+            return;
+        }
         if (selecting || freeze.running)
             return;
         if (recording) {
@@ -205,7 +216,7 @@ print(json.dumps({"name": m["name"], "x": m["x"], "y": m["y"], "scale": m["scale
         }
         // Whole focused screen straight to clipboard + file, no selection.
         function fullscreen(): void {
-            Quickshell.execDetached(["sh", "-c", 'f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; mkdir -p ~/Pictures/Screenshots; grim -o "$(hyprctl monitors -j | python3 -c \'import json,sys; print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))\')" "$f" && wl-copy --type image/png < "$f" && notify-send -a hi-shell -i "$f" "$1" "$(printf "$2" "$f")"', "sh", Translation.tr("Screenshot copied"), Translation.tr("Saved to %1").replace("%1", "%s")]);
+            root.fullscreen();
         }
     }
 

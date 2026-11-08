@@ -366,6 +366,7 @@ Lock from the session menu or `qs -c hi-shell ipc call session lock` (or `ipc ca
 ever stuck, switch to a TTY (Ctrl+Alt+F3), log in and run `qs -c hi-shell ipc call lock unlock`. The own lock lives in the
 shell, so if the shell dies while locked the screen stays locked: restart it and lock again. The idle lock made by
 Settings › Lock screen › Idle and `fallback.sh lock` ask the shell first and use hyprlock only when the shell is down.
+Screenshot keys (Print, Ctrl+Print, Super+Shift+S) work on the lock screen too and take the whole screen (the selection overlay can't show over a lock); the keybinds need `locked = true`, as in `hypr/hi-shell/keybinds.lua`.
 If you keep your own hypridle config, point it at the shell the same way:
 
 ```ini

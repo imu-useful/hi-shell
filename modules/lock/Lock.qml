@@ -29,6 +29,12 @@ Scope {
         lock: sessionLock
     }
 
+    Binding {
+        target: ShellState
+        property: "locked"
+        value: sessionLock.locked
+    }
+
     Connections {
         target: LockScreen
         function onLockRequested() {

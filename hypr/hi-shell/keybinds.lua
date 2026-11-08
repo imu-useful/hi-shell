@@ -59,9 +59,9 @@ for _, key in ipairs({ "Alt_L", "Alt_R" }) do
 end
 
 -- Screenshots always go to ~/Pictures/Screenshots and the clipboard.
-hl.bind("Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh screen"), { description = "hi-shell: Screenshot of the screen (file + clipboard)" })
-hl.bind("CTRL + Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { description = "hi-shell: Screenshot of a region or window (file + clipboard)" })
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { description = "hi-shell: Screenshot / OCR / record a region" })
+hl.bind("Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh screen"), { locked = true, description = "hi-shell: Screenshot of the screen (file + clipboard)" })
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { locked = true, description = "hi-shell: Screenshot of a region or window (file + clipboard)" })
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("sh ~/.config/hypr/hi-shell/fallback.sh region"), { locked = true, description = "hi-shell: Screenshot / OCR / record a region" })
 hl.bind("SUPER + SHIFT + X", hl.dsp.exec_cmd("qs -c hi-shell ipc call region ocr"), { description = "hi-shell: Copy text from a region (OCR)" })
 hl.bind("SUPER + SHIFT + T", hl.dsp.exec_cmd("qs -c hi-shell ipc call region translate"), { description = "hi-shell: Translate text from a region" })
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs -c hi-shell ipc call region record"), { description = "hi-shell: Record a region (again to stop)" })

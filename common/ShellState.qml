@@ -15,6 +15,8 @@ Singleton {
     // Left sidebar tab: home | claude | translator | clipboard
     property string sidebarLeftTab: "home"
     property bool calendarOpen: false
+    // The session is locked (modules/lock/Lock.qml): overlays can't show, so a region screenshot takes the whole screen.
+    property bool locked: false
 
     // Dynamic Island hold-to-switch, shared because the clock widget drives it too: a press on
     // the clock (the island) fills islandHold (0..1) over bar.island.holdDuration; when it
