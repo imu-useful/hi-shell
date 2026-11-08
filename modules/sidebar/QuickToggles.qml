@@ -308,7 +308,7 @@ ColumnLayout {
                     id: body
                     anchors.fill: parent
                     anchors.margins: root.android ? 0 : 2
-                    radius: root.android ? (tile.t.active ? Appearance.rounding.full : Appearance.rounding.extraLarge) : height / 2
+                    radius: root.android ? (tile.t.active ? Appearance.shape.button : Appearance.shape.tile) : height / 2
                     color: tile.t.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
                     border.width: root.editing ? 1 : 0
                     border.color: Colors.m3outline

@@ -91,9 +91,10 @@ Scope {
                 opacity: loader.revealed ? 1 : 0
                 width: window.panelWidth
                 height: parent.height
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Appearance.translucent(Colors.m3surfaceContainerLow)
-                border.width: 1
+                // Soft Tonal: depth comes from tone, so no outline unless the panel is see-through.
+                border.width: Config.options.appearance.transparency ? 1 : 0
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 Behavior on x { SpatialAnim {} }
