@@ -408,7 +408,19 @@ Scope {
             readonly property int cardWidth: 600
             readonly property int gap: 16
             readonly property int previewWidth: Math.max(240, Math.min(400, ((screen?.width ?? 1920) - cardWidth - 64) / 2 - gap))
-            readonly property bool showPreview: root.mode === ";" && (list.currentItem?.modelData?.clip ?? null) !== null && (list.currentItem?.thumb ?? "") !== ""
+            readonly property bool wantPreview: root.mode === ";" && (list.currentItem?.modelData?.clip ?? null) !== null && (list.currentItem?.thumb ?? "") !== ""
+            // The preview opens only once an image has stayed selected for a moment, so scrolling
+            // past images while searching doesn't flash the panel; it closes at once.
+            property bool showPreview: false
+            onWantPreviewChanged: {
+                if (wantPreview) previewDelay.restart();
+                else { previewDelay.stop(); showPreview = false; }
+            }
+            Timer {
+                id: previewDelay
+                interval: 300
+                onTriggered: window.showPreview = window.wantPreview
+            }
             implicitWidth: cardWidth + 2 * (previewWidth + gap)
             implicitHeight: card.implicitHeight
             mask: Region {
