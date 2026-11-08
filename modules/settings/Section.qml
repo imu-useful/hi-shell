@@ -19,7 +19,7 @@ ColumnLayout {
         Rectangle {
             implicitWidth: 30
             implicitHeight: 30
-            radius: 10
+            radius: Appearance.rounding.medium
             color: Colors.m3secondaryContainer
             MaterialIcon {
                 anchors.centerIn: parent
@@ -38,7 +38,7 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: card.implicitHeight + 12
-        radius: Appearance.rounding.large
+        radius: Appearance.shape.tile
         color: Colors.m3surfaceContainer
 
         ColumnLayout {
