@@ -37,6 +37,8 @@ ShellRoot {
 
     IslandOverlay {}
 
+    IconThemeWatcher {}
+
     Launcher {}
 
     AppGrid {}

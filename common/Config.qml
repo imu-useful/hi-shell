@@ -52,6 +52,8 @@ Singleton {
             property JsonObject appearance: JsonObject {
                 // App icons in one color, the palette's primary (dock, workspaces, launcher).
                 property bool themedIcons: false
+                // Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise).
+                property bool restartOnIconTheme: true
                 // Translucent surfaces (the compositor blurs what's behind them).
                 property bool transparency: true
                 property real transparencyLevel: 0.12
