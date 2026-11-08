@@ -11,6 +11,7 @@ import qs.services
 // A new version of the shell is out: shown once per start, after the first update check.
 // Release channel: the release and its notes. Git channel: a new commit (the list of them).
 // Update runs update.sh and opens Settings > About, where its output shows; Later (or Esc) closes it until the next start.
+// Held back while a fullscreen window is up (it grabs the keyboard): it shows when fullscreen ends.
 // Turned off in Settings > About.
 Scope {
     id: root
@@ -19,7 +20,7 @@ Scope {
     property bool dismissed: false
     // `qs -c hi-shell ipc call updateDialog preview` shows it with sample text
     property bool preview: false
-    readonly property bool open: preview || (Config.options.update.notify && !dismissed && Updates.shellChecked && Updates.shellBehind > 0)
+    readonly property bool open: preview || (Config.options.update.notify && !dismissed && Updates.shellChecked && Updates.shellBehind > 0 && Fullscreen.screens.length === 0)
     readonly property string notes: preview ? "Update window: what the update brings, Update and Later\nSettings: the window can be turned off in About" : Updates.shellNotes
 
     IpcHandler {
