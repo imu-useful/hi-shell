@@ -10,7 +10,9 @@ ColumnLayout {
 
     readonly property var l: Config.options.lock
     spacing: 24
-    readonly property bool builtin: l.mode === "builtin"
+    // The elements and their looks are hyprlock's; the shell's own lock screen has its own fixed card.
+    readonly property bool builtin: l.mode === "hyprlock"
+    readonly property bool shellLock: l.mode === "builtin"
 
     // Chips for the elements, in the order they show on the screen (top to bottom).
     readonly property var elements: [
@@ -31,9 +33,9 @@ ColumnLayout {
         ChoiceRow {
             icon: "tune"
             title: Translation.tr("Type")
-            subtitle: Translation.tr("hi-shell's own, your hyprlock config, or another locker")
+            subtitle: Translation.tr("hi-shell's own screen, hyprlock in hi-shell's look, your hyprlock config, or another locker")
             value: root.l.mode
-            options: [{ value: "builtin", text: "hi-shell" }, { value: "file", text: Translation.tr("My hyprlock config") }, { value: "command", text: Translation.tr("My command") }]
+            options: [{ value: "builtin", text: "hi-shell" }, { value: "hyprlock", text: "hyprlock" }, { value: "file", text: Translation.tr("My hyprlock config") }, { value: "command", text: Translation.tr("My command") }]
             onSelected: value => root.l.mode = value
         }
         TextRow {
@@ -84,6 +86,20 @@ ColumnLayout {
         StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "lock_clock"; title: Translation.tr("On battery: lock after, minutes"); value: idleSection.i.batLockMin; from: 0; to: 600; onChanged: v => idleSection.i.batLockMin = v }
         StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "desktop_access_disabled"; title: Translation.tr("On battery: screen off after, minutes"); value: idleSection.i.batScreenOffMin; from: 0; to: 600; onChanged: v => idleSection.i.batScreenOffMin = v }
         StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "bedtime"; title: Translation.tr("On battery: suspend after, minutes"); value: idleSection.i.batSuspendMin; from: 0; to: 600; onChanged: v => idleSection.i.batSuspendMin = v }
+    }
+
+    Section {
+        visible: root.shellLock
+        icon: "notifications"
+        title: Translation.tr("On the lock screen")
+
+        SwitchRow {
+            icon: "visibility_off"
+            title: Translation.tr("Hide notifications")
+            subtitle: Translation.tr("Only how many came in shows, not what they say")
+            checked: root.l.hideNotifs
+            onToggled: checked => root.l.hideNotifs = checked
+        }
     }
 
     Section {
@@ -228,7 +244,7 @@ ColumnLayout {
     }
 
     Section {
-        visible: root.builtin
+        visible: root.builtin || root.shellLock
         icon: "wallpaper"
         title: Translation.tr("Background")
 
@@ -240,7 +256,7 @@ ColumnLayout {
             onToggled: checked => root.l.wallpaper = checked
         }
         SliderRow {
-            visible: root.l.wallpaper
+            visible: root.builtin && root.l.wallpaper
             icon: "blur_on"
             title: Translation.tr("Blur")
             value: root.l.blurPasses
@@ -248,7 +264,7 @@ ColumnLayout {
             onMoved: value => root.l.blurPasses = value
         }
         SliderRow {
-            visible: root.l.wallpaper && root.l.blurPasses > 0
+            visible: root.builtin && root.l.wallpaper && root.l.blurPasses > 0
             icon: "lens_blur"
             title: Translation.tr("Blur radius")
             value: root.l.blurSize

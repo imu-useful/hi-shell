@@ -5,7 +5,8 @@ import Quickshell
 import Quickshell.Io
 import qs.common
 
-// The lock screen: hyprlock with a config generated from hi-shell's look
+// The lock screen. Mode "builtin": the shell's own session lock (modules/lock), a card of widgets over the
+// blurred wallpaper. Mode "hyprlock": hyprlock with a config generated from hi-shell's look
 // (~/.config/hi-shell/hyprlock.conf): the current wallpaper blurred behind a big
 // clock, the date and a greeting in the interface language, the avatar, a Material
 // password field, now playing, battery and keyboard layout. Rewritten whenever the
@@ -14,8 +15,14 @@ Singleton {
     id: root
 
     readonly property string path: `${Config.dir}/hyprlock.conf`
-    // Falls back to hyprlock's own config if this one fails, so locking never fails.
-    readonly property string command: `pidof hyprlock || hyprlock -c "${path}" || hyprlock`
+    // The shell's own lock (modules/lock) is in use.
+    readonly property bool shellLock: Config.options.lock.mode === "builtin"
+    // Falls back to hyprlock's own config if this one fails, so locking never fails; the shell's own
+    // lock is asked first (it isn't there when the shell is down: then hyprlock does it).
+    readonly property string hyprlockCommand: `pidof hyprlock || hyprlock -c "${path}" || hyprlock`
+    readonly property string command: shellLock ? `qs -c hi-shell ipc call lock lock || ${hyprlockCommand}` : hyprlockCommand
+
+    signal lockRequested
 
     // Your own lock screen: a hyprlock config (hi-shell's file then just sources it, so the
     // idle lock and the fallback script use it too) or another locker's command.
@@ -28,6 +35,10 @@ Singleton {
     readonly property string customCommand: Config.options.lock.mode === "command" ? (Config.options.lock.customCommand ?? "").trim() : ""
 
     function lock() {
+        if (shellLock) {
+            lockRequested();
+            return;
+        }
         writeNow();
         Quickshell.execDetached(["sh", "-c", customCommand !== "" ? customCommand : command]);
     }

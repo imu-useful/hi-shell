@@ -347,20 +347,30 @@ the palette changes.
 
 ## Lock screen
 
-hi-shell locks with hyprlock, using a lock screen it generates from its own look in
-`~/.config/hi-shell/hyprlock.conf`: the current wallpaper blurred, a big clock in the palette's primary color, the date
-and a greeting in the interface language, your avatar (`~/.face`), a Material password field, now playing, battery and
-keyboard layout. It follows wallpaper, palette, font and language changes.
+hi-shell locks with its own Wayland session lock (`modules/lock`), laid out like the lock screen of
+[caelestia-dots/shell](https://github.com/caelestia-dots/shell): a card over the blurred wallpaper with three columns.
+Left: the weather, a fetch-style block about the system, and the player (cover, title, previous / play / next).
+Middle: the time (hours in the primary color, minutes in the secondary), the date, your avatar (`~/.face`) in a
+cookie shape, and the password pill (every typed character is a dot of a different shape; Enter or the arrow checks it,
+Ctrl+Backspace clears it). Under it the reason a password was refused, or a hint about Caps Lock and the keyboard layout.
+Right: CPU, RAM and disk use, and the notifications that came in. The card follows the palette, the font, the
+transparency setting and the language.
 
-Settings › Lock screen chooses what shows: the clock, date, greeting, avatar, now playing, battery, keyboard layout and
-the Caps Lock hint can each be switched off. The clock has its own size and format (`date` syntax, e.g. `%I:%M %p`), and
-the wallpaper can be turned off, blurred and dimmed. The password field is always shown. Settings are in
-`~/.config/hi-shell/config.json` under `lock`.
+The password is checked by PAM with `modules/lock/pam.d/hi-shell-lock` (pam_unix and faillock).
+Settings › Lock screen › Type picks the lock: **hi-shell** (this one), **hyprlock** (hyprlock with a config generated
+from hi-shell's look in `~/.config/hi-shell/hyprlock.conf`: clock, date, greeting, avatar, now playing, battery, keyboard
+layout, each switchable, with its own size and format), your own hyprlock config, or another locker's command.
+"Hide notifications" keeps what they say off the lock screen. Settings are in `~/.config/hi-shell/config.json`
+under `lock`.
 
-Lock from the session menu or `qs -c hi-shell ipc call session lock`; for idle and suspend, point hypridle at it:
+Lock from the session menu or `qs -c hi-shell ipc call session lock` (or `ipc call lock lock`). If the shell's own lock is
+ever stuck, switch to a TTY (Ctrl+Alt+F3), log in and run `qs -c hi-shell ipc call lock unlock`. The own lock lives in the
+shell, so if the shell dies while locked the screen stays locked: restart it and lock again. The idle lock made by
+Settings › Lock screen › Idle and `fallback.sh lock` ask the shell first and use hyprlock only when the shell is down.
+If you keep your own hypridle config, point it at the shell the same way:
 
 ```ini
-$lock_cmd = pidof hyprlock || hyprlock -c ~/.config/hi-shell/hyprlock.conf || hyprlock
+$lock_cmd = qs -c hi-shell ipc call lock lock || pidof hyprlock || hyprlock
 ```
 
 ## Power saving

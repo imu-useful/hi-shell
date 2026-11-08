@@ -4,7 +4,7 @@
 #   launcher   the app launcher             (fuzzel)
 #   region     a screenshot of a region     (slurp + grim, to the clipboard and ~/Pictures/Screenshots)
 #   screen     a screenshot of the screen   (grim, to the clipboard and ~/Pictures/Screenshots)
-#   lock       the lock screen              (hyprlock, with hi-shell's config when there is one)
+#   lock       the lock screen              (the shell's own; hyprlock, with hi-shell's config, when the shell is down)
 #   session    the power menu               (wlogout)
 # A job first asks the shell (qs -c hi-shell ipc call ...); the program runs only when that fails.
 
@@ -30,6 +30,7 @@ case "$1" in
         shell_call region fullscreen || shot
         ;;
     lock)
+        shell_call session lock && exit 0
         if [ -f "$HOME/.config/hi-shell/hyprlock.conf" ]; then
             pidof hyprlock >/dev/null 2>&1 || hyprlock -c "$HOME/.config/hi-shell/hyprlock.conf"
         else

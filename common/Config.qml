@@ -256,11 +256,14 @@ Singleton {
 
             // The lock screen (services/LockScreen.qml): what it shows and how it looks.
             property JsonObject lock: JsonObject {
-                // "builtin": hi-shell's own look; "file": your hyprlock config (sourced);
+                // "builtin": the shell's own lock screen (modules/lock); "hyprlock": hyprlock with a config made
+                // from hi-shell's look (the elements below); "file": your hyprlock config (sourced);
                 // "command": any other locker (swaylock, gtklock, ...), run by Lock.
                 property string mode: "builtin"
                 property string customConfig: ""
                 property string customCommand: ""
+                // Builtin: the notification list only says how many came in, not what they say.
+                property bool hideNotifs: false
                 property bool clock: true
                 property bool date: true
                 property bool greeting: true

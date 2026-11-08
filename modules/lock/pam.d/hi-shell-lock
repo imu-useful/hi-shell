@@ -1,0 +1,6 @@
+#%PAM-1.0
+# Password check for hi-shell's lock screen (modules/lock/Pam.qml): pam_unix with faillock.
+auth    required                    pam_faillock.so     preauth
+auth    [success=1 default=bad]     pam_unix.so         nullok
+auth    [default=die]               pam_faillock.so     authfail
+auth    required                    pam_faillock.so     authsucc

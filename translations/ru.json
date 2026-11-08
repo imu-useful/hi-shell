@@ -1188,5 +1188,19 @@
     "You lost": "Вы проиграли",
     "Draw": "Ничья",
     "Solved in %1 moves": "Собрано за %1 ходов",
-    "All lights out in %1 moves": "Весь свет погашен за %1 ходов"
+    "All lights out in %1 moves": "Весь свет погашен за %1 ходов",
+    "Max tries reached": "Попытки закончились",
+    "Enter your password": "Введите пароль",
+    "Password check failed: %1": "Не удалось проверить пароль: %1",
+    "Incorrect password. Please try again.": "Неверный пароль. Попробуйте ещё раз.",
+    "Maximum password attempts reached.": "Достигнут предел попыток ввода пароля.",
+    "Keyboard layout: %1": "Раскладка: %1",
+    "No weather": "Нет данных о погоде",
+    "High %1 • Low %2": "Макс. %1 • Мин. %2",
+    "Nothing playing": "Ничего не играет",
+    "Try playing some music!": "Включите музыку!",
+    "Unlock for notifications": "Разблокируйте, чтобы увидеть уведомления",
+    "Hide notifications": "Скрывать уведомления",
+    "Only how many came in shows, not what they say": "Показывается только их число, без содержимого",
+    "hi-shell's own screen, hyprlock in hi-shell's look, your hyprlock config, or another locker": "свой экран hi-shell, hyprlock в стиле hi-shell, ваш конфиг hyprlock или другой локер"
 }

@@ -6,6 +6,7 @@ import qs.common
 import qs.services
 import qs.modules
 import qs.modules.focus
+import qs.modules.lock
 
 ShellRoot {
     // Reloading on file changes is for development (HI_SHELL_DEV=1): this Quickshell
@@ -51,6 +52,8 @@ ShellRoot {
     Settings {}
 
     SessionScreen {}
+
+    Lock {}
 
     PolkitDialog {}
 
