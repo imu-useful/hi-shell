@@ -77,7 +77,17 @@ Variants {
 
         // The app's .desktop entry. Ids are compared without case (Happ.desktop, class "happ"), and
         // a miss isn't kept: the entries may not be loaded yet.
+        // The entries are looked up when they're needed, never kept in the app data: DesktopEntries
+        // rescans and replaces its entry objects, and a kept one goes dead (a click did nothing).
         property var entryCache: ({})
+        property int entriesRev: 0
+        Connections {
+            target: DesktopEntries.applications
+            function onValuesChanged() {
+                window.entryCache = {};
+                window.entriesRev++;
+            }
+        }
         function entryFor(id) {
             if (entryCache[id])
                 return entryCache[id];
@@ -104,7 +114,7 @@ Variants {
             const pinned = options.pinned.map(id => id.toLowerCase());
             const extra = options.showRunning ? [...running.keys()].filter(id => !pinned.includes(id)) : [];
             const ids = [...pinned, ...extra];
-            const built = ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [], entry: entryFor(id) }));
+            const built = ids.map(id => ({ id, pinned: pinned.includes(id), windows: running.get(id) ?? [] }));
             for (const a of built)
                 known[a.id] = a;
             return built;
@@ -113,8 +123,7 @@ Variants {
         // Focus the app's next window (step -1 for the previous one); a closed app is launched.
         function cycle(app, step) {
             if (app.windows.length === 0) {
-                if (app.entry)
-                    FocusBlocker.launch(app.entry);
+                launch(app);
                 return;
             }
             const i = app.windows.indexOf(Hyprland.activeToplevel);
@@ -123,8 +132,9 @@ Variants {
             Hyprland.dispatch(`hl.dsp.focus({ window = "address:0x${next.address}" })`);
         }
         function launch(app) {
-            if (app.entry)
-                FocusBlocker.launch(app.entry);
+            const entry = entryFor(app.id);
+            if (entry)
+                FocusBlocker.launch(entry);
         }
         function togglePin(app) {
             const list = options.pinned.filter(id => id.toLowerCase() !== app.id);
@@ -148,6 +158,10 @@ Variants {
 
         // The menu of an app, opened above its icon.
         property var menuApp: null
+        readonly property var menuEntry: {
+            window.entriesRev;
+            return menuApp ? entryFor(menuApp.id) : null;
+        }
         // The icon's centre along the dock, in the window's coordinates.
         property real menuAlong: 0
         readonly property bool menuOpen: menuApp !== null
@@ -263,6 +277,7 @@ Variants {
                         required property string appId
                         required property int index
                         app: window.appFor(appId)
+                        entry: { window.entriesRev; return window.entryFor(appId); }
                         iconSize: window.iconSize
                         pointer: dock.pointerAlong
                         position: window.position
@@ -300,8 +315,8 @@ Variants {
             app: window.menuApp
             canMoveLeft: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) > 0
             canMoveRight: window.menuApp?.pinned === true && window.options.pinned.findIndex(id => id.toLowerCase() === window.menuApp.id) < window.options.pinned.length - 1
-            canOpen: window.menuApp?.entry !== null && window.menuApp?.entry !== undefined
-            actions: window.menuApp?.entry?.actions ?? []
+            canOpen: menuEntry !== null
+            actions: menuEntry?.actions ?? []
             windowCount: window.menuApp?.windows.length ?? 0
             onRunAction: action => {
                 action.execute();

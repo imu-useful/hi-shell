@@ -12,8 +12,9 @@ import qs.services
 Item {
     id: root
 
-    // { id, pinned, windows, entry } from Dock.qml
+    // { id, pinned, windows } from Dock.qml, and its .desktop entry (null when there is none)
     required property var app
+    property var entry: null
     required property int iconSize
     // The pointer's x in the dock's row (-1000 when it's not over the dock), and how much to grow (0 = off).
     property real pointer: -1000
@@ -73,7 +74,7 @@ Item {
             NumberAnimation { target: icon; property: "lift"; to: root.iconSize * 0.35; duration: 180; easing.type: Easing.OutQuad }
             NumberAnimation { target: icon; property: "lift"; to: 0; duration: 180; easing.type: Easing.InQuad }
         }
-        source: Quickshell.iconPath(root.app.entry?.icon ?? root.app.id, "application-x-executable")
+        source: Quickshell.iconPath(root.entry?.icon ?? root.app.id, "application-x-executable")
     }
 
     // The windows of the app: one dot per window (up to 3), the focused app's dots are longer.
@@ -125,7 +126,7 @@ Item {
         ColumnLayout {
             spacing: 2
             StyledText {
-                text: root.app.entry?.name ?? root.app.id
+                text: root.entry?.name ?? root.app.id
                 font.weight: Font.Medium
             }
             Repeater {
