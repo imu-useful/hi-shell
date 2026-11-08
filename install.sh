@@ -252,7 +252,10 @@ fi
 
 # --- Source ---
 step "Source"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
+# The real folder, symlinks resolved: run as ~/.config/quickshell/hi-shell/install.sh it would otherwise
+# take the link for the checkout and point the link at itself ("Too many levels of symbolic links").
+self="${BASH_SOURCE[0]:-$0}"
+SCRIPT_DIR="$(cd -P "$(dirname "$(readlink -f "$self" 2>/dev/null || echo "$self")")" 2>/dev/null && pwd -P || true)"
 if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/shell.qml" && -d "$SCRIPT_DIR/.git" ]]; then
     REPO="$SCRIPT_DIR"
     echo "Using this checkout: $REPO"
