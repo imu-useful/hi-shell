@@ -19,7 +19,7 @@ ColumnLayout {
         SwitchRow {
             icon: "notifications_active"
             title: Translation.tr("Event sounds")
-            subtitle: Translation.tr("Notifications, timers, battery, screenshots, volume")
+            subtitle: Translation.tr("Notifications, timers, battery, screenshots, volume, system and devices")
             checked: s.enabled
             onToggled: checked => s.enabled = checked
         }
@@ -116,6 +116,18 @@ ColumnLayout {
             subtitle: Translation.tr("A tick when the volume changes")
             checked: s.volumeTick
             onToggled: checked => s.volumeTick = checked
+        }
+        SwitchRow {
+            icon: "power_settings_new"
+            title: Translation.tr("Startup, lock and shutdown")
+            checked: s.session
+            onToggled: checked => s.session = checked
+        }
+        SwitchRow {
+            icon: "bluetooth_connected"
+            title: Translation.tr("Bluetooth devices and microphone")
+            checked: s.devices
+            onToggled: checked => s.devices = checked
         }
         SwitchRow {
             icon: "screenshot_region"

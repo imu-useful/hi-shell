@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Bluetooth
 import qs.common
 
 // Event sounds of the shell, played through PipeWire (pw-play). Everything that makes a sound asks
@@ -31,7 +32,14 @@ Singleton {
         plugged: ["power-plug", "battery", "Charger plugged in"],
         unplugged: ["power-unplug", "battery", "Charger unplugged"],
         screenshot: ["screen-capture", "capture", "Screenshot"],
-        volume: ["audio-volume-change", "volumeTick", "Volume change"]
+        volume: ["audio-volume-change", "volumeTick", "Volume change"],
+        startup: ["service-login", "session", "System startup"],
+        lock: ["service-logout", "session", "Screen locked"],
+        shutdown: ["service-logout", "session", "Shutdown or logout"],
+        deviceAdded: ["device-added", "devices", "Bluetooth device connected"],
+        deviceRemoved: ["device-removed", "devices", "Bluetooth device disconnected"],
+        micOn: ["audio-volume-change", "devices", "Microphone on"],
+        micOff: ["audio-volume-change", "devices", "Microphone muted"]
     })
     // Packs shipped with the shell (besides the system theme).
     readonly property var downloadable: ["miui", "samsung", "iphone", "windows", "win7", "winxp", "android"]
@@ -39,6 +47,15 @@ Singleton {
     property list<string> installed: []
     property string installing: ""
     property bool failed: false
+
+    // An event a pack has no file for takes the file of a related one before the system theme's.
+    readonly property var related: ({
+        shutdown: "lock",
+        deviceAdded: "plugged",
+        deviceRemoved: "unplugged",
+        micOn: "volume",
+        micOff: "volume"
+    })
 
     // The volume tick comes at most this often, so dragging a slider doesn't machine-gun it.
     readonly property int tickGap: 120
@@ -61,8 +78,11 @@ Singleton {
             lastTick = now;
         }
         // The pack's file (the user's folder, then the shipped one) in any format pw-play reads, else the system theme's.
-        Quickshell.execDetached(["sh", "-c", 'for f in "$1".* "$2".* "$3"; do [ -f "$f" ] && exec pw-play --volume "$4" "$f"; done',
-            "sh", `${userDir}${options.pack}/${event}`, `${bundledDir}${options.pack}/${event}`, `${dir}${e[0]}.oga`, String(options.volume)]);
+        const alt = related[event] ?? event;
+        const pack = options.pack;
+        Quickshell.execDetached(["sh", "-c", 'for f in "$1".* "$2".* "$3".* "$4".* "$5"; do [ -f "$f" ] && exec pw-play --volume "$6" "$f"; done',
+            "sh", `${userDir}${pack}/${event}`, `${bundledDir}${pack}/${event}`, `${userDir}${pack}/${alt}`, `${bundledDir}${pack}/${alt}`,
+            `${dir}${e[0]}.oga`, String(options.volume)]);
     }
 
     function install(pack) {
@@ -98,6 +118,39 @@ Singleton {
                 root.play("notification", true);
             }
         }
+    }
+
+    // Bluetooth devices coming and going (not the ones found when the shell starts).
+    property bool armed: false
+    readonly property int connectedDevices: (Bluetooth.devices?.values ?? []).filter(d => d.connected).length
+    property int knownDevices: -1
+    onConnectedDevicesChanged: {
+        if (armed && knownDevices >= 0)
+            play(connectedDevices > knownDevices ? "deviceAdded" : "deviceRemoved");
+        knownDevices = connectedDevices;
+    }
+
+    Timer {
+        interval: 4000
+        running: true
+        onTriggered: {
+            root.armed = true;
+            root.knownDevices = root.connectedDevices;
+        }
+    }
+
+    // The startup sound only right after the system came up, not at every restart of the shell.
+    Process {
+        id: uptime
+        command: ["sh", "-c", "cut -d. -f1 /proc/uptime"]
+        stdout: StdioCollector {
+            onStreamFinished: if (parseInt(text) < 240) root.play("startup")
+        }
+    }
+    Timer {
+        interval: 1500
+        running: true
+        onTriggered: uptime.running = true
     }
 
     Component.onCompleted: refresh()

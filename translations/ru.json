@@ -1139,7 +1139,6 @@
     "They come with the shell for personal use, see sounds/NOTICE.md": "Они идут вместе с оболочкой для личного использования, см. sounds/NOTICE.md",
     "Volume change": "Изменение громкости",
     "A tick when the volume changes": "Щелчок при изменении громкости",
-    "Notifications, timers, battery, screenshots, volume": "Уведомления, таймеры, батарея, скриншоты, громкость",
     "Keep quiet when disturbing is off": "Молчать, когда не беспокоить",
     "Silent in Do Not Disturb, Presentation, Wait mode and Focus Mode (timers still sound)": "Без звуков при «Не беспокоить», презентации, режиме ожидания и режиме фокуса (таймеры звучат)",
     "Barely any screen time. Well done!": "Почти нет экранного времени. Молодец!",
@@ -1211,5 +1210,13 @@
     "Humidity": "Влажность",
     "Wind": "Ветер",
     "Rain chance": "Вероятность осадков",
-    "Sunrise · sunset": "Восход · закат"
+    "Sunrise · sunset": "Восход · закат",
+    "Notifications, timers, battery, screenshots, volume, system and devices": "Уведомления, таймеры, батарея, скриншоты, громкость, система и устройства",
+    "Startup, lock and shutdown": "Запуск, блокировка и выключение",
+    "Bluetooth devices and microphone": "Bluetooth-устройства и микрофон",
+    "System startup": "Запуск системы",
+    "Screen locked": "Экран заблокирован",
+    "Shutdown or logout": "Выключение или выход",
+    "Bluetooth device connected": "Bluetooth-устройство подключено",
+    "Bluetooth device disconnected": "Bluetooth-устройство отключено"
 }

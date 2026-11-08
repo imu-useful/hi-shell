@@ -85,6 +85,8 @@ Scope {
         target: root.source?.audio ?? null
         function onMutedChanged() {
             const muted = root.source.audio.muted;
+            if (root.armed)
+                Sounds.play(muted ? "micOff" : "micOn");
             root.show(muted ? "mic_off" : "mic", muted ? Translation.tr("Microphone muted") : Translation.tr("Microphone on"), -1);
         }
     }

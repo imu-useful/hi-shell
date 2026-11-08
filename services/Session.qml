@@ -13,9 +13,11 @@ Singleton {
     id: root
 
     function lock() {
+        Sounds.play("lock");
         LockScreen.lock();
     }
     function logout() {
+        Sounds.play("shutdown");
         Hyprland.dispatch("hl.dsp.exit()");
     }
     function suspend() {
@@ -25,9 +27,11 @@ Singleton {
         Quickshell.execDetached(["systemctl", "hibernate"]);
     }
     function reboot() {
+        Sounds.play("shutdown");
         Quickshell.execDetached(["systemctl", "reboot"]);
     }
     function poweroff() {
+        Sounds.play("shutdown");
         Quickshell.execDetached(["systemctl", "poweroff"]);
     }
 
