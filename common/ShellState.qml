@@ -85,6 +85,8 @@ Singleton {
     signal showWelcome()
     // Play the startup greeting once more (Settings › Interface).
     signal previewGreeting()
+    // The easter egg in Settings › About: "hi" typed into the secret setting.
+    property bool secretHello: false
 
     // Display mode picker (the display key, the quick toggle, Settings).
     property bool displayModeOpen: false

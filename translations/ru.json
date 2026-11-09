@@ -1218,5 +1218,14 @@
     "Screen locked": "Экран заблокирован",
     "Shutdown or logout": "Выключение или выход",
     "Bluetooth device connected": "Bluetooth-устройство подключено",
-    "Bluetooth device disconnected": "Bluetooth-устройство отключено"
+    "Bluetooth device disconnected": "Bluetooth-устройство отключено",
+    "Secret setting": "Секретная настройка",
+    "Key": "Ключ",
+    "Enter the key": "Введите ключ",
+    "Wrong key. Don't waste your time on nonsense.": "Ключ неверный. Не страдай фигнёй.",
+    "Nope. Go touch grass instead of guessing keys.": "Мимо. Лучше выйди погулять, чем подбирать ключи.",
+    "That's not it. Seriously, stop messing around.": "Не то. Серьёзно, хватит дурью маяться.",
+    "Wrong. Is this really how you spend your evening?": "Неправильно. Ты правда так проводишь вечер?",
+    "Incorrect. The key is not \"please\" either.": "Неверно. И «пожалуйста» тоже не ключ.",
+    "Hi to you too": "Тебе тоже привет"
 }

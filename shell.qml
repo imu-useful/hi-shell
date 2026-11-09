@@ -89,6 +89,8 @@ ShellRoot {
 
     UpdateDialog {}
 
+    SecretHello {}
+
     FocusSettingsWindow {}
 
     BlockedToast {}

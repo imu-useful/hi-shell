@@ -18,6 +18,20 @@ ColumnLayout {
         : Translation.tr("Couldn't check for updates (no network?)")
     property string quickshell: ""
 
+    // Easter egg: five taps on the logo open the secret setting
+    readonly property int secretTaps: 5
+    readonly property string secretKey: "hi"
+    readonly property var jokes: [
+        Translation.tr("Wrong key. Don't waste your time on nonsense."),
+        Translation.tr("Nope. Go touch grass instead of guessing keys."),
+        Translation.tr("That's not it. Seriously, stop messing around."),
+        Translation.tr("Wrong. Is this really how you spend your evening?"),
+        Translation.tr("Incorrect. The key is not \"please\" either.")
+    ]
+    property int taps: 0
+    property bool secretOpen: false
+    property string secretHint: ""
+
     spacing: 24
 
     Process {
@@ -42,6 +56,23 @@ ColumnLayout {
                 shape: "sunny"
                 color: Colors.m3primaryContainer
             }
+            MouseArea {
+                anchors.fill: parent
+                z: 1
+                onClicked: {
+                    root.taps++;
+                    tapReset.restart();
+                    if (root.taps >= root.secretTaps) {
+                        root.taps = 0;
+                        root.secretOpen = true;
+                    }
+                }
+            }
+            Timer {
+                id: tapReset
+                interval: 1500
+                onTriggered: root.taps = 0
+            }
             MaterialIcon {
                 anchors.centerIn: parent
                 icon: "auto_awesome"
@@ -65,6 +96,32 @@ ColumnLayout {
                 text: root.revision ? Translation.tr("Version %1").arg(root.revision) : ""
                 font.pixelSize: Appearance.font.size.labelMedium
                 color: Colors.m3outline
+            }
+        }
+    }
+
+    Section {
+        visible: root.secretOpen
+        icon: "key"
+        title: Translation.tr("Secret setting")
+
+        TextRow {
+            icon: "vpn_key"
+            title: Translation.tr("Key")
+            subtitle: root.secretHint || Translation.tr("Enter the key")
+            placeholder: Translation.tr("Key")
+            fieldWidth: 180
+            onEdited: text => {
+                const key = text.trim();
+                if (key === "")
+                    return;
+                if (key.toLowerCase() === root.secretKey) {
+                    root.secretHint = "";
+                    root.secretOpen = false;
+                    ShellState.secretHello = true;
+                } else {
+                    root.secretHint = root.jokes[Math.floor(Math.random() * root.jokes.length)];
+                }
             }
         }
     }
