@@ -322,6 +322,10 @@ Sections:
 - `appearance.contextMenu`: `material` (the shell's own Material You menus for the tray, default), `caelestia` (the same menus in the look of [caelestia's shell](https://github.com/caelestia-dots/shell): compact pill rows, a Back pill under a submenu) or `standard` (the system's menus); also in Settings › Interface
 - `apps.terminal`: terminal for terminal apps and the system upgrade
 
+## Tests
+
+`./tests/run.sh` runs the tests (python3 and node; no framework needed): the config schema, the `hi` command with a fake `qs`, presets, the palette script, the config audit and the Russian translations. The QML itself isn't unit-tested; it is checked by running the shell.
+
 ## Terminal configs
 
 `install.sh` offers hi-shell's configs from `dots/` one by one (an existing file is kept as `<file>.backup-<date>`;
