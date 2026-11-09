@@ -140,7 +140,9 @@ ColumnLayout {
                     root.taps++;
                     tapReset.restart();
                     logo.turn += 72; // five taps make a full turn
-                    hand.wave();
+                    // Each tap of the series is another gesture of the hand (wave, shaka, flip,
+                    // jump, spin); the fifth opens the secret setting
+                    hand.play(hand.gestures[Math.min(root.taps, hand.gestures.length) - 1]);
                     if (root.taps >= root.secretTaps) {
                         root.taps = 0;
                         root.secretOpen = true;

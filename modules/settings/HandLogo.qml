@@ -19,7 +19,11 @@ Item {
     readonly property real layerW: 360 * unit
     readonly property real layerH: 327 * unit
 
-    property real angle: 0
+    property real angle: 0 // the hand turned about the wrist (waving, the shaka)
+    property real spin: 0 // a whole turn about its middle
+    property real flip: 0 // 0..180 turns it over: the back of the hand (the reversed hand)
+    property real lift: 0 // how high it is off the ground (in 1/200ths of its width)
+    property real squash: 1 // < 1: squashed on landing, stretched in the air
     property real arcsOpacity: 0
     property real arcsPush: 0
 
@@ -28,6 +32,19 @@ Item {
 
     function wave(): void {
         swing.restart();
+    }
+
+    readonly property var gestures: ["wave", "shaka", "flip", "jump", "spin"]
+
+    // A gesture by name: wave, shaka (tilted and shaken, "call me"), flip (turned over to show the
+    // back of the hand), jump (a hop with a squash on landing), spin (a full turn)
+    function play(name: string): void {
+        if (name === "wave") {
+            swing.restart();
+            return;
+        }
+        arcsFlash.restart();
+        ({ shaka: shakaAnim, flip: flipAnim, jump: jumpAnim, spin: spinAnim })[name]?.restart();
     }
 
     // One swing of the hand to `target`; the arcs flash to `flash` and slide out when it swings right.
@@ -82,11 +99,31 @@ Item {
             source: handImage
             colorization: 1
             colorizationColor: root.color
-            transform: Rotation {
-                origin.x: 165 * root.unit
-                origin.y: 172 * root.unit
-                angle: root.angle
-            }
+            transform: [
+                Rotation {
+                    origin.x: 165 * root.unit
+                    origin.y: 172 * root.unit
+                    angle: root.angle
+                },
+                Rotation {
+                    origin.x: 162 * root.unit
+                    origin.y: 98 * root.unit
+                    angle: root.spin
+                },
+                Rotation {
+                    origin.x: 162 * root.unit
+                    origin.y: 98 * root.unit
+                    axis { x: 0; y: 1; z: 0 }
+                    angle: root.flip
+                },
+                Scale {
+                    origin.x: 162 * root.unit
+                    origin.y: 176 * root.unit
+                    xScale: 2 - root.squash
+                    yScale: root.squash
+                },
+                Translate { y: -root.lift * root.unit }
+            ]
         }
     }
 
@@ -98,5 +135,56 @@ Item {
         Swing { target: -6; flash: 0.6 }
         Swing { target: 8; flash: 0.8 }
         Swing { target: 0; flash: 0 }
+    }
+
+    // The arcs flash once for the gestures that don't drive them themselves
+    SequentialAnimation {
+        id: arcsFlash
+        NumberAnimation { target: root; property: "arcsOpacity"; to: 1; duration: 150; easing.type: Easing.OutCubic }
+        NumberAnimation { target: root; property: "arcsOpacity"; to: 0; duration: 650; easing.type: Easing.InOutCubic }
+    }
+
+    // 🤙: tips over, shakes from side to side, settles back
+    SequentialAnimation {
+        id: shakaAnim
+        NumberAnimation { target: root; property: "angle"; to: -38; duration: 220; easing.type: Easing.OutBack }
+        SequentialAnimation {
+            loops: 3
+            NumberAnimation { target: root; property: "angle"; to: -56; duration: 85; easing.type: Easing.InOutSine }
+            NumberAnimation { target: root; property: "angle"; to: -20; duration: 85; easing.type: Easing.InOutSine }
+        }
+        PauseAnimation { duration: 80 }
+        NumberAnimation { target: root; property: "angle"; to: 0; duration: 320; easing.type: Easing.OutBack }
+    }
+
+    // 🖑: turns over to show the back of the hand, holds, turns back
+    SequentialAnimation {
+        id: flipAnim
+        NumberAnimation { target: root; property: "flip"; to: 180; duration: 420; easing.type: Easing.OutBack }
+        PauseAnimation { duration: 650 }
+        NumberAnimation { target: root; property: "flip"; to: 360; duration: 420; easing.type: Easing.InOutCubic }
+        ScriptAction { script: root.flip = 0 }
+    }
+
+    // A hop: stretches going up, squashes on landing and springs back
+    SequentialAnimation {
+        id: jumpAnim
+        ParallelAnimation {
+            NumberAnimation { target: root; property: "lift"; to: 26; duration: 230; easing.type: Easing.OutCubic }
+            NumberAnimation { target: root; property: "squash"; to: 1.12; duration: 230; easing.type: Easing.OutCubic }
+        }
+        ParallelAnimation {
+            NumberAnimation { target: root; property: "lift"; to: 0; duration: 220; easing.type: Easing.InQuad }
+            NumberAnimation { target: root; property: "squash"; to: 1; duration: 220 }
+        }
+        NumberAnimation { target: root; property: "squash"; to: 0.78; duration: 90; easing.type: Easing.OutQuad }
+        NumberAnimation { target: root; property: "squash"; to: 1; duration: 380; easing.type: Easing.OutElastic; easing.amplitude: 1.2; easing.period: 0.4 }
+    }
+
+    // A whole turn
+    SequentialAnimation {
+        id: spinAnim
+        NumberAnimation { target: root; property: "spin"; from: 0; to: 360; duration: 800; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
+        ScriptAction { script: root.spin = 0 }
     }
 }
