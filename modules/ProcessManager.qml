@@ -100,7 +100,7 @@ Scope {
                 radius: Appearance.shape.panel
                 color: Colors.m3surfaceContainer
                 border.width: Appearance.edge
-                border.color: Appearance.edgeColor
+                border.color: Colors.m3outlineVariant
 
                 opacity: loader.revealed ? 1 : 0
                 scale: loader.revealed ? 1 : 0.9

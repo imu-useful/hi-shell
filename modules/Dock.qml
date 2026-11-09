@@ -239,7 +239,7 @@ Variants {
             radius: Math.min(window.options.cornerRadius, Math.min(width, height) / 2)
             color: Appearance.translucent(Colors.m3surfaceContainer)
             border.width: Appearance.edge
-            border.color: Appearance.edgeColor
+            border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
             HoverHandler {
                 id: dockHover

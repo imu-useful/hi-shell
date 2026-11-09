@@ -54,9 +54,6 @@ Singleton {
                 property bool themedIcons: false
                 // Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise).
                 property bool restartOnIconTheme: true
-                // The look of the shell: material = Material You (tonal surfaces), glass = Liquid Glass
-                // (frosted translucent panes with a bright rim and rounder corners).
-                property string design: "material"
                 // Translucent surfaces (the compositor blurs what's behind them).
                 property bool transparency: true
                 property real transparencyLevel: 0.12

@@ -6,5 +6,5 @@ Rectangle {
     radius: Appearance.rounding.full
     color: Appearance.translucent(Colors.m3surfaceContainer, 0.25)
     border.width: Appearance.edge
-    border.color: Appearance.edgeColor
+    border.color: Colors.m3outlineVariant
 }

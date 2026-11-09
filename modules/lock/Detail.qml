@@ -17,7 +17,7 @@ Rectangle {
     radius: Appearance.rounding.extraLarge
     color: Qt.alpha(Colors.m3surfaceContainerHigh, 0.95)
     border.width: Appearance.edge
-    border.color: Appearance.edgeColor
+    border.color: Colors.m3outlineVariant
 
     z: 10
     visible: opacity > 0

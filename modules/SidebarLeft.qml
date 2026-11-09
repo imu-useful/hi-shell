@@ -95,7 +95,7 @@ Scope {
                 color: Appearance.translucent(Colors.m3surfaceContainerLow)
                 // Soft Tonal: depth comes from tone, so no outline unless the panel is see-through.
                 border.width: Appearance.edge
-                border.color: Appearance.edgeColor
+                border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                 Behavior on x { SpatialAnim {} }
                 Behavior on opacity { SpatialAnim {} }
