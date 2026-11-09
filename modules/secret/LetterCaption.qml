@@ -16,6 +16,9 @@ Item {
     property real sceneLength: 7
     property real hue: 0.6
     property real fontSize: 72
+    // The letters' color: pastel light by default (for dark scenes); lower the lightness for a light one
+    property real saturation: 0.85
+    property real lightness: 0.78
 
     readonly property real appear: spring((sceneTime - 0.1) / 0.9)
     readonly property real leave: clamp((sceneLength - sceneTime) / 0.4)
@@ -59,7 +62,7 @@ Item {
                 font.pixelSize: root.fontSize
                 font.weight: Font.Bold
                 elide: Text.ElideNone
-                color: root.toneColor(index * 0.03 + root.time * 0.05, 0.85, 0.78 + 0.06 * Math.sin(root.time * 2 - index * 0.6), 1)
+                color: root.toneColor(index * 0.03 + root.time * 0.05, root.saturation, root.lightness + 0.06 * Math.sin(root.time * 2 - index * 0.6), 1)
                 opacity: show
                 transformOrigin: Item.Center
                 scale: (0.35 + 0.65 * inP) * (0.8 + 0.2 * outP)

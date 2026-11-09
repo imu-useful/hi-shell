@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.modules.secret
 
 // Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
-// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"). A click or Esc closes it.
+// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"). A click or Esc closes it.
 Scope {
     id: root
 
@@ -71,6 +71,10 @@ Scope {
                         material: material,
                         "liquid glass": glass,
                         nothing: nothing,
+                        coloros: coloros,
+                        "color os": coloros,
+                        oppo: coloros,
+                        aquamorphic: coloros,
                         "nothing os": nothing,
                         nothingos: nothing,
                         "nothing ui": nothing,
@@ -92,6 +96,7 @@ Scope {
                 Component { id: confetti; Confetti { revealed: loader.revealed } }
                 Component { id: disco; Disco { revealed: loader.revealed } }
                 Component { id: nyan; Nyan { revealed: loader.revealed } }
+                Component { id: coloros; ColorOS { revealed: loader.revealed } }
                 Component { id: nothing; NothingUI { revealed: loader.revealed } }
                 Component { id: glass; LiquidGlass { revealed: loader.revealed } }
                 Component { id: material; MaterialYou { revealed: loader.revealed } }
