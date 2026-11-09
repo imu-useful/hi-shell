@@ -64,8 +64,10 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: Appearance.anim.fast } }
     }
 
-    // The dots, centered; a long password slides out to the left.
+    // The dots, centered: a typed character adds one shape on the right (it pops in) and the others slide left
+    // to make room; backspace shrinks the last one away. A long password scrolls to its end.
     Item {
+        id: dotArea
         anchors.left: icon.right
         anchors.right: enter.left
         anchors.leftMargin: 8
@@ -74,24 +76,39 @@ Rectangle {
         height: parent.height
         clip: true
 
-        Row {
+        ListView {
             id: dots
+            readonly property int cell: 22
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            x: Math.min((parent.width - width) / 2, parent.width - width)
-            spacing: 4
+            height: 20
+            width: Math.min(count * cell, dotArea.width)
+            orientation: ListView.Horizontal
+            interactive: false
+            model: root.pam.buffer.length
+            onCountChanged: positionViewAtEnd()
 
-            Repeater {
-                model: root.pam.buffer.length
+            Behavior on width { SpatialAnim {} }
+
+            add: Transition {
+                NumberAnimation { property: "scale"; from: 0; to: 1; duration: Appearance.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Appearance.anim.spatialFast }
+            }
+            remove: Transition {
+                NumberAnimation { property: "scale"; to: 0; duration: Appearance.anim.fast }
+            }
+
+            delegate: Item {
+                required property int index
+                width: dots.cell
+                height: dots.height
 
                 MaterialShape {
-                    required property int index
+                    anchors.centerIn: parent
                     width: 18
                     height: 18
+                    animated: false
                     shape: root.dotShapes[index % root.dotShapes.length]
                     color: Colors.m3onSurface
-                    scale: 0
-                    Component.onCompleted: scale = 1
-                    Behavior on scale { SpringAnim { overshoot: 1.4 } }
                 }
             }
         }
