@@ -79,7 +79,7 @@
     "Window": "Окно",
     "Workspace %1": "Пространство %1",
     "Battery %1%": "Батарея %1%",
-    "Fully charged": "Полностью заряжена",
+    "Fully charged": "Полностью заряжено",
     "Charging · full in %1": "Заряжается · до полной %1",
     "Charging": "Заряжается",
     "On battery · %1 left": "От батареи · осталось %1",
@@ -1258,5 +1258,17 @@
     "Light as a signal": "Свет как сигнал",
     "Progress, plainly": "Прогресс без прикрас",
     "Aquamorphic": "Аквоморфизм",
-    "Smooth as water": "Плавно, как вода"
+    "Smooth as water": "Плавно, как вода",
+    "Rounded and calm": "Мягко и спокойно",
+    "Reach everything": "Всё под рукой",
+    "Torch": "Фонарик",
+    "Airplane mode": "Авиарежим",
+    "Night mode": "Ночной режим",
+    "Location": "Геолокация",
+    "Always on display": "Всегда на экране",
+    "Haptics": "Вибро-отклик",
+    "Messages": "Сообщения",
+    "Hi, how's it going?": "Привет, как дела?",
+    "Coffee at 10:00": "Кофе в 10:00",
+    "Sunny, 3°": "Солнечно, 3°"
 }
