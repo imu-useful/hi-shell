@@ -26,10 +26,11 @@ Scope {
         ShellState.desktopEditing = value;
     }
 
-    function setEnabled(id, enabled) {
-        const layout = Object.assign({}, options.layout);
-        layout[id] = Object.assign({}, DesktopLayout.entry(options.layout, id), { enabled });
-        options.layout = layout;
+    function setEnabled(id, enabled, screenName) {
+        const current = ScreenPrefs.layoutFor(screenName);
+        const layout = Object.assign({}, current);
+        layout[id] = Object.assign({}, DesktopLayout.entry(current, id), { enabled });
+        ScreenPrefs.saveLayout(screenName, layout);
     }
 
     IpcHandler {
@@ -46,6 +47,8 @@ Scope {
         }
         function resetLayout(): void {
             root.options.layout = {};
+            for (const name of Object.keys(root.options.layouts ?? {}))
+                Config.mapSet("desktop.layouts", name, null);
         }
     }
 
@@ -56,7 +59,8 @@ Scope {
             id: window
 
             required property ShellScreen modelData
-            readonly property bool hasWidgets: root.options.widgets && (root.options.monitor ? modelData?.name === root.options.monitor : modelData === Quickshell.screens[0])
+            readonly property bool hasWidgets: root.options.widgets && ScreenPrefs.selected(root.options.monitors, root.options.monitor, modelData)
+            readonly property string screenName: modelData?.name ?? ""
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
             readonly property bool covered: !root.editing && Hyprland.toplevels.values.some(t => t.workspace?.id === monitor?.activeWorkspace?.id)
             // 1 on the empty desktop, 0 with windows open (in focus mode): blur, frame and
@@ -131,7 +135,10 @@ Scope {
                 // The wallpaper, or the playing track's cover in cover mode.
                 // (The cover from the local copy CoverMode downloads: quicker than fetching the
                 // player's URL again, and the same picture the palette came from.)
+                // This screen's own picture (wallpapers.perScreen), if it has one.
+                readonly property string own: ScreenPrefs.wallpaperFor(window.screenName)
                 property string source: CoverMode.active ? (CoverMode.file ? `file://${CoverMode.file}` : Mpris.artUrl)
+                                                         : own !== "" ? `file://${own}`
                                                          : Wallpapers.still ? `file://${Wallpapers.still}` : ""
                 property bool flip: false
                 onSourceChanged: {
@@ -177,7 +184,7 @@ Scope {
                 LiveWallpaper {
                     id: live
                     anchors.fill: parent
-                    source: Wallpapers.live && !CoverMode.active ? Wallpapers.current : ""
+                    source: Wallpapers.live && !CoverMode.active && wallpaper.own === "" ? Wallpapers.current : ""
                     playing: !window.covered && !PowerSaver.enabled
                 }
             }
@@ -463,6 +470,8 @@ Scope {
                 // Alignment guides while a widget is dragged (-1 = none); set by DesktopWidget.
                 property real guideX: -1
                 property real guideY: -1
+                // For the widgets in here: whose layout they follow.
+                readonly property string screenName: window.screenName
 
                 Rectangle {
                     visible: widgets.guideX >= 0
@@ -628,7 +637,7 @@ Scope {
                             tonal: true
                             text: Translation.tr("Reset")
                             onClicked: {
-                                root.options.layout = {};
+                                ScreenPrefs.saveLayout(window.screenName, {});
                                 root.options.toolbar.x = root.options.toolbar.y = -1;
                             }
                         }
@@ -647,8 +656,8 @@ Scope {
                             Chip {
                                 required property string modelData
                                 text: Translation.tr(DesktopLayout.names[modelData])
-                                selected: DesktopLayout.entry(root.options.layout, modelData).enabled
-                                onClicked: root.setEnabled(modelData, !selected)
+                                selected: DesktopLayout.entry(ScreenPrefs.layoutFor(window.screenName), modelData).enabled
+                                onClicked: root.setEnabled(modelData, !selected, window.screenName)
                             }
                         }
                     }

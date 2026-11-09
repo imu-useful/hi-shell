@@ -1,6 +1,7 @@
 import QtQuick
 import qs.common
 import qs.common.widgets
+import qs.services
 import "Layout.js" as DesktopLayout
 
 // Places one desktop widget from Config desktop.layout. In edit mode it can be
@@ -17,7 +18,9 @@ Item {
     // hidden widgets would otherwise keep updating in the background.
     default property Component content
 
-    readonly property var entry: DesktopLayout.entry(Config.options.desktop.layout, widgetId)
+    // The screen this widget is on (set by the container in Desktop.qml): its layout may be its own.
+    readonly property string screenName: parent?.screenName ?? ""
+    readonly property var entry: DesktopLayout.entry(ScreenPrefs.layoutFor(screenName), widgetId)
     readonly property int grid: 16
     // How close (px) an edge has to come to another edge to snap to it.
     readonly property int snapDistance: 10
@@ -95,24 +98,24 @@ Item {
     }
 
     function saveScale(value) {
-        const layout = Object.assign({}, Config.options.desktop.layout);
+        const layout = Object.assign({}, ScreenPrefs.layoutFor(screenName));
         layout[widgetId] = Object.assign({}, entry, { scale: value });
-        Config.options.desktop.layout = layout;
+        ScreenPrefs.saveLayout(screenName, layout);
     }
 
     function saveWidth(value) {
-        const layout = Object.assign({}, Config.options.desktop.layout);
+        const layout = Object.assign({}, ScreenPrefs.layoutFor(screenName));
         layout[widgetId] = Object.assign({}, entry, { w: value });
-        Config.options.desktop.layout = layout;
+        ScreenPrefs.saveLayout(screenName, layout);
     }
 
     function save() {
         const w = parent.width, h = parent.height;
         const nx = Math.max(0, Math.min(w - width, x));
         const ny = Math.max(0, Math.min(h - height, y));
-        const layout = Object.assign({}, Config.options.desktop.layout);
+        const layout = Object.assign({}, ScreenPrefs.layoutFor(screenName));
         layout[widgetId] = Object.assign({}, entry, { x: nx / w, y: ny / h });
-        Config.options.desktop.layout = layout;
+        ScreenPrefs.saveLayout(screenName, layout);
         // Dragging replaced the position bindings; follow the config again.
         x = Qt.binding(() => Math.round(entry.x * (parent?.width ?? 0)));
         y = Qt.binding(() => Math.round(entry.y * (parent?.height ?? 0)));

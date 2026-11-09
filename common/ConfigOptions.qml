@@ -193,6 +193,8 @@ JsonAdapter {
         property real frameY: 0.5
         // The frame's size, as a fraction of the screen's shorter side.
         property real frameSize: 0.62
+        // Screen name -> a picture of its own for that screen (a path; images and gifs). The palette still follows `current`.
+        property var perScreen: ({})
     }
 
     property JsonObject desktop: JsonObject {
@@ -201,6 +203,10 @@ JsonAdapter {
         property bool widgets: true
         // Screen name (e.g. "eDP-1") for the widgets; empty = first screen.
         property string monitor: ""
+        // The screens that show the widgets: names, or ["*"] for every screen. Empty = `monitor`, else the first screen.
+        property list<string> monitors: []
+        // Screen name -> a layout of its own (same shape as `layout`); a screen not in here uses `layout`.
+        property var layouts: ({})
         // Widget id -> { enabled, x, y } with x / y as fractions of the screen;
         // missing ids use the defaults in modules/desktop/Layout.js. Edit mode writes this.
         property var layout: ({})
@@ -439,6 +445,11 @@ JsonAdapter {
         property int iconSize: 44
         // Screen name; empty = first screen.
         property string monitor: ""
+        // The screens that have a dock: names, or ["*"] for every screen. Empty = `monitor`, else the first screen.
+        property list<string> monitors: []
+        // Screen name -> overrides of position, autoHide, magnify, showWhenEmpty, showRunning, appsButton, showIndicators,
+        // magnifyAmount, spacing, cornerRadius, edgeMargin and iconSize for that screen's dock. (The pinned apps are shared.)
+        property var perScreen: ({})
         // App ids (desktop file names / window classes), right click an icon to pin.
         property list<string> pinned: ["firefox", "kitty", "org.gnome.Nautilus"]
     }

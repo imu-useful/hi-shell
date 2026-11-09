@@ -13,14 +13,15 @@ import qs.modules.dock
 // Middle click: a new window. The first button opens the full-screen list of every app. Wheel over an app: its windows in turn. Right click: a menu (pin,
 // move, new window, app actions, close). Icons grow toward the pointer. Auto-hide: shows when the pointer reaches the bottom, or when the workspace has no windows.
 Variants {
-    // One dock: on dock.monitor, or the first screen.
-    model: Config.options.dock.enabled ? Quickshell.screens.filter(s => !Config.options.dock.monitor || s.name === Config.options.dock.monitor).slice(0, 1) : []
+    // A dock on every screen in dock.monitors (["*"] = all), else on dock.monitor, else on the first screen.
+    model: Config.options.dock.enabled ? Quickshell.screens.filter(s => ScreenPrefs.selected(Config.options.dock.monitors, Config.options.dock.monitor, s)) : []
 
     PanelWindow {
         id: window
 
         required property ShellScreen modelData
-        readonly property var options: Config.options.dock
+        // This screen's dock: the shared options with its own (dock.perScreen) over them.
+        readonly property var options: ScreenPrefs.dockFor(modelData.name)
         readonly property int iconSize: options.iconSize
         // No window on the workspace this screen shows.
         readonly property var monitor: Hyprland.monitorFor(modelData)
@@ -138,7 +139,7 @@ Variants {
         }
         function togglePin(app) {
             const list = options.pinned.filter(id => id.toLowerCase() !== app.id);
-            options.pinned = app.pinned ? list : [...list, app.id];
+            Config.options.dock.pinned = app.pinned ? list : [...list, app.id];
         }
         // Swaps a pinned app with its neighbour in the pins.
         function movePin(app, step) {
@@ -148,7 +149,7 @@ Variants {
             if (i < 0 || j < 0 || j >= pins.length)
                 return;
             [pins[i], pins[j]] = [pins[j], pins[i]];
-            options.pinned = pins;
+            Config.options.dock.pinned = pins;
         }
 
         function closeWindows(app) {

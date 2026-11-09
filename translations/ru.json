@@ -1336,5 +1336,12 @@
     "Open the folder": "Открыть папку",
     "Reload": "Перезагрузить",
     "Widget %1 didn't load": "Виджет %1 не загрузился",
-    "Script": "Скрипт"
+    "Script": "Скрипт",
+    "What each screen shows: the desktop widgets (with a layout of its own if you like), the dock, and a wallpaper of its own. Bars have their own picker in Bar.": "Что показывает каждый экран: виджеты рабочего стола (при желании со своей раскладкой), док и свои обои. Панели выбираются на странице «Панель».",
+    "Desktop widgets": "Виджеты рабочего стола",
+    "Own widget layout": "Своя раскладка виджетов",
+    "Starts as a copy of the shared layout; edit it in the desktop's edit mode": "Начинается как копия общей раскладки; меняется в режиме правки рабочего стола",
+    "Dock icon size": "Размер значков дока",
+    "Use the shared dock settings": "Использовать общие настройки дока",
+    "A picture for this screen only (a path); empty = the shared wallpaper": "Картинка только для этого экрана (путь); пусто — общие обои"
 }

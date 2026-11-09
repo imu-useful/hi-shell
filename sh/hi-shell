@@ -7,6 +7,7 @@
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
+#   Screens      hi dock screens <all|name...>   hi desktop screens|own ...   hi wallpaper screen <name> <file|none>
 #   Widgets      hi widgets [list|new <name>|edit <name>|reload|path]   hi script <name> '<command>' [seconds] [icon] [template]
 #   Presets      hi preset list | save <name> | load <file>
 #   Media        hi play | pause | next | prev
@@ -17,7 +18,7 @@ set -u
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-usage() { sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
 
 doctor() {
     bad=0
@@ -192,6 +193,11 @@ wallpaper() {
         random) ipc wallpaper random ;;
         select) ipc wallpaper toggleSelector ;;
         get) ipc wallpaper get ;;
+        # hi wallpaper screen <name> <file|none>: a picture for one screen only
+        screen)
+            [ $# -ge 3 ] || { echo "Usage: hi wallpaper screen <screen> <file|none>   (screens: hyprctl monitors)" >&2; exit 1; }
+            if [ "$3" = none ]; then val=null; else val=$(python3 -I -c 'import json,os,sys; print(json.dumps(os.path.realpath(sys.argv[1])))' "$3"); fi
+            ipc config map wallpapers.perScreen "$2" " $val" >/dev/null && echo "Done" ;;
         *) ipc wallpaper set "$(readlink -f "$1")" ;;
     esac
 }
@@ -246,6 +252,43 @@ print(json.dumps(opts))' "$@") || exit 1
     ipc config map bar.instances "script#$1" " $json" >/dev/null && echo "Made script#$1. Add it to a bar: Settings > Bar, or hi bar edit" 
 }
 
+# hi dock screens <all|name...>: the screens that have a dock; hi dock own <screen> <key> <json|null>: one setting for that screen's dock
+dock() {
+    need_running
+    sub=${1:-}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        screens)
+            [ $# -gt 0 ] || { echo "Usage: hi dock screens <all|name...>" >&2; exit 1; }
+            if [ "$1" = all ]; then list='["*"]'; else list=$(python3 -I -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "$@"); fi
+            ipc config set dock.monitors " $list" ;;
+        own) [ $# -ge 3 ] || { echo "Usage: hi dock own <screen> <position|iconSize|autoHide|...> <json|null>" >&2; exit 1; }
+            ipc config map dock.perScreen "$1.$2" " $3" >/dev/null && echo "Done" ;;
+        on | off) ipc config set dock.enabled "$([ "$sub" = on ] && echo true || echo false)" ;;
+        *) echo "Usage: hi dock on|off|screens <all|name...>|own <screen> <key> <json|null>" >&2; exit 1 ;;
+    esac
+}
+
+# hi desktop screens <all|name...>: the screens that show desktop widgets; hi desktop own <screen> [off]: a layout of its own
+desktop() {
+    need_running
+    sub=${1:-}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        screens)
+            [ $# -gt 0 ] || { echo "Usage: hi desktop screens <all|name...>" >&2; exit 1; }
+            if [ "$1" = all ]; then list='["*"]'; else list=$(python3 -I -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "$@"); fi
+            ipc config set desktop.monitors " $list" ;;
+        own)
+            [ -n "${1:-}" ] || { echo "Usage: hi desktop own <screen> [off]" >&2; exit 1; }
+            if [ "${2:-}" = off ]; then ipc config map desktop.layouts "$1" " null" >/dev/null && echo "$1 uses the shared layout"
+            else cur=$(ipc config get desktop.layout); ipc config map desktop.layouts "$1" " $cur" >/dev/null && echo "$1 has its own layout (a copy of the shared one)"; fi ;;
+        edit) ipc desktop edit ;;
+        done) ipc desktop done ;;
+        *) echo "Usage: hi desktop screens <all|name...>|own <screen> [off]|edit|done" >&2; exit 1 ;;
+    esac
+}
+
 update() {
     [ -x "$repo/update.sh" ] || { echo "update.sh not found in $repo" >&2; exit 1; }
     exec "$repo/update.sh" "$@"
@@ -279,6 +322,8 @@ case "$cmd" in
     theme) theme "$@" ;;
     wallpaper | wall) wallpaper "$@" ;;
     preset | presets) preset "$@" ;;
+    dock) dock "$@" ;;
+    desktop) desktop "$@" ;;
     widgets | widget) widgets "$@" ;;
     script) script "$@" ;;
     play | pause | toggle-play) need_running; ipc mpris playPause ;;

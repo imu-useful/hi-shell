@@ -1,5 +1,5 @@
 # Fish completions for the hi-shell command line (hi and hi-shell).
-set -l cmds start stop restart status log doctor update config settings launcher apps overview calendar weather processes sidebar bar lock session wait present ask theme wallpaper preset widgets script play pause next prev qr keybinds ipc help
+set -l cmds start stop restart status log doctor update config settings launcher apps overview calendar weather processes sidebar bar lock session wait present ask theme wallpaper preset dock desktop widgets script play pause next prev qr keybinds ipc help
 for c in hi hi-shell
     complete -c $c -f
     complete -c $c -n "not __fish_seen_subcommand_from $cmds" -a "$cmds"
@@ -13,4 +13,8 @@ for c in hi hi-shell
 end
 for c in hi hi-shell
     complete -c $c -n "__fish_seen_subcommand_from widgets" -a "list new edit reload path"
+end
+for c in hi hi-shell
+    complete -c $c -n "__fish_seen_subcommand_from dock" -a "on off screens own"
+    complete -c $c -n "__fish_seen_subcommand_from desktop" -a "screens own edit done"
 end

@@ -74,6 +74,26 @@ class CliTest(unittest.TestCase):
     def test_widgets_edit_rejects_a_path(self):
         self.assertNotEqual(self.qs.run("widgets", "edit", "../x").returncode, 0)
 
+    def test_wallpaper_for_one_screen(self):
+        self.qs.run("wallpaper", "screen", "eDP-1", "/tmp/a b.png")
+        self.assertEqual(self.last(), ["config", "map", "wallpapers.perScreen", "eDP-1", ' "/tmp/a b.png"'])
+        self.qs.run("wallpaper", "screen", "eDP-1", "none")
+        self.assertEqual(self.last()[-1], " null")
+        self.assertNotEqual(self.qs.run("wallpaper", "screen", "eDP-1").returncode, 0)
+
+    def test_dock_and_desktop_screens(self):
+        self.qs.run("dock", "screens", "all")
+        self.assertEqual(self.last(), ["config", "set", "dock.monitors", ' ["*"]'])
+        self.qs.run("dock", "screens", "eDP-1", "HDMI-A-1")
+        self.assertEqual(self.last(), ["config", "set", "dock.monitors", ' ["eDP-1", "HDMI-A-1"]'])
+        self.qs.run("dock", "own", "eDP-1", "iconSize", "56")
+        self.assertEqual(self.last(), ["config", "map", "dock.perScreen", "eDP-1.iconSize", " 56"])
+        self.qs.run("desktop", "screens", "HDMI-A-1")
+        self.assertEqual(self.last(), ["config", "set", "desktop.monitors", ' ["HDMI-A-1"]'])
+        self.qs.run("desktop", "own", "eDP-1", "off")
+        self.assertEqual(self.last(), ["config", "map", "desktop.layouts", "eDP-1", " null"])
+        self.assertNotEqual(self.qs.run("dock", "screens").returncode, 0)
+
     def test_unknown_command_fails_and_help_lists_the_commands(self):
         self.assertEqual(self.qs.run("nope").returncode, 1)
         out = self.qs.run("help").stdout
