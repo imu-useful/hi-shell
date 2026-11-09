@@ -12,18 +12,30 @@ Canvas {
 
     required property bool revealed
     property real time: 0
+    // Painted on the GPU and off the GUI thread: the default (a CPU image) can't keep up at 1080p
+    renderTarget: Canvas.FramebufferObject
+    renderStrategy: Canvas.Threaded
+    property real sinceFrame: 0
+    readonly property real minFrame: 0.0155 // cap at about 60 fps, whatever the display rate
 
     readonly property real sceneLength: 7
     readonly property real overlap: 0.6
     readonly property var captions: [Translation.tr("Material You"), Translation.tr("Dynamic color"), Translation.tr("Expressive shapes"), Translation.tr("Made for you")]
     readonly property var names: ["circle", "cookie6", "clover4", "sunny", "flower", "star", "burst", "softBurst", "puffy", "pill", "diamond", "hexagon", "cookie12", "clover8", "boom", "blob", "square", "triangle", "verySunny", "cookie9"]
-    property var cache: []
+    // lods[level][shape]: level 0 = all 144 outline points (big shapes), 1 = every 2nd, 2 = every 4th
+    property var lods: []
     property real baseHue: 0.6
     property int captionIndex: 0
     property real captionAlpha: 0
 
     Component.onCompleted: {
-        cache = names.map(n => Shapes.points(n, 0));
+        const flat = (name, stride) => {
+            const p = Shapes.points(name, 0), out = [];
+            for (let i = 0; i < p.length; i += stride)
+                out.push(p[i][0], p[i][1]);
+            return out;
+        };
+        lods = [1, 2, 4].map(st => names.map(n => flat(n, st)));
         const h = Colors.m3primary.hslHue;
         baseHue = h >= 0 ? h : 0.6;
     }
@@ -32,7 +44,11 @@ Canvas {
         running: root.revealed
         onTriggered: {
             root.time += frameTime;
-            root.requestPaint();
+            root.sinceFrame += frameTime;
+            if (root.sinceFrame >= root.minFrame) {
+                root.sinceFrame = 0;
+                root.requestPaint();
+            }
         }
     }
 
@@ -60,13 +76,21 @@ Canvas {
         return `hsla(${Math.round((((h + r[0]) % 1) + 1) % 1 * 360)}, ${Math.round(r[1] * 100)}%, ${Math.round(r[2] * 100)}%, ${alpha ?? 1})`;
     }
 
+    function lod(r) {
+        return r > 90 ? 0 : r > 28 ? 1 : 2;
+    }
+
     function shape(ctx, a, b, mix, cx, cy, r, rot, color) {
-        const cs = Math.cos(rot), sn = Math.sin(rot);
+        const cs = Math.cos(rot) * r, sn = Math.sin(rot) * r;
+        const n = a.length;
         ctx.beginPath();
-        for (let i = 0; i < a.length; i++) {
-            const x = a[i][0] + (b[i][0] - a[i][0]) * mix;
-            const y = a[i][1] + (b[i][1] - a[i][1]) * mix;
-            const px = cx + (x * cs - y * sn) * r, py = cy + (x * sn + y * cs) * r;
+        for (let i = 0; i < n; i += 2) {
+            let x = a[i], y = a[i + 1];
+            if (mix !== 0) {
+                x += (b[i] - x) * mix;
+                y += (b[i + 1] - y) * mix;
+            }
+            const px = cx + x * cs - y * sn, py = cy + x * sn + y * cs;
             if (i === 0)
                 ctx.moveTo(px, py);
             else
@@ -80,10 +104,9 @@ Canvas {
     // Morph through the shape list: `p` counts shapes passed; the change itself takes the first
     // 45% of each step (a spring), the rest is a rest.
     function morph(ctx, p, cx, cy, r, rot, color) {
-        const n = names.length;
+        const n = names.length, set = lods[lod(r)];
         const i = Math.floor(p), f = p - i;
-        const a = cache[((i % n) + n) % n], b = cache[(((i + 1) % n) + n) % n];
-        shape(ctx, a, b, spring(f / 0.45), cx, cy, r, rot, color);
+        shape(ctx, set[((i % n) + n) % n], set[(((i + 1) % n) + n) % n], spring(f / 0.45), cx, cy, r, rot, color);
     }
 
     // ---- backdrop ----------------------------------------------------------------------------
@@ -106,14 +129,14 @@ Canvas {
         }
         // Tiny shapes drifting upward, far behind
         const u = Math.min(w, h);
-        for (let k = 0; k < 34; k++) {
+        for (let k = 0; k < 20; k++) {
             const seed = k * 12.9898;
             const sx = (Math.sin(seed) * 43758.5453) % 1;
             const sy = (Math.sin(seed * 1.7) * 24634.6345) % 1;
             const size = u * (0.008 + Math.abs(sx * 2 % 1) * 0.02);
             const x = (Math.abs(sx) * w + Math.sin(time * 0.4 + k) * 30) % w;
             const y = h - ((Math.abs(sy) * h + time * (14 + k % 9 * 5)) % (h + 80)) + 40;
-            const a = cache[k % cache.length];
+            const a = lods[2][k % names.length];
             shape(ctx, a, a, 0, x, y, size, time * 0.3 + k, tone(k, 0.16));
         }
         // Ripples leaving the middle
@@ -131,13 +154,15 @@ Canvas {
     // `tl` is the time in the scene (negative while it is still arriving); `e` the arrival spring.
 
     function hero(ctx, w, h, tl, u) {
+        const glow = ctx.createRadialGradient(w / 2, h / 2, u * 0.1, w / 2, h / 2, u * 0.5);
+        glow.addColorStop(0, tone(0, 0.35));
+        glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(w / 2 - u * 0.5, h / 2 - u * 0.5, u, u);
         const rs = [0.3, 0.21, 0.12];
         for (let k = 0; k < 3; k++) {
             const breathe = 1 + 0.04 * Math.sin(time * 4 + k);
-            ctx.shadowBlur = 50;
-            ctx.shadowColor = tone(k === 1 ? 4 : 0, 0.5);
             morph(ctx, tl * 1.25 + k * 3.3, w / 2, h / 2, u * rs[k] * breathe, time * (k % 2 ? -0.7 : 0.5) + k, tone([0, 4, 2][k]));
-            ctx.shadowBlur = 0;
         }
     }
 
@@ -151,30 +176,26 @@ Canvas {
                 morph(ctx, k * 0.7 + time * 0.7 * dir, cx + Math.cos(ang) * radius * u, cy + Math.sin(ang) * radius * u, u * size * pulse, time * dir + k, tone(k + (dir > 0 ? 0 : 3)));
             }
         }
-        ctx.shadowBlur = 60;
-        ctx.shadowColor = tone(0, 0.6);
         morph(ctx, tl * 1.2 + 4, cx, cy, u * (0.13 + 0.015 * Math.sin(time * 5)), -time * 0.8, tone(5));
-        ctx.shadowBlur = 0;
     }
 
     function grid(ctx, w, h, tl, u) {
-        const cols = 13, rows = 7, cell = u * 0.118;
+        const cols = 11, rows = 6, cell = u * 0.138;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const dx = c - (cols - 1) / 2, dy = r - (rows - 1) / 2;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 const phase = dist * 0.5 - tl * 1.1;
                 const size = cell * 0.5 * (0.5 + 0.5 * (0.55 + 0.45 * Math.sin(phase * 2.1)));
-                const n = names.length;
+                const n = names.length, set = lods[lod(size * 1.7)];
                 const i = Math.floor(phase), f = phase - i;
-                const a = cache[((i % n) + n) % n], b = cache[(((i + 1) % n) + n) % n];
-                shape(ctx, a, b, spring(f), w / 2 + dx * cell, h / 2 + dy * cell, size * 1.7, phase * 0.6, tone(Math.floor(dist * 0.7 - tl)));
+                shape(ctx, set[((i % n) + n) % n], set[(((i + 1) % n) + n) % n], spring(f), w / 2 + dx * cell, h / 2 + dy * cell, size * 1.7, phase * 0.6, tone(Math.floor(dist * 0.7 - tl)));
             }
         }
     }
 
     function bloom(ctx, w, h, tl, u) {
-        const count = 100, golden = 2.39996323;
+        const count = 72, golden = 2.39996323;
         for (let k = 0; k < count; k++) {
             const grow = spring((tl - k * 0.015) / 0.9);
             if (grow <= 0)
@@ -203,7 +224,7 @@ Canvas {
     onPaint: {
         const ctx = getContext("2d");
         const w = width, h = height, u = Math.min(w, h);
-        if (cache.length === 0)
+        if (lods.length === 0)
             return;
         backdrop(ctx, w, h);
         const cycle = sceneLength * 4;
