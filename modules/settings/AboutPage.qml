@@ -20,7 +20,7 @@ ColumnLayout {
 
     // Easter egg: five taps on the logo open the secret setting
     readonly property int secretTaps: 5
-    readonly property string secretKey: "hi"
+    readonly property var secretKeys: ["hi", "matrix", "confetti", "sudo", "arch", "42"]
     readonly property var jokes: [
         Translation.tr("Wrong key. Don't waste your time on nonsense."),
         Translation.tr("Nope. Go touch grass instead of guessing keys."),
@@ -115,10 +115,10 @@ ColumnLayout {
                 const key = text.trim();
                 if (key === "")
                     return;
-                if (key.toLowerCase() === root.secretKey) {
+                if (root.secretKeys.includes(key.toLowerCase())) {
                     root.secretHint = "";
                     root.secretOpen = false;
-                    ShellState.secretHello = true;
+                    ShellState.secretEgg = key.toLowerCase();
                 } else {
                     root.secretHint = root.jokes[Math.floor(Math.random() * root.jokes.length)];
                 }

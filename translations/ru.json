@@ -1227,5 +1227,8 @@
     "That's not it. Seriously, stop messing around.": "Не то. Серьёзно, хватит дурью маяться.",
     "Wrong. Is this really how you spend your evening?": "Неправильно. Ты правда так проводишь вечер?",
     "Incorrect. The key is not \"please\" either.": "Неверно. И «пожалуйста» тоже не ключ.",
-    "Hi to you too": "Тебе тоже привет"
+    "Hi to you too": "Тебе тоже привет",
+    "hi is not in the sudoers file. This incident will be reported.": "hi нет в файле sudoers. Об этом инциденте будет сообщено.",
+    "I use Arch, btw.": "Я использую Arch, кстати.",
+    "42. Now you only need the question.": "42. Осталось только узнать вопрос."
 }

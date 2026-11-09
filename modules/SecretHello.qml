@@ -4,16 +4,18 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
+import qs.modules.secret
 
-// Easter egg (Settings › About, the key "hi"): a full-screen "Hi to you too" over the animated
-// logo. A click or Esc closes it.
+// Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
+// logo, "matrix", "confetti", "sudo", "arch", "42". A click or Esc closes it.
 Scope {
     id: root
 
-    readonly property bool open: ShellState.secretHello
+    readonly property string egg: ShellState.secretEgg
+    readonly property bool open: egg !== ""
 
     function close(): void {
-        ShellState.secretHello = false;
+        ShellState.secretEgg = "";
     }
 
     PanelLoader {
@@ -51,29 +53,43 @@ Scope {
                     onClicked: root.close()
                 }
 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 32
+                Loader {
+                    anchors.fill: parent
+                    sourceComponent: ({
+                        hi: hello,
+                        matrix: matrix,
+                        confetti: confetti,
+                        sudo: sudo,
+                        arch: arch,
+                        "42": answer
+                    })[root.egg] ?? null
+                }
 
-                    StyledText {
-                        id: greeting
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: Translation.tr("Hi to you too")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Math.min(96, window.width / 12)
-                        font.weight: Font.DemiBold
-                        color: "white"
-                        elide: Text.ElideNone
-                        property real rise: loader.revealed ? 1 : 0
-                        opacity: rise
-                        transform: Translate { y: (1 - greeting.rise) * 24 }
-                        Behavior on rise { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+                Component { id: hello; HelloLogo { anchors.centerIn: parent; revealed: loader.revealed; screenWidth: window.width; screenHeight: window.height } }
+                Component { id: matrix; MatrixRain { revealed: loader.revealed } }
+                Component { id: confetti; Confetti { revealed: loader.revealed } }
+                Component {
+                    id: sudo
+                    Terminal {
+                        revealed: loader.revealed
+                        prompt: "$ sudo rm -rf /\n"
+                        message: Translation.tr("hi is not in the sudoers file. This incident will be reported.")
                     }
-
-                    AnimatedLogo {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        height: Math.min(320, window.height * 0.4)
-                        playing: loader.revealed
+                }
+                Component {
+                    id: arch
+                    Terminal {
+                        revealed: loader.revealed
+                        prompt: "$ neofetch\n"
+                        message: Translation.tr("I use Arch, btw.")
+                    }
+                }
+                Component {
+                    id: answer
+                    Terminal {
+                        revealed: loader.revealed
+                        prompt: "$ deep-thought --question 'life, the universe and everything'\n"
+                        message: Translation.tr("42. Now you only need the question.")
                     }
                 }
             }
