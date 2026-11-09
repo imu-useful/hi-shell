@@ -95,8 +95,6 @@ Scope {
                 border.width: Appearance.edge
                 border.color: Appearance.edgeColor
 
-                GlassSheen {}
-
                 opacity: loader.revealed ? 1 : 0
                 scale: loader.revealed ? 1 : 0.85
                 Behavior on opacity { EffectAnim {} }

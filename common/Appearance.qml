@@ -124,9 +124,6 @@ Singleton {
             return color;
         const base = level ?? options.transparencyLevel;
         // Glass is frosted: much more of the blurred background shows through.
-        if (!glass)
-            return Qt.alpha(color, 1 - base);
-        // A touch of white and much more of the blurred background; not less see-through than a clear pane.
-        return Qt.alpha(Qt.tint(color, Qt.rgba(1, 1, 1, 0.1)), 1 - Math.max(0.55, Math.min(0.7, base + 0.15)));
+        return Qt.alpha(color, 1 - (glass ? Math.min(0.6, base + 0.3) : base));
     }
 }

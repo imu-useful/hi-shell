@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
-import qs.common.widgets
 
 // The details that open next to a pill while the pointer is on it (or on the details themselves, so a
 // button in them can be reached). Put it inside the pill and anchor it above or below.
@@ -19,8 +18,6 @@ Rectangle {
     color: Qt.alpha(Colors.m3surfaceContainerHigh, 0.95)
     border.width: Appearance.edge
     border.color: Appearance.edgeColor
-
-    GlassSheen {}
 
     z: 10
     visible: opacity > 0

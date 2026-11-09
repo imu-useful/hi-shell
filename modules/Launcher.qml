@@ -474,8 +474,6 @@ Scope {
                 border.width: Appearance.edge
                 border.color: Appearance.edgeColor
 
-                GlassSheen {}
-
                 // The window's offsetScale is already animated; a second animation here would lag it.
                 opacity: 1 - window.offsetScale
 
@@ -600,8 +598,6 @@ Scope {
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: width > 0 ? Appearance.edge : 0
                 border.color: Appearance.edgeColor
-
-                GlassSheen {}
                 clip: true
                 opacity: window.showPreview && loader.revealed ? 1 : 0
                 Behavior on width { SpatialAnim {} }
