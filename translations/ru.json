@@ -1276,5 +1276,19 @@
     "Incoming call": "Входящий звонок",
     "Steps": "Шаги",
     "Island": "Остров",
-    "Controls": "Управление"
+    "Controls": "Управление",
+    "Shape & size": "Форма и размер",
+    "Density": "Плотность",
+    "The spacing between and inside elements": "Расстояния между элементами и внутри них",
+    "Compact": "Компактная",
+    "Comfortable": "Обычная",
+    "Spacious": "Просторная",
+    "Corner roundness": "Скругление углов",
+    "0 makes every corner square": "При 0 все углы прямые",
+    "Text size": "Размер текста",
+    "Palette": "Палитра",
+    "Seed color": "Исходный цвет",
+    "A color like #ff6a00 to make the palette from; empty = from the wallpaper": "Цвет вроде #ff6a00, из которого строится палитра; пусто — из обоев",
+    "Contrast": "Контрастность",
+    "Reset shape, size and palette": "Сбросить форму, размер и палитру"
 }
