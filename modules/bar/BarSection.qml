@@ -36,6 +36,9 @@ GridLayout {
             required property string modelData
             required property int index
             readonly property var bar: root.bar
+            // "resources#disks": the type before the #, the options of this copy in Config bar.instances.
+            readonly property string type: modelData.split("#")[0]
+            readonly property var instance: modelData.includes("#") ? (Config.options.bar.instances?.[modelData] ?? ({})) : ({})
 
             readonly property bool isIsland: modelData === "clock" && root.side === 0
             // +1: moves on towards the end of the bar while going, -1: back.
@@ -55,11 +58,11 @@ GridLayout {
                 y: root.bar.vertical ? loader.dir * (1 - loader.keep) * 40 : 0
             }
 
-            sourceComponent: root.registry[modelData] ?? null
+            sourceComponent: root.registry[type] ?? null
             Component.onCompleted: {
                 if (isIsland)
                     root.islandLoader = loader;
-                if (!root.registry[modelData])
+                if (!root.registry[type])
                     console.warn(`Bar: unknown widget "${modelData}"`);
             }
         }

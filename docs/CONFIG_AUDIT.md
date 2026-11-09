@@ -1,8 +1,8 @@
 # Config audit
 
-200 options in `common/ConfigOptions.qml`.
+203 options in `common/ConfigOptions.qml`.
 
-## Options without a control in the settings app (44)
+## Options without a control in the settings app (47)
 
 | Option | Type | Default |
 | --- | --- | --- |
@@ -13,6 +13,9 @@
 | `bar.left` | `list<string>` | `["launcher", "activeWindow"]` |
 | `bar.center` | `list<string>` | `["resources", "media", "workspaces", "clock", "utilButtons", "weather"]` |
 | `bar.right` | `list<string>` | `["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]` |
+| `bar.monitors` | `var` | `({})` |
+| `bar.extra` | `var` | `[]` |
+| `bar.instances` | `var` | `({})` |
 | `sidebar.quickToggles.shown` | `list<string>` | `["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]` |
 | `wallpapers.downloadDirectory` | `string` | `"~/Pictures/Wallpapers/online"` |
 | `wallpapers.frameSize` | `real` | `0.62` |
@@ -51,11 +54,14 @@
 | `capture.ocrLanguages` | `string` | `"auto"` |
 | `capture.recordSound` | `string` | `"off"` |
 
-## Options not referenced anywhere (10)
+## Options not referenced anywhere (13)
 
 - `appearance.fonts.icon`
 - `appearance.colorOverrides`
 - `appearance.gtkColorScheme`
+- `bar.left`
+- `bar.center`
+- `bar.right`
 - `lock.clock`
 - `lock.date`
 - `lock.greeting`

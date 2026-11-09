@@ -70,6 +70,16 @@ JsonAdapter {
         property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
         property list<string> right: ["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]
 
+        // Per screen: screen name (hyprctl monitors) -> overrides of this bar's { enabled, position, style, height,
+        // margin, left, center, right }; what a screen doesn't set comes from the options here.
+        property var monitors: ({})
+        // More bars: [{ id, monitors: ["eDP-1"] (empty = every screen), position, style, height, margin, left, center, right }]
+        // (what an entry doesn't set comes from the options here, the widget lists default to empty).
+        property var extra: []
+        // Several copies of a widget with options of their own: "type#name" in a widget list, e.g. "resources#disks",
+        // set here as { "resources#disks": { "shown": ["disk"] } }. Types: resources, utilButtons, workspaces, media, zoneClock.
+        property var instances: ({})
+
         property JsonObject workspaces: JsonObject {
             property int shown: 10
             property bool numbers: false

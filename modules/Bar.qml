@@ -6,18 +6,33 @@ import qs.common.widgets
 import qs.modules.bar
 import qs.services as Services
 
-// The bar, one per screen (Variants in shell.qml). Layout, position and style
+// One bar window (Variants in shell.qml makes the main bar for every screen and any extra bars). Layout, position and style
 // come from Config bar.*: widget ids in left / center / right, position
 // top | bottom | left | right, style hug | float | islands | m3.
 PanelWindow {
     id: root
 
+    // { screen: name, barId: "main" or the id of an extra bar }, see services/BarLayout.qml
     required property var modelData
-    screen: modelData
+    screen: Quickshell.screens.find(s => s.name === modelData.screen) ?? null
 
-    readonly property var options: Config.options.bar
-    readonly property string position: ["top", "bottom", "left", "right"].includes(options.position) ? options.position : "top"
-    readonly property string style: ["hug", "float", "islands", "m3"].includes(options.style) ? options.style : "float"
+    // This bar's settings: the defaults of Config bar.*, with the screen's (or the extra bar's) own on top.
+    readonly property var options: Services.BarLayout.spec(modelData.screen, modelData.barId)
+    // The widget lists only change when their contents do: a new height or style leaves the widgets alone.
+    property var leftIds: []
+    property var centerIds: []
+    property var rightIds: []
+    function syncLists() {
+        for (const [prop, key] of [["leftIds", "left"], ["centerIds", "center"], ["rightIds", "right"]]) {
+            if (JSON.stringify(root[prop]) !== JSON.stringify(options[key]))
+                root[prop] = options[key];
+        }
+    }
+    onOptionsChanged: syncLists()
+    Component.onCompleted: syncLists()
+
+    readonly property string position: options.position
+    readonly property string style: options.style
     readonly property bool vertical: position === "left" || position === "right"
     readonly property bool edgeToEdge: style === "hug" || style === "m3"
     readonly property int thickness: options.height
@@ -53,7 +68,8 @@ PanelWindow {
         notifications: notifications,
         visualizer: visualizer,
         divider: divider,
-        focus: focus
+        focus: focus,
+        zoneClock: zoneClock
     })
 
     // The Dynamic Island (the clock widget) takes the bar over while it shows music or a notification:
@@ -73,12 +89,12 @@ PanelWindow {
     readonly property real islandH: islandKnown ? islandLoader.height : 0
     readonly property real narrow: islandKnown ? collapse : 0
     // Which section holds the clock, and where (index in it).
-    readonly property string islandSection: options.left.includes("clock") ? "left" : options.center.includes("clock") ? "center" : options.right.includes("clock") ? "right" : ""
+    readonly property string islandSection: leftIds.includes("clock") ? "left" : centerIds.includes("clock") ? "center" : rightIds.includes("clock") ? "right" : ""
 
     // Focus Mode keeps only workspaces, system icons and the clock, with the session's
     // timer next to the clock (or in the middle if the bar has no clock).
     readonly property var zenWidgets: ["workspaces", "systemIcons", "clock"]
-    readonly property bool hasClock: [...options.left, ...options.center, ...options.right].includes("clock")
+    readonly property bool hasClock: [...leftIds, ...centerIds, ...rightIds].includes("clock")
     function section(widgets, middle) {
         if (!ShellState.zen)
             return widgets;
@@ -113,6 +129,7 @@ PanelWindow {
     Component { id: visualizer; Visualizer {} }
     Component { id: divider; Divider {} }
     Component { id: focus; FocusWidget {} }
+    Component { id: zoneClock; ZoneClock {} }
 
     anchors.top: position !== "bottom"
     anchors.bottom: position !== "top"
@@ -199,7 +216,7 @@ PanelWindow {
                 BarSection {
                     id: left
                     bar: root.context
-                    widgets: root.section(root.options.left, false)
+                    widgets: root.section(root.leftIds, false)
                     registry: root.registry
                     collapse: root.collapse
                     side: root.islandSection === "" || root.islandSection === "left" ? 0 : (0 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)
@@ -212,7 +229,7 @@ PanelWindow {
                 BarSection {
                     id: center
                     bar: root.context
-                    widgets: root.section(root.options.center, true)
+                    widgets: root.section(root.centerIds, true)
                     registry: root.registry
                     collapse: root.collapse
                     side: root.islandSection === "" || root.islandSection === "center" ? 0 : (1 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)
@@ -226,7 +243,7 @@ PanelWindow {
                 BarSection {
                     id: right
                     bar: root.context
-                    widgets: root.section(root.options.right, false)
+                    widgets: root.section(root.rightIds, false)
                     registry: root.registry
                     collapse: root.collapse
                     side: root.islandSection === "" || root.islandSection === "right" ? 0 : (2 < ["left", "center", "right"].indexOf(root.islandSection) ? -1 : 1)

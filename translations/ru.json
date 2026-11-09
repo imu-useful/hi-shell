@@ -1290,5 +1290,6 @@
     "Seed color": "Исходный цвет",
     "A color like #ff6a00 to make the palette from; empty = from the wallpaper": "Цвет вроде #ff6a00, из которого строится палитра; пусто — из обоев",
     "Contrast": "Контрастность",
-    "Reset shape, size and palette": "Сбросить форму, размер и палитру"
+    "Reset shape, size and palette": "Сбросить форму, размер и палитру",
+    "Clock in a timezone": "Часы в часовом поясе"
 }

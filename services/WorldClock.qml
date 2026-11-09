@@ -12,11 +12,16 @@ Singleton {
 
     // [{ zone, city, time ("05:36"), offset ("+9"), isDay }]
     property var clocks: []
-    readonly property list<string> zones: Config.options.desktop.worldClocks
+    // Every clock that is computed, the desktop card's and the bar's (zoneClock instances).
+    property var allClocks: []
+    readonly property list<string> deskZones: Config.options.desktop.worldClocks
+    readonly property var barZones: Object.values(Config.options.bar.instances ?? {}).map(i => i?.zone).filter(z => typeof z === "string" && /^[A-Za-z0-9_+\-\/]+$/.test(z))
+    readonly property var zones: [...new Set([...deskZones, ...barZones])]
 
     function refresh() {
         if (zones.length === 0) {
             clocks = [];
+            allClocks = [];
             return;
         }
         proc.command = ["sh", "-c", 'for z in "$@"; do TZ="$z" date "+$z|%H:%M|%z"; done', "sh", ...zones];
@@ -29,7 +34,7 @@ Singleton {
         id: proc
         stdout: StdioCollector {
             onStreamFinished: {
-                root.clocks = text.trim().split("\n").filter(l => l.includes("|")).map(l => {
+                const parsed = text.trim().split("\n").filter(l => l.includes("|")).map(l => {
                     const [zone, time, offset] = l.split("|");
                     const h = Number(time.slice(0, 2));
                     // "+0900" -> "+9", "+0530" -> "+5:30"
@@ -42,6 +47,8 @@ Singleton {
                         isDay: h >= 7 && h < 19
                     };
                 });
+                root.allClocks = parsed;
+                root.clocks = parsed.filter(c => root.deskZones.includes(c.zone));
             }
         }
     }

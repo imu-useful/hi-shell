@@ -15,7 +15,7 @@ BarWidget {
         wallpaper: { icon: "wallpaper", action: () => ShellState.wallpaperSelectorOpen = !ShellState.wallpaperSelectorOpen },
         mic: { icon: "mic", command: ["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"] }
     })
-    readonly property var buttons: Config.options.bar.utilButtons.shown.filter(k => all[k]).map(k => all[k])
+    readonly property var buttons: pick("shown", Config.options.bar.utilButtons.shown).filter(k => all[k]).map(k => all[k])
 
     shown: buttons.length > 0
     padding: 4

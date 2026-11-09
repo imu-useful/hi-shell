@@ -13,6 +13,12 @@ Item {
     id: root
 
     readonly property var bar: parent?.bar ?? null
+    // The options of this copy of the widget ("type#name" in the bar's list, Config bar.instances); empty for a plain id.
+    readonly property var instance: parent?.instance ?? ({})
+    // An option of this copy, else the widget's shared one.
+    function pick(key, shared) {
+        return instance[key] !== undefined ? instance[key] : shared;
+    }
     readonly property bool vertical: bar?.vertical ?? false
     readonly property int thickness: (bar?.thickness ?? 40) - 12
     readonly property int popupEdge: bar?.popupEdge ?? Edges.Bottom

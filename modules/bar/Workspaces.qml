@@ -13,7 +13,14 @@ import qs.services
 BarWidget {
     id: root
 
-    readonly property var options: Config.options.bar.workspaces
+    // The shared options, with this copy's own (Config bar.instances) over them.
+    readonly property var options: ({
+        shown: pick("shown", Config.options.bar.workspaces.shown),
+        numbers: pick("numbers", Config.options.bar.workspaces.numbers),
+        appIcons: pick("appIcons", Config.options.bar.workspaces.appIcons),
+        appsPerWorkspace: pick("appsPerWorkspace", Config.options.bar.workspaces.appsPerWorkspace),
+        switchStyle: pick("switchStyle", Config.options.bar.workspaces.switchStyle)
+    })
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(bar?.screen ?? null)
     readonly property int activeId: monitor?.activeWorkspace?.id ?? 1
     readonly property int shown: Math.max(1, options.shown)

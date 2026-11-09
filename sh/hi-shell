@@ -3,7 +3,7 @@
 #
 #   Shell        hi start | stop | restart | status | log [-f] | doctor | update
 #   Panels       hi settings [page] | launcher | apps | overview | calendar | weather | processes
-#                hi sidebar [left|right] | bar [show|hide|toggle] | lock | session | wait | present
+#                hi sidebar [left|right] | bar [show|hide|toggle|list|add|rm|monitor|instance] | lock | session | wait | present
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
@@ -144,7 +144,27 @@ sidebar() {
 
 barcmd() {
     need_running
-    ipc bar "${1:-toggle}"
+    sub=${1:-toggle}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        list) ipc config get bar.extra; echo "per screen:"; ipc config get bar.monitors; echo "copies:"; ipc config get bar.instances ;;
+        # hi bar add <id> [position] [widgets...]: an extra bar, its widgets in the center
+        add)
+            [ -n "${1:-}" ] || { echo "Usage: hi bar add <id> [top|bottom|left|right] [widget...]" >&2; exit 1; }
+            id=$1; pos=${2:-bottom}; [ $# -gt 1 ] && shift 2 || shift $#
+            widgets=$(printf '"%s",' "$@"); widgets="[${widgets%,}]"
+            ipc config listput bar.extra "{\"id\":\"$id\",\"position\":\"$pos\",\"center\":$widgets}" >/dev/null && echo "Added the bar $id ($pos)" ;;
+        rm | remove) [ -n "${1:-}" ] || { echo "Usage: hi bar rm <id>" >&2; exit 1; }; ipc config listdel bar.extra "$1" >/dev/null && echo "Removed the bar $1" ;;
+        # hi bar monitor <screen> <key> <json>: override one setting of the main bar on a screen (null = back to the default)
+        monitor)
+            [ $# -ge 3 ] || { echo "Usage: hi bar monitor <screen> <enabled|position|style|height|margin|left|center|right> <json|null>   (screens: hyprctl monitors)" >&2; exit 1; }
+            ipc config map bar.monitors "$1.$2" "$3" >/dev/null && echo "Done" ;;
+        # hi bar instance <type#name> <json>: a copy of a widget with options of its own, e.g. 'zoneClock#tokyo' '{"zone":"Asia/Tokyo"}'
+        instance)
+            [ $# -ge 2 ] || { echo "Usage: hi bar instance <type#name> <json|null>   e.g. 'resources#disks' '{\"shown\":[\"disk\"]}'" >&2; exit 1; }
+            ipc config map bar.instances "$1" "$2" >/dev/null && echo "Done" ;;
+        *) ipc bar "$sub" ;;
+    esac
 }
 
 theme() {

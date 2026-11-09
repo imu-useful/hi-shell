@@ -16,7 +16,7 @@ BarWidget {
     shown: Mpris.hasPlayer
     padding: 3
     Layout.fillWidth: true
-    Layout.maximumWidth: Config.options.bar.media.maxWidth
+    Layout.maximumWidth: pick("maxWidth", Config.options.bar.media.maxWidth)
     contentWidth: vertical ? artSize : artSize + 8 + label.implicitWidth + 6 + playButton.width + 2
     contentHeight: artSize
 

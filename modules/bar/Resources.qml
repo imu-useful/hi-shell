@@ -17,7 +17,7 @@ BarWidget {
         disk: { icon: "hard_drive", value: SystemStats.diskUsage }
     })
     // Keys only: a model holding the values would recreate the rings on every update.
-    readonly property var keys: Config.options.bar.resources.shown.filter(k => ["cpu", "ram", "swap", "gpu", "disk"].includes(k))
+    readonly property var keys: pick("shown", Config.options.bar.resources.shown).filter(k => ["cpu", "ram", "swap", "gpu", "disk"].includes(k))
 
     padding: 8
     contentWidth: grid.implicitWidth
