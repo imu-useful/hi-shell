@@ -92,6 +92,8 @@ PopupWindow {
         border.width: root.pill ? 0 : Appearance.edge
         border.color: Appearance.edgeColor
 
+        GlassSheen {}
+
         opacity: root.shown ? 1 : 0
         scale: root.shown ? 1 : (root.pill ? 0.8 : 0.9)
         transformOrigin: root.edge === Edges.Bottom ? Item.Top : Item.Bottom

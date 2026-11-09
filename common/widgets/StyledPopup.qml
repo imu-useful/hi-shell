@@ -100,6 +100,8 @@ PopupWindow {
             border.width: Appearance.edge
             border.color: Appearance.edgeColor
 
+            GlassSheen {}
+
             opacity: root.shown ? 1 : 0
             scale: root.shown ? 1 : 0.88
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }

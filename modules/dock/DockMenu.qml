@@ -46,6 +46,8 @@ Rectangle {
     border.width: Appearance.edge
     border.color: Appearance.edgeColor
 
+    GlassSheen {}
+
     component MenuRow: Rectangle {
         property string icon: ""
         property string label: ""

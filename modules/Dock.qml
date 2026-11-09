@@ -241,6 +241,8 @@ Variants {
             border.width: Appearance.edge
             border.color: Appearance.edgeColor
 
+            GlassSheen {}
+
             HoverHandler {
                 id: dockHover
             }

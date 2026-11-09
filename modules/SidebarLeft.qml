@@ -97,6 +97,8 @@ Scope {
                 border.width: Appearance.edge
                 border.color: Appearance.edgeColor
 
+                GlassSheen {}
+
                 Behavior on x { SpatialAnim {} }
                 Behavior on opacity { SpatialAnim {} }
 
