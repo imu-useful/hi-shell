@@ -78,13 +78,6 @@ Canvas {
         return `hsla(${Math.round((((h + r[0]) % 1) + 1) % 1 * 360)}, ${Math.round(r[1] * 100)}%, ${Math.round(r[2] * 100)}%, ${alpha ?? 1})`;
     }
 
-    // The same tonal roles as a QML color (the canvas takes CSS strings, QML items don't)
-    function toneColor(i, alpha) {
-        const roles = [[0, 0.9, 0.62], [0.11, 0.6, 0.72], [0.28, 0.75, 0.68], [0, 0.5, 0.3], [0.28, 0.5, 0.32], [0.11, 0.45, 0.86]];
-        const r = roles[((i % 6) + 6) % 6];
-        return Qt.hsla((((hue() + r[0]) % 1) + 1) % 1, r[1], r[2], alpha);
-    }
-
     function lod(r) {
         return r > 90 ? 0 : r > 28 ? 1 : 2;
     }
@@ -244,73 +237,15 @@ Canvas {
             scene(i + 1, ctx, w, h, tl - sceneLength, u);
     }
 
-    // The caption: letter by letter. Each springs up (rising, growing, straightening) a beat after
-    // the one before, colors drift along the line, in the pause the line ripples gently, and on the
-    // way out the letters leave in the same order. A bar of light grows under the words.
-    Item {
-        id: captionBox
+    LetterCaption {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: root.height * 0.07
-        width: letters.width
-        height: letters.height + 30
-
-        readonly property real fontSize: Math.min(88, root.height / 12)
-        readonly property real appear: root.spring((root.sceneTime - 0.1) / 0.9)
-        readonly property real leave: root.clamp((root.sceneLength - root.sceneTime) / 0.4)
-
-        Row {
-            id: letters
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 0
-
-            Repeater {
-                model: root.caption.length
-
-                StyledText {
-                    id: letter
-
-                    required property int index
-                    // How far this letter is into its entrance / exit (0..1, springy on the way in)
-                    readonly property real inP: root.spring((root.sceneTime - 0.05 - index * 0.05) / 0.65)
-                    readonly property real outP: root.clamp((root.sceneLength - root.sceneTime - index * 0.025) / 0.35)
-                    readonly property real show: Math.min(1, inP * 1.6) * outP
-
-                    text: root.caption[index]
-                    font.family: Appearance.font.title
-                    font.pixelSize: captionBox.fontSize
-                    font.weight: Font.Bold
-                    elide: Text.ElideNone
-                    // Pastel tones sliding along the word as the seed color drifts
-                    color: Qt.hsla((root.hue() + index * 0.03 + root.time * 0.05) % 1, 0.85, 0.78 + 0.06 * Math.sin(root.time * 2 - index * 0.6), 1)
-                    opacity: show
-                    transformOrigin: Item.Center
-                    scale: (0.35 + 0.65 * inP) * (0.8 + 0.2 * outP)
-                    rotation: (1 - inP) * (index % 2 ? -14 : 14) + (1 - outP) * (index % 2 ? 10 : -10)
-                    transform: Translate {
-                        y: (1 - letter.inP) * 70 + (1 - letter.outP) * -30 + Math.sin(root.time * 2.4 + letter.index * 0.55) * 4 * letter.show
-                    }
-                }
-            }
-        }
-
-        // The bar under the words
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: letters.bottom
-            anchors.topMargin: 10
-            height: 6
-            radius: 3
-            width: letters.width * 0.7 * Math.max(0, captionBox.appear) * captionBox.leave
-            opacity: captionBox.leave
-            gradient: Gradient {
-                orientation: Gradient.Horizontal
-                GradientStop { position: 0; color: root.toneColor(0, 0) }
-                GradientStop { position: 0.2; color: root.toneColor(0, 1) }
-                GradientStop { position: 0.5; color: root.toneColor(2, 1) }
-                GradientStop { position: 0.8; color: root.toneColor(1, 1) }
-                GradientStop { position: 1; color: root.toneColor(1, 0) }
-            }
-        }
+        text: root.caption
+        time: root.time
+        sceneTime: root.sceneTime
+        sceneLength: root.sceneLength
+        hue: root.hue()
+        fontSize: Math.min(88, root.height / 12)
     }
 }
