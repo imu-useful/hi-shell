@@ -21,8 +21,8 @@ Scope {
     readonly property var current: BarLayout.spec(screenName, barId)
     // Every widget of the bar, in all three sections.
     readonly property var present: [...current.left, ...current.center, ...current.right]
-    readonly property var addable: [...Object.keys(BarWidgets.names), ...Object.keys(Config.options.bar.instances ?? {})]
-        .filter(id => id === "divider" || id === "zoneClock" || !present.includes(id))
+    readonly property var addable: [...Object.keys(BarWidgets.names), ...UserWidgets.names, ...Object.keys(Config.options.bar.instances ?? {})]
+        .filter(id => id === "divider" || id === "zoneClock" || id === "script" || !present.includes(id))
 
     function add(id) {
         BarLayout.writeList(screenName, barId, section, [...current[section], id]);

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.common
+import qs.services
 
 // One bar section (left / center / right): a row (or column) of widgets
 // created from their ids. Unknown ids are skipped with a warning.
@@ -84,11 +85,11 @@ GridLayout {
                 }
             }
 
-            sourceComponent: root.registry[type] ?? null
+            sourceComponent: root.registry[type] ?? UserWidgets.component(type)
             Component.onCompleted: {
                 if (isIsland)
                     root.islandLoader = loader;
-                if (!root.registry[type])
+                if (!root.registry[type] && !UserWidgets.component(type))
                     console.warn(`Bar: unknown widget "${modelData}"`);
             }
         }

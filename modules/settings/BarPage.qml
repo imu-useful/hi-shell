@@ -50,7 +50,8 @@ ColumnLayout {
         resources: { shown: ["cpu"] },
         utilButtons: { shown: ["screenshot"] },
         workspaces: { shown: 5 },
-        media: { maxWidth: 160 }
+        media: { maxWidth: 160 },
+        script: { command: "date +%H:%M", interval: 30, icon: "terminal" }
     })
     property string newCopyType: "zoneClock"
     property string newCopyName: ""
@@ -173,7 +174,7 @@ ColumnLayout {
             spacing: 6
 
             Repeater {
-                model: [...Object.keys(BarWidgets.names), ...Object.keys(Config.options.bar.instances ?? {})].filter(id => id === "divider" || id === "zoneClock" ? true : !section.items.includes(id))
+                model: [...Object.keys(BarWidgets.names), ...UserWidgets.names, ...Object.keys(Config.options.bar.instances ?? {})].filter(id => id === "divider" || id === "zoneClock" || id === "script" ? true : !section.items.includes(id))
 
                 Chip {
                     required property string modelData
@@ -468,6 +469,56 @@ ColumnLayout {
             title: Translation.tr("Hide updates when there are none")
             checked: root.bar.updates.hideWhenNone
             onToggled: checked => root.bar.updates.hideWhenNone = checked
+        }
+    }
+
+    Section {
+        icon: "extension"
+        title: Translation.tr("Your own widgets")
+
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("A QML file in the widgets folder is a widget with the file's name; add it to a section above. Saving the file updates the bar. A widget made of a command needs no file: make a Script copy below.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        Repeater {
+            model: UserWidgets.names
+
+            ListRow {
+                required property string modelData
+                readonly property var info: UserWidgets.widgets[modelData]
+                Layout.fillWidth: true
+                icon: info.error ? "error" : "extension"
+                title: modelData
+                subtitle: info.error ? info.error.split("\n")[0] : info.file
+            }
+        }
+        StyledText {
+            visible: UserWidgets.names.length === 0
+            Layout.margins: 14
+            text: Translation.tr("No widgets yet. `hi widgets new <name>` makes one.")
+            color: Colors.m3outline
+        }
+        RowLayout {
+            Layout.margins: 14
+            spacing: 8
+
+            M3Button {
+                tonal: true
+                icon: "folder_open"
+                text: Translation.tr("Open the folder")
+                onClicked: UserWidgets.openFolder()
+            }
+            M3Button {
+                tonal: true
+                icon: "refresh"
+                text: Translation.tr("Reload")
+                onClicked: UserWidgets.reload()
+            }
         }
     }
 

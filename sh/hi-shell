@@ -7,6 +7,7 @@
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
+#   Widgets      hi widgets [list|new <name>|edit <name>|reload|path]   hi script <name> '<command>' [seconds] [icon] [template]
 #   Presets      hi preset list | save <name> | load <file>
 #   Media        hi play | pause | next | prev
 #   Other        hi qr [text] | keybinds [word] | ipc [<target> <function> [args]] | help
@@ -16,7 +17,7 @@ set -u
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-usage() { sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; }
 
 doctor() {
     bad=0
@@ -202,6 +203,43 @@ preset() {
     esac
 }
 
+widgets() {
+    dir="${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/widgets"
+    sub=${1:-list}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        list) need_running; out=$(ipc widgets list); if [ -n "$out" ]; then echo "$out"; else echo "No widgets in $dir (hi widgets new <name> makes one)"; fi ;;
+        path) echo "$dir" ;;
+        reload) need_running; ipc widgets reload ;;
+        new)
+            [ -n "${1:-}" ] || { echo "Usage: hi widgets new <name>   (letters, digits and _, starting with a letter)" >&2; exit 1; }
+            case "$1" in [A-Za-z]*) ;; *) echo "The name must start with a letter" >&2; exit 1 ;; esac
+            case "$1" in *[!A-Za-z0-9_]*) echo "The name may only have letters, digits and _" >&2; exit 1 ;; esac
+            mkdir -p "$dir"
+            [ -e "$dir/$1.qml" ] && { echo "$dir/$1.qml already exists" >&2; exit 1; }
+            sed "s/__NAME__/$1/g" "$here/widgets/template.qml" >"$dir/$1.qml"
+            echo "Made $dir/$1.qml. Add it to a bar: hi bar add mybar top $1   (or Settings > Bar)" ;;
+        edit) [ -n "${1:-}" ] || { echo "Usage: hi widgets edit <name>" >&2; exit 1; }; "${VISUAL:-${EDITOR:-nano}}" "$dir/$1.qml" ;;
+        *) echo "Usage: hi widgets list|new <name>|edit <name>|reload|path" >&2; exit 1 ;;
+    esac
+}
+
+# hi script <name> <command> [seconds] [icon] [template]: a bar widget made of a command, "script#<name>"
+script() {
+    [ $# -ge 2 ] || { echo "Usage: hi script <name> '<command>' [seconds] [icon] [template]   e.g. hi script temp 'sensors | head -1' 10 thermostat '{}°'" >&2; exit 1; }
+    need_running
+    json=$(python3 -I -c '
+import json, sys
+name, command = sys.argv[1], sys.argv[2]
+opts = {"command": command, "interval": float(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3] else 5}
+if len(sys.argv) > 4 and sys.argv[4]:
+    opts["icon"] = sys.argv[4]
+if len(sys.argv) > 5 and sys.argv[5]:
+    opts["template"] = sys.argv[5]
+print(json.dumps(opts))' "$@") || exit 1
+    ipc config map bar.instances "script#$1" " $json" >/dev/null && echo "Made script#$1. Add it to a bar: Settings > Bar, or hi bar edit" 
+}
+
 update() {
     [ -x "$repo/update.sh" ] || { echo "update.sh not found in $repo" >&2; exit 1; }
     exec "$repo/update.sh" "$@"
@@ -235,6 +273,8 @@ case "$cmd" in
     theme) theme "$@" ;;
     wallpaper | wall) wallpaper "$@" ;;
     preset | presets) preset "$@" ;;
+    widgets | widget) widgets "$@" ;;
+    script) script "$@" ;;
     play | pause | toggle-play) need_running; ipc mpris playPause ;;
     next) need_running; ipc mpris next ;;
     prev | previous) need_running; ipc mpris previous ;;

@@ -76,7 +76,8 @@ PanelWindow {
         visualizer: visualizer,
         divider: divider,
         focus: focus,
-        zoneClock: zoneClock
+        zoneClock: zoneClock,
+        script: script
     })
 
     // The Dynamic Island (the clock widget) takes the bar over while it shows music or a notification:
@@ -203,6 +204,7 @@ PanelWindow {
     Component { id: divider; Divider {} }
     Component { id: focus; FocusWidget {} }
     Component { id: zoneClock; ZoneClock {} }
+    Component { id: script; ScriptWidget {} }
 
     anchors.top: position !== "bottom"
     anchors.bottom: position !== "top"

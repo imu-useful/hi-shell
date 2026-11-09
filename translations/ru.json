@@ -1329,5 +1329,12 @@
     "Pop": "Появление",
     "Spin": "Вращение",
     "Preview": "Предпросмотр",
-    "Play it now": "Показать сейчас"
+    "Play it now": "Показать сейчас",
+    "Your own widgets": "Ваши виджеты",
+    "A QML file in the widgets folder is a widget with the file's name; add it to a section above. Saving the file updates the bar. A widget made of a command needs no file: make a Script copy below.": "QML-файл в папке виджетов — это виджет с именем файла; добавьте его в секцию выше. Сохранение файла обновляет панель. Виджету из команды файл не нужен: создайте копию «Скрипт» ниже.",
+    "No widgets yet. `hi widgets new <name>` makes one.": "Виджетов пока нет. `hi widgets new <имя>` создаст его.",
+    "Open the folder": "Открыть папку",
+    "Reload": "Перезагрузить",
+    "Widget %1 didn't load": "Виджет %1 не загрузился",
+    "Script": "Скрипт"
 }
