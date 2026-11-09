@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "ConfigSchema.js" as Schema
 
 // User configuration in ~/.config/hi-shell/config.json.
 // Missing keys fall back to the defaults below; edits to the file apply live,
@@ -17,6 +18,39 @@ Singleton {
     readonly property bool ready: file.loaded
     property bool filledIn: false
 
+    // Options reset to their defaults on the last check, as [{ path, value, reason, def }]
+    // (a hand edit that broke a rule in common/ConfigSchema.js).
+    property var lastProblems: []
+
+    function getPath(path) {
+        let o = adapter;
+        for (const k of path.split(".")) {
+            if (o === undefined || o === null)
+                return undefined;
+            o = o[k];
+        }
+        return o;
+    }
+
+    function setPath(path, value) {
+        const parts = path.split(".");
+        let o = adapter;
+        for (const k of parts.slice(0, -1))
+            o = o[k];
+        o[parts[parts.length - 1]] = value;
+    }
+
+    // Put every option that breaks its rule back to its default and say so; the shell keeps running
+    // with a sane value instead of a typo (bar.position: "lefft") breaking a panel.
+    function validate() {
+        const bad = Schema.check(getPath);
+        for (const b of bad) {
+            console.warn(`Config: ${b.path} = ${JSON.stringify(b.value)} ${b.reason}; using ${JSON.stringify(b.def)}`);
+            setPath(b.path, b.def);
+        }
+        lastProblems = bad;
+    }
+
     FileView {
         id: file
         path: root.path
@@ -24,9 +58,13 @@ Singleton {
         atomicWrites: true
         printErrors: false
         onFileChanged: reload()
-        onAdapterUpdated: writeTimer.restart()
+        onAdapterUpdated: {
+            validate();
+            writeTimer.restart();
+        }
         // Write back once per start so options added in newer versions show up in the file.
         onLoaded: {
+            validate();
             if (!root.filledIn) {
                 root.filledIn = true;
                 writeTimer.restart();

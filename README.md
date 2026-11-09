@@ -283,6 +283,7 @@ the defaults on first start; edits apply live). The Hyprland page applies change
 `~/.config/hi-shell/hyprland.lua`, which `overrides.lua` loads at startup; "Reset Hyprland overrides" removes them.
 A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
+A value that breaks its rule in `common/ConfigSchema.js` (a typo in `bar.position`, a `lock.brightness` of 7) is reported in the log (`qs -c hi-shell log`) and replaced by its default; `python3 tools/audit_config.py` lists the options that have no control in the settings app (`docs/CONFIG_AUDIT.md`).
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
