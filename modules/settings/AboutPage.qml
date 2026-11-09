@@ -84,7 +84,7 @@ ColumnLayout {
             SequentialAnimation {
                 id: hint
                 PauseAnimation { duration: 700 }
-                ScriptAction { script: { logo.burst(1.7); logo.turn += 72; } }
+                ScriptAction { script: { logo.burst(1.7); logo.turn += 72; hand.wave(); } }
                 NumberAnimation { target: logo; property: "flash"; to: 1; duration: 350; easing.type: Easing.OutCubic }
                 NumberAnimation { target: logo; property: "flash"; to: 0; duration: 900; easing.type: Easing.InOutCubic }
                 ScriptAction { script: logo.burst(1.7) }
@@ -140,6 +140,7 @@ ColumnLayout {
                     root.taps++;
                     tapReset.restart();
                     logo.turn += 72; // five taps make a full turn
+                    hand.wave();
                     if (root.taps >= root.secretTaps) {
                         root.taps = 0;
                         root.secretOpen = true;
@@ -154,13 +155,12 @@ ColumnLayout {
                 interval: 1500
                 onTriggered: root.taps = 0
             }
-            MaterialIcon {
+            HandLogo {
+                id: hand
                 anchors.centerIn: parent
-                icon: "auto_awesome"
-                fill: 1
-                iconSize: 44
+                size: 58
                 color: Colors.m3onPrimaryContainer
-                rotation: logo.flash * 20
+                arcColor: Colors.m3tertiary
             }
         }
         ColumnLayout {
