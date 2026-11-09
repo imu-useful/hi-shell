@@ -8,6 +8,7 @@
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
 #   Screens      hi dock screens <all|name...>   hi desktop screens|own ...   hi wallpaper screen <name> <file|none>
+#   Rules        hi rules [list|templates|add <template>|edit <id>|on|off <id>|rm <id>|facts|check]
 #   Widgets      hi widgets [list|new <name>|edit <name>|reload|path]   hi script <name> '<command>' [seconds] [icon] [template]
 #   Presets      hi preset list | save <name> | load <file>
 #   Media        hi play | pause | next | prev
@@ -18,7 +19,7 @@ set -u
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-usage() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
 
 doctor() {
     bad=0
@@ -289,6 +290,36 @@ desktop() {
     esac
 }
 
+# hi rules: "when this, do that" (see docs/RULES.md)
+rules() {
+    need_running
+    sub=${1:-list}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        list) out=$(ipc rules list); if [ -n "$out" ]; then printf '%s\n' "$out" | column -t -s "$(printf '\t')"; else echo "No rules yet: hi rules templates, hi rules add <template>, hi rules edit <id>"; fi ;;
+        templates) ipc rules templates | column -t -s "$(printf '\t')" ;;
+        add) [ -n "${1:-}" ] || { echo "Usage: hi rules add <template>   (hi rules templates)" >&2; exit 1; }; ipc rules addTemplate "$1" ;;
+        rm | remove) [ -n "${1:-}" ] || { echo "Usage: hi rules rm <id>" >&2; exit 1; }; ipc rules remove "$1" ;;
+        on) [ -n "${1:-}" ] || { echo "Usage: hi rules on <id>" >&2; exit 1; }; ipc rules enable "$1" true ;;
+        off) [ -n "${1:-}" ] || { echo "Usage: hi rules off <id>" >&2; exit 1; }; ipc rules enable "$1" false ;;
+        show) [ -n "${1:-}" ] || { echo "Usage: hi rules show <id>" >&2; exit 1; }; ipc rules get "$1" ;;
+        facts) ipc rules facts ;;
+        check) out=$(ipc rules check); if [ -n "$out" ]; then echo "$out"; exit 1; else echo "All rules are fine."; fi ;;
+        # hi rules edit <id>: the rule in $EDITOR (a new id starts from a skeleton); saved when the file is valid JSON
+        edit)
+            [ -n "${1:-}" ] || { echo "Usage: hi rules edit <id>" >&2; exit 1; }
+            case "$1" in *[!A-Za-z0-9_-]*) echo "The id is letters, digits, - and _" >&2; exit 1 ;; esac
+            tmp=$(mktemp "${TMPDIR:-/tmp}/hi-rule-XXXXXX.json") || exit 1
+            cur=$(ipc rules get "$1")
+            case "$cur" in "No such rule"*) printf '{\n  "id": "%s",\n  "name": "",\n  "when": { "battery": "discharging" },\n  "then": [ { "notify": "on battery" } ],\n  "else": []\n}\n' "$1" >"$tmp" ;; *) printf '%s\n' "$cur" >"$tmp" ;; esac
+            "${VISUAL:-${EDITOR:-nano}}" "$tmp"
+            json=$(python3 -I -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$tmp") || { echo "Not valid JSON; nothing saved (file kept: $tmp)" >&2; exit 1; }
+            rm -f "$tmp"
+            ipc rules put "$json" ;;
+        *) echo "Usage: hi rules list|templates|add <template>|edit <id>|show <id>|on <id>|off <id>|rm <id>|facts|check" >&2; exit 1 ;;
+    esac
+}
+
 update() {
     [ -x "$repo/update.sh" ] || { echo "update.sh not found in $repo" >&2; exit 1; }
     exec "$repo/update.sh" "$@"
@@ -322,6 +353,7 @@ case "$cmd" in
     theme) theme "$@" ;;
     wallpaper | wall) wallpaper "$@" ;;
     preset | presets) preset "$@" ;;
+    rules | rule) rules "$@" ;;
     dock) dock "$@" ;;
     desktop) desktop "$@" ;;
     widgets | widget) widgets "$@" ;;

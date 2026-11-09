@@ -258,7 +258,7 @@ Scope {
                             width: flick.width - 12
                             sourceComponent: ({
                                 quick: quick, general: general, bar: bar, desktop: desktop,
-                                interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                                interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
                             })[ShellState.settingsPage] ?? quick
                             onLoaded: {
                                 flick.targetY = 0;
@@ -279,6 +279,7 @@ Scope {
                         Component { id: autostart; AutostartPage {} }
                         Component { id: keybinds; KeybindsPage {} }
                         Component { id: screentime; ScreenTimePage {} }
+                        Component { id: rules; RulesPage {} }
                         Component { id: defaultapps; DefaultAppsPage {} }
                         Component { id: about; AboutPage {} }
                         Component { id: lock; LockPage {} }

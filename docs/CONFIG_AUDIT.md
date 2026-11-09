@@ -1,6 +1,6 @@
 # Config audit
 
-207 options in `common/ConfigOptions.qml`.
+214 options in `common/ConfigOptions.qml`.
 
 ## Options without a control in the settings app (46)
 
@@ -18,6 +18,7 @@
 | `sidebar.quickToggles.shown` | `list<string>` | `["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]` |
 | `wallpapers.downloadDirectory` | `string` | `"~/Pictures/Wallpapers/online"` |
 | `wallpapers.frameSize` | `real` | `0.62` |
+| `desktop.layouts` | `var` | `({})` |
 | `desktop.toolbar.x` | `real` | `-1` |
 | `desktop.toolbar.y` | `real` | `-1` |
 | `idle.manage` | `bool` | `false` |
@@ -48,7 +49,6 @@
 | `tray.hidden` | `list<string>` | `[]` |
 | `hyprland.monitors` | `var` | `({})` |
 | `hyprland.options` | `var` | `({})` |
-| `dock.monitor` | `string` | `""` |
 | `dock.pinned` | `list<string>` | `["firefox", "kitty", "org.gnome.Nautilus"]` |
 | `capture.ocrLanguages` | `string` | `"auto"` |
 | `capture.recordSound` | `string` | `"off"` |

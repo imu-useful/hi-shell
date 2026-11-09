@@ -86,4 +86,22 @@ Singleton {
         interval: 3000
         onTriggered: root.hyprSet(false)
     }
+
+    // qs -c hi-shell ipc call powersaving on | off | toggle | status
+    IpcHandler {
+        target: "powersaving"
+
+        function on(): void {
+            root.apply(true);
+        }
+        function off(): void {
+            root.apply(false);
+        }
+        function toggle(): void {
+            root.apply(!root.enabled);
+        }
+        function status(): string {
+            return root.enabled ? "on" : "off";
+        }
+    }
 }

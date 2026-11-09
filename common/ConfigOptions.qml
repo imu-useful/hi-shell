@@ -155,6 +155,11 @@ JsonAdapter {
         property string game: "dino"
     }
 
+    // Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs;
+    // when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all.
+    property var rules: []
+    property bool rulesEnabled: true
+
     property JsonObject launcher: JsonObject {
         // The prefixes that switch the source, in the order of the chips under the empty search:
         // = calculator, > run a command, < keybinds, : emoji, ; clipboard, / settings, ~ files.

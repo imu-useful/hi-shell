@@ -1343,5 +1343,17 @@
     "Starts as a copy of the shared layout; edit it in the desktop's edit mode": "Начинается как копия общей раскладки; меняется в режиме правки рабочего стола",
     "Dock icon size": "Размер значков дока",
     "Use the shared dock settings": "Использовать общие настройки дока",
-    "A picture for this screen only (a path); empty = the shared wallpaper": "Картинка только для этого экрана (путь); пусто — общие обои"
+    "A picture for this screen only (a path); empty = the shared wallpaper": "Картинка только для этого экрана (путь); пусто — общие обои",
+    "Rules": "Правила",
+    "Rules are on": "Правила включены",
+    "Off stops every rule and puts back what they changed": "Выключение останавливает все правила и возвращает то, что они изменили",
+    "A rule runs its actions when its condition turns true, and when it turns false the options it changed go back. Start from a template below, change a rule with Edit, or use `hi rules` in a terminal.": "Правило выполняет действия, когда его условие становится истинным, а когда становится ложным, изменённые опции возвращаются. Начните с шаблона ниже, измените правило кнопкой правки или используйте `hi rules` в терминале.",
+    "Active now": "Сейчас действует",
+    "No rules yet": "Правил пока нет",
+    "Add a rule": "Добавить правило",
+    "Power saving on battery below 30%": "Экономия энергии при заряде батареи ниже 30%",
+    "Dark mode from 20:00 to 07:00": "Тёмная тема с 20:00 до 07:00",
+    "No sounds over a fullscreen window": "Без звуков при полноэкранном окне",
+    "A dock on every screen with a second screen": "Док на каждом экране, когда подключён второй",
+    "Presentation mode while Steam is open": "Режим презентации, пока открыта игра Steam"
 }

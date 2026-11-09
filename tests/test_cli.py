@@ -94,6 +94,18 @@ class CliTest(unittest.TestCase):
         self.assertEqual(self.last(), ["config", "map", "desktop.layouts", "eDP-1", " null"])
         self.assertNotEqual(self.qs.run("dock", "screens").returncode, 0)
 
+    def test_rules_commands_call_the_rules_target(self):
+        self.qs.run("rules", "add", "night-dark")
+        self.assertEqual(self.last(), ["rules", "addTemplate", "night-dark"])
+        self.qs.run("rules", "off", "x")
+        self.assertEqual(self.last(), ["rules", "enable", "x", "false"])
+        self.qs.run("rules", "on", "x")
+        self.assertEqual(self.last(), ["rules", "enable", "x", "true"])
+        self.qs.run("rules", "rm", "x")
+        self.assertEqual(self.last(), ["rules", "remove", "x"])
+        self.assertNotEqual(self.qs.run("rules", "add").returncode, 0)
+        self.assertNotEqual(self.qs.run("rules", "edit", "a b").returncode, 0)
+
     def test_unknown_command_fails_and_help_lists_the_commands(self):
         self.assertEqual(self.qs.run("nope").returncode, 1)
         out = self.qs.run("help").stdout

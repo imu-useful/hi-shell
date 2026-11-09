@@ -16,6 +16,7 @@ const pages = [
     // { id: "keybinds", title: "Keybinds", icon: "keyboard", keywords: "keybinds keybindings shortcuts hotkeys keys bind binds key super ctrl alt shift remap rebind hyprland" },
     { id: "defaultapps", title: "Defaults", icon: "open_in_new", keywords: "task manager ctrl shift escape btop htop system monitor processes defaults default apps applications browser web file manager email images video music audio pdf text editor terminal open with mime xdg" },
     { id: "screentime", title: "Screen time", icon: "hourglass_top", keywords: "screen time usage used apps app limit limits minutes hours today week statistics focus time spent" },
+    { id: "rules", title: "Rules", icon: "rule", keywords: "rules automation when then condition battery fullscreen time night monitor connected app open script trigger power saving dark mode schedule" },
     { id: "about", title: "About", icon: "info", keywords: "about version quickshell source credits presets preset export import backup share" }
 ];
 

@@ -38,6 +38,12 @@ class DropScriptsTest(unittest.TestCase):
         self.assertEqual(bar["extra"][0]["center"], ["media"])
         self.assertEqual(bar["monitors"]["eDP-1"]["left"], [])
 
+    def test_rules_are_removed_too(self):
+        cfg = {"rules": [{"id": "x", "when": {"dark": True}, "then": [{"run": "id"}]}], "rulesEnabled": True, "bar": {}}
+        presets.drop_scripts(cfg)
+        self.assertNotIn("rules", cfg)
+        self.assertNotIn("rulesEnabled", cfg)
+
     def test_config_without_a_bar_is_left_alone(self):
         cfg = {"dock": {"enabled": True}}
         presets.drop_scripts(cfg)

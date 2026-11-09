@@ -44,6 +44,10 @@ def drop_scripts(config: dict) -> None:
     """A preset is shared, so it must not bring commands with it: script widgets (bar.instances "script#...") run
     a shell command from their options, so they are left out of an imported preset (with their place in the bar
     lists). A script widget you made yourself stays."""
+    # Rules run commands and change any option, so a shared preset doesn't bring them either.
+    if config.pop("rules", None):
+        print("presets: left out the preset's rules (they can run commands)", file=sys.stderr)
+    config.pop("rulesEnabled", None)
     bar = config.get("bar")
     if not isinstance(bar, dict):
         return
