@@ -50,23 +50,102 @@ ColumnLayout {
 
     RowLayout {
         spacing: 20
+        // The logo is the way to the secret setting, so it hints at itself: it lights up once when
+        // the page opens, shrinks under the pointer, gives under a press, and turns a little with
+        // every tap (the fifth is a bigger burst, and the setting appears).
         Item {
+            id: logo
+
+            property real turn: 0
+            property real flash: 0 // 0..1, how much the logo is lit
+            property real ripple: 0 // 0..1, progress of the ring leaving it
+            property real rippleSize: 1.6
+
             implicitWidth: 96
             implicitHeight: 96
+            scale: tap.pressed ? 0.86 : tap.containsMouse ? 0.92 : 1
+            Behavior on scale {
+                NumberAnimation {
+                    duration: Appearance.anim.spatial
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Appearance.anim.spatialFast
+                }
+            }
+
+            function burst(size) {
+                rippleSize = size;
+                ripple = 0;
+                rippleAnim.restart();
+            }
+
+            Component.onCompleted: hint.start()
+
+            // Once, a moment after the page opens: two rings and a glow
+            SequentialAnimation {
+                id: hint
+                PauseAnimation { duration: 700 }
+                ScriptAction { script: { logo.burst(1.7); logo.turn += 72; } }
+                NumberAnimation { target: logo; property: "flash"; to: 1; duration: 350; easing.type: Easing.OutCubic }
+                NumberAnimation { target: logo; property: "flash"; to: 0; duration: 900; easing.type: Easing.InOutCubic }
+                ScriptAction { script: logo.burst(1.7) }
+            }
+
+            NumberAnimation {
+                id: rippleAnim
+                target: logo
+                property: "ripple"
+                from: 0
+                to: 1
+                duration: 900
+                easing.type: Easing.OutCubic
+            }
+
+            // The ring that leaves the logo
+            MaterialShape {
+                anchors.centerIn: parent
+                width: parent.width * (1 + (logo.rippleSize - 1) * logo.ripple)
+                height: width
+                shape: "sunny"
+                animated: false
+                color: "transparent"
+                borderColor: Colors.m3primary
+                borderWidth: 3
+                shapeRotation: logo.turn
+                opacity: logo.ripple > 0 && logo.ripple < 1 ? 1 - logo.ripple : 0
+            }
+            // The glow behind it
+            MaterialShape {
+                anchors.centerIn: parent
+                width: parent.width * 1.25
+                height: width
+                shape: "sunny"
+                animated: false
+                color: Colors.m3primary
+                shapeRotation: logo.turn
+                opacity: 0.35 * logo.flash
+            }
             MaterialShape {
                 anchors.fill: parent
                 shape: "sunny"
-                color: Colors.m3primaryContainer
+                shapeRotation: logo.turn
+                color: Qt.tint(Colors.m3primaryContainer, Qt.rgba(Colors.m3primary.r, Colors.m3primary.g, Colors.m3primary.b, 0.55 * logo.flash))
             }
             MouseArea {
+                id: tap
                 anchors.fill: parent
                 z: 1
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     root.taps++;
                     tapReset.restart();
+                    logo.turn += 72; // five taps make a full turn
                     if (root.taps >= root.secretTaps) {
                         root.taps = 0;
                         root.secretOpen = true;
+                        logo.burst(2.4);
+                    } else {
+                        logo.burst(1.35);
                     }
                 }
             }
@@ -81,6 +160,7 @@ ColumnLayout {
                 fill: 1
                 iconSize: 44
                 color: Colors.m3onPrimaryContainer
+                rotation: logo.flash * 20
             }
         }
         ColumnLayout {
