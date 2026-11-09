@@ -1,8 +1,8 @@
 # Config audit
 
-203 options in `common/ConfigOptions.qml`.
+207 options in `common/ConfigOptions.qml`.
 
-## Options without a control in the settings app (47)
+## Options without a control in the settings app (46)
 
 | Option | Type | Default |
 | --- | --- | --- |
@@ -10,12 +10,11 @@
 | `appearance.fonts.icon` | `string` | `"Material Symbols Rounded"` |
 | `appearance.colorOverrides` | `var` | `({})` |
 | `appearance.gtkColorScheme` | `bool` | `true` |
+| `bar.height` | `int` | `40` |
+| `bar.margin` | `int` | `6` |
 | `bar.left` | `list<string>` | `["launcher", "activeWindow"]` |
 | `bar.center` | `list<string>` | `["resources", "media", "workspaces", "clock", "utilButtons", "weather"]` |
 | `bar.right` | `list<string>` | `["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]` |
-| `bar.monitors` | `var` | `({})` |
-| `bar.extra` | `var` | `[]` |
-| `bar.instances` | `var` | `({})` |
 | `sidebar.quickToggles.shown` | `list<string>` | `["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]` |
 | `wallpapers.downloadDirectory` | `string` | `"~/Pictures/Wallpapers/online"` |
 | `wallpapers.frameSize` | `real` | `0.62` |
@@ -72,7 +71,7 @@
 
 ## Hardcoded values in modules/ and common/widgets/
 
-124 colors, 76 durations, 104 radii, 37 font sizes
+124 colors, 76 durations, 105 radii, 37 font sizes
 
 | File | Total | Colors | Durations | Radii | Font sizes |
 | --- | --- | --- | --- | --- | --- |

@@ -9,6 +9,9 @@ GridLayout {
 
     required property var bar
     required property list<string> widgets
+    // "left", "center" or "right": which list of the bar this is (for dragging in edit mode).
+    property string key: ""
+    property alias repeater: rep
     // id -> Component, see Bar.qml
     required property var registry
     // The Dynamic Island (the clock) takes the bar over: 0..1, how far the other widgets have gone.
@@ -28,6 +31,7 @@ GridLayout {
     columnSpacing: 4
 
     Repeater {
+        id: rep
         model: root.widgets
 
         Loader {
@@ -56,6 +60,28 @@ GridLayout {
             transform: Translate {
                 x: root.bar.vertical ? 0 : loader.dir * (1 - loader.keep) * 40
                 y: root.bar.vertical ? loader.dir * (1 - loader.keep) * 40 : 0
+            }
+
+            // Edit mode: the widget can't be used, only dragged (see Bar.qml).
+            MouseArea {
+                anchors.fill: parent
+                z: 100
+                visible: ShellState.barEdit
+                cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                preventStealing: true
+                onPressed: mouse => root.bar.dragStart(root.key, loader.index, loader.modelData, loader)
+                onPositionChanged: mouse => root.bar.dragMove(loader, mouse.x, mouse.y)
+                onReleased: root.bar.dragEnd()
+                onCanceled: root.bar.dragCancel()
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Appearance.rounding.medium
+                    color: Qt.alpha(Colors.m3primary, parent.pressed ? 0.25 : 0.1)
+                    border.width: 1
+                    border.color: Qt.alpha(Colors.m3primary, 0.7)
+                    opacity: ShellState.barEdit ? 1 : 0
+                }
             }
 
             sourceComponent: root.registry[type] ?? null

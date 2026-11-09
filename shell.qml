@@ -35,6 +35,8 @@ ShellRoot {
         Bar {}
     }
 
+    BarEditor {}
+
     IslandOverlay {}
 
     IconThemeWatcher {}

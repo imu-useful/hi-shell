@@ -23,7 +23,7 @@ Scope {
     readonly property bool open: ShellState.launcherOpen
     property string query: ""
 
-    readonly property var prefixes: [
+    readonly property var allPrefixes: [
         { key: "=", icon: "calculate", name: Translation.tr("Calculator") },
         { key: ">", icon: "terminal", name: Translation.tr("Run command") },
         { key: "<", icon: "keyboard", name: Translation.tr("Keybinds") },
@@ -32,12 +32,16 @@ Scope {
         { key: "/", icon: "settings", name: Translation.tr("Settings") },
         { key: "~", icon: "folder", name: Translation.tr("Files") }
     ]
+    // Config launcher.prefixes: which of them are on, in that order.
+    readonly property var prefixes: Array.from(Config.options.launcher.prefixes).map(k => allPrefixes.find(p => p.key === k)).filter(p => p !== undefined)
+    // Config launcher.sources: what a plain search looks through, in the order of the results.
+    readonly property var sources: Array.from(Config.options.launcher.sources)
     readonly property string mode: prefixes.some(p => p.key === query[0]) ? query[0] : ""
     readonly property string term: mode ? query.slice(1).trim() : query.trim()
 
     property string calcResult: ""
     // Plain text that reads as a calculation, and its answer (for that very text).
-    readonly property bool mathLike: mode === "" && Expression.isMath(term)
+    readonly property bool mathLike: mode === "" && sources.includes("math") && Expression.isMath(term)
     property string inlineFor: ""
     property string inlineResult: ""
     property var binds: []
@@ -81,7 +85,8 @@ Scope {
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return [...inlineMath(), ...focusMatches(term), ...windowMatches(term), ...settingsMatches(term), ...filterApps(term), ...emojiMatches(term)];
+            return sources.flatMap(id => id === "math" ? inlineMath() : id === "focus" ? focusMatches(term) : id === "windows" ? windowMatches(term)
+                : id === "settings" ? settingsMatches(term) : id === "apps" ? filterApps(term) : id === "emoji" ? emojiMatches(term) : []);
         }
     }
 
@@ -264,7 +269,7 @@ Scope {
 
     // Calculator: qalc, debounced.
     onTermChanged: {
-        if (mode === "=" || (mode === "" && Expression.isMath(term)))
+        if (mode === "=" || (mode === "" && sources.includes("math") && Expression.isMath(term)))
             calcTimer.restart();
         if (mode === "~")
             fileTimer.restart();
@@ -528,7 +533,7 @@ Scope {
                                 StyledText {
                                     anchors.verticalCenter: parent.verticalCenter
                                     visible: search.text === ""
-                                    text: Translation.tr("Search apps, or type = > < : ; /")
+                                    text: root.prefixes.length > 0 ? Translation.tr("Search apps, or type %1").arg(root.prefixes.map(p => p.key).join(" ")) : Translation.tr("Search apps")
                                     font: search.font
                                     color: Colors.m3onSurfaceVariant
                                 }

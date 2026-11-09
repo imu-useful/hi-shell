@@ -5,6 +5,7 @@ import qs.common
 import qs.common.widgets
 import qs.modules.bar
 import qs.services as Services
+import "settings/BarWidgets.js" as BarWidgets
 
 // One bar window (Variants in shell.qml makes the main bar for every screen and any extra bars). Layout, position and style
 // come from Config bar.*: widget ids in left / center / right, position
@@ -47,6 +48,12 @@ PanelWindow {
         readonly property int thickness: root.thickness
         readonly property var screen: root.screen
         readonly property int popupEdge: root.position === "top" ? Edges.Bottom : root.position === "bottom" ? Edges.Top : root.position === "left" ? Edges.Right : Edges.Left
+
+        // Edit mode: dragging a widget (BarSection's overlay calls these).
+        function dragStart(section, index, id, item) { root.beginDrag(section, index, id, item); }
+        function dragMove(item, x, y) { root.moveDrag(item, x, y); }
+        function dragEnd() { root.endDrag(); }
+        function dragCancel() { root.dragInfo = null; }
     }
 
     readonly property var registry: ({
@@ -74,7 +81,7 @@ PanelWindow {
 
     // The Dynamic Island (the clock widget) takes the bar over while it shows music or a notification:
     // the other widgets go towards it and fade out, and come back after.
-    readonly property bool compact: Services.Island.compact && hasClock
+    readonly property bool compact: Services.Island.compact && hasClock && !ShellState.barEdit
     property real collapse: compact ? 1 : 0
     Behavior on collapse {
         NumberAnimation { duration: Appearance.anim.slow; easing.type: Easing.InOutCubic }
@@ -108,6 +115,72 @@ PanelWindow {
         if (middle && !hasClock)
             out.push("focus");
         return out;
+    }
+
+    // --- Edit mode: drag widgets between and within the sections, or off the bar to remove them ---
+    // dragInfo: { section, index, id } of the widget being dragged; dropSection / dropIndex / dropRemove: where it
+    // would land (set while moving), dragX / dragY: the pointer in `content` coordinates.
+    property var dragInfo: null
+    property string dropSection: ""
+    property int dropIndex: -1
+    property bool dropRemove: false
+    property real dragX: 0
+    property real dragY: 0
+    readonly property var sectionItems: ({ left: left, center: center, right: right })
+    readonly property var sectionIds: ({ left: leftIds, center: centerIds, right: rightIds })
+
+    function beginDrag(section, index, id, item) {
+        dragInfo = { section, index, id };
+        dropSection = section;
+        dropIndex = index;
+        dropRemove = false;
+    }
+
+    function moveDrag(item, mx, my) {
+        if (!dragInfo)
+            return;
+        const p = item.mapToItem(content, mx, my);
+        dragX = p.x;
+        dragY = p.y;
+        const along = vertical ? p.y : p.x;
+        const across = vertical ? p.x : p.y;
+        const span = vertical ? content.height : content.width;
+        const thick = vertical ? content.width : content.height;
+        const key = along < span / 3 ? "left" : along < span * 2 / 3 ? "center" : "right";
+        const sec = sectionItems[key];
+        let idx = sectionIds[key].length;
+        for (let i = 0; i < sec.repeater.count; i++) {
+            const it = sec.repeater.itemAt(i);
+            if (!it || !it.visible || (key === dragInfo.section && i === dragInfo.index))
+                continue;
+            const c = it.mapToItem(content, it.width / 2, it.height / 2);
+            if ((vertical ? c.y : c.x) > along) {
+                idx = i;
+                break;
+            }
+        }
+        dropSection = key;
+        dropIndex = idx;
+        dropRemove = across < -thick * 0.8 || across > thick * 1.8;
+    }
+
+    function endDrag() {
+        const info = dragInfo;
+        dragInfo = null;
+        if (!info)
+            return;
+        const lists = { left: [...leftIds], center: [...centerIds], right: [...rightIds] };
+        lists[info.section].splice(info.index, 1);
+        if (!dropRemove) {
+            let at = dropIndex;
+            if (dropSection === info.section && at > info.index)
+                at--;
+            lists[dropSection].splice(Math.max(0, Math.min(at, lists[dropSection].length)), 0, info.id);
+        }
+        for (const key of ["left", "center", "right"]) {
+            if (JSON.stringify(lists[key]) !== JSON.stringify(sectionIds[key]))
+                Services.BarLayout.writeList(modelData.screen, modelData.barId, key, lists[key]);
+        }
     }
 
     Component { id: launcher; LauncherButton {} }
@@ -215,6 +288,7 @@ PanelWindow {
 
                 BarSection {
                     id: left
+                    key: "left"
                     bar: root.context
                     widgets: root.section(root.leftIds, false)
                     registry: root.registry
@@ -228,6 +302,7 @@ PanelWindow {
 
                 BarSection {
                     id: center
+                    key: "center"
                     bar: root.context
                     widgets: root.section(root.centerIds, true)
                     registry: root.registry
@@ -242,6 +317,7 @@ PanelWindow {
 
                 BarSection {
                     id: right
+                    key: "right"
                     bar: root.context
                     widgets: root.section(root.rightIds, false)
                     registry: root.registry
@@ -252,6 +328,65 @@ PanelWindow {
                     height: root.vertical ? Math.min(implicitHeight, Math.max(0, content.length - content.centerEnd - 12)) : content.height
                     x: root.vertical ? 0 : content.width - width
                     y: root.vertical ? content.height - height : 0
+                }
+
+                // Edit mode: the three drop zones, where the widget would land, and the widget under the pointer.
+                Repeater {
+                    model: ShellState.barEdit ? ["left", "center", "right"] : []
+
+                    Rectangle {
+                        required property string modelData
+                        required property int index
+                        z: 50
+                        x: root.vertical ? 0 : content.width * index / 3
+                        y: root.vertical ? content.height * index / 3 : 0
+                        width: root.vertical ? content.width : content.width / 3
+                        height: root.vertical ? content.height / 3 : content.height
+                        radius: Appearance.rounding.medium
+                        color: "transparent"
+                        border.width: root.dragInfo && root.dropSection === modelData && !root.dropRemove ? 2 : 1
+                        border.color: Qt.alpha(Colors.m3tertiary, root.dragInfo && root.dropSection === modelData && !root.dropRemove ? 0.9 : 0.35)
+                    }
+                }
+                // The insertion point.
+                Rectangle {
+                    readonly property var sec: root.sectionItems[root.dropSection] ?? null
+                    readonly property var ref: sec && root.dropIndex >= 0 && root.dropIndex < sec.repeater.count ? sec.repeater.itemAt(root.dropIndex) : null
+                    visible: root.dragInfo !== null && !root.dropRemove && sec !== null
+                    z: 60
+                    color: Colors.m3tertiary
+                    radius: 1
+                    width: root.vertical ? content.width - 8 : 3
+                    height: root.vertical ? 3 : content.height - 8
+                    x: root.vertical ? 4 : (ref ? ref.mapToItem(content, 0, 0).x - 5 : sec ? sec.mapToItem(content, sec.width, 0).x + 2 : 0)
+                    y: root.vertical ? (ref ? ref.mapToItem(content, 0, 0).y - 5 : sec ? sec.mapToItem(content, 0, sec.height).y + 2 : 0) : 4
+                }
+                Rectangle {
+                    visible: root.dragInfo !== null
+                    z: 70
+                    x: root.dragX - width / 2
+                    y: root.dragY - height / 2
+                    width: ghostRow.implicitWidth + 20
+                    height: 30
+                    radius: Appearance.rounding.full
+                    color: root.dropRemove ? Colors.m3errorContainer : Colors.m3primaryContainer
+                    opacity: 0.92
+
+                    Row {
+                        id: ghostRow
+                        anchors.centerIn: parent
+                        spacing: 6
+                        MaterialIcon {
+                            icon: root.dropRemove ? "delete" : (BarWidgets.icons[(root.dragInfo?.id ?? "").split("#")[0]] ?? "widgets")
+                            iconSize: 16
+                            color: root.dropRemove ? Colors.m3onErrorContainer : Colors.m3onPrimaryContainer
+                        }
+                        StyledText {
+                            text: BarWidgets.names[root.dragInfo?.id ?? ""] ? Translation.tr(BarWidgets.names[root.dragInfo.id]) : (root.dragInfo?.id ?? "")
+                            font.pixelSize: Appearance.font.size.labelMedium
+                            color: root.dropRemove ? Colors.m3onErrorContainer : Colors.m3onPrimaryContainer
+                        }
+                    }
                 }
 
                 // Islands style: one pill behind each non-empty section.

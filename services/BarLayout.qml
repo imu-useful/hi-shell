@@ -13,6 +13,11 @@ Singleton {
     readonly property var positions: ["top", "bottom", "left", "right"]
     readonly property var styles: ["hug", "float", "islands", "m3"]
 
+    // Lists read from the config file may be array-like objects rather than real arrays.
+    function arr(v) {
+        return v !== null && v !== undefined && typeof v === "object" && typeof v.length === "number" ? Array.from(v) : [];
+    }
+
     // The settings of bar `barId` on the screen `screenName`, with every field filled in.
     function spec(screenName, barId) {
         const base = {
@@ -28,7 +33,7 @@ Singleton {
         if (barId === "main") {
             own = (options.monitors ?? {})[screenName] ?? {};
         } else {
-            own = (options.extra ?? []).find(b => (b.id ?? "") === barId) ?? {};
+            own = arr(options.extra).find(b => (b.id ?? "") === barId) ?? {};
             base.left = [];
             base.center = [];
             base.right = [];
@@ -43,20 +48,36 @@ Singleton {
         out.height = Math.max(20, Math.min(120, Number(out.height) || 40));
         out.margin = Math.max(0, Math.min(64, Number(out.margin) || 0));
         for (const k of ["left", "center", "right"])
-            out[k] = Array.isArray(out[k]) ? out[k].filter(w => typeof w === "string") : [];
+            out[k] = arr(out[k]).filter(w => typeof w === "string");
         return out;
+    }
+
+    // Save the widget list `key` (left / center / right) of bar `barId` on `screenName`: an extra bar keeps it in its
+    // entry; the main bar in the screen's own settings if that screen has a list of its own, else in bar.<key>.
+    function writeList(screenName, barId, key, list) {
+        if (barId === "main") {
+            const own = (options.monitors ?? {})[screenName] ?? {};
+            if (own[key] !== undefined && own[key] !== null)
+                Config.mapSet("bar.monitors", screenName + "." + key, list);
+            else
+                Config.options.bar[key] = list;
+            return;
+        }
+        const entry = arr(options.extra).find(b => b.id === barId);
+        if (entry)
+            Config.listPut("bar.extra", Object.assign({}, entry, { [key]: list }));
     }
 
     // [{ screen, barId }] for every window to create.
     readonly property var entries: {
         const list = [];
-        const extra = (options.extra ?? []).filter(b => b && typeof b.id === "string" && b.id !== "" && b.id !== "main");
+        const extra = arr(options.extra).filter(b => b && typeof b.id === "string" && b.id !== "" && b.id !== "main");
         for (const scr of Quickshell.screens) {
             const own = (options.monitors ?? {})[scr.name] ?? {};
             if (own.enabled !== false)
                 list.push({ screen: scr.name, barId: "main" });
             for (const b of extra) {
-                const on = Array.isArray(b.monitors) ? b.monitors : [];
+                const on = arr(b.monitors);
                 if (on.length === 0 || on.includes(scr.name))
                     list.push({ screen: scr.name, barId: b.id });
             }

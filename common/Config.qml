@@ -71,6 +71,11 @@ Singleton {
         return true;
     }
 
+    // A list option may come back from the file as an array-like object that Array.isArray doesn't accept.
+    function isList(v) {
+        return Array.isArray(v) || (v !== null && typeof v === "object" && typeof v.length === "number" && !isSection(v));
+    }
+
     function isSection(v) {
         return v !== null && typeof v === "object" && !Array.isArray(v) && v.toString().indexOf("JsonObject") !== -1;
     }
@@ -85,6 +90,56 @@ Singleton {
             else
                 live[k] = Array.isArray(v) || (v && typeof v === "object") ? JSON.parse(JSON.stringify(v)) : v;
         }
+    }
+
+    // Set one entry of a map option (a plain object): `key` may be dotted ("eDP-1.height"); a null value removes
+    // it. Returns the new map, or null if `path` isn't a map. The whole map is written back, so the change is saved.
+    function mapSet(path, key, value) {
+        const cur = getPath(path);
+        if (cur === undefined || isSection(cur) || isList(cur) || cur !== null && typeof cur !== "object")
+            return null;
+        const copy = JSON.parse(JSON.stringify(cur ?? {}));
+        const keys = key.split(".");
+        let o = copy;
+        for (const k of keys.slice(0, -1)) {
+            if (o[k] === null || typeof o[k] !== "object")
+                o[k] = {};
+            o = o[k];
+        }
+        const last = keys[keys.length - 1];
+        if (value === null || value === undefined)
+            delete o[last];
+        else
+            o[last] = value;
+        setPath(path, copy);
+        return copy;
+    }
+
+    // Add or replace the entry of a list option that has the same "id" (a list of objects).
+    function listPut(path, entry) {
+        const cur = getPath(path);
+        if (!isList(cur))
+            return null;
+        const copy = JSON.parse(JSON.stringify(cur)).filter(x => !(x && entry && x.id !== undefined && x.id === entry.id));
+        copy.push(entry);
+        setPath(path, copy);
+        return copy;
+    }
+
+    function listDel(path, id) {
+        const cur = getPath(path);
+        if (!isList(cur))
+            return null;
+        const copy = JSON.parse(JSON.stringify(cur)).filter(x => !(x && x.id === id));
+        setPath(path, copy);
+        return copy;
+    }
+
+    // Write the file now instead of after the debounce: for changes made from a command, which may be
+    // followed at once by a restart.
+    function flush() {
+        writeTimer.stop();
+        file.writeAdapter();
     }
 
     // Put every option that breaks its rule back to its default and say so; the shell keeps running
@@ -158,68 +213,48 @@ Singleton {
             const before = root.getPath(path);
             root.setPath(path, v);
             root.validate();
+            root.flush();
             const now = root.getPath(path);
             return JSON.stringify(before) + " -> " + JSON.stringify(now) + (root.lastProblems.length ? " (" + root.lastProblems[0].reason + ", default used)" : "");
         }
 
         function reset(path: string): string {
-            return root.reset(path) ? "Reset " + (path || "everything") + " to the defaults" : "No such option or section: " + path;
+            const ok = root.reset(path);
+            root.flush();
+            return ok ? "Reset " + (path || "everything") + " to the defaults" : "No such option or section: " + path;
         }
 
         // Edit one entry of a map option without writing the whole map: map bar.monitors eDP-1.position '"bottom"'
         // (the key may be dotted; the value is JSON, `null` removes the entry).
         function map(path: string, key: string, value: string): string {
-            const cur = root.getPath(path);
-            if (cur === undefined || root.isSection(cur) || Array.isArray(cur) || typeof cur !== "object")
-                return path + " is not a map option";
             let v;
             try {
                 v = JSON.parse(value);
             } catch (e) {
                 v = value;
             }
-            const copy = JSON.parse(JSON.stringify(cur ?? {}));
-            // Screen names hold dashes but no dots, so a dot always separates levels.
-            const keys = key.split(".");
-            let o = copy;
-            for (const k of keys.slice(0, -1)) {
-                if (o[k] === null || typeof o[k] !== "object")
-                    o[k] = {};
-                o = o[k];
-            }
-            const last = keys[keys.length - 1];
-            if (v === null)
-                delete o[last];
-            else
-                o[last] = v;
-            root.setPath(path, copy);
-            return JSON.stringify(copy);
+            const out = root.mapSet(path, key, v);
+            root.flush();
+            return out === null ? path + " is not a map option" : JSON.stringify(out);
         }
 
         // Add (or replace) an entry of a list option by its "id": list bar.extra '{"id":"side","position":"left"}'
         function listput(path: string, entry: string): string {
-            const cur = root.getPath(path);
-            if (!Array.isArray(cur))
-                return path + " is not a list option";
             let e;
             try {
                 e = JSON.parse(entry);
             } catch (err) {
                 return "Not JSON: " + entry;
             }
-            const copy = JSON.parse(JSON.stringify(cur)).filter(x => !(x && e && x.id !== undefined && x.id === e.id));
-            copy.push(e);
-            root.setPath(path, copy);
-            return JSON.stringify(copy);
+            const out = root.listPut(path, e);
+            root.flush();
+            return out === null ? path + " is not a list option" : JSON.stringify(out);
         }
 
         function listdel(path: string, id: string): string {
-            const cur = root.getPath(path);
-            if (!Array.isArray(cur))
-                return path + " is not a list option";
-            const copy = JSON.parse(JSON.stringify(cur)).filter(x => !(x && x.id === id));
-            root.setPath(path, copy);
-            return JSON.stringify(copy);
+            const out = root.listDel(path, id);
+            root.flush();
+            return out === null ? path + " is not a list option" : JSON.stringify(out);
         }
 
         function path(): string {

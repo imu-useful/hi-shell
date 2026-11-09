@@ -144,10 +144,24 @@ JsonAdapter {
             // waitMode (hidden by default: add it in the sidebar's tile editor)
             property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]
         }
+        // What the right sidebar shows under its header and in what order: quickToggles, quickSliders, tabs.
+        // Leave one out to hide it.
+        property list<string> sections: ["quickToggles", "quickSliders", "tabs"]
+        // The tabs of the "tabs" section, in order: notifications, calendar, todo, timers.
+        property list<string> tabs: ["notifications", "calendar", "todo", "timers"]
         // Night light color temperature (K) for hyprsunset.
         property int nightLightTemperature: 4500
         // The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout
         property string game: "dino"
+    }
+
+    property JsonObject launcher: JsonObject {
+        // The prefixes that switch the source, in the order of the chips under the empty search:
+        // = calculator, > run a command, < keybinds, : emoji, ; clipboard, / settings, ~ files.
+        property list<string> prefixes: ["=", ">", "<", ":", ";", "/", "~"]
+        // What a plain search looks through, and in what order the results come: math (a typed calculation),
+        // focus (Focus Mode), windows (open windows), settings (settings pages), apps, emoji.
+        property list<string> sources: ["math", "focus", "windows", "settings", "apps", "emoji"]
     }
 
     property JsonObject spotify: JsonObject {

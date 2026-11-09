@@ -17,6 +17,8 @@ Scope {
     id: root
 
     readonly property bool open: ShellState.sidebarRightOpen
+    // The sections of the main page, in the order of Config sidebar.sections (unknown ids are dropped).
+    readonly property var sectionIds: Array.from(Config.options.sidebar.sections).filter((id, i, all) => ["quickToggles", "quickSliders", "tabs"].includes(id) && all.indexOf(id) === i)
     // "" = main page, or wifi / bluetooth / audio
     property string page: ""
     property bool editing: false
@@ -130,22 +132,41 @@ Scope {
                         onCloseRequested: root.setOpen(false)
                     }
 
+                    Repeater {
+                        model: root.sectionIds
+
+                        Loader {
+                            required property string modelData
+                            Layout.fillWidth: true
+                            Layout.fillHeight: modelData === "tabs"
+                            sourceComponent: modelData === "quickToggles" ? togglesSection : modelData === "quickSliders" ? slidersSection : modelData === "tabs" ? tabsSection : null
+                        }
+                    }
+
+                    // Keeps the sections at the top when the tabs are hidden.
+                    Item {
+                        visible: !root.sectionIds.includes("tabs")
+                        Layout.fillHeight: true
+                    }
+                }
+
+                Component {
+                    id: togglesSection
                     QuickToggles {
-                        Layout.fillWidth: true
                         editing: root.editing
                         onOpenPage: page => root.page = page
                         onCloseRequested: root.setOpen(false)
                     }
-
+                }
+                Component {
+                    id: slidersSection
                     QuickSliders {
-                        Layout.fillWidth: true
                         onOpenPage: page => root.page = page
                     }
-
-                    BottomGroup {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                    }
+                }
+                Component {
+                    id: tabsSection
+                    BottomGroup {}
                 }
 
                 // Sub-pages

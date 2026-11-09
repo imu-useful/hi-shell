@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.common
+import qs.services
 import qs.common.widgets
 import "BarWidgets.js" as BarWidgets
 
@@ -11,6 +13,70 @@ ColumnLayout {
     readonly property var bar: Config.options.bar
     spacing: 24
 
+    // Which bar the layout and style rows edit: "main" (the defaults), "screen:<name>" (the main bar on one screen,
+    // its own settings over the defaults) or "extra:<id>" (another bar).
+    property string target: "main"
+    readonly property bool isMain: target === "main"
+    readonly property bool isScreen: target.startsWith("screen:")
+    readonly property bool isExtra: target.startsWith("extra:")
+    readonly property string targetName: target.slice(target.indexOf(":") + 1)
+    readonly property var extraBars: Config.options.bar.extra ?? []
+    readonly property var monitorOverrides: Config.options.bar.monitors ?? {}
+    // A target that was removed or whose screen was unplugged falls back to the main bar.
+    onExtraBarsChanged: if (isExtra && !extraBars.some(b => b.id === targetName)) target = "main"
+
+    // The effective value of a setting of the target bar, and writing one.
+    function tget(key) {
+        if (isMain)
+            return Config.options.bar[key];
+        if (key === "monitors")
+            return (extraBars.find(b => b.id === targetName) ?? {}).monitors ?? [];
+        return BarLayout.spec(isScreen ? targetName : "", isScreen ? "main" : targetName)[key];
+    }
+    function tset(key, value) {
+        if (isMain)
+            Config.options.bar[key] = value;
+        else if (isScreen)
+            Config.mapSet("bar.monitors", targetName + "." + key, value);
+        else {
+            const entry = extraBars.find(b => b.id === targetName);
+            if (entry)
+                Config.listPut("bar.extra", Object.assign({}, entry, { [key]: value }));
+        }
+    }
+    // Widget copies: new ones start with these options.
+    readonly property var copyDefaults: ({
+        zoneClock: { zone: "Europe/London", label: "" },
+        resources: { shown: ["cpu"] },
+        utilButtons: { shown: ["screenshot"] },
+        workspaces: { shown: 5 },
+        media: { maxWidth: 160 }
+    })
+    property string newCopyType: "zoneClock"
+    property string newCopyName: ""
+    readonly property string newCopyId: newCopyType + "#" + newCopyName.trim().replace(/[^A-Za-z0-9_-]/g, "")
+    function addCopy() {
+        if (newCopyName.trim() === "" || (Config.options.bar.instances ?? {})[newCopyId] !== undefined)
+            return;
+        Config.mapSet("bar.instances", newCopyId, copyDefaults[newCopyType]);
+        newCopyName = "";
+    }
+    function addExtraBar() {
+        let n = 2;
+        while (extraBars.some(b => b.id === "bar" + n))
+            n++;
+        Config.listPut("bar.extra", { id: "bar" + n, position: "bottom", center: ["workspaces"] });
+        target = "extra:bar" + n;
+    }
+    function removeTarget() {
+        const t = target;
+        target = "main";
+        if (t.startsWith("extra:"))
+            Config.listDel("bar.extra", t.slice(6));
+        else if (t.startsWith("screen:"))
+            Config.mapSet("bar.monitors", t.slice(7), null);
+    }
+
     component LayoutSection: ColumnLayout {
         id: section
 
@@ -18,10 +84,10 @@ ColumnLayout {
         required property string label
         property int selected: -1
         property bool adding: false
-        readonly property list<string> items: Config.options.bar[key]
+        readonly property var items: root.tget(key)
 
         function write(list) {
-            Config.options.bar[key] = list;
+            root.tset(key, list);
         }
 
         Layout.fillWidth: true
@@ -81,8 +147,8 @@ ColumnLayout {
                 Chip {
                     required property string modelData
                     required property int index
-                    icon: BarWidgets.icons[modelData] ?? "widgets"
-                    text: Translation.tr(BarWidgets.names[modelData] ?? modelData)
+                    icon: BarWidgets.icons[modelData.split("#")[0]] ?? "widgets"
+                    text: BarWidgets.names[modelData] ? Translation.tr(BarWidgets.names[modelData]) : modelData
                     selected: section.selected === index
                     closable: true
                     onClicked: section.selected = section.selected === index ? -1 : index
@@ -107,12 +173,12 @@ ColumnLayout {
             spacing: 6
 
             Repeater {
-                model: Object.keys(BarWidgets.names).filter(id => id === "divider" || !section.items.includes(id))
+                model: [...Object.keys(BarWidgets.names), ...Object.keys(Config.options.bar.instances ?? {})].filter(id => id === "divider" || id === "zoneClock" ? true : !section.items.includes(id))
 
                 Chip {
                     required property string modelData
                     icon: "add"
-                    text: Translation.tr(BarWidgets.names[modelData])
+                    text: BarWidgets.names[modelData] ? Translation.tr(BarWidgets.names[modelData]) : modelData
                     onClicked: section.write([...section.items, modelData])
                 }
             }
@@ -120,9 +186,112 @@ ColumnLayout {
     }
 
     Section {
+        icon: "dock_to_bottom"
+        title: Translation.tr("Which bar")
+
+        Flow {
+            Layout.fillWidth: true
+            Layout.margins: 10
+            spacing: 6
+
+            Chip {
+                icon: "toolbar"
+                text: Translation.tr("Main bar")
+                selected: root.isMain
+                onClicked: root.target = "main"
+            }
+            Repeater {
+                model: Quickshell.screens
+
+                Chip {
+                    required property var modelData
+                    icon: root.monitorOverrides[modelData.name] ? "tv_gen" : "tv"
+                    text: modelData.name
+                    selected: root.target === "screen:" + modelData.name
+                    onClicked: root.target = "screen:" + modelData.name
+                }
+            }
+            Repeater {
+                model: root.extraBars
+
+                Chip {
+                    required property var modelData
+                    icon: "dock_to_bottom"
+                    text: modelData.id
+                    selected: root.target === "extra:" + modelData.id
+                    onClicked: root.target = "extra:" + modelData.id
+                }
+            }
+            Chip {
+                icon: "add"
+                text: Translation.tr("Add a bar")
+                onClicked: root.addExtraBar()
+            }
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.topMargin: 0
+            wrapMode: Text.WordWrap
+            text: root.isMain ? Translation.tr("The main bar is on every screen. Pick a screen to give it a bar of its own, or add another bar.")
+                : root.isScreen ? Translation.tr("Settings changed here are only for this screen; the rest comes from the main bar.")
+                : Translation.tr("Another bar. Keep the clock (the Dynamic Island) in one bar only.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        SwitchRow {
+            visible: root.isScreen
+            icon: "visibility"
+            title: Translation.tr("Show the bar on this screen")
+            checked: (root.monitorOverrides[root.targetName] ?? {}).enabled !== false
+            onToggled: checked => Config.mapSet("bar.monitors", root.targetName + ".enabled", checked ? null : false)
+        }
+        ListRow {
+            visible: root.isExtra
+            Layout.fillWidth: true
+            icon: "tv"
+            title: Translation.tr("Screens")
+            Repeater {
+                model: Quickshell.screens
+
+                Chip {
+                    required property var modelData
+                    readonly property var listed: Array.from(root.tget("monitors") ?? [])
+                    readonly property var names: Quickshell.screens.map(x => x.name)
+                    text: modelData.name
+                    selected: listed.length === 0 || listed.includes(modelData.name)
+                    onClicked: {
+                        const now = listed.length === 0 ? names : listed;
+                        const next = selected ? now.filter(n => n !== modelData.name) : [...now, modelData.name];
+                        if (next.length > 0)
+                            root.tset("monitors", next.length === names.length ? [] : next);
+                    }
+                }
+            }
+        }
+        M3Button {
+            visible: !root.isMain && (root.isExtra || root.monitorOverrides[root.targetName] !== undefined)
+            Layout.margins: 14
+            tonal: true
+            text: root.isExtra ? Translation.tr("Remove this bar") : Translation.tr("Use the main bar's settings")
+            onClicked: root.removeTarget()
+        }
+    }
+
+    Section {
         icon: "view_week"
         title: Translation.tr("Bar layout")
 
+        M3Button {
+            Layout.margins: 14
+            tonal: true
+            icon: "drag_pan"
+            text: Translation.tr("Edit on the bar")
+            onClicked: {
+                ShellState.settingsOpen = false;
+                ShellState.barEdit = true;
+            }
+        }
         LayoutSection { key: "left"; label: Translation.tr("Left") }
         LayoutSection { key: "center"; label: Translation.tr("Center") }
         LayoutSection { key: "right"; label: Translation.tr("Right") }
@@ -135,33 +304,35 @@ ColumnLayout {
         ChoiceRow {
             icon: "open_with"
             title: Translation.tr("Position")
-            value: root.bar.position
+            value: root.tget("position")
             options: [
                 { value: "top", text: Translation.tr("Top"), icon: "arrow_upward" },
                 { value: "left", text: Translation.tr("Left"), icon: "arrow_back" },
                 { value: "bottom", text: Translation.tr("Bottom"), icon: "arrow_downward" },
                 { value: "right", text: Translation.tr("Right"), icon: "arrow_forward" }
             ]
-            onSelected: value => root.bar.position = value
+            onSelected: value => root.tset("position", value)
         }
         ChoiceRow {
             icon: "style"
             title: Translation.tr("Style")
-            value: root.bar.style
+            value: root.tget("style")
             options: [
                 { value: "hug", text: Translation.tr("Hug") },
                 { value: "float", text: Translation.tr("Float") },
                 { value: "islands", text: Translation.tr("Islands") },
                 { value: "m3", text: "M3" }
             ]
-            onSelected: value => root.bar.style = value
+            onSelected: value => root.tset("style", value)
         }
         ListRow {
+            visible: root.isMain
             icon: "pets"
             title: Translation.tr("Logo")
             subtitle: Translation.tr("The button at the start of the bar. Auto is this system's distribution")
         }
         LogoPicker {
+            visible: root.isMain
             Layout.fillWidth: true
             Layout.leftMargin: 16
             Layout.rightMargin: 16
@@ -171,21 +342,21 @@ ColumnLayout {
         SliderRow {
             icon: "height"
             title: Translation.tr("Thickness")
-            value: root.bar.height
+            value: root.tget("height")
             from: 32
             to: 60
             suffix: Translation.tr(" px")
-            onMoved: value => root.bar.height = value
+            onMoved: value => root.tset("height", value)
         }
         SliderRow {
             icon: "padding"
             title: Translation.tr("Gap to the screen edge")
             subtitle: Translation.tr("Float and Islands styles")
-            value: root.bar.margin
+            value: root.tget("margin")
             from: 0
             to: 20
             suffix: Translation.tr(" px")
-            onMoved: value => root.bar.margin = value
+            onMoved: value => root.tset("margin", value)
         }
     }
 
@@ -297,6 +468,73 @@ ColumnLayout {
             title: Translation.tr("Hide updates when there are none")
             checked: root.bar.updates.hideWhenNone
             onToggled: checked => root.bar.updates.hideWhenNone = checked
+        }
+    }
+
+    Section {
+        icon: "content_copy"
+        title: Translation.tr("Widget copies")
+
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("A copy of a widget with options of its own, e.g. a second resources widget showing only the disk, or the time in Tokyo. Add it to a section above like any widget. Options are JSON.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        Repeater {
+            model: Object.keys(Config.options.bar.instances ?? {})
+
+            RowLayout {
+                required property string modelData
+                Layout.fillWidth: true
+                spacing: 4
+
+                TextRow {
+                    Layout.fillWidth: true
+                    icon: BarWidgets.icons[modelData.split("#")[0]] ?? "widgets"
+                    title: modelData
+                    value: JSON.stringify((Config.options.bar.instances ?? {})[modelData] ?? {})
+                    fieldWidth: 300
+                    onEdited: text => {
+                        try {
+                            const v = JSON.parse(text);
+                            if (v !== null && typeof v === "object" && !Array.isArray(v))
+                                Config.mapSet("bar.instances", modelData, v);
+                        } catch (e) {}
+                    }
+                }
+                IconButton {
+                    icon: "delete"
+                    onClicked: Config.mapSet("bar.instances", modelData, null)
+                }
+            }
+        }
+        ChoiceRow {
+            icon: "widgets"
+            title: Translation.tr("New copy of")
+            value: root.newCopyType
+            options: Object.keys(root.copyDefaults).map(k => ({ value: k, text: Translation.tr(BarWidgets.names[k] ?? k) }))
+            onSelected: value => root.newCopyType = value
+        }
+        TextRow {
+            icon: "label"
+            title: Translation.tr("Name")
+            subtitle: Translation.tr("Letters and digits; the copy is called %1").arg(root.newCopyId)
+            placeholder: "tokyo"
+            value: root.newCopyName
+            fieldWidth: 160
+            onEdited: text => root.newCopyName = text
+        }
+        M3Button {
+            Layout.margins: 14
+            tonal: true
+            icon: "add"
+            text: Translation.tr("Add the copy")
+            enabled: root.newCopyName.trim() !== ""
+            onClicked: root.addCopy()
         }
     }
 

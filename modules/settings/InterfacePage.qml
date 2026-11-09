@@ -106,6 +106,105 @@ ColumnLayout {
     }
 
     Section {
+        icon: "right_panel_open"
+        title: Translation.tr("Right sidebar")
+
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("What the sidebar shows under its header, and in what order")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            options: [
+                { id: "quickToggles", text: Translation.tr("Quick toggles"), icon: "toggle_on" },
+                { id: "quickSliders", text: Translation.tr("Sliders"), icon: "tune" },
+                { id: "tabs", text: Translation.tr("Tabs"), icon: "tab" }
+            ]
+            minimum: 0
+            value: Config.options.sidebar.sections
+            onChanged: list => Config.options.sidebar.sections = list
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Tabs")
+            font.weight: Font.Medium
+        }
+        OrderedChips {
+            options: [
+                { id: "notifications", text: Translation.tr("Notifications"), icon: "notifications" },
+                { id: "calendar", text: Translation.tr("Calendar"), icon: "calendar_month" },
+                { id: "todo", text: Translation.tr("To-do"), icon: "checklist" },
+                { id: "timers", text: Translation.tr("Timers"), icon: "timer" }
+            ]
+            value: Config.options.sidebar.tabs
+            onChanged: list => Config.options.sidebar.tabs = list
+        }
+    }
+
+    Section {
+        icon: "search"
+        title: Translation.tr("Launcher")
+
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("What a plain search looks through, in the order of the results")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            options: [
+                { id: "math", text: Translation.tr("Calculator"), icon: "calculate" },
+                { id: "focus", text: Translation.tr("Focus Mode"), icon: "target" },
+                { id: "windows", text: Translation.tr("Open windows"), icon: "web_asset" },
+                { id: "settings", text: Translation.tr("Settings"), icon: "settings" },
+                { id: "apps", text: Translation.tr("Apps"), icon: "apps" },
+                { id: "emoji", text: Translation.tr("Emoji"), icon: "mood" }
+            ]
+            value: Config.options.launcher.sources
+            onChanged: list => Config.options.launcher.sources = list
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Prefixes: a first character that switches the search to one source")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            minimum: 0
+            options: [
+                { id: "=", text: "=  " + Translation.tr("Calculator"), icon: "calculate" },
+                { id: ">", text: ">  " + Translation.tr("Run command"), icon: "terminal" },
+                { id: "<", text: "<  " + Translation.tr("Keybinds"), icon: "keyboard" },
+                { id: ":", text: ":  " + Translation.tr("Emoji"), icon: "mood" },
+                { id: ";", text: ";  " + Translation.tr("Clipboard"), icon: "content_paste" },
+                { id: "/", text: "/  " + Translation.tr("Settings"), icon: "settings" },
+                { id: "~", text: "~  " + Translation.tr("Files"), icon: "folder" }
+            ]
+            value: Config.options.launcher.prefixes
+            onChanged: list => Config.options.launcher.prefixes = list
+        }
+        M3Button {
+            Layout.margins: 14
+            tonal: true
+            text: Translation.tr("Reset the sidebar and launcher")
+            onClicked: ["sidebar.sections", "sidebar.tabs", "launcher"].forEach(k => Config.reset(k))
+        }
+    }
+
+    Section {
         icon: "animation"
         title: Translation.tr("Motion & surfaces")
 

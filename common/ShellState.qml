@@ -92,6 +92,8 @@ Singleton {
     property bool displayModeOpen: false
     // Bar hidden on every screen (`qs -c hi-shell ipc call bar toggle`).
     property bool barHidden: false
+    // The bars are being edited: widgets can be dragged to move or remove them (modules/BarEditor.qml).
+    property bool barEdit: false
     // Text for the translator to take (region "translate"); consumed by the page.
     property string translatorInput: ""
 
@@ -106,6 +108,16 @@ Singleton {
         }
         function hide(): void {
             root.barHidden = true;
+        }
+        // Drag the widgets of the bars around (a panel with the rest of the widgets and Done appears).
+        function edit(): void {
+            if (!root.zen) {
+                root.barHidden = false;
+                root.barEdit = true;
+            }
+        }
+        function done(): void {
+            root.barEdit = false;
         }
         // For bug reports: what decides whether the bar shows (`qs -c hi-shell ipc call bar status`).
         function status(): string {

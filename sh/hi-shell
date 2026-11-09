@@ -3,7 +3,7 @@
 #
 #   Shell        hi start | stop | restart | status | log [-f] | doctor | update
 #   Panels       hi settings [page] | launcher | apps | overview | calendar | weather | processes
-#                hi sidebar [left|right] | bar [show|hide|toggle|list|add|rm|monitor|instance] | lock | session | wait | present
+#                hi sidebar [left|right] | bar [show|hide|toggle|edit|done|list|add|rm|monitor|instance] | lock | session | wait | present
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
@@ -86,6 +86,7 @@ here=$(dirname "$(readlink -f "$0")")
 repo=$(dirname "$here")
 cfg="${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json"
 
+# A value that starts with [ is mangled by qs ipc (["a"] arrives as a); the commands below put a space before JSON.
 ipc() { qs -c hi-shell ipc call "$@"; }
 
 running() { qs -c hi-shell list 2>/dev/null | grep -q 'Process ID'; }
@@ -125,7 +126,7 @@ config() {
         get) need_running; ipc config get "${1:-}" ;;
         set)
             [ $# -ge 2 ] || { echo "Usage: hi config set <option> <value>   (value is JSON: 40, true, \"top\"; a bare word is a string)" >&2; exit 1; }
-            need_running; opt=$1; shift; ipc config set "$opt" "$*" ;;
+            need_running; opt=$1; shift; ipc config set "$opt" " $*" ;;
         reset) need_running; ipc config reset "${1:-}" ;;
         path) echo "$cfg" ;;
         edit) "${VISUAL:-${EDITOR:-nano}}" "$cfg" ;;
@@ -158,11 +159,13 @@ barcmd() {
         # hi bar monitor <screen> <key> <json>: override one setting of the main bar on a screen (null = back to the default)
         monitor)
             [ $# -ge 3 ] || { echo "Usage: hi bar monitor <screen> <enabled|position|style|height|margin|left|center|right> <json|null>   (screens: hyprctl monitors)" >&2; exit 1; }
-            ipc config map bar.monitors "$1.$2" "$3" >/dev/null && echo "Done" ;;
+            ipc config map bar.monitors "$1.$2" " $3" >/dev/null && echo "Done" ;;
         # hi bar instance <type#name> <json>: a copy of a widget with options of its own, e.g. 'zoneClock#tokyo' '{"zone":"Asia/Tokyo"}'
         instance)
             [ $# -ge 2 ] || { echo "Usage: hi bar instance <type#name> <json|null>   e.g. 'resources#disks' '{\"shown\":[\"disk\"]}'" >&2; exit 1; }
-            ipc config map bar.instances "$1" "$2" >/dev/null && echo "Done" ;;
+            ipc config map bar.instances "$1" " $2" >/dev/null && echo "Done" ;;
+        edit) ipc bar edit ;;
+        done) ipc bar done ;;
         *) ipc bar "$sub" ;;
     esac
 }
@@ -209,7 +212,7 @@ cmd=${1:-help}
 case "$cmd" in
     start) start ;;
     stop) stop ;;
-    restart) stop; sleep 1; start ;;
+    restart) sleep 0.4; stop; sleep 1; start ;;
     status) status ;;
     log | logs) log "$@" ;;
     doctor) doctor ;;

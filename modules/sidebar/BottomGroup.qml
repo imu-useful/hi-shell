@@ -9,26 +9,35 @@ import qs.modules.calendar
 ColumnLayout {
     id: root
 
-    readonly property list<string> tabs: ["notifications", "calendar", "todo", "timers"]
+    // Config sidebar.tabs, in order; the default four if it holds none that exist.
+    readonly property var known: ["notifications", "calendar", "todo", "timers"]
+    readonly property var tabs: {
+        const list = Array.from(Config.options.sidebar.tabs).filter((t, i, all) => known.includes(t) && all.indexOf(t) === i);
+        return list.length > 0 ? list : known;
+    }
+    readonly property var tabInfo: ({
+        notifications: { icon: "notifications", text: Notifications.list.length ? String(Notifications.list.length) : "" },
+        calendar: { icon: "calendar_month", text: "" },
+        todo: { icon: "checklist", text: Todo.pending ? String(Todo.pending) : "" },
+        timers: { icon: "timer", text: "" }
+    })
+    // The open tab, or the first one when it was hidden.
+    readonly property string currentTab: tabs.includes(ShellState.sidebarTab) ? ShellState.sidebarTab : tabs[0]
 
     spacing: 10
 
     SegmentedButton {
         Layout.fillWidth: true
-        model: [
-            { icon: "notifications", text: Notifications.list.length ? String(Notifications.list.length) : "" },
-            { icon: "calendar_month", text: "" },
-            { icon: "checklist", text: Todo.pending ? String(Todo.pending) : "" },
-            { icon: "timer", text: "" }
-        ]
-        currentIndex: Math.max(0, root.tabs.indexOf(ShellState.sidebarTab))
+        visible: root.tabs.length > 1
+        model: root.tabs.map(t => root.tabInfo[t])
+        currentIndex: Math.max(0, root.tabs.indexOf(root.currentTab))
         onSelected: index => ShellState.sidebarTab = root.tabs[index]
     }
 
     Loader {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        sourceComponent: ShellState.sidebarTab === "calendar" ? calendar : ShellState.sidebarTab === "todo" ? todo : ShellState.sidebarTab === "timers" ? timers : notifications
+        sourceComponent: root.currentTab === "calendar" ? calendar : root.currentTab === "todo" ? todo : root.currentTab === "timers" ? timers : notifications
     }
 
     Component {
