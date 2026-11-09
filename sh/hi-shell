@@ -4,7 +4,7 @@
 #   Shell        hi start | stop | restart | status | log [-f] | doctor | update
 #   Panels       hi settings [page] | launcher | apps | overview | calendar | weather | processes
 #                hi sidebar [left|right] | bar [show|hide|toggle] | lock | session | wait | present
-#                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>]    hi wallpaper [random|<file>]
+#                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload
 #   Presets      hi preset list | save <name> | load <file>
@@ -151,6 +151,9 @@ theme() {
     need_running
     case "${1:-toggle}" in
         dark | light) ipc theme setMode "$1" ;;
+        seed) [ -n "${2:-}" ] || { echo "Usage: hi theme seed <#rrggbb|wallpaper>" >&2; exit 1; }
+            case "$2" in wallpaper | none) c='""' ;; *) c="\"$2\"" ;; esac
+            ipc config set appearance.seedColor "$c" ;;
         toggle) ipc theme toggleMode ;;
         *) ipc theme setScheme "$1" ;;
     esac

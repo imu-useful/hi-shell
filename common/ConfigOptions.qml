@@ -27,6 +27,18 @@ JsonAdapter {
             property string mono: "JetBrains Mono"
             property string icon: "Material Symbols Rounded"
         }
+        // Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's.
+        property real cornerScale: 1
+        property real fontScale: 1
+        // compact | comfortable | spacious: the spacing between and inside elements.
+        property string density: "comfortable"
+        // A color (#rrggbb) to make the palette from instead of the wallpaper; empty = from the wallpaper.
+        property string seedColor: ""
+        // -1 (soft) .. 1 (strong): the palette's contrast.
+        property real contrast: 0
+        // Colors of your own over the palette: role -> "#rrggbb", e.g. { "primary": "#ff6a00", "surface": "#101010" }.
+        // The roles are the names in the palette file (~/.local/state/hi-shell/colors.json).
+        property var colorOverrides: ({})
         // Global multiplier for animation durations (0 disables animations).
         property real animationSpeed: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant

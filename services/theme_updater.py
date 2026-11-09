@@ -79,10 +79,13 @@ def load_previous(output: Path) -> dict:
         return {}
 
 
-def generate(wallpaper: Path, mode: str, scheme: str) -> dict[str, str]:
+def generate(wallpaper: Path, mode: str, scheme: str, seed: str = "", contrast: float = 0.0) -> dict[str, str]:
+    """Colors from a seed color when one is given, else from the picture."""
+    source = ["color", "hex", seed.lstrip("#")] if seed else ["image", str(wallpaper), "--prefer", "saturation"]
+    cmd = ["matugen", *source, "--json", "hex", "--dry-run", "--quiet", "--mode", mode,
+           "--type", f"scheme-{scheme}", "--contrast", str(contrast)]
     out = subprocess.run(
-        ["matugen", "image", str(wallpaper), "--json", "hex", "--dry-run", "--quiet",
-         "--prefer", "saturation", "--mode", mode, "--type", f"scheme-{scheme}"],
+        cmd,
         capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL,
     )
     if out.returncode != 0:
@@ -96,6 +99,8 @@ def main() -> int:
     ap.add_argument("--wallpaper", type=Path, help="image to generate colors from (default: detect)")
     ap.add_argument("--mode", choices=["dark", "light"], help="color scheme mode (default: keep previous, else dark)")
     ap.add_argument("--scheme", choices=SCHEMES, help="matugen scheme type (default: keep previous, else tonal-spot)")
+    ap.add_argument("--seed", default=None, help="#rrggbb to make the palette from instead of the wallpaper ('' = the wallpaper)")
+    ap.add_argument("--contrast", type=float, default=None, help="-1 (soft) .. 1 (strong); default: keep previous, else 0")
     ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help=f"output JSON (default: {DEFAULT_OUTPUT})")
     ap.add_argument("--force", action="store_true", help="regenerate even if nothing changed")
     args = ap.parse_args()
@@ -107,6 +112,8 @@ def main() -> int:
     previous = load_previous(args.output)
     mode = args.mode or previous.get("mode", "dark")
     scheme = args.scheme or previous.get("scheme", "tonal-spot")
+    seed = previous.get("seed", "") if args.seed is None else args.seed
+    contrast = previous.get("contrast", 0.0) if args.contrast is None else max(-1.0, min(1.0, args.contrast))
 
     wallpaper = args.wallpaper.expanduser() if args.wallpaper else detect_wallpaper()
     if wallpaper is None:
@@ -120,6 +127,7 @@ def main() -> int:
 
     unchanged = (previous.get("wallpaper") == str(wallpaper) and previous.get("mtime") == mtime
                  and previous.get("mode") == mode and previous.get("scheme", "tonal-spot") == scheme
+                 and previous.get("seed", "") == seed and previous.get("contrast", 0.0) == contrast
                  and previous.get("colors"))
     if unchanged and not args.force:
         log(f"up to date ({wallpaper.name}, {mode}, {scheme})")
@@ -132,7 +140,7 @@ def main() -> int:
         return 1
 
     try:
-        colors = generate(picture, mode, scheme)
+        colors = generate(picture, mode, scheme, seed, contrast)
     except (OSError, RuntimeError, ValueError, KeyError, subprocess.SubprocessError) as e:
         log(f"matugen failed: {e}")
         return 1
@@ -142,7 +150,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     # Atomic: the shell watches this file and would otherwise read it half-written.
     tmp = args.output.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"wallpaper": str(wallpaper), "mtime": mtime, "mode": mode, "scheme": scheme, "colors": colors}, indent=2))
+    tmp.write_text(json.dumps({"wallpaper": str(wallpaper), "mtime": mtime, "mode": mode, "scheme": scheme, "seed": seed, "contrast": contrast, "colors": colors}, indent=2))
     tmp.replace(args.output)
     log(f"generated {mode} {scheme} palette from {wallpaper.name} -> {args.output}")
     return 0

@@ -291,7 +291,7 @@ A value that breaks its rule in `common/ConfigSchema.js` (a typo in `bar.positio
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
-- `appearance`: fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`, `restartOnIconTheme` (on by default: the shell restarts when KDE's icon theme changes, because icons break in a running process otherwise)
+- `appearance`: `cornerScale` (0 = square corners, 1 = Material's), `fontScale`, `density` (`compact`, `comfortable`, `spacious`), `seedColor` (`#rrggbb`: the palette comes from this color instead of the wallpaper; `hi theme seed <#rrggbb|wallpaper>`), `contrast` (-1..1), `colorOverrides` (role → `#rrggbb` over the palette, e.g. `{"primary": "#ff6a00"}`; roles are the names in `~/.local/state/hi-shell/colors.json`), fonts, transparency, animation speed (`0` disables animations), matugen `scheme`, `autoMode`, `restartOnIconTheme` (on by default: the shell restarts when KDE's icon theme changes, because icons break in a running process otherwise)
 - `greeting`: the "Welcome back!" at every start: `enabled`, `text`, `style` (`random`, `rise`, `drop`, `pop`, `slide`, `spin`), `logo`; the very first start always plays its own animation
 - `wallpapers`: folders, download folder, `unsplashKey` / `wallhavenKey`, desktop `frame` shape, `frameDance` (the frame turns and pulses to the music)
 - `bar`: `position` (top, bottom, left, right), `style` (hug, float, islands, m3), height, margin, and the widget

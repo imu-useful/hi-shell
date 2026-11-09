@@ -29,6 +29,7 @@ Singleton {
         }
         const scheme = schemes.includes(options.scheme) ? options.scheme : "tonal-spot";
         updater.command = ["python3", Quickshell.shellDir + "/services/theme_updater.py", "--output", Colors.path, "--scheme", scheme,
+            "--seed", options.seedColor, "--contrast", String(options.contrast),
             ...(cover && !args.includes("--wallpaper") ? ["--wallpaper", cover] : []), ...args];
         updater.running = true;
     }
@@ -48,6 +49,12 @@ Singleton {
     Connections {
         target: root.options
         function onSchemeChanged() {
+            root.update();
+        }
+        function onSeedColorChanged() {
+            root.update();
+        }
+        function onContrastChanged() {
             root.update();
         }
     }

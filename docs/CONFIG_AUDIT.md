@@ -1,13 +1,14 @@
 # Config audit
 
-194 options in `common/ConfigOptions.qml`.
+200 options in `common/ConfigOptions.qml`.
 
-## Options without a control in the settings app (43)
+## Options without a control in the settings app (44)
 
 | Option | Type | Default |
 | --- | --- | --- |
 | `appearance.restartOnIconTheme` | `bool` | `true` |
 | `appearance.fonts.icon` | `string` | `"Material Symbols Rounded"` |
+| `appearance.colorOverrides` | `var` | `({})` |
 | `appearance.gtkColorScheme` | `bool` | `true` |
 | `bar.left` | `list<string>` | `["launcher", "activeWindow"]` |
 | `bar.center` | `list<string>` | `["resources", "media", "workspaces", "clock", "utilButtons", "weather"]` |
@@ -50,9 +51,10 @@
 | `capture.ocrLanguages` | `string` | `"auto"` |
 | `capture.recordSound` | `string` | `"off"` |
 
-## Options not referenced anywhere (9)
+## Options not referenced anywhere (10)
 
 - `appearance.fonts.icon`
+- `appearance.colorOverrides`
 - `appearance.gtkColorScheme`
 - `lock.clock`
 - `lock.date`
@@ -64,7 +66,7 @@
 
 ## Hardcoded values in modules/ and common/widgets/
 
-123 colors, 76 durations, 104 radii, 37 font sizes
+124 colors, 76 durations, 104 radii, 37 font sizes
 
 | File | Total | Colors | Durations | Radii | Font sizes |
 | --- | --- | --- | --- | --- | --- |

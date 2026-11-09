@@ -48,6 +48,64 @@ ColumnLayout {
     }
 
     Section {
+        icon: "straighten"
+        title: Translation.tr("Shape & size")
+
+        ChoiceRow {
+            icon: "density_medium"
+            title: Translation.tr("Density")
+            subtitle: Translation.tr("The spacing between and inside elements")
+            value: a.density
+            options: [{ value: "compact", text: Translation.tr("Compact") }, { value: "comfortable", text: Translation.tr("Comfortable") }, { value: "spacious", text: Translation.tr("Spacious") }]
+            onSelected: value => a.density = value
+        }
+        SliderRow {
+            icon: "rounded_corner"
+            title: Translation.tr("Corner roundness")
+            subtitle: Translation.tr("0 makes every corner square")
+            value: Math.round(a.cornerScale * 100)
+            from: 0; to: 200; step: 5; suffix: "%"
+            onMoved: value => a.cornerScale = value / 100
+        }
+        SliderRow {
+            icon: "format_size"
+            title: Translation.tr("Text size")
+            value: Math.round(a.fontScale * 100)
+            from: 60; to: 200; step: 5; suffix: "%"
+            onMoved: value => a.fontScale = value / 100
+        }
+    }
+
+    Section {
+        icon: "palette"
+        title: Translation.tr("Palette")
+
+        TextRow {
+            icon: "colorize"
+            title: Translation.tr("Seed color")
+            subtitle: Translation.tr("A color like #ff6a00 to make the palette from; empty = from the wallpaper")
+            placeholder: "#ff6a00"
+            value: a.seedColor
+            onEdited: text => {
+                const t = text.trim();
+                a.seedColor = t === "" || /^#[0-9a-fA-F]{6}$/.test(t) ? t : a.seedColor;
+            }
+        }
+        SliderRow {
+            icon: "contrast"
+            title: Translation.tr("Contrast")
+            value: Math.round(a.contrast * 100)
+            from: -100; to: 100; step: 10; suffix: "%"
+            onMoved: value => a.contrast = value / 100
+        }
+        M3Button {
+            Layout.margins: 14
+            text: Translation.tr("Reset shape, size and palette")
+            onClicked: ["cornerScale", "fontScale", "density", "seedColor", "contrast"].forEach(k => Config.reset("appearance." + k))
+        }
+    }
+
+    Section {
         icon: "animation"
         title: Translation.tr("Motion & surfaces")
 

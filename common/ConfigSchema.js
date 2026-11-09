@@ -8,6 +8,11 @@ const rules = {
     "language": { enum: ["auto", "en", "ru"], def: "auto", allowOther: true }, // custom languages add codes
     "appearance.transparencyLevel": { min: 0, max: 1, def: 0.12 },
     "appearance.animationSpeed": { min: 0, max: 4, def: 1 },
+    "appearance.cornerScale": { min: 0, max: 2, def: 1 },
+    "appearance.fontScale": { min: 0.6, max: 2, def: 1 },
+    "appearance.density": { enum: ["compact", "comfortable", "spacious"], def: "comfortable" },
+    "appearance.seedColor": { pattern: "^#[0-9a-fA-F]{6}$", allowEmpty: true, def: "" },
+    "appearance.contrast": { min: -1, max: 1, def: 0 },
     "appearance.screenCorners": { min: 0, max: 64, def: 16 },
     "appearance.contextMenu": { enum: ["material", "caelestia", "standard"], def: "material" },
     "appearance.scheme": { enum: ["tonal-spot", "content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "vibrant"], def: "tonal-spot" },
@@ -71,6 +76,11 @@ function problem(path, value) {
     const r = rules[path];
     if (!r)
         return "";
+    if (r.pattern) {
+        if (r.allowEmpty && value === "")
+            return "";
+        return typeof value === "string" && new RegExp(r.pattern).test(value) ? "" : "must look like #rrggbb";
+    }
     if (r.enum) {
         if (r.allowOther && typeof value === "string" && value !== "")
             return "";

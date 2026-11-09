@@ -22,7 +22,11 @@ Singleton {
         file.reload();
     }
 
+    // Colors of your own (appearance.colorOverrides) win over the generated palette.
     function role(name, fallback) {
+        const own = Config.options.appearance.colorOverrides;
+        if (own && own[name] !== undefined && /^#[0-9a-fA-F]{6,8}$/.test(own[name]))
+            return own[name];
         return scheme[name] ?? fallback;
     }
 
