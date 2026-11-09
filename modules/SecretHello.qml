@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.modules.secret
 
 // Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
-// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"). A click or Esc closes it.
+// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"), "hyperos" (also "hyper os", "xiaomi"). A click or Esc closes it.
 Scope {
     id: root
 
@@ -71,6 +71,9 @@ Scope {
                         material: material,
                         "liquid glass": glass,
                         nothing: nothing,
+                        hyperos: hyperos,
+                        "hyper os": hyperos,
+                        xiaomi: hyperos,
                         oneui: oneui,
                         "one ui": oneui,
                         samsung: oneui,
@@ -99,6 +102,7 @@ Scope {
                 Component { id: confetti; Confetti { revealed: loader.revealed } }
                 Component { id: disco; Disco { revealed: loader.revealed } }
                 Component { id: nyan; Nyan { revealed: loader.revealed } }
+                Component { id: hyperos; HyperOS { revealed: loader.revealed } }
                 Component { id: oneui; OneUI { revealed: loader.revealed } }
                 Component { id: coloros; ColorOS { revealed: loader.revealed } }
                 Component { id: nothing; NothingUI { revealed: loader.revealed } }
