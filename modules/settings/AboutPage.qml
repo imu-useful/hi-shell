@@ -28,6 +28,8 @@ ColumnLayout {
         Translation.tr("Wrong. Is this really how you spend your evening?"),
         Translation.tr("Incorrect. The key is not \"please\" either.")
     ]
+    readonly property var rickKeys: ["rickroll", "rick", "never gonna give you up"]
+    readonly property string rickUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     property int taps: 0
     property bool secretOpen: false
     property string secretHint: ""
@@ -115,7 +117,11 @@ ColumnLayout {
                 const key = text.trim();
                 if (key === "")
                     return;
-                if (root.secretKeys.includes(key.toLowerCase())) {
+                if (root.rickKeys.includes(key.toLowerCase())) {
+                    // No overlay here: it would sit on top of the browser that opens
+                    root.secretHint = Translation.tr("Never gonna give you up");
+                    Qt.openUrlExternally(root.rickUrl);
+                } else if (root.secretKeys.includes(key.toLowerCase())) {
                     root.secretHint = "";
                     root.secretOpen = false;
                     ShellState.secretEgg = key.toLowerCase();
