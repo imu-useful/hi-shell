@@ -39,6 +39,20 @@ ColumnLayout {
     }
 
     Section {
+        icon: "style"
+        title: Translation.tr("Design")
+
+        ChoiceRow {
+            icon: "brush"
+            title: Translation.tr("Design")
+            subtitle: a.design === "glass" ? Translation.tr("Frosted translucent panes with a bright rim and rounder corners; needs transparency") : Translation.tr("Tonal surfaces of the wallpaper's palette")
+            value: a.design
+            options: [{ value: "material", text: "Material You" }, { value: "glass", text: "Liquid Glass" }]
+            onSelected: value => a.design = value
+        }
+    }
+
+    Section {
         icon: "text_fields"
         title: Translation.tr("Fonts")
 

@@ -25,7 +25,13 @@ Singleton {
 
     // Outline width for floating surfaces: depth comes from tone, so the outline is only
     // there when the surface is see-through (otherwise its edge would dissolve into the wallpaper).
-    readonly property int edge: options.transparency && !ShellState.zen ? 1 : 0
+    readonly property int edge: (options.transparency || glass) && !ShellState.zen ? 1 : 0
+
+    // The design: "material" (Material You) or "glass" (Liquid Glass).
+    readonly property bool glass: options.design === "glass"
+
+    // Outline color of floating surfaces: a faint tone line, or the bright rim of a pane of glass.
+    readonly property color edgeColor: glass ? Qt.alpha("white", Colors.dark ? 0.3 : 0.65) : Qt.alpha(Colors.m3outlineVariant, 0.6)
 
     // Spacing scale (px); use these instead of loose numbers in layouts.
     readonly property QtObject space: QtObject {
@@ -50,8 +56,8 @@ Singleton {
 
     // Corner radius per component kind; the "Soft Tonal" look is tuned here.
     readonly property QtObject shape: QtObject {
-        readonly property int panel: rounding.extraLarge
-        readonly property int card: rounding.large
+        readonly property int panel: root.glass ? rounding.extraLargeIncreased : rounding.extraLarge
+        readonly property int card: root.glass ? rounding.largeIncreased : rounding.large
         readonly property int button: rounding.full
         readonly property int chip: rounding.small
         readonly property int field: rounding.full
@@ -116,6 +122,8 @@ Singleton {
         // Focus Mode turns blur off, so nothing shows through either.
         if (!options.transparency || ShellState.zen)
             return color;
-        return Qt.alpha(color, 1 - (level ?? options.transparencyLevel));
+        const base = level ?? options.transparencyLevel;
+        // Glass is frosted: much more of the blurred background shows through.
+        return Qt.alpha(color, 1 - (glass ? Math.min(0.6, base + 0.3) : base));
     }
 }

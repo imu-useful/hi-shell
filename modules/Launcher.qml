@@ -472,7 +472,7 @@ Scope {
                 // Translucent so the compositor blur (see hypr/hi-shell/layer-rules.lua) shows through.
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: Appearance.edge
-                border.color: Colors.m3outlineVariant
+                border.color: Appearance.edgeColor
 
                 // The window's offsetScale is already animated; a second animation here would lag it.
                 opacity: 1 - window.offsetScale
@@ -597,7 +597,7 @@ Scope {
                 radius: Appearance.rounding.extraLarge
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: width > 0 ? Appearance.edge : 0
-                border.color: Colors.m3outlineVariant
+                border.color: Appearance.edgeColor
                 clip: true
                 opacity: window.showPreview && loader.revealed ? 1 : 0
                 Behavior on width { SpatialAnim {} }

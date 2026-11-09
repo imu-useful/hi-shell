@@ -44,7 +44,7 @@ Rectangle {
     radius: Appearance.rounding.medium
     color: Colors.m3surfaceContainerHighest
     border.width: Appearance.edge
-    border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
+    border.color: Appearance.edgeColor
 
     component MenuRow: Rectangle {
         property string icon: ""
