@@ -24,6 +24,9 @@
 //   { ipc: "theme setMode dark" }        qs ipc call <target> <function> [args]
 //   { run: "notify-send hi" }            a shell command
 //   { notify: "Battery saver is on" }    a notification
+//   { profile: "desk", only: "bar,dock" }   apply the preset or profile "desk" from the presets folder (only: parts, optional);
+//                                        { profile: "undo" } puts back the setup from before the last one. Keep `rules` out of
+//                                        the parts you switch (hi preset save saves a plain preset; --profile adds the code)
 //
 // Facts (what the conditions look at): { battery: { available, percent, charging, full, onBattery }, fullscreen, screens: [names],
 // time: minutes since midnight, weekday, app, apps: [classes], workspace, dark, playing, commands: { command: bool } }
@@ -181,11 +184,18 @@ function validateAction(a) {
             return `set ${a.set} needs a value`;
         return "";
     }
+    if (a.profile !== undefined) {
+        if (typeof a.profile !== "string" || !/^([A-Za-z0-9][A-Za-z0-9 ._-]*|undo)$/.test(a.profile) || a.profile.includes(".."))
+            return "profile is the name of a preset (letters, digits, space, . _ -) or undo";
+        if (a.only !== undefined && (typeof a.only !== "string" || !/^[A-Za-z0-9_,]*$/.test(a.only)))
+            return "only is a list of parts like bar,dock,colors";
+        return "";
+    }
     for (const k of ["ipc", "run", "notify"]) {
         if (a[k] !== undefined)
             return typeof a[k] === "string" && a[k].trim() !== "" ? "" : `${k} is a non-empty text`;
     }
-    return "an action has set + value, ipc, run or notify";
+    return "an action has set + value, ipc, run, notify or profile";
 }
 
 // Why a rule is no good, or "" if it is fine.
@@ -292,6 +302,12 @@ const templates = {
         name: "A dock on every screen with a second screen",
         when: { screenCount: { atLeast: 2 } },
         then: [{ set: "dock.monitors", value: ["*"] }]
+    },
+    "monitor-profile": {
+        name: "A preset while a second screen is connected (edit the names)",
+        when: { screen: "HDMI-A-1" },
+        then: [{ profile: "desk", only: "bar,dock,desktop" }],
+        else: [{ profile: "undo" }]
     },
     "game-mode": {
         name: "Presentation mode while Steam is open",

@@ -10,7 +10,7 @@
 #   Screens      hi dock screens <all|name...>   hi desktop screens|own ...   hi wallpaper screen <name> <file|none>
 #   Rules        hi rules [list|templates|add <template>|edit <id>|on|off <id>|rm <id>|facts|check]
 #   Widgets      hi widgets [list|new <name>|edit <name>|reload|path]   hi script <name> '<command>' [seconds] [icon] [template]
-#   Presets      hi preset list | save <name> | load <file>
+#   Presets      hi preset list|save [--profile]|load <name> [--only bar,dock] [--trust]|diff|undo|dump <dir>|restore <dir>
 #   Media        hi play | pause | next | prev
 #   Other        hi qr [text] | keybinds [word] | ipc [<target> <function> [args]] | help
 #
@@ -203,13 +203,71 @@ wallpaper() {
     esac
 }
 
+# hi preset: presets (config, wallpaper, colors) and profiles (also rules, scripts, widgets, keybinds); see docs/PROFILES.md
 preset() {
-    need_running
-    case "${1:-list}" in
-        list) ipc presets list ;;
-        save) [ -n "${2:-}" ] || { echo "Usage: hi preset save <name>" >&2; exit 1; }; ipc presets save "$2" ;;
-        load) [ -n "${2:-}" ] || { echo "Usage: hi preset load <file>" >&2; exit 1; }; ipc presets load "$(readlink -f "$2")" ;;
-        *) echo "Usage: hi preset list|save <name>|load <file>" >&2; exit 1 ;;
+    sub=${1:-list}
+    [ $# -gt 0 ] && shift
+    state="${XDG_STATE_HOME:-$HOME/.local/state}/hi-shell"
+    presets_dir="${XDG_DATA_HOME:-$HOME/.local/share}/hi-shell/presets"
+    py="$repo/services/presets.py"
+    wd="${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/widgets"
+    bf="${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/binds.lua"
+    # A name without a slash is a preset in the presets folder.
+    resolve() {
+        case "$1" in
+            */* | *.tar.gz) readlink -f "$1" ;;
+            *) echo "$presets_dir/$1.tar.gz" ;;
+        esac
+    }
+    # --only <parts> and --trust, shared by load, diff and restore
+    only=""; trust=""; profile=""
+    parse_flags() {
+        only=""; trust=""; profile=""; rest=""
+        while [ $# -gt 0 ]; do
+            case "$1" in
+                --only) [ $# -ge 2 ] || { echo "--only needs a list like bar,dock,colors" >&2; exit 1; }; only=$2; shift 2 ;;
+                --trust) trust=1; shift ;;
+                --profile) profile=1; shift ;;
+                *) rest="${rest:+$rest }$1"; shift ;;
+            esac
+        done
+    }
+    case "$sub" in
+        list) need_running; ipc presets list ;;
+        save)
+            need_running; parse_flags "$@"
+            if [ -n "$profile" ]; then ipc presets saveProfile "${rest:- }"; else ipc presets save "${rest:- }"; fi ;;
+        load)
+            need_running; parse_flags "$@"
+            [ -n "$rest" ] || { echo "Usage: hi preset load <name|file> [--only bar,dock,colors] [--trust]" >&2; exit 1; }
+            ipc presets loadWith "$(resolve "$rest")" " $only" "$([ -n "$trust" ] && echo true || echo false)" ;;
+        diff)
+            parse_flags "$@"
+            [ -n "$rest" ] || { echo "Usage: hi preset diff <name|file> [--only parts] [--trust]" >&2; exit 1; }
+            exec python3 "$py" diff "$(resolve "$rest")" --config "$cfg" --widgets-dir "$wd" --binds "$bf" ${only:+--only "$only"} ${trust:+--trust} ;;
+        undo)
+            need_running
+            python3 "$py" undo --config "$cfg" --backup-dir "$state/preset-backups" --widgets-dir "$wd" --binds "$bf" ;;
+        # hi preset dump <folder> [--profile]: a folder for git, one file per config section
+        dump)
+            need_running; parse_flags "$@"
+            [ -n "$rest" ] || { echo "Usage: hi preset dump <folder> [--profile]" >&2; exit 1; }
+            wall=$(ipc wallpaper get | head -n1)
+            python3 "$py" dump "$rest" --config "$cfg" --colors "$state/colors.json" ${wall:+--wallpaper "$wall"} \
+                ${profile:+--profile --widgets-dir "$wd" --binds "$bf"} ;;
+        # hi preset restore <folder> [--only parts] [--trust]
+        restore)
+            need_running; parse_flags "$@"
+            [ -n "$rest" ] || { echo "Usage: hi preset restore <folder> [--only parts] [--trust]" >&2; exit 1; }
+            out=$(python3 "$py" restore "$rest" --config "$cfg" --wallpapers "$HOME/Pictures/Wallpapers/presets" --backup-dir "$state/preset-backups" \
+                --widgets-dir "$wd" --binds "$bf" \
+                ${only:+--only "$only"} ${trust:+--trust}) || exit 1
+            wall=$(printf '%s' "$out" | python3 -I -c 'import json,sys; print(json.load(sys.stdin).get("wallpaper",""))')
+            mode=$(printf '%s' "$out" | python3 -I -c 'import json,sys; print(json.load(sys.stdin).get("mode",""))')
+            [ -z "$wall" ] || ipc wallpaper set "$wall" >/dev/null
+            [ -z "$mode" ] || ipc theme setMode "$mode" >/dev/null
+            echo "Restored from $rest" ;;
+        *) echo "Usage: hi preset list|save [--profile] [name]|load <name|file> [--only parts] [--trust]|diff <name|file>|undo|dump <folder> [--profile]|restore <folder>" >&2; exit 1 ;;
     esac
 }
 

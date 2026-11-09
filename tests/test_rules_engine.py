@@ -91,11 +91,18 @@ class ValidateTest(unittest.TestCase):
             (dict(self.GOOD, then=[{"set": "bar.height"}]), "needs a value"),
             (dict(self.GOOD, then=[{"set": "../x", "value": 1}]), "option path"),
             (dict(self.GOOD, then=[{"foo": 1}]), "an action has"),
+            (dict(self.GOOD, then=[{"profile": "../../etc/x"}]), "profile is"),
+            (dict(self.GOOD, then=[{"profile": "a/b"}]), "profile is"),
+            (dict(self.GOOD, then=[{"profile": "desk", "only": "bar;rm"}]), "only is"),
             (dict(self.GOOD, then="x"), "list of actions"),
             ([], "object"),
         ]
         for rule, word in cases:
             self.assertIn(word, self.rule_error(rule), rule)
+
+    def test_profile_actions_are_valid(self):
+        for action in ({"profile": "desk"}, {"profile": "desk", "only": "bar,dock"}, {"profile": "undo"}, {"profile": "my preset 2"}):
+            self.assertEqual(self.rule_error(dict(self.GOOD, then=[action])), "", action)
 
     def test_deep_nesting_is_refused(self):
         cond = {"dark": True}

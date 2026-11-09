@@ -77,12 +77,24 @@ Singleton {
         Quickshell.execDetached(["qs", "-c", "hi-shell", "ipc", "call", ...text.trim().split(/\s+/)]);
     }
 
+    // A preset or profile from the presets folder, or "undo". It is trusted (the rule is yours), so it may bring code;
+    // keep `rules` out of what a rule switches with `only`.
+    function applyProfile(action) {
+        if (action.profile === "undo") {
+            Presets.undo();
+            return;
+        }
+        Presets.importPreset(`${Presets.dir}/${action.profile}.tar.gz`, true, action.only ?? "");
+    }
+
     function runActions(list) {
         for (const a of list ?? []) {
             if (a.ipc !== undefined)
                 ipcCall(a.ipc);
             else if (a.run !== undefined)
                 Quickshell.execDetached(["sh", "-c", a.run]);
+            else if (a.profile !== undefined)
+                applyProfile(a);
             else if (a.notify !== undefined)
                 Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-i", "preferences-system", a.notify]);
         }

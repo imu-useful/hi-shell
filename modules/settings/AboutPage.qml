@@ -292,6 +292,8 @@ ColumnLayout {
 
         Component.onCompleted: Presets.refresh()
 
+        property bool profile: false
+
         TextRow {
             icon: "save"
             title: Translation.tr("Save current setup")
@@ -302,43 +304,108 @@ ColumnLayout {
             M3Button {
                 text: Translation.tr("Save")
                 enabled: !Presets.busy
-                onClicked: Presets.exportPreset(presets.name)
+                onClicked: Presets.exportPreset(presets.name, presets.profile)
             }
+        }
+        SwitchRow {
+            icon: "key"
+            title: Translation.tr("Also save my rules, scripts, widgets and keybinds")
+            subtitle: Translation.tr("A profile for yourself: they run code, so applying them needs an explicit OK, and a profile is not for sharing")
+            checked: presets.profile
+            onToggled: checked => presets.profile = checked
         }
         Repeater {
             model: Presets.list
-            ListRow {
+            ColumnLayout {
                 required property var modelData
                 Layout.fillWidth: true
-                icon: "style"
-                title: modelData.name
-                subtitle: [modelData.created.replace("T", " ").slice(0, 16), modelData.wallpaper].filter(s => s).join(" · ")
-                M3Button {
-                    tonal: true
-                    text: Translation.tr("Apply")
-                    enabled: !Presets.busy
-                    onClicked: Presets.importPreset(modelData.path)
+                spacing: 0
+
+                ListRow {
+                    Layout.fillWidth: true
+                    icon: modelData.profile ? "badge" : "style"
+                    title: modelData.name
+                    tag: modelData.profile ? Translation.tr("Profile") : ""
+                    subtitle: [modelData.created.replace("T", " ").slice(0, 16), modelData.wallpaper].filter(s => s).join(" · ")
+                    IconButton {
+                        icon: "difference"
+                        tooltip: Translation.tr("What it changes")
+                        onClicked: Presets.diffPath === modelData.path ? Presets.diffPath = "" : Presets.previewPreset(modelData.path, false, "")
+                    }
+                    M3Button {
+                        tonal: true
+                        text: Translation.tr("Apply")
+                        enabled: !Presets.busy
+                        onClicked: Presets.importPreset(modelData.path, false, "")
+                    }
+                    M3Button {
+                        visible: modelData.profile
+                        tonal: true
+                        text: Translation.tr("Apply with code")
+                        enabled: !Presets.busy
+                        onClicked: Presets.importPreset(modelData.path, true, "")
+                    }
+                    IconButton {
+                        icon: "delete"
+                        tooltip: Translation.tr("Delete")
+                        onClicked: Presets.remove(modelData.path)
+                    }
                 }
-                IconButton {
-                    icon: "delete"
-                    tooltip: Translation.tr("Delete")
-                    onClicked: Presets.remove(modelData.path)
+                StyledText {
+                    visible: Presets.diffPath === modelData.path
+                    Layout.fillWidth: true
+                    Layout.margins: 14
+                    Layout.topMargin: 0
+                    wrapMode: Text.WrapAnywhere
+                    text: Presets.diffText || Translation.tr("No changes.")
+                    font.family: Appearance.font.mono
+                    font.pixelSize: Appearance.font.size.labelMedium
+                    color: Colors.m3onSurfaceVariant
                 }
+            }
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "undo"
+            title: Translation.tr("Undo the last preset")
+            subtitle: Translation.tr("Puts back the config (and keybinds and widgets) from before it was applied; the wallpaper stays")
+            M3Button {
+                tonal: true
+                text: Translation.tr("Undo")
+                enabled: !Presets.busy
+                onClicked: Presets.undo()
             }
         }
         TextRow {
             icon: "upload_file"
             title: Translation.tr("Apply from a file")
-            subtitle: Presets.error || Translation.tr("A .tar.gz preset someone shared")
+            subtitle: Presets.error || Translation.tr("A .tar.gz preset someone shared; what can run code in it is left out")
             placeholder: "~/Downloads/preset.tar.gz"
             fieldWidth: 220
             onEdited: text => presets.importPath = text.trim()
+            IconButton {
+                icon: "difference"
+                tooltip: Translation.tr("What it changes")
+                enabled: presets.importPath !== ""
+                onClicked: Presets.previewPreset(presets.importPath, false, "")
+            }
             M3Button {
                 tonal: true
                 text: Translation.tr("Apply")
                 enabled: presets.importPath !== "" && !Presets.busy
-                onClicked: Presets.importPreset(presets.importPath)
+                onClicked: Presets.importPreset(presets.importPath, false, "")
             }
+        }
+        StyledText {
+            visible: Presets.diffPath !== "" && Presets.diffPath === presets.importPath
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.topMargin: 0
+            wrapMode: Text.WrapAnywhere
+            text: Presets.diffText || Translation.tr("No changes.")
+            font.family: Appearance.font.mono
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
         }
         ListRow {
             Layout.fillWidth: true

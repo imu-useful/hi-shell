@@ -1355,5 +1355,18 @@
     "Dark mode from 20:00 to 07:00": "Тёмная тема с 20:00 до 07:00",
     "No sounds over a fullscreen window": "Без звуков при полноэкранном окне",
     "A dock on every screen with a second screen": "Док на каждом экране, когда подключён второй",
-    "Presentation mode while Steam is open": "Режим презентации, пока открыта игра Steam"
+    "Presentation mode while Steam is open": "Режим презентации, пока открыта игра Steam",
+    "Also save my rules, scripts, widgets and keybinds": "Сохранить также мои правила, скрипты, виджеты и горячие клавиши",
+    "A profile for yourself: they run code, so applying them needs an explicit OK, and a profile is not for sharing": "Профиль для себя: это исполняемый код, поэтому для применения нужно явное согласие, и делиться профилем не стоит",
+    "Profile": "Профиль",
+    "What it changes": "Что изменится",
+    "Apply with code": "Применить вместе с кодом",
+    "No changes.": "Изменений нет.",
+    "Undo the last preset": "Отменить последний пресет",
+    "Puts back the config (and keybinds and widgets) from before it was applied; the wallpaper stays": "Возвращает конфиг (а также клавиши и виджеты) как до применения; обои остаются",
+    "Undo": "Отменить",
+    "A .tar.gz preset someone shared; what can run code in it is left out": "Пресет .tar.gz, которым поделились; всё, что может выполнять код, из него убирается",
+    "Preset undone": "Пресет отменён",
+    "The setup from before the last preset is back": "Настройки до последнего пресета возвращены",
+    "A preset while a second screen is connected (edit the names)": "Пресет, пока подключён второй экран (измените имена)"
 }

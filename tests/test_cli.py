@@ -106,6 +106,39 @@ class CliTest(unittest.TestCase):
         self.assertNotEqual(self.qs.run("rules", "add").returncode, 0)
         self.assertNotEqual(self.qs.run("rules", "edit", "a b").returncode, 0)
 
+    def test_preset_save_and_load_call_the_presets_target(self):
+        self.qs.run("preset", "save", "mine")
+        self.assertEqual(self.last(), ["presets", "save", "mine"])
+        self.qs.run("preset", "save", "--profile", "work")
+        self.assertEqual(self.last(), ["presets", "saveProfile", "work"])
+        self.qs.run("preset", "load", "work")
+        call = self.last()
+        self.assertEqual(call[:2], ["presets", "loadWith"])
+        self.assertTrue(call[2].endswith("/hi-shell/presets/work.tar.gz"))
+        self.assertEqual((call[3].strip(), call[4]), ("", "false"))
+        self.qs.run("preset", "load", "work", "--only", "bar,dock", "--trust")
+        call = self.last()
+        self.assertEqual((call[3].strip(), call[4]), ("bar,dock", "true"))
+        self.assertNotEqual(self.qs.run("preset", "load").returncode, 0)
+        self.assertNotEqual(self.qs.run("preset", "load", "x", "--only").returncode, 0)
+
+    def test_preset_diff_runs_on_the_files_without_the_shell(self):
+        import json
+        import subprocess
+        import sys
+        from helpers import ROOT
+        cfgdir = self.qs.home / ".config" / "hi-shell"
+        cfgdir.mkdir(parents=True)
+        (cfgdir / "config.json").write_text(json.dumps({"bar": {"height": 40}}))
+        src = self.qs.dir / "src.json"
+        src.write_text(json.dumps({"bar": {"height": 30}}))
+        out = self.qs.dir / "p.tar.gz"
+        subprocess.run([sys.executable, str(ROOT / "services" / "presets.py"), "export", str(out), "--config", str(src)], check=True, capture_output=True)
+        r = self.qs.run("preset", "diff", str(out))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("bar.height: 40 -> 30", r.stdout)
+        self.assertEqual(self.qs.calls, [])
+
     def test_unknown_command_fails_and_help_lists_the_commands(self):
         self.assertEqual(self.qs.run("nope").returncode, 1)
         out = self.qs.run("help").stdout

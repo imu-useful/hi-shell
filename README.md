@@ -45,7 +45,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 | 🎨 **Theming** | Wallpaper picker (local folders, Wallhaven, Unsplash), live wallpapers (video, gif), Material 3 palette from the wallpaper via matugen, scheme variants, light / dark / auto, shaped wallpaper frame |
 | ⚙️ **Settings** | Every option in a settings app, Hyprland displays / gaps / blur / input included, searchable from the launcher |
 | 🌍 **Languages** | English and Russian: the whole interface, dates and plural forms |
-| 👋 **Welcome & presets** | A first-run setup, and presets that save your config, wallpaper and colors to one shareable file |
+| 👋 **Welcome & presets** | A first-run setup, and presets that save your config, wallpaper and colors to one shareable file; profiles for yourself (rules, scripts, widgets, keybinds too), a diff before applying, partial loads, undo, and a git-friendly folder: [docs/PROFILES.md](docs/PROFILES.md) |
 
 Animations run everywhere, yet the shell idles at about 1% CPU: hidden panels and disabled widgets aren't created,
 and the audio spectrum is drawn by a single shader.

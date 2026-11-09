@@ -8,7 +8,7 @@ for c in hi hi-shell
     complete -c $c -n "__fish_seen_subcommand_from bar" -a "show hide toggle edit done list add rm monitor instance"
     complete -c $c -n "__fish_seen_subcommand_from theme" -a "dark light toggle seed tonal-spot content expressive fidelity fruit-salad monochrome neutral rainbow vibrant"
     complete -c $c -n "__fish_seen_subcommand_from wallpaper" -a "random get"
-    complete -c $c -n "__fish_seen_subcommand_from preset" -a "list save load"
+    complete -c $c -n "__fish_seen_subcommand_from preset" -a "list save load diff undo dump restore"
     complete -c $c -n "__fish_seen_subcommand_from log" -a "-f"
 end
 for c in hi hi-shell
