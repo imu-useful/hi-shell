@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.modules.secret
 
 // Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
-// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg". A click or Esc closes it.
+// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story". A click or Esc closes it.
 Scope {
     id: root
 
@@ -64,6 +64,8 @@ Scope {
                         disco: disco,
                         nyan: nyan,
                         man: man,
+                        undertale: story,
+                        story: story,
                         egg: man,
                         "42": answer
                     })[root.egg] ?? null
@@ -75,6 +77,7 @@ Scope {
                 Component { id: disco; Disco { revealed: loader.revealed } }
                 Component { id: nyan; Nyan { revealed: loader.revealed } }
                 Component { id: man; Man { revealed: loader.revealed } }
+                Component { id: story; Story { revealed: loader.revealed; onFinished: root.close() } }
                 Component {
                     id: sudo
                     Terminal {

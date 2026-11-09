@@ -130,6 +130,27 @@ def disco():
     tr.save(total, "disco.ogg")
 
 
+def story():
+    """A slow music-box lullaby for the story intro (key "story")."""
+    bpm, bars = 72, 8
+    beat = 60 / bpm
+    total = bars * 4 * beat
+    tr = Track(total)
+    chords = [(57, 60, 64), (53, 57, 60), (48, 52, 55), (55, 59, 62)] * 2  # Am F C G
+    for b in range(bars):
+        ch = chords[b]
+        for k in range(8):  # rolling arpeggio, eighths
+            n = ch[[0, 1, 2, 1, 0, 1, 2, 1][k]] + 12
+            tr.add((b * 4 + k / 2) * beat, tone("sine", hz(n), beat * 1.2, 0.35, 3.2))
+        tr.add(b * 4 * beat, tone("tri", hz(ch[0] - 12), beat * 3.5, 0.45, 0.9))
+    hook = [(0, 76), (2, 79), (3, 76), (4, 72), (8, 74), (10, 77), (11, 74), (12, 71),
+            (16, 72), (18, 76), (19, 79), (20, 84), (24, 83), (26, 79), (27, 76), (28, 79)]
+    for pos, n in hook:  # the tune, a note per half beat from bar 3 on
+        tr.add((8 + pos) * beat / 2 * 2 / 2 + 0, tone("sine", hz(n + 12), beat * 1.6, 0.3, 2.2))
+    tr.save(total, "story.ogg")
+
+
 if __name__ == "__main__":
     nyan()
     disco()
+    story()
