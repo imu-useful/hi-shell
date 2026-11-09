@@ -20,7 +20,7 @@ ColumnLayout {
 
     // Easter egg: five taps on the logo open the secret setting
     readonly property int secretTaps: 5
-    readonly property var secretKeys: ["hi", "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu"]
+    readonly property var secretKeys: ["hi", "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material", "material you", "m3", "expressive"]
     readonly property var jokes: [
         Translation.tr("Wrong key. Don't waste your time on nonsense."),
         Translation.tr("Nope. Go touch grass instead of guessing keys."),
