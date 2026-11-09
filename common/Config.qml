@@ -22,10 +22,16 @@ Singleton {
     // (a hand edit that broke a rule in common/ConfigSchema.js).
     property var lastProblems: []
 
+    // Path segments that would reach Object.prototype or the adapter's own members instead of an option.
+    readonly property var forbiddenKeys: ["__proto__", "constructor", "prototype"]
+    function safeKey(k) {
+        return typeof k === "string" && k !== "" && !forbiddenKeys.includes(k) && !k.startsWith("on") && !k.endsWith("Changed");
+    }
+
     function getPath(path) {
         let o = adapter;
         for (const k of path.split(".")) {
-            if (o === undefined || o === null)
+            if (o === undefined || o === null || !safeKey(k))
                 return undefined;
             o = o[k];
         }
@@ -34,6 +40,8 @@ Singleton {
 
     function setPath(path, value) {
         const parts = path.split(".");
+        if (!parts.every(safeKey))
+            return;
         let o = adapter;
         for (const k of parts.slice(0, -1))
             o = o[k];
@@ -100,6 +108,9 @@ Singleton {
             return null;
         const copy = JSON.parse(JSON.stringify(cur ?? {}));
         const keys = key.split(".");
+        // A key like "__proto__.x" would write onto Object.prototype.
+        if (!keys.every(k => k !== "" && !forbiddenKeys.includes(k)))
+            return null;
         let o = copy;
         for (const k of keys.slice(0, -1)) {
             if (o[k] === null || typeof o[k] !== "object")

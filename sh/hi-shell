@@ -153,9 +153,11 @@ barcmd() {
         # hi bar add <id> [position] [widgets...]: an extra bar, its widgets in the center
         add)
             [ -n "${1:-}" ] || { echo "Usage: hi bar add <id> [top|bottom|left|right] [widget...]" >&2; exit 1; }
-            id=$1; pos=${2:-bottom}; [ $# -gt 1 ] && shift 2 || shift $#
-            widgets=$(printf '"%s",' "$@"); widgets="[${widgets%,}]"
-            ipc config listput bar.extra "{\"id\":\"$id\",\"position\":\"$pos\",\"center\":$widgets}" >/dev/null && echo "Added the bar $id ($pos)" ;;
+            json=$(python3 -I -c '
+import json, sys
+id_, pos, widgets = sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "bottom", sys.argv[3:]
+print(json.dumps({"id": id_, "position": pos, "center": widgets}))' "$@") || exit 1
+            ipc config listput bar.extra "$json" >/dev/null && echo "Added the bar $1" ;;
         rm | remove) [ -n "${1:-}" ] || { echo "Usage: hi bar rm <id>" >&2; exit 1; }; ipc config listdel bar.extra "$1" >/dev/null && echo "Removed the bar $1" ;;
         # hi bar monitor <screen> <key> <json>: override one setting of the main bar on a screen (null = back to the default)
         monitor)
@@ -176,7 +178,7 @@ theme() {
     case "${1:-toggle}" in
         dark | light) ipc theme setMode "$1" ;;
         seed) [ -n "${2:-}" ] || { echo "Usage: hi theme seed <#rrggbb|wallpaper>" >&2; exit 1; }
-            case "$2" in wallpaper | none) c='""' ;; *) c="\"$2\"" ;; esac
+            case "$2" in wallpaper | none) c='""' ;; *#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) c="\"$2\"" ;; *) echo "A color looks like #rrggbb" >&2; exit 1 ;; esac
             ipc config set appearance.seedColor "$c" ;;
         toggle) ipc theme toggleMode ;;
         *) ipc theme setScheme "$1" ;;
@@ -219,7 +221,10 @@ widgets() {
             [ -e "$dir/$1.qml" ] && { echo "$dir/$1.qml already exists" >&2; exit 1; }
             sed "s/__NAME__/$1/g" "$here/widgets/template.qml" >"$dir/$1.qml"
             echo "Made $dir/$1.qml. Add it to a bar: hi bar add mybar top $1   (or Settings > Bar)" ;;
-        edit) [ -n "${1:-}" ] || { echo "Usage: hi widgets edit <name>" >&2; exit 1; }; "${VISUAL:-${EDITOR:-nano}}" "$dir/$1.qml" ;;
+        edit)
+            [ -n "${1:-}" ] || { echo "Usage: hi widgets edit <name>" >&2; exit 1; }
+            case "$1" in *[!A-Za-z0-9_]*) echo "Not a widget name: $1" >&2; exit 1 ;; esac
+            "${VISUAL:-${EDITOR:-nano}}" "$dir/$1.qml" ;;
         *) echo "Usage: hi widgets list|new <name>|edit <name>|reload|path" >&2; exit 1 ;;
     esac
 }

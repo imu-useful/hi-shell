@@ -16,7 +16,7 @@ Singleton {
     property var allClocks: []
     readonly property list<string> deskZones: Config.options.desktop.worldClocks
     readonly property var barZones: Object.values(Config.options.bar.instances ?? {}).map(i => i?.zone).filter(z => typeof z === "string" && /^[A-Za-z0-9_+\-\/]+$/.test(z))
-    readonly property var zones: [...new Set([...deskZones, ...barZones])]
+    readonly property var zones: [...new Set([...deskZones, ...barZones])].filter(z => /^[A-Za-z0-9_+\-\/]+$/.test(z))
 
     function refresh() {
         if (zones.length === 0) {

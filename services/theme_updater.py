@@ -17,6 +17,7 @@ or system themes are touched.
 """
 
 import argparse
+import re
 import json
 import os
 import shutil
@@ -107,6 +108,10 @@ def main() -> int:
 
     if not shutil.which("matugen"):
         log("matugen not found in PATH")
+        return 1
+
+    if args.seed and not re.fullmatch(r"#?[0-9a-fA-F]{6}", args.seed):
+        log(f"--seed must look like #rrggbb, got {args.seed!r}")
         return 1
 
     previous = load_previous(args.output)

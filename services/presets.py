@@ -40,6 +40,33 @@ def add_bytes(tar: tarfile.TarFile, name: str, data: bytes) -> None:
     tar.addfile(info, io.BytesIO(data))
 
 
+def drop_scripts(config: dict) -> None:
+    """A preset is shared, so it must not bring commands with it: script widgets (bar.instances "script#...") run
+    a shell command from their options, so they are left out of an imported preset (with their place in the bar
+    lists). A script widget you made yourself stays."""
+    bar = config.get("bar")
+    if not isinstance(bar, dict):
+        return
+    instances = bar.get("instances")
+    dropped = []
+    if isinstance(instances, dict):
+        dropped = [k for k in instances if k.startswith("script#")]
+        for k in dropped:
+            del instances[k]
+    lists = [bar.get(k) for k in ("left", "center", "right")]
+    for entry in bar.get("extra", []) if isinstance(bar.get("extra"), list) else []:
+        if isinstance(entry, dict):
+            lists += [entry.get(k) for k in ("left", "center", "right")]
+    for monitor in bar.get("monitors", {}).values() if isinstance(bar.get("monitors"), dict) else []:
+        if isinstance(monitor, dict):
+            lists += [monitor.get(k) for k in ("left", "center", "right")]
+    for lst in lists:
+        if isinstance(lst, list):
+            lst[:] = [w for w in lst if not (isinstance(w, str) and w.startswith("script#"))]
+    if dropped:
+        print(f"presets: left out {len(dropped)} script widget(s) from the preset (they run commands): {', '.join(dropped)}", file=sys.stderr)
+
+
 def export(args) -> int:
     config = json.loads(Path(args.config).read_text())
     for section, key in PRIVATE:
@@ -126,6 +153,7 @@ def import_(args) -> int:
     current = json.loads(config_path.read_text()) if config_path.is_file() else {}
     for section, key in PRIVATE:
         preset_config.get(section, {}).pop(key, None)
+    drop_scripts(preset_config)
     merged = merge(current, preset_config)
     tmp = config_path.with_suffix(".part")
     tmp.write_text(json.dumps(merged, indent=4, ensure_ascii=False))
