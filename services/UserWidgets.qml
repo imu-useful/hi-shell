@@ -37,6 +37,12 @@ Singleton {
                 next[name] = { name, file: r.file, component: null, error: "The name is a built-in widget's; rename the file" };
                 continue;
             }
+            // A file that didn't change keeps its component: replacing it would restart the widget.
+            const unchanged = widgets[name] && known[name] === r.modified && !widgets[name].error;
+            if (unchanged) {
+                next[name] = widgets[name];
+                continue;
+            }
             // The modification time in the URL: the engine caches a file by its URL, so an edit needs a new one.
             const comp = Qt.createComponent(`file://${dir}/${r.file}?v=${r.modified}`, Component.PreferSynchronous);
             const error = comp.status === Component.Ready ? "" : comp.errorString().trim().replace(/file:\/\/[^\s]*\/([^\/\s?]+)\?v=\d+/g, "$1") || "Not loaded";
@@ -48,14 +54,26 @@ Singleton {
                 Quickshell.execDetached(["notify-send", "-a", "hi-shell", "-u", "normal", "-i", "dialog-warning", Translation.tr("Widget %1 didn't load").arg(name), error.split("\n")[0]]);
             }
         }
+        const times = {};
+        for (const r of rows)
+            times[r.file.replace(/\.qml$/, "")] = r.modified;
+        known = times;
         widgets = next;
     }
 
     // Load every file again now (the watcher restarts and prints the folder afresh).
     function reload() {
-        watcher.running = false;
-        watcher.running = true;
+        known = ({});
+        if (watcher.running) {
+            restartWatcher = true;
+            watcher.running = false;
+        } else {
+            watcher.running = true;
+        }
     }
+    property bool restartWatcher: false
+    // name -> modification time of the version that is loaded, to leave the files that didn't change alone.
+    property var known: ({})
 
     function openFolder() {
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${dir}' && xdg-open '${dir}'`]);
@@ -67,6 +85,12 @@ Singleton {
         id: watcher
         running: Config.ready
         command: ["sh", "-c", 'mkdir -p "$1"; prev=x; while :; do cur=$(for f in "$1"/*.qml; do [ -f "$f" ] && echo "$(basename "$f") $(stat -c %Y "$f")"; done); if [ "$cur" != "$prev" ]; then printf "%s\\n---\\n" "$cur"; prev=$cur; fi; sleep 2; done', "sh", root.dir]
+        onRunningChanged: {
+            if (!running && root.restartWatcher) {
+                root.restartWatcher = false;
+                running = true;
+            }
+        }
         stdout: SplitParser {
             splitMarker: "---\n"
             onRead: block => {

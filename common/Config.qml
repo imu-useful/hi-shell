@@ -149,6 +149,9 @@ Singleton {
     // Write the file now instead of after the debounce: for changes made from a command, which may be
     // followed at once by a restart.
     function flush() {
+        // Before the file has been read the adapter only holds defaults: writing now would replace the user's file.
+        if (!file.loaded)
+            return;
         writeTimer.stop();
         file.writeAdapter();
     }
@@ -215,18 +218,20 @@ Singleton {
                 return "No such option: " + path;
             if (root.isSection(root.getPath(path)))
                 return path + " is a section; set one of its options";
+            // The CLI puts a space before the value (qs ipc mangles a leading "["), so it is trimmed first.
+            const text = value.trim();
             let v;
             try {
-                v = JSON.parse(value);
+                v = JSON.parse(text);
             } catch (e) {
-                v = value;
+                v = text;
             }
             const before = root.getPath(path);
             root.setPath(path, v);
             root.validate();
             root.flush();
             const now = root.getPath(path);
-            return JSON.stringify(before) + " -> " + JSON.stringify(now) + (root.lastProblems.length ? " (" + root.lastProblems[0].reason + ", default used)" : "");
+            return JSON.stringify(before) + " -> " + JSON.stringify(now) + (root.lastProblems.some(b => b.path === path) ? " (" + root.lastProblems.find(b => b.path === path).reason + ", default used)" : "");
         }
 
         function reset(path: string): string {
@@ -238,11 +243,12 @@ Singleton {
         // Edit one entry of a map option without writing the whole map: map bar.monitors eDP-1.position '"bottom"'
         // (the key may be dotted; the value is JSON, `null` removes the entry).
         function map(path: string, key: string, value: string): string {
+            const text = value.trim();
             let v;
             try {
-                v = JSON.parse(value);
+                v = JSON.parse(text);
             } catch (e) {
-                v = value;
+                v = text;
             }
             const out = root.mapSet(path, key, v);
             root.flush();
@@ -253,7 +259,7 @@ Singleton {
         function listput(path: string, entry: string): string {
             let e;
             try {
-                e = JSON.parse(entry);
+                e = JSON.parse(entry.trim());
             } catch (err) {
                 return "Not JSON: " + entry;
             }

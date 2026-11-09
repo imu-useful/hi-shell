@@ -165,6 +165,7 @@ print(json.dumps({"id": id_, "position": pos, "center": widgets}))' "$@") || exi
             ipc config map bar.monitors "$1.$2" " $3" >/dev/null && echo "Done" ;;
         # hi bar instance <type#name> <json>: a copy of a widget with options of its own, e.g. 'zoneClock#tokyo' '{"zone":"Asia/Tokyo"}'
         instance)
+            case "${1:-}" in *.*) echo "The name can't have a dot" >&2; exit 1 ;; esac
             [ $# -ge 2 ] || { echo "Usage: hi bar instance <type#name> <json|null>   e.g. 'resources#disks' '{\"shown\":[\"disk\"]}'" >&2; exit 1; }
             ipc config map bar.instances "$1" " $2" >/dev/null && echo "Done" ;;
         edit) ipc bar edit ;;

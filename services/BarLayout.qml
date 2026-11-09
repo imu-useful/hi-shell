@@ -52,6 +52,15 @@ Singleton {
         return out;
     }
 
+    // `entries` keeps the same array while the list of bars is the same, so that a change inside a bar (a widget
+    // dragged, a slider) doesn't make Variants build every bar window again.
+    property var entries: []
+    onComputedEntriesChanged: {
+        if (JSON.stringify(computedEntries) !== JSON.stringify(entries))
+            entries = computedEntries;
+    }
+    Component.onCompleted: entries = computedEntries
+
     // Save the widget list `key` (left / center / right) of bar `barId` on `screenName`: an extra bar keeps it in its
     // entry; the main bar in the screen's own settings if that screen has a list of its own, else in bar.<key>.
     function writeList(screenName, barId, key, list) {
@@ -69,7 +78,7 @@ Singleton {
     }
 
     // [{ screen, barId }] for every window to create.
-    readonly property var entries: {
+    readonly property var computedEntries: {
         const list = [];
         const extra = arr(options.extra).filter(b => b && typeof b.id === "string" && b.id !== "" && b.id !== "main");
         for (const scr of Quickshell.screens) {

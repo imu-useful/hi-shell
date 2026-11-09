@@ -121,26 +121,30 @@ def main() -> int:
     contrast = previous.get("contrast", 0.0) if args.contrast is None else max(-1.0, min(1.0, args.contrast))
 
     wallpaper = args.wallpaper.expanduser() if args.wallpaper else detect_wallpaper()
-    if wallpaper is None:
+    if seed and (wallpaper is None or not wallpaper.is_file()):
+        # The palette comes from the seed color, so it doesn't need a picture.
+        wallpaper = None
+    elif wallpaper is None:
         log("could not detect the current wallpaper; pass --wallpaper PATH")
         return 1
-    if not wallpaper.is_file():
+    elif not wallpaper.is_file():
         log(f"wallpaper not found: {wallpaper}")
         return 1
-    wallpaper = wallpaper.resolve()
-    mtime = wallpaper.stat().st_mtime
+    if wallpaper is not None:
+        wallpaper = wallpaper.resolve()
+    mtime = wallpaper.stat().st_mtime if wallpaper is not None else 0
 
-    unchanged = (previous.get("wallpaper") == str(wallpaper) and previous.get("mtime") == mtime
+    unchanged = (previous.get("wallpaper") == (str(wallpaper) if wallpaper else "") and previous.get("mtime") == mtime
                  and previous.get("mode") == mode and previous.get("scheme", "tonal-spot") == scheme
                  and previous.get("seed", "") == seed and previous.get("contrast", 0.0) == contrast
                  and previous.get("colors"))
     if unchanged and not args.force:
-        log(f"up to date ({wallpaper.name}, {mode}, {scheme})")
+        log(f"up to date ({wallpaper.name if wallpaper else seed}, {mode}, {scheme})")
         return 0
 
     # A video has no colors of its own: the palette comes from a frame of it.
-    picture = still_for(wallpaper)
-    if picture is None:
+    picture = still_for(wallpaper) if wallpaper is not None else None
+    if picture is None and wallpaper is not None:
         log(f"couldn't take a frame of {wallpaper.name}")
         return 1
 
@@ -155,9 +159,9 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     # Atomic: the shell watches this file and would otherwise read it half-written.
     tmp = args.output.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"wallpaper": str(wallpaper), "mtime": mtime, "mode": mode, "scheme": scheme, "seed": seed, "contrast": contrast, "colors": colors}, indent=2))
+    tmp.write_text(json.dumps({"wallpaper": str(wallpaper) if wallpaper else "", "mtime": mtime, "mode": mode, "scheme": scheme, "seed": seed, "contrast": contrast, "colors": colors}, indent=2))
     tmp.replace(args.output)
-    log(f"generated {mode} {scheme} palette from {wallpaper.name} -> {args.output}")
+    log(f"generated {mode} {scheme} palette from {wallpaper.name if wallpaper else seed} -> {args.output}")
     return 0
 
 

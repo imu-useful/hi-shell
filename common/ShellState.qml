@@ -143,6 +143,8 @@ Singleton {
     // cover mode are off, and Settings, the left sidebar and the wallpaper picker stay
     // closed.
     property bool zen: false
+    // Focus Mode keeps its own fixed bar: leave edit mode when it starts.
+    onZenChanged: if (zen) barEdit = false
     // A short message on the on-screen display (e.g. "locked during Focus Mode").
     signal osdMessage(string icon, string label)
 }

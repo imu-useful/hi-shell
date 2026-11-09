@@ -23,7 +23,8 @@ BarWidget {
         if (!asJson)
             return { text: poll.output.split("\n")[0] ?? "" };
         try {
-            return JSON.parse(poll.output.split("\n")[0] ?? "");
+            const v = JSON.parse(poll.output.split("\n")[0] ?? "");
+            return v !== null && typeof v === "object" ? v : { text: "" };
         } catch (e) {
             return { text: "" };
         }
@@ -35,7 +36,7 @@ BarWidget {
         return c === "primary" ? Colors.m3primary : c === "secondary" ? Colors.m3secondary : c === "tertiary" ? Colors.m3tertiary
             : c === "error" ? Colors.m3error : /^#[0-9a-fA-F]{6,8}$/.test(c) ? c : Colors.m3onSurface;
     }
-    readonly property string text: root.rawText === "" ? "" : root.template.replace("{}", root.rawText)
+    readonly property string text: root.rawText === "" ? "" : root.template.split("{}").join(root.rawText)
 
     shown: command !== "" && (instance.hideWhenEmpty === false || poll.ran && (text !== "" || icon !== ""))
     clickable: (instance.click ?? instance.rightClick ?? instance.middleClick ?? "") !== ""
