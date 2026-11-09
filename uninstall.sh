@@ -33,6 +33,13 @@ if [[ -L "$cli" && "$(readlink "$cli")" == */sh/hi-shell ]]; then
     echo "Removed $cli"
 fi
 
+for extra in "$HOME/.local/bin/hi" "$HOME/.config/fish/completions/hi.fish"; do
+    if [[ -L "$extra" && "$(readlink "$extra")" == */sh/* ]]; then
+        rm -f "$extra"
+        echo "Removed $extra"
+    fi
+done
+
 step "Stopping hi-shell"
 qs -c hi-shell kill &>/dev/null && echo "Stopped." || echo "Not running."
 

@@ -319,6 +319,16 @@ if [[ ! -e "$cli" || -L "$cli" ]]; then
 else
     warn "$cli exists and isn't a link, left alone"
 fi
+# The short name, `hi`, and its fish completions.
+short="$HOME/.local/bin/hi"
+if [[ ! -e "$short" || -L "$short" ]]; then
+    ln -sfn "$REPO/sh/hi-shell" "$short"
+    echo "$short -> $REPO/sh/hi-shell"
+fi
+if command -v fish >/dev/null; then
+    mkdir -p "$HOME/.config/fish/completions"
+    ln -sfn "$REPO/sh/completions/hi.fish" "$HOME/.config/fish/completions/hi.fish"
+fi
 
 # --- Hyprland integration ---
 # hypr/hi-shell/ (startup, keybinds, window and layer rules, ...) is copied into your Hyprland

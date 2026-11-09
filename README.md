@@ -232,13 +232,17 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 | click the weather in the bar | Weather details: the current conditions, the next 24 hours and the 7 days (refresh button inside); `qs -c hi-shell ipc call weatherDetails toggle` |
 | scroll | Every slider (volume, brightness, mic, app volumes, track position, settings); on the bar: system icons = volume, battery = brightness, media = player volume, keyboard layout = switch, workspaces = previous / next; the calendar scrolls through months |
 
-The `hi-shell` command (linked into `~/.local/bin` by `install.sh`) wraps the common jobs:
+The `hi` command (linked into `~/.local/bin` by `install.sh`) wraps the common jobs:
 
 ```sh
-hi-shell doctor            # is the shell running, are its programs installed
-hi-shell qr [text]         # a QR code in the terminal (no text: the clipboard)
-hi-shell keybinds [word]   # the keybinds, optionally only those matching a word
-hi-shell ipc <target> <function> [args]   # the same as qs -c hi-shell ipc call ...
+hi start | stop | restart | status | log [-f] | doctor | update
+hi settings [page] | launcher | apps | overview | sidebar [left|right] | bar [show|hide|toggle] | lock | session
+hi ask <prompt> | theme [dark|light|toggle|<scheme>] | wallpaper [random|<file>] | play | pause | next | prev
+hi config get <option|section> | set <option> <value> | reset [option|section] | edit | path
+hi preset list | save <name> | load <file>
+hi qr [text]               # a QR code in the terminal (no text: the clipboard)
+hi keybinds [word]         # the keybinds, optionally only those matching a word
+hi ipc <target> <function> [args]   # the same as qs -c hi-shell ipc call ...  (hi ipc: list everything)
 ```
 
 Change the keys in `~/.config/hypr/hi-shell/keybinds.lua` (the other files in that folder hold the startup, window and layer rules; `update.sh` keeps your edits and leaves a new version of a changed file as `<name>.lua.new`; turn on Settings → Hyprland → "Keep my Hyprland files on update", `hyprland.keepFiles` in the config, and updates don't touch that folder at all, they only list what changed upstream). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:

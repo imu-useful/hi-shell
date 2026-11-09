@@ -40,6 +40,53 @@ Singleton {
         o[parts[parts.length - 1]] = value;
     }
 
+    // The same options with nothing read from the file: their values are the defaults.
+    ConfigOptions {
+        id: pristine
+    }
+
+    // Copy the defaults of `path` (a section such as "bar" or "bar.clock", or one option; empty = everything)
+    // over the live values. Lists and maps are copied, not shared.
+    function reset(path) {
+        const parts = path ? path.split(".") : [];
+        let live = adapter, def = pristine;
+        for (const k of parts.slice(0, -1)) {
+            live = live[k];
+            def = def[k];
+        }
+        if (parts.length === 0) {
+            copyDefaults(live, def);
+            return true;
+        }
+        const last = parts[parts.length - 1];
+        if (live === undefined || live[last] === undefined) {
+            console.warn("Config: no such option or section:", path);
+            return false;
+        }
+        if (isSection(def[last])) {
+            copyDefaults(live[last], def[last]);
+        } else {
+            live[last] = JSON.parse(JSON.stringify(def[last]));
+        }
+        return true;
+    }
+
+    function isSection(v) {
+        return v !== null && typeof v === "object" && !Array.isArray(v) && v.toString().indexOf("JsonObject") !== -1;
+    }
+
+    function copyDefaults(live, def) {
+        for (const k in def) {
+            const v = def[k];
+            if (typeof v === "function" || k === "objectName" || k.endsWith("Changed") || k.startsWith("on") && k.length > 2 && k[2] === k[2].toUpperCase())
+                continue;
+            if (isSection(v))
+                copyDefaults(live[k], v);
+            else
+                live[k] = Array.isArray(v) || (v && typeof v === "object") ? JSON.parse(JSON.stringify(v)) : v;
+        }
+    }
+
     // Put every option that breaks its rule back to its default and say so; the shell keeps running
     // with a sane value instead of a typo (bar.position: "lefft") breaking a panel.
     function validate() {
@@ -78,450 +125,62 @@ Singleton {
             }
         }
 
-        JsonAdapter {
+        ConfigOptions {
             id: adapter
-
-            // Interface language: auto (from $LANG), en, ru
-            property string language: "auto"
-            // Languages made with AI (Settings > General > Language): [{ code, name }]; their files are
-            // in ~/.config/hi-shell/translations.
-            property var customLanguages: []
-
-            property JsonObject appearance: JsonObject {
-                // App icons in one color, the palette's primary (dock, workspaces, launcher).
-                property bool themedIcons: false
-                // Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise).
-                property bool restartOnIconTheme: true
-                // Translucent surfaces (the compositor blurs what's behind them).
-                property bool transparency: true
-                property real transparencyLevel: 0.12
-                // The playing track's cover, blurred, behind the media cards.
-                property bool coverBackdrop: true
-                property JsonObject fonts: JsonObject {
-                    property string main: "Google Sans Flex"
-                    property string title: "Google Sans Flex"
-                    property string mono: "JetBrains Mono"
-                    property string icon: "Material Symbols Rounded"
-                }
-                // Global multiplier for animation durations (0 disables animations).
-                property real animationSpeed: 1
-                // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
-                property string scheme: "tonal-spot"
-                // Switch dark / light at sunset / sunrise (from the weather service's location).
-                property bool autoMode: false
-                // Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light.
-                property bool gtkColorScheme: true
-                // Rounded black screen corners, radius in px (0 = off).
-                property int screenCorners: 16
-                // Context menus (the system tray's): material = the shell's own Material You menu,
-                // standard = the one the system draws.
-                property string contextMenu: "material"
-            }
-
-            property JsonObject bar: JsonObject {
-                // top | bottom | left | right
-                property string position: "top"
-                // hug: edge to edge | float: detached, rounded | islands: one pill per section | m3: edge to edge, tonal groups
-                property string style: "float"
-                // The logo of the bar's first button: "auto" (this system's) or a distribution id (common/icons/distros).
-                property string logo: "auto"
-                // Bar thickness (height, or width for a vertical bar) and gap to the screen edge.
-                property int height: 40
-                property int margin: 6
-                // Widget ids: launcher, workspaces, activeWindow, media, resources, clock, weather, tray,
-                // systemIcons, notifications, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
-                property list<string> left: ["launcher", "activeWindow"]
-                property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
-                property list<string> right: ["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]
-
-                property JsonObject workspaces: JsonObject {
-                    property int shown: 10
-                    property bool numbers: false
-                    property bool appIcons: true
-                    // Icons shown per workspace; the apps beyond it are counted as "+N"
-                    property int appsPerWorkspace: 3
-                    // How the active pill moves: "slide" or "stretch" (it stretches over the slots in between, like a snake)
-                    property string switchStyle: "slide"
-                }
-                property JsonObject clock: JsonObject {
-                    // Qt date format strings
-                    property string timeFormat: "HH:mm"
-                    property string dateFormat: "ddd, dd/MM"
-                }
-                // Dynamic Island = the clock widget: it also shows the music player, notifications and the
-                // camera / microphone indicator, and floats over fullscreen windows.
-                property JsonObject island: JsonObject {
-                    property bool enabled: true
-                    // While it shows music or a notification the other widgets leave the bar (they go towards the island and fade).
-                    property bool hideBar: true
-                    // How long a press must be held to switch its state (ms).
-                    property int holdDuration: 2000
-                    // The music player state (a hold switches to it).
-                    property bool music: true
-                    // Show notifications in the island instead of as popup cards.
-                    property bool notifications: true
-                    // Volume, brightness, microphone and keyboard layout changes, instead of the display's own pill.
-                    property bool osd: true
-                    // The camera / microphone indicator.
-                    property bool privacy: true
-                    // Float at the top of the screen over a fullscreen window (the bar is hidden there).
-                    property bool fullscreen: true
-                }
-                property JsonObject media: JsonObject {
-                    property int maxWidth: 220
-                    // Spin the cover art while playing.
-                    property bool spinArt: true
-                }
-                property JsonObject resources: JsonObject {
-                    // cpu, ram, swap, gpu, disk
-                    property list<string> shown: ["cpu", "ram"]
-                }
-                property JsonObject utilButtons: JsonObject {
-                    // screenshot, colorPicker, darkMode, wallpaper, mic
-                    property list<string> shown: ["screenshot", "colorPicker", "wallpaper", "darkMode"]
-                }
-                property JsonObject updates: JsonObject {
-                    property bool hideWhenNone: true
-                }
-            }
-
-            property JsonObject sidebar: JsonObject {
-                property JsonObject quickToggles: JsonObject {
-                    // android: two-column pills with labels | classic: round icon buttons
-                    property string style: "android"
-                    // Tiles per page in the android style (the rest go to further pages); 0 = all on one page
-                    property int perPage: 6
-                    // Slide between pages (off: switch instantly)
-                    property bool slide: true
-                    // Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic,
-                    // gameMode, vpn, happ, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession,
-                    // waitMode (hidden by default: add it in the sidebar's tile editor)
-                    property list<string> shown: ["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]
-                }
-                // Night light color temperature (K) for hyprsunset.
-                property int nightLightTemperature: 4500
-                // The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout
-                property string game: "dino"
-            }
-
-            property JsonObject spotify: JsonObject {
-                // Client ID from developer.spotify.com/dashboard (not a secret: login uses PKCE).
-                property string clientId: ""
-            }
-
-            property JsonObject wallpapers: JsonObject {
-                property list<string> directories: ["~/Pictures/Wallpapers"]
-                // A slideshow: a random picture from the folders every this many minutes (0 = off).
-                property int slideshowMinutes: 0
-                // Online pictures are saved here before being set.
-                property string downloadDirectory: "~/Pictures/Wallpapers/online"
-                // Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one.
-                property string unsplashKey: ""
-                // Optional Wallhaven API key (only needed for NSFW / account features).
-                property string wallhavenKey: ""
-                // Play a video or gif wallpaper (off: its still picture is shown). It pauses while a window covers the desktop.
-                property bool animate: true
-                // Shape the wallpaper is shown in on the desktop ("" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ...
-                property string frame: ""
-                // The frame turns and pulses to the music while something plays.
-                property bool frameDance: true
-                // On a beat the frame turns into another shape (it morphs), going through a set of shapes.
-                property bool frameBeatShape: true
-                // Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle).
-                // Moved by dragging it in the desktop's edit mode.
-                property real frameX: 0.5
-                property real frameY: 0.5
-                // The frame's size, as a fraction of the screen's shorter side.
-                property real frameSize: 0.62
-            }
-
-            property JsonObject desktop: JsonObject {
-                // Draw the wallpaper (the theme's current one) behind the widgets.
-                property bool wallpaper: true
-                property bool widgets: true
-                // Screen name (e.g. "eDP-1") for the widgets; empty = first screen.
-                property string monitor: ""
-                // Widget id -> { enabled, x, y } with x / y as fractions of the screen;
-                // missing ids use the defaults in modules/desktop/Layout.js. Edit mode writes this.
-                property var layout: ({})
-                // Where the edit toolbar was dragged to, as fractions of the free space on the
-                // screen (-1 = the default, bottom center).
-                property JsonObject toolbar: JsonObject {
-                    property real x: -1
-                    property real y: -1
-                }
-                property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]
-                // Picture for the image frame widget (empty = the wallpaper).
-                property string image: ""
-                // Focus mode: with windows open, the wallpaper is sharp and widgets and frame hide.
-                property bool focusMode: true
-                // Cover mode: the playing track's cover instead of the wallpaper (and its colors).
-                property bool coverMode: false
-                // Full-width audio visualizer along the bottom while media plays (needs cava).
-                property bool visualizer: true
-                // The big digital clock also shows the seconds (HH:MM:SS).
-                property bool clockSeconds: false
-                // The player card's progress bar: a travelling wave while playing (off: a plain bar),
-                // and the wave kicks to the beat (needs cava).
-                property bool waveProgress: true
-                property bool waveBeat: true
-            }
-
-            // What Ctrl+Shift+Escape opens: hi-shell's process manager, or a program of your own
-            // (btop in a terminal, a system monitor...).
-            property JsonObject processes: JsonObject {
-                property string mode: "builtin" // builtin | command
-                property string command: "btop"
-                property bool inTerminal: true
-            }
-
-            // The palette for other apps (services/AppThemes.qml), each one opt-in.
-            property JsonObject appThemes: JsonObject {
-                property bool gtk: false
-                property bool neovim: false
-            }
-
-            // Idle (services/Idle.qml): when off, your own hypridle config is left alone. When on, hi-shell
-            // runs hypridle with a config made from these minutes (0 = never), on battery too if asked.
-            property JsonObject idle: JsonObject {
-                property bool manage: false
-                property int lockMin: 5
-                property int screenOffMin: 10
-                property int suspendMin: 15
-                property bool separateBattery: false
-                property int batLockMin: 2
-                property int batScreenOffMin: 3
-                property int batSuspendMin: 5
-            }
-
-            // The lock screen (services/LockScreen.qml): what it shows and how it looks.
-            property JsonObject lock: JsonObject {
-                // "builtin": the shell's own lock screen (modules/lock); "hyprlock": hyprlock with a config made
-                // from hi-shell's look (the elements below); "file": your hyprlock config (sourced);
-                // "command": any other locker (swaylock, gtklock, ...), run by Lock.
-                property string mode: "builtin"
-                property string customConfig: ""
-                property string customCommand: ""
-                // Builtin: the notification list only says how many came in, not what they say.
-                property bool hideNotifs: false
-                property bool clock: true
-                property bool date: true
-                property bool greeting: true
-                property bool avatar: true
-                property bool nowPlaying: true
-                property bool battery: true
-                property bool keyboardLayout: true
-                property bool capsLockHint: true
-                // Clock height in px, and its format for `date` (letters and % only).
-                property int clockSize: 120
-                property string clockFormat: "%H:%M"
-                // The date line, for `date` (letters and % only).
-                property string dateFormat: "%A, %-d %B"
-                // Where the column sits: "center", "left" or "right".
-                property string align: "center"
-                // The color of the clock and the accents: "primary", "secondary" or "tertiary".
-                property string accent: "primary"
-                // A line of your own under the date (empty = none).
-                property string message: ""
-                property int avatarSize: 116
-                // The password field: width in px, and "round" or "square" corners.
-                property int fieldWidth: 320
-                property string fieldShape: "round"
-                property int fieldOutline: 2
-                // Show a dot for every typed character.
-                property bool fieldDots: true
-                // The wallpaper behind the lock screen (off: the plain surface color).
-                property bool wallpaper: true
-                property int blurPasses: 3
-                property int blurSize: 8
-                // 0..1, how much the picture is dimmed.
-                property real brightness: 0.55
-            }
-
-            // Power saving (services/PowerSaver.qml): turned on by hand. `saved` keeps the
-            // values it changed, to put back when it's turned off.
-            property JsonObject contentFilter: JsonObject {
-                // Close a browser tab whose title has one of these words (services/KeywordFilter.qml).
-                property bool keywordsOn: false
-                property list<string> keywords: ["porn", "hentai", "порно", "хентай"]
-            }
-
-            // The "Welcome back!" at every start (the very first start always plays its own animation).
-            property JsonObject greeting: JsonObject {
-                property bool enabled: true
-                property string text: "Welcome back!"
-                // random, or one of: rise, drop, pop, slide, spin
-                property string style: "random"
-                // The animated logo with the text
-                property bool logo: true
-            }
-
-            property JsonObject viewing: JsonObject {
-                // Viewing mode by itself: a fullscreen window while something plays.
-                property bool auto: true
-            }
-
-            property JsonObject presentation: JsonObject {
-                // What Presentation mode does while it's on.
-                property bool holdNotifications: true
-                property bool keepAwake: true
-                property bool nightLightOff: true
-                property bool hideDesktopWidgets: true
-                property bool hideBar: false
-            }
-
-            property JsonObject powerSaving: JsonObject {
-                property bool enabled: false
-                property var saved: ({})
-            }
-
-            property JsonObject ai: JsonObject {
-                // claude CLI model alias: "" (CLI default), opus, sonnet, haiku
-                property string model: ""
-                // Off: no AI chat tab, no palette (Super+Y), nothing asks a model. The welcome
-                // screen and Settings > General switch it.
-                property bool enabled: true
-                // "claude" (the CLI) or a provider id from services/AiProviders.js: openrouter, openai,
-                // gemini, groq, deepseek, mistral, ollama, custom
-                property string provider: "claude"
-                // Per provider id: API key, chosen model, and the server address where it isn't the
-                // default (Ollama's port, a custom server)
-                property var keys: ({})
-                property var models: ({})
-                property var urls: ({})
-                // Before the per-provider maps: OpenRouter's key and model (still read as a fallback)
-                property string openrouterKey: ""
-                property string openrouterModel: ""
-            }
-
-            property JsonObject translator: JsonObject {
-                property string target: "en"
-                // Shown as quick picks in the translator.
-                property list<string> languages: ["en", "ru", "de", "fr", "es", "uk", "ja", "zh"]
-            }
-
-            property JsonObject clipboard: JsonObject {
-                // Start `wl-paste --watch cliphist store` (text and images) with the shell.
-                property bool watch: true
-            }
-
-            property JsonObject weather: JsonObject {
-                property bool enabled: true
-                // Empty city and 0/0 coordinates = locate by IP address.
-                property string city: ""
-                property real latitude: 0
-                property real longitude: 0
-                property bool imperial: false
-                property int refreshMinutes: 15
-            }
-
-            property JsonObject battery: JsonObject {
-                property int low: 20
-                property int critical: 10
-                property bool warnings: true
-            }
-
-            property JsonObject focus: JsonObject {
-                // Breathing on the breaks (Focus Mode): the bar's cue and the wallpaper frame follow it.
-                property bool breathing: true
-            }
-
-            property JsonObject notifications: JsonObject {
-                // Popup timeout (ms) when the app doesn't set one.
-                property int defaultTimeout: 6000
-                property int historyLimit: 100
-                // Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus).
-                property bool holdInFocus: true
-            }
-
-            property JsonObject updates: JsonObject {
-                property bool enabled: true
-                property int intervalMinutes: 60
-                // Also count AUR updates (needs yay or paru).
-                property bool aur: true
-            }
-
-            property JsonObject tray: JsonObject {
-                // Item ids (see `qs -c hi-shell ipc call tray list`) to leave out of the bar.
-                property list<string> hidden: []
-            }
-
-            // Written by the settings app's Hyprland page (see services/HyprlandSettings.qml).
-            property JsonObject hyprland: JsonObject {
-                // output name -> { mode, position, scale, transform }
-                property var monitors: ({})
-                // option path ("general.gaps_in") -> value
-                property var options: ({})
-                // Updates leave ~/.config/hypr/hi-shell/ (keybinds, rules) alone (update.sh, install.sh read this)
-                property bool keepFiles: false
-            }
-
-            property JsonObject dock: JsonObject {
-                property bool enabled: false
-                // Screen edge: "bottom", "top", "left" or "right".
-                property string position: "bottom"
-                property bool autoHide: true
-                property bool magnify: true
-                // With auto-hide: also show the dock while the workspace has no windows.
-                property bool showWhenEmpty: true
-                // Running apps that aren't pinned get an icon too.
-                property bool showRunning: true
-                // A button first in the dock that opens the full-screen list of every app.
-                property bool appsButton: true
-                // The dots under an icon, one per window.
-                property bool showIndicators: true
-                // How much an icon grows toward the pointer (percent), the gap between icons,
-                // the corner radius and the distance from the screen edge (px).
-                property int magnifyAmount: 45
-                property int spacing: 2
-                property int cornerRadius: 28
-                property int edgeMargin: 8
-                property int iconSize: 44
-                // Screen name; empty = first screen.
-                property string monitor: ""
-                // App ids (desktop file names / window classes), right click an icon to pin.
-                property list<string> pinned: ["firefox", "kitty", "org.gnome.Nautilus"]
-            }
-
-            property JsonObject sounds: JsonObject {
-                // Event sounds (services/Sounds.qml): the freedesktop theme through pw-play.
-                property bool enabled: true
-                // "freedesktop" (the system theme) or a downloaded pack: miui, samsung, iphone, windows, win7, winxp, android
-                property string pack: "freedesktop"
-                property real volume: 0.7
-                property bool notifications: true
-                property bool timers: true
-                property bool battery: true
-                property bool capture: true
-                property bool volumeTick: true
-                property bool session: true
-                property bool devices: true
-                // Silent while Do Not Disturb, Presentation or Wait mode is on, and in Focus Mode (but for the timers).
-                property bool quiet: true
-            }
-
-            property JsonObject capture: JsonObject {
-                // tesseract languages for OCR, e.g. "eng+rus"; auto = every installed one
-                // (install tesseract-data-rus for Russian)
-                property string ocrLanguages: "auto"
-                // Sound of a screen recording: "off", "system" (what plays through the speakers)
-                // or "mic" (the default microphone)
-                property string recordSound: "off"
-            }
-
-            // How update.sh updates: "git" (the latest main) or "release" (the latest tagged release).
-            // Chosen at install (install.sh --channel); installs from before this one follow git.
-            property JsonObject update: JsonObject {
-                property string channel: "git"
-                // The window about a new version when the shell starts
-                property bool notify: true
-            }
-
-            property JsonObject apps: JsonObject {
-                // Used for desktop entries with Terminal=true
-                property string terminal: "kitty"
-            }
         }
+    }
+
+    // qs -c hi-shell ipc call config get bar.height   (hi-shell config get bar.height)
+    IpcHandler {
+        target: "config"
+
+        function get(path: string): string {
+            const v = path ? root.getPath(path) : undefined;
+            if (path && v === undefined)
+                return "No such option: " + path;
+            if (!path)
+                return "Give an option or a section, e.g. bar.height";
+            return root.isSection(v) ? root.dump(path) : JSON.stringify(v);
+        }
+
+        // The value is JSON: 40, true, "top", ["a", "b"]; a bare word is taken as a string.
+        function set(path: string, value: string): string {
+            if (root.getPath(path) === undefined)
+                return "No such option: " + path;
+            if (root.isSection(root.getPath(path)))
+                return path + " is a section; set one of its options";
+            let v;
+            try {
+                v = JSON.parse(value);
+            } catch (e) {
+                v = value;
+            }
+            const before = root.getPath(path);
+            root.setPath(path, v);
+            root.validate();
+            const now = root.getPath(path);
+            return JSON.stringify(before) + " -> " + JSON.stringify(now) + (root.lastProblems.length ? " (" + root.lastProblems[0].reason + ", default used)" : "");
+        }
+
+        function reset(path: string): string {
+            return root.reset(path) ? "Reset " + (path || "everything") + " to the defaults" : "No such option or section: " + path;
+        }
+
+        function path(): string {
+            return root.path;
+        }
+    }
+
+    function dump(path) {
+        const out = {};
+        const def = getPath(path);
+        for (const k in def) {
+            const v = def[k];
+            if (typeof v === "function" || k === "objectName" || k.endsWith("Changed") || k.startsWith("on") && k.length > 2 && k[2] === k[2].toUpperCase())
+                continue;
+            out[k] = isSection(v) ? JSON.parse(dump(path + "." + k)) : v;
+        }
+        return JSON.stringify(out, null, 2);
     }
 
     // Coalesce bursts of changes (e.g. a slider drag) into one write.

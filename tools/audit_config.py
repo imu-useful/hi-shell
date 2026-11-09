@@ -17,7 +17,7 @@ def parse_options():
     """Return [(dotted.path, type, default)] for every leaf option in Config.qml."""
     stack, out = [], []
     started = False
-    for line in (ROOT / "common/Config.qml").read_text().splitlines():
+    for line in (ROOT / "common/ConfigOptions.qml").read_text().splitlines():
         if "JsonAdapter {" in line:
             started = True
             continue
@@ -32,7 +32,7 @@ def parse_options():
             typ = f"list<{m.group(1)}>" if m.group(1) else m.group(2)
             out.append((".".join(stack + [m.group(3)]), typ, (m.group(4) or "").strip()))
             continue
-        if line.strip() == "}" and stack and line.startswith(" " * (12 + 4 * (len(stack) - 1)) + "}"):
+        if line.strip() == "}" and stack and line.startswith(" " * (4 + 4 * (len(stack) - 1)) + "}"):
             stack.pop()
     return out
 
@@ -87,7 +87,7 @@ def main():
     in_code = referenced(opts, ui)
 
     lines = ["# Config audit", "",
-             f"{len(opts)} options in `common/Config.qml`.", ""]
+             f"{len(opts)} options in `common/ConfigOptions.qml`.", ""]
     missing = [o for o in opts if not in_settings[o[0]]]
     lines += [f"## Options without a control in the settings app ({len(missing)})", "",
               "| Option | Type | Default |", "| --- | --- | --- |"]

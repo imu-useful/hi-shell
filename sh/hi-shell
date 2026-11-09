@@ -1,19 +1,22 @@
 #!/bin/sh
-# hi-shell command line.
+# hi-shell command line (also installed as `hi`).
 #
-#   hi-shell doctor            check the shell is running and its programs are installed
-#   hi-shell qr [text]         a QR code in the terminal (no text: the clipboard)
-#   hi-shell keybinds [word]   the keybinds, optionally only those matching a word
-#   hi-shell ipc <target> <function> [args]   call a panel (same as qs -c hi-shell ipc call ...)
-#   hi-shell ipc               list every target and function
-#   hi-shell help
+#   Shell        hi start | stop | restart | status | log [-f] | doctor | update
+#   Panels       hi settings [page] | launcher | apps | overview | calendar | weather | processes
+#                hi sidebar [left|right] | bar [show|hide|toggle] | lock | session | wait | present
+#                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>]    hi wallpaper [random|<file>]
+#   Config       hi config get <option|section>      hi config set <option> <value>
+#                hi config reset [option|section]    hi config edit | path | reload
+#   Presets      hi preset list | save <name> | load <file>
+#   Media        hi play | pause | next | prev
+#   Other        hi qr [text] | keybinds [word] | ipc [<target> <function> [args]] | help
 #
-# install.sh links this file to ~/.local/bin/hi-shell.
+# install.sh links this file to ~/.local/bin/hi-shell and ~/.local/bin/hi.
 set -u
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; }
 
 doctor() {
     bad=0
@@ -79,15 +82,142 @@ for keys, desc in sorted(rows):
 ' "$@"
 }
 
-case "${1:-help}" in
+here=$(dirname "$(readlink -f "$0")")
+repo=$(dirname "$here")
+cfg="${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json"
+
+ipc() { qs -c hi-shell ipc call "$@"; }
+
+running() { qs -c hi-shell list 2>/dev/null | grep -q 'Process ID'; }
+
+need_running() {
+    running || { echo "hi-shell isn't running: hi start" >&2; exit 1; }
+}
+
+start() {
+    if running; then echo "Already running."; return 0; fi
+    # run.sh makes the icon font and picks the Vulkan renderer; -d detaches.
+    if [ -x "$repo/run.sh" ]; then "$repo/run.sh" -d; else qs -c hi-shell -d; fi
+    echo "Started."
+}
+
+stop() { qs -c hi-shell kill >/dev/null 2>&1 && echo "Stopped." || echo "Not running."; }
+
+status() {
+    if running; then
+        qs -c hi-shell list 2>/dev/null | grep -E 'Process ID|Launch time|Config path' | sed 's/^ *//'
+        echo "Errors in the log: $(qs -c hi-shell log 2>/dev/null | grep -c ' ERROR')"
+    else
+        echo "Not running."
+        return 1
+    fi
+}
+
+log() {
+    if [ "${1:-}" = "-f" ]; then exec qs -c hi-shell log -f; fi
+    qs -c hi-shell log 2>&1 | tail -n "${1:-60}"
+}
+
+config() {
+    sub=${1:-help}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        get) need_running; ipc config get "${1:-}" ;;
+        set)
+            [ $# -ge 2 ] || { echo "Usage: hi config set <option> <value>   (value is JSON: 40, true, \"top\"; a bare word is a string)" >&2; exit 1; }
+            need_running; opt=$1; shift; ipc config set "$opt" "$*" ;;
+        reset) need_running; ipc config reset "${1:-}" ;;
+        path) echo "$cfg" ;;
+        edit) "${VISUAL:-${EDITOR:-nano}}" "$cfg" ;;
+        reload) need_running; touch "$cfg"; echo "Touched $cfg: the shell reloads it." ;;
+        *) echo "Usage: hi config get|set|reset|edit|path|reload" >&2; exit 1 ;;
+    esac
+}
+
+sidebar() {
+    need_running
+    case "${1:-right}" in
+        left | l) ipc sidebarLeft toggle ;;
+        *) ipc sidebarRight toggle ;;
+    esac
+}
+
+barcmd() {
+    need_running
+    ipc bar "${1:-toggle}"
+}
+
+theme() {
+    need_running
+    case "${1:-toggle}" in
+        dark | light) ipc theme setMode "$1" ;;
+        toggle) ipc theme toggleMode ;;
+        *) ipc theme setScheme "$1" ;;
+    esac
+}
+
+wallpaper() {
+    need_running
+    case "${1:-select}" in
+        random) ipc wallpaper random ;;
+        select) ipc wallpaper toggleSelector ;;
+        get) ipc wallpaper get ;;
+        *) ipc wallpaper set "$(readlink -f "$1")" ;;
+    esac
+}
+
+preset() {
+    need_running
+    case "${1:-list}" in
+        list) ipc presets list ;;
+        save) [ -n "${2:-}" ] || { echo "Usage: hi preset save <name>" >&2; exit 1; }; ipc presets save "$2" ;;
+        load) [ -n "${2:-}" ] || { echo "Usage: hi preset load <file>" >&2; exit 1; }; ipc presets load "$(readlink -f "$2")" ;;
+        *) echo "Usage: hi preset list|save <name>|load <file>" >&2; exit 1 ;;
+    esac
+}
+
+update() {
+    [ -x "$repo/update.sh" ] || { echo "update.sh not found in $repo" >&2; exit 1; }
+    exec "$repo/update.sh" "$@"
+}
+
+cmd=${1:-help}
+[ $# -gt 0 ] && shift
+case "$cmd" in
+    start) start ;;
+    stop) stop ;;
+    restart) stop; sleep 1; start ;;
+    status) status ;;
+    log | logs) log "$@" ;;
     doctor) doctor ;;
-    qr) shift; qr "$@" ;;
-    keybinds) shift; keybinds "$@" ;;
+    update) update "$@" ;;
+    config | cfg) config "$@" ;;
+    settings | set-up) need_running; if [ $# -gt 0 ]; then ipc settings open "$1"; else ipc settings toggle; fi ;;
+    launcher | run) need_running; if [ $# -gt 0 ]; then ipc launcher search "$*"; ipc launcher open; else ipc launcher toggle; fi ;;
+    apps) need_running; ipc appgrid toggle ;;
+    overview) need_running; ipc overview toggle ;;
+    calendar) need_running; ipc calendar toggle ;;
+    weather) need_running; ipc weather refresh; ipc weatherDetails toggle ;;
+    processes | top) need_running; ipc processes toggle ;;
+    sidebar) sidebar "$@" ;;
+    bar) barcmd "$@" ;;
+    lock) need_running; ipc lock lock ;;
+    session | power) need_running; ipc session toggleScreen ;;
+    wait) need_running; ipc waitmode toggle ;;
+    present | presentation) need_running; ipc presentation toggle ;;
+    ask | ai) need_running; if [ $# -gt 0 ]; then ipc ai ask "$*"; else ipc ai toggle; fi ;;
+    theme) theme "$@" ;;
+    wallpaper | wall) wallpaper "$@" ;;
+    preset | presets) preset "$@" ;;
+    play | pause | toggle-play) need_running; ipc mpris playPause ;;
+    next) need_running; ipc mpris next ;;
+    prev | previous) need_running; ipc mpris previous ;;
+    qr) qr "$@" ;;
+    keybinds | keys) keybinds "$@" ;;
     ipc)
-        shift
         if [ $# -eq 0 ]; then exec qs -c hi-shell ipc show; fi
         exec qs -c hi-shell ipc call "$@"
         ;;
     help | -h | --help) usage ;;
-    *) echo "Unknown command: $1" >&2; usage >&2; exit 1 ;;
+    *) echo "Unknown command: $cmd" >&2; usage >&2; exit 1 ;;
 esac

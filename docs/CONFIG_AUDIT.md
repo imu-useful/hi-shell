@@ -1,6 +1,6 @@
 # Config audit
 
-194 options in `common/Config.qml`.
+194 options in `common/ConfigOptions.qml`.
 
 ## Options without a control in the settings app (43)
 
