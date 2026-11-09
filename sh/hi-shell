@@ -2,11 +2,11 @@
 # hi-shell command line (also installed as `hi`).
 #
 #   Shell        hi start | stop | restart | status | log [-f] | doctor | update
-#   Panels       hi settings [page] | launcher | apps | overview | calendar | weather | processes
+#   Panels       hi settings [page|search <word>] | launcher | apps | overview | calendar | weather | processes
 #                hi sidebar [left|right] | bar [show|hide|toggle|edit|done|list|add|rm|monitor|instance] | lock | session | wait | present
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
 #   Config       hi config get <option|section>      hi config set <option> <value>
-#                hi config reset [option|section]    hi config edit | path | reload
+#                hi config reset [option|section]    hi config edit | path | reload | search <word>
 #   Screens      hi dock screens <all|name...>   hi desktop screens|own ...   hi wallpaper screen <name> <file|none>
 #   Rules        hi rules [list|templates|add <template>|edit <id>|on|off <id>|rm <id>|facts|check]
 #   Widgets      hi widgets [list|new <name>|edit <name>|reload|path]   hi script <name> '<command>' [seconds] [icon] [template]
@@ -132,9 +132,11 @@ config() {
             need_running; opt=$1; shift; ipc config set "$opt" " $*" ;;
         reset) need_running; ipc config reset "${1:-}" ;;
         path) echo "$cfg" ;;
+        # hi config search <word...>: options by name or description, with default and where to change them
+        search) [ $# -gt 0 ] || { echo "Usage: hi config search <word...>" >&2; exit 1; }; python3 "$repo/tools/config_meta.py" search "$@" ;;
         edit) "${VISUAL:-${EDITOR:-nano}}" "$cfg" ;;
         reload) need_running; touch "$cfg"; echo "Touched $cfg: the shell reloads it." ;;
-        *) echo "Usage: hi config get|set|reset|edit|path|reload" >&2; exit 1 ;;
+        *) echo "Usage: hi config get|set|reset|search|edit|path|reload" >&2; exit 1 ;;
     esac
 }
 
@@ -394,7 +396,13 @@ case "$cmd" in
     doctor) doctor ;;
     update) update "$@" ;;
     config | cfg) config "$@" ;;
-    settings | set-up) need_running; if [ $# -gt 0 ]; then ipc settings open "$1"; else ipc settings toggle; fi ;;
+    settings | set-up)
+        need_running
+        case "${1:-}" in
+            search) shift; ipc settings search " $*" ;;
+            "") ipc settings toggle ;;
+            *) ipc settings open "$1" ;;
+        esac ;;
     launcher | run) need_running; if [ $# -gt 0 ]; then ipc launcher search "$*"; ipc launcher open; else ipc launcher toggle; fi ;;
     apps) need_running; ipc appgrid toggle ;;
     overview) need_running; ipc overview toggle ;;

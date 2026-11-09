@@ -9,6 +9,19 @@ ColumnLayout {
     spacing: 24
 
     Section {
+        icon: "tune"
+        title: Translation.tr("Settings")
+
+        SwitchRow {
+            icon: "science"
+            title: Translation.tr("Show advanced settings")
+            subtitle: Translation.tr("Rarely needed rows (blur passes, dock spacing, refresh times, ...). The search finds them either way")
+            checked: Config.options.settingsAdvanced
+            onToggled: checked => Config.options.settingsAdvanced = checked
+        }
+    }
+
+    Section {
         icon: "palette"
         title: Translation.tr("Wallpaper & colors")
 

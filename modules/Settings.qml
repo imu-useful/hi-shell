@@ -16,6 +16,9 @@ import "settings/Pages.js" as Pages
 Scope {
     id: root
 
+    // What is typed in the search box (it shows the matching pages and options instead of a page).
+    property string searchQuery: ""
+
     readonly property bool open: ShellState.settingsOpen && !ShellState.zen
 
     function setOpen(value) {
@@ -32,6 +35,11 @@ Scope {
         function open(page: string): void {
             if (page)
                 ShellState.settingsPage = page;
+            root.setOpen(true);
+        }
+        // Open Settings with the search box filled: `hi settings search dock gap`.
+        function search(text: string): void {
+            root.searchQuery = text;
             root.setOpen(true);
         }
         function close(): void {
@@ -191,6 +199,55 @@ Scope {
                             }
                         }
 
+                        // Search over the pages and every option (by name and description).
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 6
+                            Layout.rightMargin: 6
+                            implicitHeight: 38
+                            radius: 19
+                            color: Colors.m3surfaceContainerHighest
+                            border.width: searchField.activeFocus ? 2 : 0
+                            border.color: Colors.m3primary
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 12
+                                anchors.rightMargin: 8
+                                spacing: 8
+                                MaterialIcon {
+                                    icon: "search"
+                                    iconSize: 18
+                                    color: Colors.m3onSurfaceVariant
+                                }
+                                TextInput {
+                                    id: searchField
+                                    Layout.fillWidth: true
+                                    text: root.searchQuery
+                                    onTextChanged: root.searchQuery = text
+                                    font.family: Appearance.font.main
+                                    font.pixelSize: Appearance.font.size.bodyMedium
+                                    color: Colors.m3onSurface
+                                    clip: true
+                                    selectByMouse: true
+
+                                    StyledText {
+                                        visible: searchField.text === ""
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: Translation.tr("Search settings")
+                                        color: Colors.m3onSurfaceVariant
+                                    }
+                                }
+                                IconButton {
+                                    visible: searchField.text !== ""
+                                    implicitWidth: 24
+                                    implicitHeight: 24
+                                    icon: "close"
+                                    onClicked: searchField.text = ""
+                                }
+                            }
+                        }
+
                         Item { implicitHeight: 6 }
 
                         // The pages: scrolled when there are more than fit in the card.
@@ -256,7 +313,7 @@ Scope {
                         Loader {
                             id: page
                             width: flick.width - 12
-                            sourceComponent: ({
+                            sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
                                 quick: quick, general: general, bar: bar, desktop: desktop,
                                 interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
                             })[ShellState.settingsPage] ?? quick
@@ -278,6 +335,18 @@ Scope {
                         Component { id: hyprland; HyprlandPage {} }
                         Component { id: autostart; AutostartPage {} }
                         Component { id: keybinds; KeybindsPage {} }
+                        Component {
+                            id: searchResults
+                            SearchResults {
+                                query: root.searchQuery
+                                onPicked: (pageId, advanced) => {
+                                    if (advanced)
+                                        Config.options.settingsAdvanced = true;
+                                    root.searchQuery = "";
+                                    ShellState.settingsPage = pageId;
+                                }
+                            }
+                        }
                         Component { id: screentime; ScreenTimePage {} }
                         Component { id: rules; RulesPage {} }
                         Component { id: defaultapps; DefaultAppsPage {} }

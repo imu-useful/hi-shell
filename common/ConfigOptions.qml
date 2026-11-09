@@ -18,17 +18,23 @@ JsonAdapter {
         property bool restartOnIconTheme: true
         // Translucent surfaces (the compositor blurs what's behind them).
         property bool transparency: true
+        // How see-through the panels are when transparency is on: 0 = solid, 0.5 = half.
         property real transparencyLevel: 0.12
         // The playing track's cover, blurred, behind the media cards.
         property bool coverBackdrop: true
         property JsonObject fonts: JsonObject {
+            // The interface font.
             property string main: "Google Sans Flex"
+            // The font of titles and headings.
             property string title: "Google Sans Flex"
+            // The monospace font (code, terminal-like text).
             property string mono: "JetBrains Mono"
+            // The icon font; the shell makes its own cut-down copy of it at start.
             property string icon: "Material Symbols Rounded"
         }
         // Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's.
         property real cornerScale: 1
+        // Multiplier for every text size (0.6 – 2).
         property real fontScale: 1
         // compact | comfortable | spacious: the spacing between and inside elements.
         property string density: "comfortable"
@@ -63,11 +69,14 @@ JsonAdapter {
         property string logo: "auto"
         // Bar thickness (height, or width for a vertical bar) and gap to the screen edge.
         property int height: 40
+        // The gap between a floating bar and the screen edge, in px.
         property int margin: 6
         // Widget ids: launcher, workspaces, activeWindow, media, resources, clock, weather, tray,
         // systemIcons, notifications, utilButtons, networkSpeed, battery, updates, keyboardLayout, power, visualizer, divider
         property list<string> left: ["launcher", "activeWindow"]
+        // Widget ids of the bar's center section (see `left`).
         property list<string> center: ["resources", "media", "workspaces", "clock", "utilButtons", "weather"]
+        // Widget ids of the bar's right section (see `left`).
         property list<string> right: ["tray", "keyboardLayout", "battery", "notifications", "systemIcons", "power"]
 
         // Per screen: screen name (hyprctl monitors) -> overrides of this bar's { enabled, position, style, height,
@@ -81,8 +90,11 @@ JsonAdapter {
         property var instances: ({})
 
         property JsonObject workspaces: JsonObject {
+            // How many workspaces the bar shows at once.
             property int shown: 10
+            // Show the workspace numbers.
             property bool numbers: false
+            // Show the icons of the apps on a workspace.
             property bool appIcons: true
             // Icons shown per workspace; the apps beyond it are counted as "+N"
             property int appsPerWorkspace: 3
@@ -92,11 +104,13 @@ JsonAdapter {
         property JsonObject clock: JsonObject {
             // Qt date format strings
             property string timeFormat: "HH:mm"
+            // Qt date format of the clock's date.
             property string dateFormat: "ddd, dd/MM"
         }
         // Dynamic Island = the clock widget: it also shows the music player, notifications and the
         // camera / microphone indicator, and floats over fullscreen windows.
         property JsonObject island: JsonObject {
+            // Turn the Dynamic Island (the clock widget that also shows music and notifications) on.
             property bool enabled: true
             // While it shows music or a notification the other widgets leave the bar (they go towards the island and fade).
             property bool hideBar: true
@@ -114,6 +128,7 @@ JsonAdapter {
             property bool fullscreen: true
         }
         property JsonObject media: JsonObject {
+            // The widest the media widget gets, in px.
             property int maxWidth: 220
             // Spin the cover art while playing.
             property bool spinArt: true
@@ -127,6 +142,7 @@ JsonAdapter {
             property list<string> shown: ["screenshot", "colorPicker", "wallpaper", "darkMode"]
         }
         property JsonObject updates: JsonObject {
+            // Hide the updates widget while there is nothing to update.
             property bool hideWhenNone: true
         }
     }
@@ -158,6 +174,9 @@ JsonAdapter {
     // Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs;
     // when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all.
     property var rules: []
+    // Settings shows the rarely needed rows too (Settings › Quick). Off hides them; the search always finds them.
+    property bool settingsAdvanced: false
+    // Off stops every rule and puts back what they changed.
     property bool rulesEnabled: true
 
     property JsonObject launcher: JsonObject {
@@ -175,6 +194,7 @@ JsonAdapter {
     }
 
     property JsonObject wallpapers: JsonObject {
+        // Folders the wallpaper picker looks in.
         property list<string> directories: ["~/Pictures/Wallpapers"]
         // A slideshow: a random picture from the folders every this many minutes (0 = off).
         property int slideshowMinutes: 0
@@ -195,6 +215,7 @@ JsonAdapter {
         // Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle).
         // Moved by dragging it in the desktop's edit mode.
         property real frameX: 0.5
+        // The vertical center of the wallpaper frame, as a fraction of the screen height.
         property real frameY: 0.5
         // The frame's size, as a fraction of the screen's shorter side.
         property real frameSize: 0.62
@@ -205,6 +226,7 @@ JsonAdapter {
     property JsonObject desktop: JsonObject {
         // Draw the wallpaper (the theme's current one) behind the widgets.
         property bool wallpaper: true
+        // Show the desktop widgets.
         property bool widgets: true
         // Screen name (e.g. "eDP-1") for the widgets; empty = first screen.
         property string monitor: ""
@@ -218,9 +240,12 @@ JsonAdapter {
         // Where the edit toolbar was dragged to, as fractions of the free space on the
         // screen (-1 = the default, bottom center).
         property JsonObject toolbar: JsonObject {
+            // Where the desktop edit toolbar was dragged to (horizontal); -1 = the default place.
             property real x: -1
+            // Where the desktop edit toolbar was dragged to (vertical); -1 = the default place.
             property real y: -1
         }
+        // IANA time zones the world clock widget shows.
         property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]
         // Picture for the image frame widget (empty = the wallpaper).
         property string image: ""
@@ -235,6 +260,7 @@ JsonAdapter {
         // The player card's progress bar: a travelling wave while playing (off: a plain bar),
         // and the wave kicks to the beat (needs cava).
         property bool waveProgress: true
+        // The player card's wave kicks to the beat (needs cava).
         property bool waveBeat: true
     }
 
@@ -242,26 +268,38 @@ JsonAdapter {
     // (btop in a terminal, a system monitor...).
     property JsonObject processes: JsonObject {
         property string mode: "builtin" // builtin | command
+        // The program Ctrl+Shift+Escape runs when mode is `command`.
         property string command: "btop"
+        // Run that program inside a terminal window.
         property bool inTerminal: true
     }
 
     // The palette for other apps (services/AppThemes.qml), each one opt-in.
     property JsonObject appThemes: JsonObject {
+        // Write the wallpaper's colors into GTK 3 and 4 apps' gtk.css.
         property bool gtk: false
+        // Write the hi-shell color scheme for Neovim (`:colorscheme hi-shell`).
         property bool neovim: false
     }
 
     // Idle (services/Idle.qml): when off, your own hypridle config is left alone. When on, hi-shell
     // runs hypridle with a config made from these minutes (0 = never), on battery too if asked.
     property JsonObject idle: JsonObject {
+        // Let hi-shell run hypridle with the times below; off leaves your own hypridle config alone.
         property bool manage: false
+        // Minutes of inactivity before the screen locks (0 = never).
         property int lockMin: 5
+        // Minutes of inactivity before the screen turns off (0 = never).
         property int screenOffMin: 10
+        // Minutes of inactivity before the computer suspends (0 = never).
         property int suspendMin: 15
+        // Use the three battery times below while on battery.
         property bool separateBattery: false
+        // Lock after this many minutes on battery (0 = never).
         property int batLockMin: 2
+        // Turn the screen off after this many minutes on battery (0 = never).
         property int batScreenOffMin: 3
+        // Suspend after this many minutes on battery (0 = never).
         property int batSuspendMin: 5
     }
 
@@ -271,20 +309,31 @@ JsonAdapter {
         // from hi-shell's look (the elements below); "file": your hyprlock config (sourced);
         // "command": any other locker (swaylock, gtklock, ...), run by Lock.
         property string mode: "builtin"
+        // Path of your hyprlock config, for mode `file`.
         property string customConfig: ""
+        // The locker to run, for mode `command` (swaylock, gtklock, ...).
         property string customCommand: ""
         // Builtin: the notification list only says how many came in, not what they say.
         property bool hideNotifs: false
+        // Show the clock on the lock screen.
         property bool clock: true
+        // Show the date on the lock screen.
         property bool date: true
+        // Show the greeting on the lock screen.
         property bool greeting: true
+        // Show your avatar on the lock screen.
         property bool avatar: true
+        // Show the playing track on the lock screen.
         property bool nowPlaying: true
+        // Show the battery on the lock screen.
         property bool battery: true
+        // Show the keyboard layout on the lock screen.
         property bool keyboardLayout: true
+        // Show a hint while Caps Lock is on.
         property bool capsLockHint: true
         // Clock height in px, and its format for `date` (letters and % only).
         property int clockSize: 120
+        // The clock's format, `date` letters and % only (%H:%M).
         property string clockFormat: "%H:%M"
         // The date line, for `date` (letters and % only).
         property string dateFormat: "%A, %-d %B"
@@ -294,16 +343,21 @@ JsonAdapter {
         property string accent: "primary"
         // A line of your own under the date (empty = none).
         property string message: ""
+        // The avatar's size in px.
         property int avatarSize: 116
         // The password field: width in px, and "round" or "square" corners.
         property int fieldWidth: 320
+        // Corners of the password field: `round` or `square`.
         property string fieldShape: "round"
+        // Width in px of the password field's outline.
         property int fieldOutline: 2
         // Show a dot for every typed character.
         property bool fieldDots: true
         // The wallpaper behind the lock screen (off: the plain surface color).
         property bool wallpaper: true
+        // How many times the wallpaper behind the lock screen is blurred.
         property int blurPasses: 3
+        // The blur's size.
         property int blurSize: 8
         // 0..1, how much the picture is dimmed.
         property real brightness: 0.55
@@ -314,12 +368,15 @@ JsonAdapter {
     property JsonObject contentFilter: JsonObject {
         // Close a browser tab whose title has one of these words (services/KeywordFilter.qml).
         property bool keywordsOn: false
+        // The words that close a browser tab when `keywordsOn` is true.
         property list<string> keywords: ["porn", "hentai", "порно", "хентай"]
     }
 
     // The "Welcome back!" at every start (the very first start always plays its own animation).
     property JsonObject greeting: JsonObject {
+        // Play the greeting at every start.
         property bool enabled: true
+        // The greeting's text.
         property string text: "Welcome back!"
         // random, or one of: rise, drop, pop, slide, spin
         property string style: "random"
@@ -335,14 +392,20 @@ JsonAdapter {
     property JsonObject presentation: JsonObject {
         // What Presentation mode does while it's on.
         property bool holdNotifications: true
+        // Presentation mode keeps the screen awake.
         property bool keepAwake: true
+        // Presentation mode turns the night light off.
         property bool nightLightOff: true
+        // Presentation mode hides the desktop widgets.
         property bool hideDesktopWidgets: true
+        // Presentation mode hides the bar.
         property bool hideBar: false
     }
 
     property JsonObject powerSaving: JsonObject {
+        // Power saving is on (use `hi ipc powersaving on|off`, not this option, so the saved values are kept).
         property bool enabled: false
+        // The values power saving changed, to put back when it is turned off (kept by the shell).
         property var saved: ({})
     }
 
@@ -358,14 +421,18 @@ JsonAdapter {
         // Per provider id: API key, chosen model, and the server address where it isn't the
         // default (Ollama's port, a custom server)
         property var keys: ({})
+        // Per provider id: the chosen model.
         property var models: ({})
+        // Per provider id: the server address, where it isn't the default.
         property var urls: ({})
         // Before the per-provider maps: OpenRouter's key and model (still read as a fallback)
         property string openrouterKey: ""
+        // Older: OpenRouter's model, still read as a fallback for `models`.
         property string openrouterModel: ""
     }
 
     property JsonObject translator: JsonObject {
+        // The language the translator translates into.
         property string target: "en"
         // Shown as quick picks in the translator.
         property list<string> languages: ["en", "ru", "de", "fr", "es", "uk", "ja", "zh"]
@@ -377,18 +444,26 @@ JsonAdapter {
     }
 
     property JsonObject weather: JsonObject {
+        // Fetch and show the weather.
         property bool enabled: true
         // Empty city and 0/0 coordinates = locate by IP address.
         property string city: ""
+        // Latitude of the place (with `longitude`, instead of `city`).
         property real latitude: 0
+        // Longitude of the place.
         property real longitude: 0
+        // Use °F and miles.
         property bool imperial: false
+        // Minutes between weather updates.
         property int refreshMinutes: 15
     }
 
     property JsonObject battery: JsonObject {
+        // The charge (%) that counts as low.
         property int low: 20
+        // The charge (%) that counts as critical.
         property int critical: 10
+        // Send notifications when the battery is low or critical.
         property bool warnings: true
     }
 
@@ -400,13 +475,16 @@ JsonAdapter {
     property JsonObject notifications: JsonObject {
         // Popup timeout (ms) when the app doesn't set one.
         property int defaultTimeout: 6000
+        // How many notifications the notification center keeps.
         property int historyLimit: 100
         // Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus).
         property bool holdInFocus: true
     }
 
     property JsonObject updates: JsonObject {
+        // Check for system updates.
         property bool enabled: true
+        // Minutes between update checks.
         property int intervalMinutes: 60
         // Also count AUR updates (needs yay or paru).
         property bool aur: true
@@ -428,10 +506,13 @@ JsonAdapter {
     }
 
     property JsonObject dock: JsonObject {
+        // Show a dock.
         property bool enabled: false
         // Screen edge: "bottom", "top", "left" or "right".
         property string position: "bottom"
+        // Hide the dock until the pointer reaches the screen edge.
         property bool autoHide: true
+        // Icons grow toward the pointer.
         property bool magnify: true
         // With auto-hide: also show the dock while the workspace has no windows.
         property bool showWhenEmpty: true
@@ -444,9 +525,13 @@ JsonAdapter {
         // How much an icon grows toward the pointer (percent), the gap between icons,
         // the corner radius and the distance from the screen edge (px).
         property int magnifyAmount: 45
+        // The gap between icons, in px.
         property int spacing: 2
+        // The dock's corner radius, in px.
         property int cornerRadius: 28
+        // The distance from the screen edge, in px.
         property int edgeMargin: 8
+        // Icon size in px.
         property int iconSize: 44
         // Screen name; empty = first screen.
         property string monitor: ""
@@ -464,13 +549,21 @@ JsonAdapter {
         property bool enabled: true
         // "freedesktop" (the system theme) or a downloaded pack: miui, samsung, iphone, windows, win7, winxp, android
         property string pack: "freedesktop"
+        // Volume of the event sounds, 0 – 1.
         property real volume: 0.7
+        // Sound for notifications.
         property bool notifications: true
+        // Sound for timers.
         property bool timers: true
+        // Sound for battery warnings and the charger.
         property bool battery: true
+        // Sound for screenshots and recordings.
         property bool capture: true
+        // A tick while the volume changes.
         property bool volumeTick: true
+        // Sound at login, logout and lock.
         property bool session: true
+        // Sound when a device is plugged in or out.
         property bool devices: true
         // Silent while Do Not Disturb, Presentation or Wait mode is on, and in Focus Mode (but for the timers).
         property bool quiet: true
@@ -488,6 +581,7 @@ JsonAdapter {
     // How update.sh updates: "git" (the latest main) or "release" (the latest tagged release).
     // Chosen at install (install.sh --channel); installs from before this one follow git.
     property JsonObject update: JsonObject {
+        // How update.sh updates: `git` (the latest main) or `release` (the latest tagged release); set at install.
         property string channel: "git"
         // The window about a new version when the shell starts
         property bool notify: true

@@ -601,6 +601,7 @@ ColumnLayout {
             onToggled: checked => root.bar.island.enabled = checked
         }
         SliderRow {
+            visible: Config.options.settingsAdvanced
             enabled: root.bar.island.enabled
             icon: "timer"
             title: Translation.tr("Hold to switch")

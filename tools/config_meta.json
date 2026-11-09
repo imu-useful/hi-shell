@@ -1,0 +1,157 @@
+{
+    "ai.keys": {
+        "ui": "elsewhere: the key field in the AI chat's provider settings and Settings \u203a General"
+    },
+    "ai.model": {
+        "ui": "elsewhere: the model picker in the AI chat"
+    },
+    "ai.openrouterKey": {
+        "ui": "file: older option, use ai.keys",
+        "advanced": true
+    },
+    "ai.openrouterModel": {
+        "ui": "file: older option, use ai.models",
+        "advanced": true
+    },
+    "appearance.colorOverrides": {
+        "ui": "file: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '\"#ff6a00\"'",
+        "advanced": true
+    },
+    "appearance.fonts.icon": {
+        "ui": "file: the icon font is made by the shell; only change it for a different Material Symbols build",
+        "advanced": true
+    },
+    "appearance.gtkColorScheme": {
+        "advanced": true
+    },
+    "appearance.restartOnIconTheme": {
+        "advanced": true
+    },
+    "bar.center": {
+        "ui": "bar"
+    },
+    "bar.height": {
+        "ui": "bar"
+    },
+    "bar.island.holdDuration": {
+        "advanced": true
+    },
+    "bar.left": {
+        "ui": "bar"
+    },
+    "bar.margin": {
+        "ui": "bar"
+    },
+    "bar.position": {
+        "ui": "bar"
+    },
+    "bar.right": {
+        "ui": "bar"
+    },
+    "bar.style": {
+        "ui": "bar"
+    },
+    "capture.ocrLanguages": {
+        "advanced": true
+    },
+    "desktop.layouts": {
+        "ui": "desktop"
+    },
+    "desktop.toolbar.*": {
+        "ui": "elsewhere: drag the toolbar in the desktop's edit mode"
+    },
+    "dock.cornerRadius": {
+        "advanced": true
+    },
+    "dock.edgeMargin": {
+        "advanced": true
+    },
+    "dock.magnifyAmount": {
+        "advanced": true
+    },
+    "dock.pinned": {
+        "ui": "elsewhere: right click an icon in the dock"
+    },
+    "dock.spacing": {
+        "advanced": true
+    },
+    "focus.breathing": {
+        "ui": "elsewhere: Focus Mode settings \u203a Timer"
+    },
+    "hyprland.monitors": {
+        "ui": "hyprland"
+    },
+    "hyprland.options": {
+        "ui": "hyprland"
+    },
+    "idle.*": {
+        "ui": "lock"
+    },
+    "idle.batLockMin": {
+        "advanced": true
+    },
+    "idle.batScreenOffMin": {
+        "advanced": true
+    },
+    "idle.batSuspendMin": {
+        "advanced": true
+    },
+    "lock.battery": {
+        "ui": "lock"
+    },
+    "lock.blurPasses": {
+        "advanced": true
+    },
+    "lock.blurSize": {
+        "advanced": true
+    },
+    "lock.capsLockHint": {
+        "ui": "lock"
+    },
+    "lock.clock": {
+        "ui": "lock"
+    },
+    "lock.date": {
+        "ui": "lock"
+    },
+    "lock.fieldOutline": {
+        "advanced": true
+    },
+    "lock.greeting": {
+        "ui": "lock"
+    },
+    "lock.keyboardLayout": {
+        "ui": "lock"
+    },
+    "lock.nowPlaying": {
+        "ui": "lock"
+    },
+    "notifications.historyLimit": {
+        "advanced": true
+    },
+    "powerSaving.saved": {
+        "ui": "file: kept by the shell while power saving is on",
+        "advanced": true
+    },
+    "sidebar.quickToggles.shown": {
+        "ui": "elsewhere: the pencil button in the right sidebar"
+    },
+    "translator.target": {
+        "ui": "elsewhere: the translator tab of the left sidebar"
+    },
+    "tray.hidden": {
+        "ui": "file: item ids from hi ipc tray list"
+    },
+    "updates.intervalMinutes": {
+        "advanced": true
+    },
+    "wallpapers.downloadDirectory": {
+        "advanced": true
+    },
+    "wallpapers.frameSize": {
+        "ui": "elsewhere: drag the frame's corner in the desktop's edit mode"
+    },
+    "weather.refreshMinutes": {
+        "advanced": true
+    }
+}

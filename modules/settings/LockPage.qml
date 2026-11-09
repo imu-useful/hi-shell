@@ -83,9 +83,9 @@ ColumnLayout {
             checked: idleSection.i.separateBattery
             onToggled: checked => idleSection.i.separateBattery = checked
         }
-        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "lock_clock"; title: Translation.tr("On battery: lock after, minutes"); value: idleSection.i.batLockMin; from: 0; to: 600; onChanged: v => idleSection.i.batLockMin = v }
-        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "desktop_access_disabled"; title: Translation.tr("On battery: screen off after, minutes"); value: idleSection.i.batScreenOffMin; from: 0; to: 600; onChanged: v => idleSection.i.batScreenOffMin = v }
-        StepperRow { visible: idleSection.i.manage && idleSection.i.separateBattery && Battery.available; icon: "bedtime"; title: Translation.tr("On battery: suspend after, minutes"); value: idleSection.i.batSuspendMin; from: 0; to: 600; onChanged: v => idleSection.i.batSuspendMin = v }
+        StepperRow { visible: Config.options.settingsAdvanced && (idleSection.i.manage && idleSection.i.separateBattery && Battery.available); icon: "lock_clock"; title: Translation.tr("On battery: lock after, minutes"); value: idleSection.i.batLockMin; from: 0; to: 600; onChanged: v => idleSection.i.batLockMin = v }
+        StepperRow { visible: Config.options.settingsAdvanced && (idleSection.i.manage && idleSection.i.separateBattery && Battery.available); icon: "desktop_access_disabled"; title: Translation.tr("On battery: screen off after, minutes"); value: idleSection.i.batScreenOffMin; from: 0; to: 600; onChanged: v => idleSection.i.batScreenOffMin = v }
+        StepperRow { visible: Config.options.settingsAdvanced && (idleSection.i.manage && idleSection.i.separateBattery && Battery.available); icon: "bedtime"; title: Translation.tr("On battery: suspend after, minutes"); value: idleSection.i.batSuspendMin; from: 0; to: 600; onChanged: v => idleSection.i.batSuspendMin = v }
     }
 
     Section {
@@ -182,6 +182,7 @@ ColumnLayout {
             onSelected: value => root.l.fieldShape = value
         }
         SliderRow {
+            visible: Config.options.settingsAdvanced
             icon: "line_weight"
             title: Translation.tr("Password field outline")
             value: root.l.fieldOutline
@@ -256,7 +257,7 @@ ColumnLayout {
             onToggled: checked => root.l.wallpaper = checked
         }
         SliderRow {
-            visible: root.builtin && root.l.wallpaper
+            visible: Config.options.settingsAdvanced && (root.builtin && root.l.wallpaper)
             icon: "blur_on"
             title: Translation.tr("Blur")
             value: root.l.blurPasses
@@ -264,7 +265,7 @@ ColumnLayout {
             onMoved: value => root.l.blurPasses = value
         }
         SliderRow {
-            visible: root.builtin && root.l.wallpaper && root.l.blurPasses > 0
+            visible: Config.options.settingsAdvanced && (root.builtin && root.l.wallpaper && root.l.blurPasses > 0)
             icon: "lens_blur"
             title: Translation.tr("Blur radius")
             value: root.l.blurSize

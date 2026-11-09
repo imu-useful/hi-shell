@@ -127,6 +127,15 @@ ColumnLayout {
             to: 180
             onChanged: value => Config.options.wallpapers.slideshowMinutes = value
         }
+        TextRow {
+            visible: Config.options.settingsAdvanced
+            icon: "download"
+            title: Translation.tr("Download folder")
+            subtitle: Translation.tr("Where wallpapers from Wallhaven and Unsplash are saved")
+            value: Config.options.wallpapers.downloadDirectory
+            fieldWidth: 260
+            onEdited: text => Config.options.wallpapers.downloadDirectory = text.trim() || "~/Pictures/Wallpapers/online"
+        }
         SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
         SwitchRow { icon: "animated_images"; title: Translation.tr("Play live wallpapers"); subtitle: Translation.tr("A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture"); checked: Config.options.wallpapers.animate; onToggled: checked => Config.options.wallpapers.animate = checked }
         SwitchRow {
@@ -203,10 +212,10 @@ ColumnLayout {
         SwitchRow { icon: "apps"; title: Translation.tr("Show running apps that aren't pinned"); checked: Config.options.dock.showRunning; onToggled: checked => Config.options.dock.showRunning = checked }
         SwitchRow { icon: "more_horiz"; title: Translation.tr("Window dots under the icons"); checked: Config.options.dock.showIndicators; onToggled: checked => Config.options.dock.showIndicators = checked }
         SwitchRow { icon: "zoom_in"; title: Translation.tr("Magnify on hover"); checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }
-        SliderRow { icon: "zoom_out_map"; title: Translation.tr("Magnify amount"); value: Config.options.dock.magnifyAmount; from: 10; to: 100; suffix: "%"; onMoved: value => Config.options.dock.magnifyAmount = value }
-        SliderRow { icon: "space_bar"; title: Translation.tr("Gap between icons"); value: Config.options.dock.spacing; from: 0; to: 20; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.spacing = value }
-        SliderRow { icon: "rounded_corner"; title: Translation.tr("Corner radius"); value: Config.options.dock.cornerRadius; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.cornerRadius = value }
-        SliderRow { icon: "vertical_align_bottom"; title: Translation.tr("Distance from the screen edge"); value: Config.options.dock.edgeMargin; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.edgeMargin = value }
+        SliderRow { visible: Config.options.settingsAdvanced; icon: "zoom_out_map"; title: Translation.tr("Magnify amount"); value: Config.options.dock.magnifyAmount; from: 10; to: 100; suffix: "%"; onMoved: value => Config.options.dock.magnifyAmount = value }
+        SliderRow { visible: Config.options.settingsAdvanced; icon: "space_bar"; title: Translation.tr("Gap between icons"); value: Config.options.dock.spacing; from: 0; to: 20; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.spacing = value }
+        SliderRow { visible: Config.options.settingsAdvanced; icon: "rounded_corner"; title: Translation.tr("Corner radius"); value: Config.options.dock.cornerRadius; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.cornerRadius = value }
+        SliderRow { visible: Config.options.settingsAdvanced; icon: "vertical_align_bottom"; title: Translation.tr("Distance from the screen edge"); value: Config.options.dock.edgeMargin; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.edgeMargin = value }
         SliderRow { icon: "photo_size_select_large"; title: Translation.tr("Icon size"); value: Config.options.dock.iconSize; from: 28; to: 72; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.iconSize = value }
     }
 

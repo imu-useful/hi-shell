@@ -288,6 +288,7 @@ the defaults on first start; edits apply live). The Hyprland page applies change
 A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 A value that breaks its rule in `common/ConfigSchema.js` (a typo in `bar.position`, a `lock.brightness` of 7) is reported in the log (`qs -c hi-shell log`) and replaced by its default; `python3 tools/audit_config.py` lists the options that have no control in the settings app (`docs/CONFIG_AUDIT.md`).
+The full list of options (type, default, allowed values, where Settings changes it) is in [docs/CONFIG.md](docs/CONFIG.md), made from the source; `hi config search <word>` finds an option by name or description. Settings has a search box (also `hi settings search <word>`) and hides the rarely needed rows until you turn on Settings › Quick › Show advanced settings (`settingsAdvanced`).
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
@@ -326,7 +327,7 @@ Sections:
 
 ## Tests
 
-`./tests/run.sh` runs the tests (python3 and node; no framework needed): the config schema, the `hi` command with a fake `qs`, presets, the palette script, the config audit and the Russian translations. The QML itself isn't unit-tested; it is checked by running the shell.
+`./tests/run.sh` runs the tests (python3 and node; no framework needed): the config schema and reference (`python3 tools/config_meta.py check` also fails if an option has no description or can't be reached from Settings, or `docs/CONFIG.md` is stale), the `hi` command with a fake `qs`, presets, the palette script, the config audit and the Russian translations. The QML itself isn't unit-tested; it is checked by running the shell.
 
 ## Terminal configs
 

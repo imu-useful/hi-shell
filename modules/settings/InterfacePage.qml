@@ -245,6 +245,21 @@ ColumnLayout {
             onToggled: checked => Config.options.appearance.themedIcons = checked
         }
         SwitchRow {
+            visible: Config.options.settingsAdvanced
+            icon: "restart_alt"
+            title: Translation.tr("Restart when the icon theme changes")
+            subtitle: Translation.tr("Icons break in a running shell when KDE's icon theme changes, so it restarts")
+            checked: Config.options.appearance.restartOnIconTheme
+            onToggled: checked => Config.options.appearance.restartOnIconTheme = checked
+        }
+        SwitchRow {
+            visible: Config.options.settingsAdvanced
+            icon: "contrast"
+            title: Translation.tr("Switch GTK apps with dark and light")
+            checked: Config.options.appearance.gtkColorScheme
+            onToggled: checked => Config.options.appearance.gtkColorScheme = checked
+        }
+        SwitchRow {
             icon: "movie"
             title: Translation.tr("Viewing mode when a video fills the screen")
             subtitle: Translation.tr("A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on")
