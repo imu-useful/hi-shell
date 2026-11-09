@@ -150,7 +150,54 @@ def story():
     tr.save(total, "story.ogg")
 
 
+def mania():
+    """The song and its note chart for the rhythm game (key "mania"): sounds/secret/mania.ogg and
+    mania.json ([time, lane, hold length] per note). Both come from the same lead line, so they match."""
+    import json
+    import random
+
+    rng = random.Random(7)
+    bpm, bars = 128, 24
+    st = 60 / bpm / 4  # a sixteenth
+    total = bars * 16 * st
+    tr = Track(total)
+    scale = [57, 60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84]  # A minor pentatonic
+    chords = [(57, 60, 64), (53, 57, 60), (48, 52, 55), (55, 59, 62)]
+    a = [[2] * 8, [3, 3, 2, 3, 3, 2], [4, 2, 2, 4, 4], [2, 2, 4, 2, 2, 4], [8, 4, 4], [6, 2, 4, 4]]
+    b = [[1, 1, 2] * 4, [3, 3, 2, 3, 3, 2], [2] * 8, [2, 2, 4, 2, 2, 4], [1, 1, 2, 1, 1, 2, 2, 2, 4]]
+    # Backing: pad all the way, drums and bass from bar 2
+    for bar in range(bars):
+        ch = chords[bar % 4]
+        for n in ch:
+            tr.add(bar * 16 * st, tone("sine", hz(n), 16 * st, 0.12, 0.6))
+        if bar < 2:
+            continue
+        for k in range(4):
+            t0 = (bar * 16 + k * 4) * st
+            tr.add(t0, kick(0.85))
+            tr.add(t0 + 2 * st, noise(0.06, 0.18, 60))
+            if bar >= 4 and k % 2:
+                tr.add(t0, noise(0.14, 0.45, 24))
+        for k in range(8):
+            tr.add((bar * 16 + k * 2) * st, tone("saw", hz(ch[0] - 24), 2 * st * 0.9, 0.25, 7))
+    notes, idx = [], 5
+    for bar in range(2, bars):
+        pool = a if bar < 10 else b if bar < 18 else a + b
+        pattern = [8, 8] if bar == bars - 1 else rng.choice(pool)
+        pos = 0
+        for ln in pattern:
+            idx = max(1, min(len(scale) - 1, idx + rng.choice([-2, -1, -1, 1, 1, 2])))
+            at = (bar * 16 + pos) * st
+            hold = ln >= 6
+            tr.add(at, tone("pulse", hz(scale[idx]), ln * st * 0.95, 0.3, 2.5 if hold else 5))
+            notes.append([round(at, 3), idx % 4, round(ln * st * 0.9, 3) if hold else 0])
+            pos += ln
+    tr.save(total, "mania.ogg")
+    (OUT / "mania.json").write_text(json.dumps({"length": round(total, 3), "notes": notes}, separators=(",", ":")))
+
+
 if __name__ == "__main__":
     nyan()
     disco()
     story()
+    mania()
