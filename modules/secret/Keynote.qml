@@ -11,8 +11,8 @@ import qs.common.widgets
 // one, ← back, and the music jumps with them. In order: the logo (the drums come in with it); "not
 // just a shell"; a made-up desktop coming alive (KeynoteDesktop.qml) in a device frame tilting
 // up; numbers counted from the install itself; a bento grid of features; the wallpaper and the
-// colors made from it; "One more thing…" over a breakdown; and, on the drop, a finale of silky
-// light (silk.frag) in the wallpaper's colors that stays until closed.
+// colors made from it; "One more thing…" over a breakdown; and, on the drop, the finale
+// (KeynoteFinale.qml) that loops until closed.
 Item {
     id: root
 
@@ -487,121 +487,16 @@ Item {
         shown: root.ease(root.local(6), 0.5, 1.4) * root.clamp((root.slides[6][1] - root.local(6)) / 0.4)
     }
 
-    // ---- the finale -------------------------------------------------------------------------------
+    // ---- the finale (KeynoteFinale.qml) -----------------------------------------------------------
 
-    Item {
-        id: finale
-
-        readonly property real t: root.time - root.finaleStart
-        // How far into the current bar (0..1); a bar is 2 s
-        readonly property real bar: ((root.musicTime - root.finaleStart) % 2 + 2) % 2 / 2
-
+    KeynoteFinale {
         anchors.fill: parent
+        t: root.time - root.finaleStart
+        time: root.time
+        kick: root.kick
+        headline: root.headline
+        u: root.u
         visible: t > -0.2
         opacity: root.ease(t, 0, 0.4)
-
-        ShaderEffect {
-            anchors.fill: parent
-            property vector2d res: Qt.vector2d(width, height)
-            property real time: root.time
-            property real kick: root.kick
-            property color c0: Colors.m3primary
-            property color c1: Colors.m3tertiary
-            property color c2: Colors.m3secondary
-            fragmentShader: Qt.resolvedUrl("silk.frag.qsb")
-        }
-
-        // Bokeh: soft motes of light rising slowly, twinkling, brighter on the beat
-        Repeater {
-            model: 40
-
-            KeynoteSlides.Glow {
-                required property int index
-                readonly property real seed: (index * 0.6180339) % 1
-                readonly property real speed: 0.012 + 0.02 * ((index * 0.37) % 1)
-                readonly property real rise: (finale.t * speed + seed) % 1
-
-                width: root.u * (0.025 + 0.06 * ((index * 0.73) % 1))
-                height: width
-                x: finale.width * ((index * 0.3819 + 0.05) % 1) + Math.sin(finale.t * 0.4 + index) * root.u * 0.03 - width / 2
-                y: finale.height * (1.1 - rise * 1.2) - height / 2
-                tint: [Colors.m3primary, Colors.m3tertiary, "#ffffff"][index % 3]
-                strength: Math.sin(rise * Math.PI) * (0.25 + 0.2 * Math.sin(finale.t * 1.7 + index * 2.1) + 0.35 * root.kick) * root.ease(finale.t, 0.5 + seed * 2, 1)
-            }
-        }
-
-        // A halo behind the name, breathing with the kick
-        KeynoteSlides.Glow {
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: -root.headline * 0.25
-            width: root.headline * 9
-            height: root.headline * 4
-            tint: Colors.m3primary
-            strength: (0.22 + 0.25 * root.kick) * root.ease(finale.t, 0, 0.6)
-        }
-
-        // A thin ring of light leaving the name on each bar's first beat
-        Repeater {
-            model: 2
-
-            Rectangle {
-                required property int index
-                // Two rings take turns: this one runs on every other bar
-                readonly property real p: index === Math.floor(((root.musicTime - root.finaleStart) / 2) % 2) ? finale.bar : 1
-
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: -root.headline * 0.25
-                width: root.headline * 3 * (1 + p * 4)
-                height: width
-                radius: width / 2
-                color: "transparent"
-                border.width: Math.max(1, root.headline * 0.05 * (1 - p))
-                border.color: Qt.alpha(Qt.lighter(Colors.m3primary, 1.3), 0.55 * Math.pow(1 - p, 1.5))
-                visible: finale.t > 0 && p < 1
-            }
-        }
-
-        Column {
-            anchors.centerIn: parent
-            spacing: root.headline * 0.2
-
-            KeynoteText {
-
-                kick: root.kick
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "hi-shell"
-                size: root.headline * 1.6
-                weight: Font.Black
-                // Brushed metal, with a glint sweeping across every 4 bars
-                colors: ["#c9cedb", "#ffffff", "#aeb4c4"]
-                time: root.time * 0.5
-                shine: ((parent.parent.t - 0.6) % 8) / 1.1
-                shown: root.ease(parent.parent.t, 0, 0.6)
-            }
-
-            KeynoteText {
-
-                kick: root.kick
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: Translation.tr("Free. Open source. Yours.")
-                size: root.headline * 0.45
-                weight: Font.DemiBold
-                colors: ["#ffffff", Qt.lighter(Colors.m3primary, 1.15), "#ffffff"]
-                time: root.time
-                shown: root.ease(parent.parent.t, 2, 0.8)
-            }
-        }
-
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: root.u * 0.06
-            text: "github.com/imu-useful/hi-shell"
-            color: Qt.rgba(1, 1, 1, 0.7)
-            font.family: Appearance.font.title
-            font.pixelSize: root.headline * 0.22
-            font.weight: Font.Medium
-            opacity: root.ease(parent.t, 4, 1)
-        }
     }
 }
