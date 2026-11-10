@@ -3,10 +3,12 @@ import qs.common
 import qs.common.widgets
 
 // The keynote's finale, over the music's drop, looping until the show is closed. Silky light
-// (silk.frag), rising bokeh and a halo stay all along; in front, four scenes of a bar pair each
-// (4 s) take turns, with a flash on every change: the name in brushed metal with rings of light
-// leaving it; words slammed in one per beat; the features orbiting a glowing "hi"; and the name
-// coming back with a burst of sparks.
+// (silk.frag), rising bokeh and a halo stay all along, and the camera kicks with the beat; in
+// front, four scenes of a bar pair each (4 s) take turns, with a flash on every change: the name
+// in brushed metal, its letters flying together from all over, god rays (rays.frag) behind it and
+// a red/cyan split on every kick; words slammed in one per beat; the features orbiting a glowing
+// "hi"; and the name again with a burst of sparks over a wall of interface cards streaming past
+// in 3D.
 Item {
     id: root
 
@@ -17,6 +19,10 @@ Item {
     // The keynote's headline size and the screen's shorter side
     property real headline: 100
     property real u: 1000
+
+    // The camera: a push on every kick, a slow sway
+    scale: 1.025 + 0.012 * kick
+    rotation: Math.sin(time * 0.25) * 0.6
 
     readonly property real sceneLength: 4
     readonly property int scene: t < 0 ? 0 : Math.floor(t / sceneLength) % 4
@@ -29,11 +35,22 @@ Item {
         Translation.tr("Free."), Translation.tr("Alive."), Translation.tr("Yours."), "hi."]
     readonly property var palettes: [["#5ac8fa", "#bf5af2", "#ff375f"], [Colors.m3primary, Colors.m3tertiary, Colors.m3secondary],
         ["#30d158", "#64d2ff", "#30d158"], ["#ffd60a", "#ff9f0a", "#ff375f"]]
+    // The interface cards of the wall: [icon, label, color]
+    readonly property var cards: [["wifi", Translation.tr("Wi-Fi"), "#5ac8fa"], ["music_note", Translation.tr("Now playing"), "#bf5af2"], ["wallpaper", Translation.tr("Wallpapers"), "#ff9f0a"],
+        ["calendar_month", Translation.tr("Calendar"), "#ff375f"], ["notifications", Translation.tr("Notifications"), "#ffd60a"], ["bluetooth", Translation.tr("Bluetooth"), "#0a84ff"],
+        ["auto_awesome", "Claude", Colors.m3primary], ["screenshot_region", Translation.tr("Screenshot"), "#30d158"], ["translate", Translation.tr("Translate"), "#64d2ff"],
+        ["calculate", Translation.tr("Calculator"), "#ff9f0a"], ["dark_mode", Translation.tr("Dark mode"), "#8e8ef0"], ["volume_up", Translation.tr("Volume"), "#30d158"]]
     readonly property var features: [["auto_awesome", Colors.m3primary], ["palette", Colors.m3tertiary], ["bolt", "#ffd60a"],
         ["tune", Colors.m3secondary], ["terminal", "#30d158"], ["dashboard", "#5ac8fa"]]
 
     function clamp(x) {
         return Math.max(0, Math.min(1, x));
+    }
+
+    // 0 -> 1 with an overshoot
+    function back(x) {
+        const c = clamp(x), k = 1.9;
+        return 1 + (k + 1) * Math.pow(c - 1, 3) + k * Math.pow(c - 1, 2);
     }
 
     function ease(x) {
@@ -55,6 +72,115 @@ Item {
         property color c1: Colors.m3tertiary
         property color c2: Colors.m3secondary
         fragmentShader: Qt.resolvedUrl("silk.frag.qsb")
+    }
+
+    // God rays from behind the name, while it's on
+    ShaderEffect {
+        anchors.fill: parent
+        property vector2d res: Qt.vector2d(width, height)
+        property vector2d center: Qt.vector2d(width / 2, height / 2 - root.headline * 0.25)
+        property real time: root.time
+        property real kick: root.kick
+        property color tint: Qt.lighter(Colors.m3primary, 1.2)
+        property color tint2: "#ffffff"
+        fragmentShader: Qt.resolvedUrl("rays.frag.qsb")
+        opacity: name.shown
+        visible: opacity > 0.01
+    }
+
+    // ---- scene 3's backdrop: a wall of interface cards streaming past in 3D ----------------------
+
+    Item {
+        id: wall
+
+        readonly property real shown: root.within(3, 0.35, 0.3)
+        readonly property real cardWidth: root.u * 0.3
+        readonly property real cardHeight: root.u * 0.13
+        readonly property real gap: root.u * 0.025
+
+        anchors.centerIn: parent
+        width: parent.width * 1.6
+        height: (cardHeight + gap) * 5
+        visible: shown > 0
+        opacity: shown * 0.55
+        transform: [
+            Rotation {
+                origin.x: wall.width / 2
+                origin.y: wall.height / 2
+                axis { x: 1; y: -0.6; z: 0.15 }
+                angle: 32
+            },
+            Scale {
+                origin.x: wall.width / 2
+                origin.y: wall.height / 2
+                xScale: 1.15 - 0.15 * wall.shown
+                yScale: xScale
+            }
+        ]
+
+        Repeater {
+            model: 5
+
+            Item {
+                id: lane
+
+                required property int index
+                // Lanes run in turns left and right, at their own speeds
+                readonly property real speed: (index % 2 ? -1 : 1) * root.u * (0.12 + 0.04 * index)
+                readonly property real span: root.cards.length * (wall.cardWidth + wall.gap)
+
+                y: index * (wall.cardHeight + wall.gap)
+                width: wall.width
+                height: wall.cardHeight
+
+                Repeater {
+                    model: root.cards.length * 2
+
+                    Rectangle {
+                        required property int index
+                        readonly property var card: root.cards[(index + lane.index * 5) % root.cards.length]
+
+                        x: ((index * (wall.cardWidth + wall.gap) + root.t * lane.speed) % (lane.span * 2) + lane.span * 2) % (lane.span * 2) - lane.span * 0.4
+                        width: wall.cardWidth
+                        height: wall.cardHeight
+                        radius: height * 0.28
+                        color: "#141418"
+                        border.color: Qt.alpha(card[2], 0.35 + 0.4 * root.kick)
+                        border.width: 1.5
+
+                        Rectangle {
+                            x: parent.height * 0.18
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.height * 0.64
+                            height: width
+                            radius: width * 0.3
+                            color: parent.card[2]
+                            MaterialIcon { anchors.centerIn: parent; icon: parent.parent.card[0]; iconSize: parent.width * 0.58; fill: 1; color: "white" }
+                        }
+
+                        Text {
+                            x: parent.height * 0.98
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: parent.card[1]
+                            color: "white"
+                            font.family: Appearance.font.title
+                            font.pixelSize: parent.height * 0.24
+                            font.weight: Font.DemiBold
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Shade behind the name, so it reads over the wall
+    KeynoteSlides.Glow {
+        anchors.centerIn: parent
+        width: root.headline * 11
+        height: root.headline * 5.5
+        tint: "black"
+        strength: 0.85 * wall.shown
+        visible: wall.visible
     }
 
     // Bokeh: soft motes of light rising slowly, twinkling, brighter on the beat
@@ -147,17 +273,69 @@ Item {
             anchors.centerIn: parent
             spacing: root.headline * 0.2
 
-            KeynoteText {
-                kick: root.kick
+            // The name, a letter at a time: as its scene begins the letters fly together from all
+            // over, spinning, and snap into place; a glint runs along them; on every kick the
+            // letters split into red and cyan for a moment
+            Row {
+                id: letters
+
+                // Seconds since the letters started flying in (scene 0 from the finale's start, scene 3)
+                readonly property real since: root.scene === 3 ? root.p : root.t < 4 ? root.t : 99
+
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "hi-shell"
-                size: root.headline * 1.6
-                weight: Font.Black
-                // Brushed metal, with a glint sweeping across as each of the name's scenes begins
-                colors: ["#c9cedb", "#ffffff", "#aeb4c4"]
-                time: root.time * 0.5
-                shine: root.scene === 3 ? (root.p - 0.3) / 1.1 : root.t < 4 ? (root.t - 0.6) / 1.1 : -1
-                shown: 1
+                spacing: -root.headline * 0.03
+                scale: 1 + 0.035 * root.kick
+
+                Repeater {
+                    model: "hi-shell".length
+
+                    Item {
+                        id: letter
+
+                        required property int index
+                        readonly property real seedX: Math.sin(index * 12.9898) * 43758.5453 % 1
+                        readonly property real seedY: Math.sin(index * 78.233) * 12345.678 % 1
+                        readonly property real fly: root.back((letters.since - index * 0.06) / 0.7)
+                        readonly property real away: 1 - Math.min(1, fly)
+
+                        implicitWidth: glyph.implicitWidth
+                        implicitHeight: glyph.implicitHeight
+
+                        transform: Translate {
+                            x: letter.seedX * root.u * 1.2 * letter.away
+                            y: letter.seedY * root.u * 0.9 * letter.away
+                        }
+                        rotation: (letter.seedX * 540) * letter.away
+                        opacity: Math.min(1, (letters.since - index * 0.06) * 4)
+
+                        Repeater {
+                            model: [["#ff2d55", -1], ["#30d5ff", 1]]
+
+                            Text {
+                                required property var modelData
+                                x: modelData[1] * root.headline * 0.05 * root.kick
+                                text: "hi-shell"[letter.index]
+                                color: modelData[0]
+                                opacity: 0.75 * root.kick
+                                font.family: Appearance.font.title
+                                font.pixelSize: root.headline * 1.6
+                                font.weight: Font.Black
+                                font.letterSpacing: -root.headline * 1.6 * 0.02
+                            }
+                        }
+
+                        KeynoteText {
+                            id: glyph
+                            text: "hi-shell"[letter.index]
+                            size: root.headline * 1.6
+                            weight: Font.Black
+                            colors: ["#c9cedb", "#ffffff", "#aeb4c4"]
+                            time: root.time * 0.5 + letter.index * 0.2
+                            shine: (letters.since - 0.9 - letter.index * 0.07) / 0.45
+                            shown: 1
+                        }
+                    }
+                }
             }
 
             KeynoteText {
