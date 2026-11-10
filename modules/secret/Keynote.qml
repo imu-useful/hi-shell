@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import qs.common
 import qs.common.widgets
@@ -10,7 +9,7 @@ import qs.common.widgets
 // made by tools/make_secret_music.py). Every slide starts on a bar, words and tiles land on beats
 // and everything pulses with the kick. The slides play on their own; → or Space jumps to the next
 // one, ← back, and the music jumps with them. In order: the logo (the drums come in with it); "not
-// just a shell"; the real desktop (a screenshot taken as the show opens) in a device frame tilting
+// just a shell"; a made-up desktop coming alive (KeynoteDesktop.qml) in a device frame tilting
 // up; numbers counted from the install itself; a bento grid of features; the wallpaper and the
 // colors made from it; "One more thing…" over a breakdown; and, on the drop, a finale of silky
 // light (silk.frag) in the wallpaper's colors that stays until closed.
@@ -51,9 +50,6 @@ Item {
     readonly property var accent: [Colors.m3primary, Colors.m3tertiary, Colors.m3secondary]
     readonly property var neon: ["#5ac8fa", "#bf5af2", "#ff375f"]
 
-    // Taken as the show opens; empty until grim is done (or if it fails)
-    property string shot: ""
-    readonly property string shotPath: `${Quickshell.env("XDG_RUNTIME_DIR") || "/tmp"}/hi-shell-keynote.png`
     property real qmlLines: 0
     property real commands: 0
 
@@ -107,15 +103,6 @@ Item {
         command: ["sh", "-c", `f="$1"; at="$2"; if command -v mpv >/dev/null; then exec mpv --no-video --really-quiet --start="$at" --ab-loop-a=46 --ab-loop-b=62 "$f";
             elif command -v ffplay >/dev/null; then exec ffplay -nodisp -autoexit -loglevel quiet -ss "$at" "$f";
             else exec pw-play "$f"; fi`, "sh", Quickshell.shellPath("sounds/secret/keynote.ogg"), String(root.musicFrom)]
-    }
-
-    Process {
-        running: true
-        command: ["grim", "-o", Hyprland.focusedMonitor?.name ?? "", root.shotPath]
-        onExited: code => {
-            if (code === 0)
-                root.shot = "file://" + root.shotPath + "?" + Date.now();
-        }
     }
 
     Process {
@@ -260,7 +247,6 @@ Item {
             height: width * root.height / Math.max(1, root.width) + 12
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.3 + (1 - rise) * parent.height * 0.35
-            source: root.shot !== "" ? root.shot : (Colors.wallpaper ? "file://" + Colors.wallpaper : "")
             glare: root.clamp((parent.t - 4) / 1.6)
             opacity: Math.min(1, rise * 2)
             scale: (0.86 + 0.14 * rise) * (1 + 0.03 * root.clamp((parent.t - 3.5) / 4.5)) * (1 + 0.008 * root.kick)
@@ -269,6 +255,13 @@ Item {
                 origin.y: device.height
                 axis { x: 1; y: 0; z: 0 }
                 angle: 38 * (1 - device.rise)
+            }
+
+            KeynoteDesktop {
+                anchors.fill: parent
+                t: device.parent.t - 2.2
+                clock: root.time
+                kick: root.kick
             }
         }
     }
@@ -434,10 +427,18 @@ Item {
             height: width * 9 / 16
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.42
-            source: Colors.wallpaper ? "file://" + Colors.wallpaper : ""
             opacity: root.ease(colorSlide.t, 0.5, 0.8)
             scale: (0.94 + 0.06 * opacity) * (1 - 0.12 * root.ease(colorSlide.t, 2, 1.2))
             glare: root.clamp((colorSlide.t - 1) / 1.4)
+
+            Image {
+                anchors.fill: parent
+                source: Colors.wallpaper ? "file://" + Colors.wallpaper : ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                smooth: true
+                mipmap: true
+            }
         }
 
         Repeater {

@@ -15,12 +15,12 @@ QtObject {
         fragmentShader: Qt.resolvedUrl("glow.frag.qsb")
     }
 
-    // A thin dark bezel with rounded corners around a picture, a shadow under it and a glare that
-    // sweeps across once `glare` goes 0 -> 1
+    // A thin dark bezel with rounded corners around whatever is put inside (its screen), a shadow
+    // under it and a glare that sweeps across once `glare` goes 0 -> 1
     component Device: Item {
         id: device
 
-        property url source
+        default property alias content: screenContent.data
         property real glare: 0
         readonly property real corner: width * 0.018
 
@@ -47,14 +47,9 @@ QtObject {
             anchors.fill: parent
             anchors.margins: 6
 
-            Image {
+            Item {
+                id: screenContent
                 anchors.fill: parent
-                source: device.source
-                fillMode: Image.PreserveAspectCrop
-                cache: false
-                asynchronous: true
-                smooth: true
-                mipmap: true
             }
 
             Rectangle {
