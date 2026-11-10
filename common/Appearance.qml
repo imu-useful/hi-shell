@@ -163,9 +163,9 @@ Singleton {
     // Surface color for panels/cards: translucent when transparency is on,
     // so the compositor blur shows through.
     function translucent(color, level) {
-        // Focus Mode turns blur off, so nothing shows through either.
-        // flat: always solid; glass: always see-through, at least a quarter, whatever the transparency switch.
-        if (options.surfaceStyle === "flat" || ShellState.zen || (!options.transparency && options.surfaceStyle !== "glass"))
+        // flat: always solid; glass: see-through, at least a quarter, whatever the transparency switch.
+        // Focus Mode and power saving turn blur off, so nothing shows through then, glass included.
+        if (options.surfaceStyle === "flat" || ShellState.zen || Config.options.powerSaving.enabled || (!options.transparency && options.surfaceStyle !== "glass"))
             return color;
         const see = level ?? options.transparencyLevel;
         return Qt.alpha(color, 1 - (options.surfaceStyle === "glass" ? Math.max(see, 0.25) : see));

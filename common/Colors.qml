@@ -49,7 +49,7 @@ Singleton {
     }
 
     function applyScheme(next) {
-        const ms = Config.options.appearance.paletteFade * Math.max(0, Config.options.appearance.animationSpeed);
+        const ms = Config.options.appearance.paletteFade * Appearance.anim.speed;
         const changed = JSON.stringify(next) !== JSON.stringify(scheme);
         if (ms > 0 && changed && Object.keys(scheme).length > 0) {
             fadeAnim.stop();
