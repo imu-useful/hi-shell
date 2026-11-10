@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
@@ -20,6 +22,117 @@ Scope {
     property int step: 0
     readonly property int steps: 5
     property var missing: []
+    // The step on screen: it lags `step` while the old one slides out
+    property int shownStep: 0
+    property int direction: 1
+    property bool leaving: false
+    // Runs 0 -> 10 each time a step comes in; rise(i) is how far its i-th piece has risen into place
+    property real reveal: 10
+
+    function rise(i: real): real {
+        const p = Math.max(0, Math.min(1, reveal - i * 0.7));
+        return 1 - Math.pow(1 - p, 3);
+    }
+
+    // A step's title with its icon in a cookie, and a line under it
+    component StepHeader: RowLayout {
+        id: header
+        property string icon
+        property string title
+        property string subtitle
+        Layout.fillWidth: true
+        spacing: 16
+        opacity: root.rise(0)
+        transform: Translate { y: (1 - root.rise(0)) * 18 }
+
+        MaterialShape {
+            implicitWidth: 52
+            implicitHeight: 52
+            shape: "cookie9"
+            color: Colors.m3primaryContainer
+            rotation: (1 - root.rise(0)) * -90
+            MaterialIcon {
+                anchors.centerIn: parent
+                icon: header.icon
+                iconSize: 26
+                fill: 1
+                color: Colors.m3onPrimaryContainer
+            }
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 2
+            StyledText {
+                text: header.title
+                font.family: Appearance.font.title
+                font.pixelSize: Appearance.font.size.headlineSmall
+            }
+            StyledText {
+                Layout.fillWidth: true
+                visible: header.subtitle !== ""
+                wrapMode: Text.Wrap
+                text: header.subtitle
+                color: Colors.m3onSurfaceVariant
+            }
+        }
+    }
+
+    // Rises into place as the `index`-th piece of the step
+    component Rise: Translate {
+        property real index
+        y: (1 - root.rise(index)) * 18
+    }
+
+    // A soft round light in `tint`, fading out from its middle
+    component Glow: Shape {
+        id: glow
+        property color tint
+        preferredRendererType: Shape.CurveRenderer
+        ShapePath {
+            strokeWidth: -1
+            strokeColor: "transparent"
+            fillGradient: RadialGradient {
+                centerX: glow.width / 2
+                centerY: glow.height / 2
+                centerRadius: glow.width / 2
+                focalX: centerX
+                focalY: centerY
+                GradientStop { position: 0; color: glow.tint }
+                GradientStop { position: 0.45; color: Qt.alpha(glow.tint, glow.tint.a * 0.4) }
+                GradientStop { position: 1; color: "transparent" }
+            }
+            PathAngleArc {
+                centerX: glow.width / 2
+                centerY: glow.height / 2
+                radiusX: glow.width / 2
+                radiusY: glow.height / 2
+                sweepAngle: 360
+            }
+        }
+    }
+
+    onStepChanged: {
+        if (step === shownStep)
+            return;
+        direction = step > shownStep ? 1 : -1;
+        swap.restart();
+    }
+
+    SequentialAnimation {
+        id: swap
+        ScriptAction { script: root.leaving = true }
+        NumberAnimation { target: root; property: "reveal"; to: 0; duration: 140; easing.type: Easing.InCubic }
+        ScriptAction { script: { root.leaving = false; root.shownStep = root.step; } }
+        NumberAnimation { target: root; property: "reveal"; from: 0; to: 10; duration: 1100 }
+    }
+
+    function intro(): void {
+        swap.stop();
+        shownStep = step;
+        reveal = 0;
+        introAnim.restart();
+    }
+    NumberAnimation { id: introAnim; target: root; property: "reveal"; from: 0; to: 10; duration: 1400 }
 
     // [command, what needs it]
     readonly property var programs: [
@@ -49,6 +162,7 @@ Scope {
         function onShowWelcome() {
             root.step = 0;
             root.open = true;
+            root.intro();
         }
     }
 
@@ -58,6 +172,7 @@ Scope {
         function open(): void {
             root.step = 0;
             root.open = true;
+            root.intro();
         }
         function close(): void {
             root.finish();
@@ -69,8 +184,10 @@ Scope {
         path: `${Paths.state}/welcome-done`
         printErrors: false
         onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound)
+            if (error === FileViewError.FileNotFound) {
                 root.open = true;
+                root.intro();
+            }
         }
     }
 
@@ -96,7 +213,7 @@ Scope {
             anchors.left: true
             anchors.right: true
             exclusionMode: ExclusionMode.Ignore
-            color: Qt.alpha("black", loader.revealed ? 0.35 : 0)
+            color: Qt.alpha("black", loader.revealed ? 0.45 : 0)
             Behavior on color { ColorAnim {} }
 
             WlrLayershell.namespace: "hi-shell-welcome"
@@ -122,7 +239,7 @@ Scope {
 
                 anchors.centerIn: parent
                 width: Math.min(parent.width - 80, 720)
-                height: Math.min(parent.height - 100, 600)
+                height: Math.min(parent.height - 100, 640)
                 radius: Appearance.shape.panel
                 color: Colors.m3surfaceContainerLow
                 border.width: Appearance.edge
@@ -133,6 +250,47 @@ Scope {
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
 
+                // Light in the wallpaper's colors drifting behind the steps (brighter on the hello),
+                // cut to the card's rounded shape
+                Item {
+                    id: ambient
+                    anchors.fill: parent
+                    opacity: root.shownStep === 0 ? 1 : 0.55
+                    Behavior on opacity { EffectAnim { duration: 600 } }
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        maskEnabled: true
+                        maskSource: cardMask
+                        maskThresholdMin: 0.5
+                        maskSpreadAtMin: 1
+                    }
+
+                    property real phase: 0
+                    NumberAnimation on phase { from: 0; to: Math.PI * 2; duration: 24000; loops: Animation.Infinite }
+
+                    Glow {
+                        width: card.width * 0.95
+                        height: width
+                        x: card.width * 0.55 - width / 2 + Math.cos(ambient.phase) * 60
+                        y: -height * 0.32 + Math.sin(ambient.phase * 2) * 30
+                        tint: Qt.alpha(Colors.m3primary, 0.24)
+                    }
+                    Glow {
+                        width: card.width * 0.8
+                        height: width
+                        x: -width * 0.3 + Math.sin(ambient.phase) * 50
+                        y: card.height - height * 0.55 + Math.cos(ambient.phase) * 30
+                        tint: Qt.alpha(Colors.m3tertiary, 0.18)
+                    }
+                }
+                Rectangle {
+                    id: cardMask
+                    anchors.fill: parent
+                    radius: card.radius
+                    visible: false
+                    layer.enabled: true
+                }
+
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 32
@@ -141,7 +299,10 @@ Scope {
                     Loader {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        sourceComponent: [hello, look, ai, keys, done][root.step]
+                        sourceComponent: [hello, look, ai, keys, done][root.shownStep]
+                        // Slides in from the side it's going to, a little
+                        opacity: Math.min(1, root.reveal)
+                        transform: Translate { x: (1 - root.rise(0)) * 36 * (root.leaving ? -root.direction : root.direction) }
                     }
 
                     // --- Navigation ---
@@ -158,8 +319,14 @@ Scope {
                                     width: index === root.step ? 24 : 8
                                     height: 8
                                     radius: 4
-                                    color: index === root.step ? Colors.m3primary : Colors.m3outlineVariant
+                                    color: index === root.step ? Colors.m3primary : dotHover.hovered ? Colors.m3outline : Colors.m3outlineVariant
                                     Behavior on width { SpatialAnim {} }
+                                    Behavior on color { ColorAnim {} }
+                                    HoverHandler { id: dotHover; cursorShape: Qt.PointingHandCursor }
+                                    TapHandler {
+                                        margin: 6
+                                        onTapped: root.step = parent.index
+                                    }
                                 }
                             }
                         }
@@ -189,31 +356,51 @@ Scope {
             Component {
                 id: hello
                 ColumnLayout {
-                    spacing: 16
+                    spacing: 14
                     Item { Layout.fillHeight: true }
-                    MaterialShape {
+                    // The emblem: the hand on a slowly turning cookie, a paler sun turning the other way behind
+                    Item {
+                        id: emblem
                         Layout.alignment: Qt.AlignHCenter
-                        implicitWidth: 120
-                        implicitHeight: 120
-                        shape: "cookie9"
-                        color: Colors.m3primaryContainer
-                        // The hi-shell hand: pops in, then waves (the arcs pulsing) every few seconds.
+                        implicitWidth: 140
+                        implicitHeight: 140
+                        opacity: root.rise(0)
+                        scale: 0.7 + 0.3 * root.rise(0)
+
+                        property real spin: 0
+                        NumberAnimation on spin { from: 0; to: 360; duration: 40000; loops: Animation.Infinite }
+
+                        MaterialShape {
+                            anchors.centerIn: parent
+                            width: 140
+                            height: 140
+                            shape: "sunny"
+                            color: Qt.alpha(Colors.m3primary, 0.16)
+                            rotation: -emblem.spin * 0.6
+                        }
+                        MaterialShape {
+                            anchors.centerIn: parent
+                            width: 108
+                            height: 108
+                            shape: "cookie9"
+                            color: Colors.m3primaryContainer
+                            rotation: emblem.spin
+                        }
+                        // Pops in, then waves (the arcs pulsing) every few seconds
                         HandLogo {
                             id: hand
                             anchors.centerIn: parent
-                            size: 66
+                            size: 60
                             color: Colors.m3onPrimaryContainer
                             arcColor: Colors.m3tertiary
                             scale: 0
 
                             Component.onCompleted: popIn.start()
-                            SpringAnim {
+                            SequentialAnimation {
                                 id: popIn
-                                target: hand
-                                property: "scale"
-                                from: 0
-                                to: 1
-                                onFinished: waveTimer.start()
+                                PauseAnimation { duration: 150 }
+                                SpringAnim { target: hand; property: "scale"; from: 0; to: 1; overshoot: 2.4 }
+                                ScriptAction { script: waveTimer.start() }
                             }
                             Timer {
                                 id: waveTimer
@@ -224,11 +411,23 @@ Scope {
                             }
                         }
                     }
-                    StyledText {
+                    Row {
                         Layout.alignment: Qt.AlignHCenter
-                        text: Translation.tr("Welcome to hi-shell")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Appearance.font.size.displaySmall
+                        spacing: 12
+                        opacity: root.rise(1)
+                        transform: Rise { index: 1 }
+                        StyledText {
+                            text: Translation.tr("Welcome to")
+                            font.family: Appearance.font.title
+                            font.pixelSize: Appearance.font.size.displaySmall
+                        }
+                        StyledText {
+                            text: "hi-shell"
+                            font.family: Appearance.font.title
+                            font.pixelSize: Appearance.font.size.displaySmall
+                            font.weight: Font.DemiBold
+                            color: Colors.m3primary
+                        }
                     }
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
@@ -237,11 +436,15 @@ Scope {
                         wrapMode: Text.Wrap
                         text: Translation.tr("A few quick choices and you're set. Everything here can be changed later in Settings.")
                         color: Colors.m3onSurfaceVariant
+                        opacity: root.rise(2)
+                        transform: Rise { index: 2 }
                     }
                     Item { implicitHeight: 8 }
                     SegmentedButton {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.fillWidth: false
+                        opacity: root.rise(3)
+                        transform: Rise { index: 3 }
                         readonly property var codes: ["auto", ...Translation.available.map(l => l.code)]
                         model: [{ text: Translation.tr("Auto"), icon: "language" }, ...Translation.available.map(l => ({ text: l.name }))]
                         currentIndex: Math.max(0, codes.indexOf(Config.options.language))
@@ -252,11 +455,15 @@ Scope {
                         Layout.alignment: Qt.AlignHCenter
                         text: Translation.tr("News in the channel, questions and chat in the group")
                         color: Colors.m3outline
+                        opacity: root.rise(4)
+                        transform: Rise { index: 4 }
                         font.pixelSize: Appearance.font.size.labelMedium
                     }
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 8
+                        opacity: root.rise(4)
+                        transform: Rise { index: 4 }
                         M3Button {
                             tonal: true
                             icon: "campaign"
@@ -278,20 +485,36 @@ Scope {
                 id: look
                 ColumnLayout {
                     spacing: 16
-                    StyledText {
-                        text: Translation.tr("Make it yours")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Appearance.font.size.headlineSmall
+                    StepHeader {
+                        icon: "palette"
+                        title: Translation.tr("Make it yours")
+                        subtitle: Translation.tr("Colors follow the wallpaper.")
                     }
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 16
+                        opacity: root.rise(1)
+                        transform: Rise { index: 1 }
                         Rectangle {
                             implicitWidth: 260
                             implicitHeight: 146
                             radius: Appearance.rounding.large
                             color: Colors.m3surfaceContainerHighest
-                            clip: true
+                            // Cut to the rounded corners
+                            layer.enabled: true
+                            layer.effect: MultiEffect {
+                                maskEnabled: true
+                                maskSource: previewMask
+                                maskThresholdMin: 0.5
+                                maskSpreadAtMin: 1
+                            }
+                            Rectangle {
+                                id: previewMask
+                                anchors.fill: parent
+                                radius: parent.radius
+                                visible: false
+                                layer.enabled: true
+                            }
                             Image {
                                 anchors.fill: parent
                                 source: Wallpapers.still ? `file://${Wallpapers.still}` : ""
@@ -303,12 +526,6 @@ Scope {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 8
-                            StyledText {
-                                Layout.fillWidth: true
-                                wrapMode: Text.Wrap
-                                text: Translation.tr("Colors follow the wallpaper.")
-                                color: Colors.m3onSurfaceVariant
-                            }
                             M3Button {
                                 icon: "wallpaper"
                                 text: Translation.tr("Choose wallpaper")
@@ -324,6 +541,8 @@ Scope {
                     }
                     ListRow {
                         Layout.fillWidth: true
+                        opacity: root.rise(2)
+                        transform: Rise { index: 2 }
                         icon: "contrast"
                         title: Translation.tr("Mode")
                         SegmentedButton {
@@ -339,6 +558,8 @@ Scope {
                     }
                     ListRow {
                         Layout.fillWidth: true
+                        opacity: root.rise(3)
+                        transform: Rise { index: 3 }
                         icon: "toolbar"
                         title: Translation.tr("Bar style")
                         SegmentedButton {
@@ -350,6 +571,8 @@ Scope {
                     }
                     ListRow {
                         Layout.fillWidth: true
+                        opacity: root.rise(4)
+                        transform: Rise { index: 4 }
                         icon: "vertical_align_top"
                         title: Translation.tr("Bar position")
                         SegmentedButton {
@@ -367,20 +590,16 @@ Scope {
                 id: ai
                 ColumnLayout {
                     spacing: 12
-                    StyledText {
-                        text: Translation.tr("AI")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Appearance.font.size.headlineSmall
-                    }
-                    StyledText {
-                        Layout.fillWidth: true
-                        wrapMode: Text.Wrap
-                        text: Translation.tr("An AI chat in the left sidebar and a palette on Super + Y. Pick who answers, or turn it off.")
-                        color: Colors.m3onSurfaceVariant
+                    StepHeader {
+                        icon: "auto_awesome"
+                        title: Translation.tr("AI")
+                        subtitle: Translation.tr("An AI chat in the left sidebar and a palette on Super + Y. Pick who answers, or turn it off.")
                     }
                     Flow {
                         Layout.fillWidth: true
                         spacing: 6
+                        opacity: root.rise(1)
+                        transform: Rise { index: 1 }
 
                         Chip {
                             icon: "block"
@@ -463,27 +682,26 @@ Scope {
                 id: keys
                 ColumnLayout {
                     spacing: 12
-                    StyledText {
-                        text: Translation.tr("Shortcuts")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Appearance.font.size.headlineSmall
-                    }
-                    StyledText {
-                        Layout.fillWidth: true
-                        wrapMode: Text.Wrap
-                        text: Translation.tr("Type < in the launcher to search all of them.")
-                        color: Colors.m3onSurfaceVariant
+                    StepHeader {
+                        icon: "keyboard"
+                        title: Translation.tr("Shortcuts")
+                        subtitle: Translation.tr("Type < in the launcher to search all of them.")
                     }
                     GridLayout {
                         Layout.fillWidth: true
+                        Layout.topMargin: 4
                         columns: 2
                         columnSpacing: 16
                         rowSpacing: 10
                         Repeater {
                             model: root.shortcuts
                             RowLayout {
+                                id: shortcutRow
                                 required property var modelData
+                                required property int index
                                 Layout.fillWidth: true
+                                opacity: root.rise(1 + index * 0.5)
+                                transform: Rise { index: 1 + shortcutRow.index * 0.5 }
                                 Layout.preferredWidth: 1
                                 spacing: 10
                                 Rectangle {
@@ -516,18 +734,12 @@ Scope {
                 id: done
                 ColumnLayout {
                     spacing: 12
-                    StyledText {
-                        text: Translation.tr("All set")
-                        font.family: Appearance.font.title
-                        font.pixelSize: Appearance.font.size.headlineSmall
-                    }
-                    StyledText {
-                        Layout.fillWidth: true
-                        wrapMode: Text.Wrap
-                        text: root.missing.length
+                    StepHeader {
+                        icon: "celebration"
+                        title: Translation.tr("All set")
+                        subtitle: root.missing.length
                             ? Translation.tr("These programs are missing, so the features using them won't work until you install them:")
                             : Translation.tr("Every optional program hi-shell uses is installed.")
-                        color: Colors.m3onSurfaceVariant
                     }
                     Flow {
                         Layout.fillWidth: true
