@@ -12,8 +12,6 @@ Item {
 
     required property bool revealed
     property real time: 0
-    // The letter-by-letter captions (the keynote's finale turns them off and writes its own)
-    property bool showCaptions: true
 
     readonly property real sceneLength: 8
     readonly property real blendLength: 1.6
@@ -95,7 +93,6 @@ Item {
     }
 
     LetterCaption {
-        visible: root.showCaptions
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.height * 0.42 - height * 0.5
         text: root.captions[root.sceneIndex]

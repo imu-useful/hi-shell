@@ -3,7 +3,8 @@ import QtQuick.Effects
 import qs.common
 
 // A keynote headline: white text, or (with `colors`) text filled with a gradient that slowly
-// slides along the line. `shown` (0..1) fades it in while it rises and settles from a slight zoom.
+// slides along the line. `shown` (0..1) fades it in while it rises and settles from a slight zoom;
+// `kick` makes it pop on the beat.
 Item {
     id: root
 
@@ -16,6 +17,8 @@ Item {
     property real shown: 1
     property real time: 0
     property real letterSpacing: -size * 0.02
+    // 0..1 on the music's beat: the line pops a little
+    property real kick: 0
 
     readonly property bool gradient: colors.length > 1
 
@@ -23,7 +26,7 @@ Item {
     implicitHeight: label.implicitHeight
     opacity: shown
     transform: Translate { y: (1 - root.shown) * root.size * 0.45 }
-    scale: 1.04 - 0.04 * root.shown
+    scale: (1.04 - 0.04 * root.shown) * (1 + 0.045 * root.kick)
 
     Text {
         id: label

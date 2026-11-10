@@ -6,11 +6,14 @@ import qs.common
 import qs.common.widgets
 
 // Keys "keynote", "presentation", "презентация" and "event": hi-shell presents itself the way a
-// product keynote does. Black stage, big type, slow fades. The slides play on their own; → or
-// Space jumps to the next one, ← back. In order: the logo; "not just a shell"; the real desktop
-// (a screenshot taken as the show opens) in a device frame tilting up; numbers counted from the
-// install itself; a bento grid of features; the wallpaper and the colors made from it;
-// "One more thing…"; and a finale over the neon show (EyeCandy.qml) that stays until closed.
+// product keynote does. Black stage, big type, its own track (sounds/secret/keynote.ogg, 120 BPM,
+// made by tools/make_secret_music.py). Every slide starts on a bar, words and tiles land on beats
+// and everything pulses with the kick. The slides play on their own; → or Space jumps to the next
+// one, ← back, and the music jumps with them. In order: the logo (the drums come in with it); "not
+// just a shell"; the real desktop (a screenshot taken as the show opens) in a device frame tilting
+// up; numbers counted from the install itself; a bento grid of features; the wallpaper and the
+// colors made from it; "One more thing…" over a breakdown; and, on the drop, a finale of silky
+// light (silk.frag) in the wallpaper's colors that stays until closed.
 Item {
     id: root
 
@@ -18,8 +21,8 @@ Item {
     property real time: 0
 
     // [start, length] in seconds; the last one (the finale) has no end
-    readonly property var slides: [[0, 7], [7, 5.5], [12.5, 7.5], [20, 7], [27, 8.5], [35.5, 7], [42.5, 4]]
-    readonly property real finaleStart: 46.5
+    readonly property var slides: [[0, 8], [8, 6], [14, 8], [22, 6], [28, 8], [36, 6], [42, 4]]
+    readonly property real finaleStart: 46
     readonly property int slideIndex: {
         if (time >= finaleStart)
             return slides.length;
@@ -28,6 +31,20 @@ Item {
                 return i;
         return 0;
     }
+
+    // The beat: the track has drums from 4 s to 42 s and from 46 s on, a kick every half second.
+    // The sound reaches the speakers a little after the player starts, so the picture waits for it.
+    readonly property real latency: 0.08
+    readonly property real beatLength: 0.5
+    readonly property real musicTime: time - latency
+    readonly property bool groove: (musicTime >= 4 && musicTime < 42) || musicTime >= finaleStart
+    readonly property real beatPhase: ((musicTime / beatLength) % 1 + 1) % 1
+    readonly property bool downbeat: Math.floor(musicTime / beatLength) % 4 === 0
+    // 1 on a kick (a bar's first one is the strongest), falling fast to 0
+    readonly property real kick: groove ? Math.exp(-beatPhase * 7) * (downbeat ? 1 : 0.6) : 0
+    // Where the music plays from (it restarts there when the slides jump)
+    property real musicFrom: 0
+    property bool musicOn: false
 
     readonly property real u: Math.min(width, height)
     readonly property real headline: Math.min(u * 0.12, width / 13)
@@ -64,8 +81,17 @@ Item {
     function jump(step) {
         const starts = slides.map(s => s[0]).concat([finaleStart]);
         const next = Math.max(0, Math.min(starts.length - 1, slideIndex + step));
-        time = starts[next] + 0.01;
+        time = starts[next];
+        playFrom(time);
     }
+
+    function playFrom(seconds) {
+        musicOn = false;
+        musicFrom = seconds;
+        Qt.callLater(() => musicOn = true);
+    }
+
+    Component.onCompleted: playFrom(0)
 
     FrameAnimation {
         running: root.revealed
@@ -74,6 +100,14 @@ Item {
 
     Shortcut { sequences: ["Right", "Space", "Return"]; onActivated: root.jump(1) }
     Shortcut { sequence: "Left"; onActivated: root.jump(-1) }
+
+    // mpv loops the finale's part of the track (A-B); ffplay and pw-play just play it to the end
+    Process {
+        running: root.revealed && root.musicOn
+        command: ["sh", "-c", `f="$1"; at="$2"; if command -v mpv >/dev/null; then exec mpv --no-video --really-quiet --start="$at" --ab-loop-a=46 --ab-loop-b=62 "$f";
+            elif command -v ffplay >/dev/null; then exec ffplay -nodisp -autoexit -loglevel quiet -ss "$at" "$f";
+            else exec pw-play "$f"; fi`, "sh", Quickshell.shellPath("sounds/secret/keynote.ogg"), String(root.musicFrom)]
+    }
 
     Process {
         running: true
@@ -111,35 +145,39 @@ Item {
             width: root.u * 1.4 * (0.9 + 0.1 * Math.sin(root.time * 0.7))
             height: width * 0.7
             tint: Colors.m3primary
-            strength: 0.35 * root.ease(parent.t, 1.6, 2)
+            strength: (0.35 + 0.12 * root.kick) * root.ease(parent.t, 4, 1.5)
         }
 
         KeynoteText {
+
+            kick: root.kick
             anchors.centerIn: parent
             text: Translation.tr("Introducing")
             size: root.headline * 0.42
             weight: Font.DemiBold
             color: "#a1a1a8"
             letterSpacing: size * 0.08
-            shown: root.ease(parent.t, 0.5, 1.2) * root.clamp((2.2 - parent.t) / 0.5)
+            shown: root.ease(parent.t, 0.5, 1.2) * root.clamp((3.8 - parent.t) / 0.4)
         }
 
         AnimatedLogo {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -root.u * 0.05
             height: root.u * 0.38
-            playing: parent.t > 2.3 && root.revealed
-            scale: 0.92 + 0.08 * root.ease(parent.t, 2.3, 2.5)
+            playing: parent.t > 4 && root.revealed
+            scale: (0.92 + 0.08 * root.ease(parent.t, 4, 2)) * (1 + 0.03 * root.kick)
         }
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.79
             text: Translation.tr("The shell. Reimagined.")
             size: root.headline * 0.55
             colors: root.accent
             time: root.time
-            shown: root.ease(parent.t, 4.2, 1.2)
+            shown: root.ease(parent.t, 6, 0.8)
         }
     }
 
@@ -152,14 +190,18 @@ Item {
         opacity: root.stage(1)
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
-            y: parent.height * 0.5 - height - root.ease(parent.t, 2.3, 1) * root.headline * 0.15
+            y: parent.height * 0.5 - height - root.ease(parent.t, 2, 0.6) * root.headline * 0.15
             text: Translation.tr("It's not just a shell.")
             size: root.headline * 0.8
-            shown: root.ease(parent.t, 0.3, 1) * (1 - 0.6 * root.ease(parent.t, 2.3, 1))
+            shown: root.ease(parent.t, 0, 0.7) * (1 - 0.6 * root.ease(parent.t, 2, 0.6))
         }
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.5 + root.headline * 0.1
             text: Translation.tr("It's your whole desktop.")
@@ -167,7 +209,7 @@ Item {
             weight: Font.Black
             colors: root.neon
             time: root.time
-            shown: root.ease(parent.t, 2.5, 1.1)
+            shown: root.ease(parent.t, 2, 0.6)
         }
     }
 
@@ -180,20 +222,24 @@ Item {
         opacity: root.stage(2)
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.07
             text: Translation.tr("Your desktop.")
             size: root.headline * 0.6
-            shown: root.ease(parent.t, 0.2, 1)
+            shown: root.ease(parent.t, 0, 0.7)
         }
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.07 + root.headline * 0.72
             text: Translation.tr("Every pixel, rethought.")
             size: root.headline * 0.6
             color: "#86868b"
-            shown: root.ease(parent.t, 0.6, 1)
+            shown: root.ease(parent.t, 0.5, 0.7)
         }
 
         KeynoteSlides.Glow {
@@ -202,22 +248,22 @@ Item {
             width: device.width * 1.3
             height: device.height * 0.7
             tint: Colors.m3primary
-            strength: 0.3 * root.ease(parent.t, 1.2, 2)
+            strength: (0.3 + 0.1 * root.kick) * root.ease(parent.t, 1, 2)
         }
 
         KeynoteSlides.Device {
             id: device
 
-            readonly property real rise: root.ease(parent.t, 0.4, 2.6)
+            readonly property real rise: root.ease(parent.t, 1, 2.5)
 
             width: Math.min(parent.width * 0.62, parent.height * 0.62 * root.width / Math.max(1, root.height))
             height: width * root.height / Math.max(1, root.width) + 12
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.3 + (1 - rise) * parent.height * 0.35
             source: root.shot !== "" ? root.shot : (Colors.wallpaper ? "file://" + Colors.wallpaper : "")
-            glare: root.clamp((parent.t - 3.2) / 1.6)
+            glare: root.clamp((parent.t - 4) / 1.6)
             opacity: Math.min(1, rise * 2)
-            scale: (0.86 + 0.14 * rise) * (1 + 0.03 * root.clamp((parent.t - 3) / 4.5))
+            scale: (0.86 + 0.14 * rise) * (1 + 0.03 * root.clamp((parent.t - 3.5) / 4.5)) * (1 + 0.008 * root.kick)
             transform: Rotation {
                 origin.x: device.width / 2
                 origin.y: device.height
@@ -236,11 +282,13 @@ Item {
         opacity: root.stage(3)
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.16
             text: Translation.tr("Built different.")
             size: root.headline * 0.7
-            shown: root.ease(parent.t, 0.2, 1)
+            shown: root.ease(parent.t, 0, 0.7)
         }
 
         Row {
@@ -249,31 +297,34 @@ Item {
             spacing: root.width * 0.07
 
             KeynoteSlides.Stat {
+                kick: root.kick
                 value: root.qmlLines
                 label: Translation.tr("lines of QML")
                 size: root.headline * 0.95
                 colors: root.neon
                 time: root.time
-                progress: root.ease(parent.parent.t, 0.9, 2.2)
+                progress: root.ease(parent.parent.t, 1, 2)
             }
 
             KeynoteSlides.Stat {
+                kick: root.kick
                 value: root.commands
                 label: Translation.tr("commands in hi")
                 size: root.headline * 0.95
                 colors: root.accent
                 time: root.time
-                progress: root.ease(parent.parent.t, 1.3, 2.2)
+                progress: root.ease(parent.parent.t, 1.5, 2)
             }
 
             KeynoteSlides.Stat {
+                kick: root.kick
                 value: 0
                 suffix: " MB"
                 label: Translation.tr("of Electron")
                 size: root.headline * 0.95
                 colors: ["#30d158", "#64d2ff", "#30d158"]
                 time: root.time
-                progress: root.ease(parent.parent.t, 1.7, 2.2)
+                progress: root.ease(parent.parent.t, 2, 2)
             }
         }
     }
@@ -304,11 +355,13 @@ Item {
         opacity: root.stage(4)
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.08
             text: Translation.tr("Everything. In one place.")
             size: root.headline * 0.6
-            shown: root.ease(bento.t, 0.2, 1)
+            shown: root.ease(bento.t, 0, 0.7)
         }
 
         Item {
@@ -333,7 +386,8 @@ Item {
                     title: bento.tiles[index][1]
                     subtitle: bento.tiles[index][2]
                     tint: bento.tiles[index][3]
-                    shown: root.ease(bento.t, 0.8 + index * 0.16, 1.1)
+                    shown: root.ease(bento.t, 1 + index * 0.5, 0.6)
+                    kick: root.kick
                 }
             }
         }
@@ -352,14 +406,18 @@ Item {
         opacity: root.stage(5)
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.1
             text: Translation.tr("Your wallpaper.")
             size: root.headline * 0.7
-            shown: root.ease(colorSlide.t, 0.2, 1)
+            shown: root.ease(colorSlide.t, 0, 0.7)
         }
 
         KeynoteText {
+
+            kick: root.kick
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.1 + root.headline * 0.8
             text: Translation.tr("Your colors.")
@@ -367,7 +425,7 @@ Item {
             weight: Font.Black
             colors: [Colors.m3primary, Colors.m3tertiary, Colors.m3secondary]
             time: root.time
-            shown: root.ease(colorSlide.t, 1.6, 1)
+            shown: root.ease(colorSlide.t, 2, 0.6)
         }
 
         KeynoteSlides.Device {
@@ -377,7 +435,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.42
             source: Colors.wallpaper ? "file://" + Colors.wallpaper : ""
-            opacity: root.ease(colorSlide.t, 0.5, 1)
+            opacity: root.ease(colorSlide.t, 0.5, 0.8)
             scale: (0.94 + 0.06 * opacity) * (1 - 0.12 * root.ease(colorSlide.t, 2, 1.2))
             glare: root.clamp((colorSlide.t - 1) / 1.4)
         }
@@ -389,7 +447,7 @@ Item {
                 id: swatch
 
                 required property int index
-                readonly property real fly: root.ease(colorSlide.t, 2.1 + index * 0.13, 1.3)
+                readonly property real fly: root.ease(colorSlide.t, 2.5 + index * 0.25, 1)
                 readonly property real size: root.u * 0.075
                 readonly property real gap: size * 0.35
                 // From the middle of the card out to a row under it
@@ -407,7 +465,7 @@ Item {
                 x: fromX + (toX - fromX) * fly
                 y: fromY + (toY - fromY) * fly + Math.sin(fly * Math.PI) * -root.u * 0.12
                 opacity: Math.min(1, fly * 3)
-                scale: 0.3 + 0.7 * fly + 0.05 * Math.sin(root.time * 3 + index)
+                scale: (0.3 + 0.7 * fly) * (1 + 0.12 * root.kick)
             }
         }
     }
@@ -415,13 +473,15 @@ Item {
     // ---- 6: one more thing ------------------------------------------------------------------------
 
     KeynoteText {
+
+        kick: root.kick
         anchors.centerIn: parent
         visible: opacity > 0
         text: Translation.tr("One more thing…")
         size: root.headline * 0.55
         weight: Font.DemiBold
         color: "#a1a1a8"
-        shown: root.ease(root.local(6), 0.8, 1.4) * root.clamp((root.slides[6][1] - root.local(6)) / 0.6)
+        shown: root.ease(root.local(6), 0.5, 1.4) * root.clamp((root.slides[6][1] - root.local(6)) / 0.4)
     }
 
     // ---- the finale -------------------------------------------------------------------------------
@@ -431,21 +491,17 @@ Item {
 
         anchors.fill: parent
         visible: t > -0.2
-        opacity: root.ease(t, 0, 2)
+        opacity: root.ease(t, 0, 0.4)
 
-        Loader {
+        ShaderEffect {
             anchors.fill: parent
-            active: parent.visible
-            sourceComponent: EyeCandy {
-                revealed: root.revealed
-                showCaptions: false
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            color: "black"
-            opacity: 0.35
+            property vector2d res: Qt.vector2d(width, height)
+            property real time: root.time
+            property real kick: root.kick
+            property color c0: Colors.m3primary
+            property color c1: Colors.m3tertiary
+            property color c2: Colors.m3secondary
+            fragmentShader: Qt.resolvedUrl("silk.frag.qsb")
         }
 
         Column {
@@ -453,22 +509,25 @@ Item {
             spacing: root.headline * 0.2
 
             KeynoteText {
+
+                kick: root.kick
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "hi-shell"
                 size: root.headline * 1.6
                 weight: Font.Black
-                shown: root.ease(parent.parent.t, 0.8, 1.4)
-                scale: 1 + 0.025 * Math.exp(-((root.time * 128 / 60) % 1) * 5)
+                shown: root.ease(parent.parent.t, 0, 0.6)
             }
 
             KeynoteText {
+
+                kick: root.kick
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: Translation.tr("Free. Open source. Yours.")
                 size: root.headline * 0.45
                 weight: Font.DemiBold
-                colors: ["#ffffff", "#e0d4ff", "#ffffff"]
+                colors: ["#ffffff", Qt.lighter(Colors.m3primary, 1.15), "#ffffff"]
                 time: root.time
-                shown: root.ease(parent.parent.t, 2.2, 1.2)
+                shown: root.ease(parent.parent.t, 2, 0.8)
             }
         }
 
@@ -481,7 +540,7 @@ Item {
             font.family: Appearance.font.title
             font.pixelSize: root.headline * 0.22
             font.weight: Font.Medium
-            opacity: root.ease(parent.t, 3.4, 1.2)
+            opacity: root.ease(parent.t, 4, 1)
         }
     }
 }

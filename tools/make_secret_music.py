@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Synthesizes the two loops behind the easter eggs (Settings > About): sounds/secret/nyan.ogg
-and sounds/secret/disco.ogg. Both tunes are original; nothing is sampled. Needs numpy and ffmpeg.
+"""Synthesizes the music behind the easter eggs (Settings > About): sounds/secret/nyan.ogg,
+disco.ogg, story.ogg, mania.ogg (+ mania.json) and keynote.ogg. Both tunes are original; nothing is sampled. Needs numpy and ffmpeg.
 
     python3 tools/make_secret_music.py
 """
@@ -196,8 +196,58 @@ def mania():
     (OUT / "mania.json").write_text(json.dumps({"length": round(total, 3), "notes": notes}, separators=(",", ":")))
 
 
+def pad(freqs, dur, vol=1.0, attack=0.4, release=0.8):
+    """A soft chord: three slightly detuned sines per note, fading in and out."""
+    t = np.arange(int(dur * RATE)) / RATE
+    w = sum(np.sin(2 * np.pi * f * d * t) for f in freqs for d in (0.997, 1.0, 1.003))
+    env = np.minimum(1, t / attack) * np.minimum(1, (dur - t) / release)
+    return w / (3 * len(freqs)) * env * vol
+
+
+def keynote():
+    """The keynote show (key "keynote"): 120 BPM, a bar every 2 s, so the slides (Keynote.qml) start
+    on bars. 0-4 s pads only; 4-42 s the groove; 42-46 s a breakdown with a riser under "One more
+    thing"; 46-62 s the drop for the finale, which the player loops (A-B 46-62)."""
+    bpm = 120
+    beat = 60 / bpm
+    bar = 4 * beat
+    total = 62
+    tr = Track(total)
+    chords = [(53, 57, 60, 64), (57, 60, 64, 67), (48, 55, 59, 64), (55, 59, 62, 67)]  # Fmaj7 Am7 Cmaj7 G
+    hook = [(0, 81), (1.5, 79), (2, 76), (3, 74), (4, 76), (5.5, 74), (6, 72), (7, 69)]
+    for b in range(int(total / bar)):
+        t0 = b * bar
+        ch = chords[b % 4]
+        groove = 2 <= b < 21 or b >= 23
+        drop = b >= 23
+        tr.add(t0, pad([hz(n) for n in ch], bar + 0.6, 0.5 if groove else 0.7))
+        if b == 21:  # the riser over the breakdown: noise swelling for two bars
+            n = 2 * bar
+            tt = np.arange(int(n * RATE)) / RATE
+            tr.add(t0, np.random.default_rng(3).uniform(-1, 1, tt.size) * (tt / n) ** 2.5 * 0.35)
+            tr.add(t0, np.sin(2 * np.pi * np.cumsum(200 + 900 * (tt / n) ** 2) / RATE) * (tt / n) ** 3 * 0.12)
+        for k in range(8):  # a plucked arpeggio in eighths
+            n = ch[[0, 1, 2, 3, 2, 1, 2, 3][k]] + 12
+            tr.add(t0 + k * beat / 2, tone("tri", hz(n), beat * 0.9, 0.13 if groove else 0.08, 7))
+        if not groove:
+            continue
+        for k in range(4):
+            tk = t0 + k * beat
+            tr.add(tk, kick(1.0))
+            tr.add(tk + beat / 2, noise(0.05, 0.12, 90))  # hat on the off-beat
+            if k % 2:
+                tr.add(tk, noise(0.18, 0.4, 24))  # clap
+        for k in range(8):  # bass in eighths, ducking under the kick
+            tr.add(t0 + k * beat / 2, tone("sine", hz(ch[0] - 24), beat / 2 * 0.9, 0.5 if k % 2 else 0.25, 5))
+        if drop and b % 2 == 0:
+            for pos, n in hook:
+                tr.add(t0 + pos * beat, tone("sine", hz(n), beat * 0.9, 0.22, 4) + tone("tri", hz(n), beat * 0.9, 0.06, 4))
+    tr.save(total, "keynote.ogg")
+
+
 if __name__ == "__main__":
     nyan()
     disco()
     story()
     mania()
+    keynote()

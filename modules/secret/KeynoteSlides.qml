@@ -101,12 +101,13 @@ QtObject {
         property color tint: "white"
         property real shown: 1
         property real unit: 12
+        property real kick: 0
 
         radius: unit * 2.4
         color: "#141416"
         border.color: Qt.rgba(1, 1, 1, 0.07)
         opacity: shown
-        scale: 0.88 + 0.12 * shown
+        scale: (0.88 + 0.12 * shown) * (1 + 0.015 * kick)
         transform: Translate { y: (1 - tile.shown) * tile.unit * 4 }
 
         Glow {
@@ -165,6 +166,7 @@ QtObject {
         property var colors: []
         property real size: 100
         property real time: 0
+        property real kick: 0
 
         spacing: size * 0.08
         opacity: Math.min(1, progress * 3)
@@ -176,6 +178,7 @@ QtObject {
             weight: Font.Black
             colors: stat.colors
             time: stat.time
+            kick: stat.kick
             shown: Math.min(1, stat.progress * 2)
         }
 
