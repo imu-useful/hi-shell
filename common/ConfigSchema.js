@@ -16,6 +16,7 @@ const rules = {
     "appearance.panelSpeed": { min: 0.25, max: 4, def: 1 },
     "appearance.barSpeed": { min: 0.25, max: 4, def: 1 },
     "appearance.notificationSpeed": { min: 0.25, max: 4, def: 1 },
+    "appearance.pressScale": { min: 0.7, max: 1, def: 0.9 },
     "appearance.animationBounce": { min: 0, max: 2, def: 1 },
     "appearance.cornerScale": { min: 0, max: 2, def: 1 },
     "appearance.fontScale": { min: 0.6, max: 2, def: 1 },

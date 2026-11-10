@@ -232,6 +232,21 @@ ColumnLayout {
             from: 0; to: 200; step: 10; suffix: "%"
             onMoved: value => a.animationBounce = value / 100
         }
+        SwitchRow {
+            icon: "water_drop"
+            title: Translation.tr("Ripple")
+            subtitle: Translation.tr("A wave grows from where you press")
+            checked: a.ripple
+            onToggled: checked => a.ripple = checked
+        }
+        SliderRow {
+            icon: "touch_app"
+            title: Translation.tr("Press squeeze")
+            subtitle: Translation.tr("How much a pressed button shrinks; 0% is not at all")
+            value: Math.round((1 - a.pressScale) * 100)
+            from: 0; to: 30; step: 1; suffix: "%"
+            onMoved: value => a.pressScale = 1 - value / 100
+        }
         SliderRow {
             icon: "palette"
             title: Translation.tr("Color fade")

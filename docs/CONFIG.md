@@ -7,7 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
-| [`appearance`](#appearance) | 30 |
+| [`appearance`](#appearance) | 32 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
 | [`launcher`](#launcher) | 2 |
@@ -77,6 +77,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.panelSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast. |
 | `appearance.barSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the bar's motion (the workspace indicator) on top of the global speed. |
 | `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the notification cards' motion on top of the global speed. |
+| `appearance.ripple` | `bool` | `true` |  | Settings › Interface | A wave grows from the point you press on buttons and rows. |
+| `appearance.pressScale` | `real` | `0.9` | 0.7 … 1 | Settings › Interface | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
 | `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |

@@ -136,6 +136,8 @@ Singleton {
         readonly property real panelSpeed: 1 / Math.max(0.1, root.options.panelSpeed)
         readonly property real barSpeed: 1 / Math.max(0.1, root.options.barSpeed)
         readonly property real notificationSpeed: 1 / Math.max(0.1, root.options.notificationSpeed)
+        // How small a pressed button gets (appearance.pressScale): 1 = not at all.
+        readonly property real pressScale: root.options.pressScale
         readonly property string launcherEffect: root.options.launcherEffect
         readonly property real launcherRise: launcherEffect === "rise" ? 1 : 0
         readonly property real launcherScale: launcherEffect === "pop" ? 0.85 : 1

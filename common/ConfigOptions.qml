@@ -63,6 +63,10 @@ JsonAdapter {
         property real barSpeed: 1
         // Speed of the notification cards' motion on top of the global speed.
         property real notificationSpeed: 1
+        // A wave grows from the point you press on buttons and rows.
+        property bool ripple: true
+        // How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller.
+        property real pressScale: 0.9
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
         property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant

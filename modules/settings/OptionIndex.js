@@ -147,6 +147,18 @@ const options = [
         "advanced": false
     },
     {
+        "path": "appearance.ripple",
+        "page": "interface",
+        "text": "A wave grows from the point you press on buttons and rows.",
+        "advanced": false
+    },
+    {
+        "path": "appearance.pressScale",
+        "page": "interface",
+        "text": "How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller.",
+        "advanced": false
+    },
+    {
         "path": "appearance.animationBounce",
         "page": "interface",
         "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",
