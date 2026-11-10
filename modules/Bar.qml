@@ -261,8 +261,20 @@ PanelWindow {
                 height: root.vertical ? parent.height + root.narrow * (root.islandH + pad * 2 - parent.height) : parent.height
                 visible: root.style !== "islands"
                 transform: Translate { y: Services.Island.drop }
-                radius: (root.edgeToEdge ? 0 : Appearance.rounding.full) * (1 - root.narrow) + Math.min(width, height) / 2 * root.narrow
+                radius: (root.edgeToEdge ? 0 : Appearance.shape.panel) * (1 - root.narrow) + Appearance.shape.panel * root.narrow
                 color: root.barColor
+                border.width: root.edgeToEdge && root.narrow < 0.5 ? 0 : Appearance.edge
+                border.color: Colors.m3outlineVariant
+
+                // Edge to edge: the outline is only the line along the screen-facing side.
+                Rectangle {
+                    visible: root.edgeToEdge && root.narrow < 0.5 && Appearance.edge > 0
+                    color: Colors.m3outlineVariant
+                    width: root.vertical ? Appearance.edge : parent.width
+                    height: root.vertical ? parent.height : Appearance.edge
+                    x: root.position === "left" ? parent.width - width : 0
+                    y: root.position === "top" ? parent.height - height : 0
+                }
             }
 
             // Right click on the empty part of the bar opens its settings; the widgets sit above
@@ -370,7 +382,7 @@ PanelWindow {
                     y: root.dragY - height / 2
                     width: ghostRow.implicitWidth + 20
                     height: 30
-                    radius: Appearance.rounding.full
+                    radius: Appearance.shape.chip
                     color: root.dropRemove ? Colors.m3errorContainer : Colors.m3primaryContainer
                     opacity: 0.92
 
@@ -403,8 +415,10 @@ PanelWindow {
                         width: modelData.width + 8
                         height: modelData.height + 8
                         z: -1
-                        radius: Appearance.rounding.full
+                        radius: Appearance.shape.panel
                         color: root.barColor
+                        border.width: Appearance.edge
+                        border.color: Colors.m3outlineVariant
                         // The island's own pill bounces with it.
                         transform: Translate { y: modelData === root.islandSec ? Services.Island.drop : 0 }
                     }

@@ -32,7 +32,7 @@ BarWidget {
         x: root.vertical ? (parent.width - width) / 2 : 0
         width: root.artSize
         height: root.artSize
-        shape: "cookie7"
+        shape: "square"
         source: Mpris.artUrl
         // Spinning turns a cached texture instead of re-masking the cover every frame.
         layer.enabled: spin.running
@@ -82,10 +82,12 @@ BarWidget {
         anchors.right: parent.right
         anchors.rightMargin: 2
         anchors.verticalCenter: parent.verticalCenter
-        width: root.artSize + 6
+        width: root.artSize + 2
         height: root.artSize - 2
-        radius: Appearance.rounding.full
-        color: Mpris.playing ? Colors.m3primary : Colors.m3secondaryContainer
+        radius: Appearance.shape.chip
+        color: Mpris.playing ? Colors.m3primary : "transparent"
+        border.width: Mpris.playing ? 0 : Math.max(1, Appearance.edge)
+        border.color: Colors.m3outline
         Behavior on color { ColorAnim {} }
 
         MaterialIcon {
@@ -93,7 +95,7 @@ BarWidget {
             icon: Mpris.playing ? "pause" : "play_arrow"
             fill: 1
             iconSize: 18
-            color: Mpris.playing ? Colors.m3onPrimary : Colors.m3onSecondaryContainer
+            color: Mpris.playing ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
         }
     }
 

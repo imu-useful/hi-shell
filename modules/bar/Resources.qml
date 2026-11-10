@@ -4,19 +4,19 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// Resource rings (bar.resources.shown: cpu, ram, swap, gpu, disk) with a
-// details popup.
+// Resource readouts (bar.resources.shown: cpu, ram, swap, gpu, disk): a short uppercase name, the
+// percentage in monospace and a thin level bar under it; a details popup on hover.
 BarWidget {
     id: root
 
     readonly property var all: ({
-        cpu: { icon: "memory", value: SystemStats.cpuUsage },
-        ram: { icon: "memory_alt", value: SystemStats.memUsage },
-        swap: { icon: "swap_horiz", value: SystemStats.swapUsage },
-        gpu: { icon: "developer_board", value: Math.max(0, SystemStats.gpuUsage) },
-        disk: { icon: "hard_drive", value: SystemStats.diskUsage }
+        cpu: { label: "CPU", value: SystemStats.cpuUsage },
+        ram: { label: "RAM", value: SystemStats.memUsage },
+        swap: { label: "SWP", value: SystemStats.swapUsage },
+        gpu: { label: "GPU", value: Math.max(0, SystemStats.gpuUsage) },
+        disk: { label: "DSK", value: SystemStats.diskUsage }
     })
-    // Keys only: a model holding the values would recreate the rings on every update.
+    // Keys only: a model holding the values would recreate the readouts on every update.
     readonly property var keys: pick("shown", Config.options.bar.resources.shown).filter(k => ["cpu", "ram", "swap", "gpu", "disk"].includes(k))
 
     padding: 8
@@ -27,42 +27,66 @@ BarWidget {
         id: grid
         anchors.centerIn: parent
         columns: root.vertical ? 1 : root.keys.length
-        spacing: root.vertical ? 6 : 10
+        spacing: root.vertical ? 8 : 12
 
         Repeater {
             model: root.keys
 
-            Grid {
+            Item {
                 id: item
                 required property string modelData
                 readonly property var info: root.all[modelData]
-                // The number counts to the new value along with the ring.
+                readonly property bool high: info.value > 0.9
+                // The number counts to the new value along with the bar.
                 property real shown: info.value
                 Behavior on shown { EffectAnim { duration: Appearance.anim.slow } }
-                columns: root.vertical ? 1 : 2
-                spacing: 4
-                horizontalItemAlignment: Grid.AlignHCenter
-                verticalItemAlignment: Grid.AlignVCenter
 
-                CircularProgress {
-                    implicitWidth: 20
-                    implicitHeight: 20
-                    value: item.info.value
-                    color: item.info.value > 0.9 ? Colors.m3error : Colors.m3primary
+                implicitWidth: readout.implicitWidth
+                implicitHeight: readout.implicitHeight + 5
 
-                    MaterialIcon {
-                        anchors.centerIn: parent
-                        icon: item.info.icon
-                        iconSize: 12
-                        fill: 1
-                        color: Colors.m3onSurface
+                Grid {
+                    id: readout
+                    columns: root.vertical ? 1 : 2
+                    spacing: root.vertical ? 0 : 5
+                    horizontalItemAlignment: Grid.AlignHCenter
+                    verticalItemAlignment: Grid.AlignVCenter
+
+                    MonoLabel {
+                        text: item.info.label
+                        font.pixelSize: Appearance.font.size.labelSmall - 1
+                    }
+                    StyledText {
+                        // Two figures wide, so the readout doesn't jump between 9 and 10.
+                        width: root.vertical ? implicitWidth : Math.max(implicitWidth, digits.advanceWidth)
+                        horizontalAlignment: Text.AlignRight
+                        text: Math.round(item.shown * 100)
+                        font.family: Appearance.font.mono
+                        font.pixelSize: Appearance.font.size.labelMedium
+                        font.weight: Font.DemiBold
+                        color: item.high ? Colors.m3error : Colors.m3onSurface
+
+                        TextMetrics {
+                            id: digits
+                            font.family: Appearance.font.mono
+                            font.pixelSize: Appearance.font.size.labelMedium
+                            font.weight: Font.DemiBold
+                            text: "00"
+                        }
                     }
                 }
 
-                StyledText {
-                    text: Math.round(item.shown * 100)
-                    font.pixelSize: Appearance.font.size.labelMedium
-                    font.features: { "tnum": 1 }
+                // Level: a hairline track with the used part in the accent.
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+                    height: 2
+                    color: Colors.m3outlineVariant
+
+                    Rectangle {
+                        width: parent.width * Math.max(0, Math.min(1, item.shown))
+                        height: parent.height
+                        color: item.high ? Colors.m3error : Colors.m3primary
+                    }
                 }
             }
         }
@@ -93,6 +117,7 @@ BarWidget {
                 }
                 StyledText {
                     text: value
+                    font.family: Appearance.font.mono
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant
                 }
@@ -100,13 +125,11 @@ BarWidget {
             Rectangle {
                 visible: fraction >= 0
                 Layout.fillWidth: true
-                implicitHeight: 4
-                radius: 2
-                color: Colors.m3secondaryContainer
+                implicitHeight: 3
+                color: Colors.m3outlineVariant
                 Rectangle {
                     width: parent.width * Math.max(0, Math.min(1, fraction))
                     height: parent.height
-                    radius: 2
                     color: fraction > 0.9 ? Colors.m3error : Colors.m3primary
                     Behavior on width { EffectAnim {} }
                 }

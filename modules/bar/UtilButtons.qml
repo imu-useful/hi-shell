@@ -35,7 +35,7 @@ BarWidget {
                 required property var modelData
                 width: root.thickness - 8
                 height: width
-                radius: width / 2
+                radius: Appearance.shape.button
                 color: "transparent"
 
                 MaterialIcon {

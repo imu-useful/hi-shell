@@ -37,9 +37,9 @@ BarWidget {
                 id: body
                 width: 21
                 height: parent.height
-                radius: 4
+                radius: 1
                 color: "transparent"
-                border.width: 1.5
+                border.width: 1
                 border.color: Qt.alpha(root.levelColor, 0.6)
 
                 Rectangle {
@@ -47,7 +47,7 @@ BarWidget {
                     y: 2.5
                     height: parent.height - 5
                     width: Math.max(2, (parent.width - 5) * Battery.percentage)
-                    radius: 2
+                    radius: 0
                     color: root.levelColor
                     Behavior on width { EffectAnim {} }
                 }
@@ -75,7 +75,8 @@ BarWidget {
 
         StyledText {
             text: root.vertical ? Battery.percent : `${Battery.percent}%`
-            font.pixelSize: Appearance.font.size.labelMedium + 1
+            font.family: Appearance.font.mono
+            font.pixelSize: Appearance.font.size.labelMedium
             font.features: { "tnum": 1 }
             color: Battery.critical ? Colors.m3error : Colors.m3onSurface
         }
