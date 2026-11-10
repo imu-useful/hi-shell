@@ -43,7 +43,7 @@ optdepends=(
 )
 install=hi-shell.install
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('a056665f937873fed858a2a8db0aecc5065dd3d482c9cb80ec8befb83c9242ed')
 
 package() {
     cd "$pkgname-$pkgver"
