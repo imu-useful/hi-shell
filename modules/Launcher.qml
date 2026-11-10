@@ -474,7 +474,7 @@ Scope {
                 x: window.previewWidth + window.gap - (window.showPreview ? (window.previewWidth + window.gap) / 2 : 0)
                 Behavior on x { SpatialAnim {} }
                 implicitHeight: column.implicitHeight + 24
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 // Translucent so the compositor blur (see hypr/hi-shell/layer-rules.lua) shows through.
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: Appearance.edge
@@ -491,30 +491,48 @@ Scope {
                     anchors.margins: 12
                     spacing: 8
 
-                    // Search field (M3 search bar)
+                    // Search field: a command prompt. "❯" (or the prefix's icon) and the query in monospace.
                     Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 56
-                        radius: Appearance.rounding.full
-                        color: Colors.m3surfaceContainerHighest
+                        implicitHeight: 48
+                        radius: Appearance.shape.field
+                        color: Qt.alpha(Colors.m3surfaceContainerLowest, 0.5)
+                        border.width: Math.max(1, Appearance.edge)
+                        border.color: search.text !== "" ? Colors.m3primary : Colors.m3outlineVariant
+                        Behavior on border.color { ColorAnim {} }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 18
-                            anchors.rightMargin: 18
-                            spacing: 12
+                            anchors.leftMargin: 14
+                            anchors.rightMargin: 14
+                            spacing: 10
 
+                            StyledText {
+                                visible: !root.mode
+                                text: "❯"
+                                font.family: Appearance.font.mono
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: Colors.m3primary
+                            }
                             MaterialIcon {
+                                visible: !!root.mode
                                 icon: root.prefixes.find(p => p.key === root.mode)?.icon ?? "search"
-                                iconSize: 24
-                                color: root.mode ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                iconSize: 20
+                                color: Colors.m3primary
                             }
 
                             TextInput {
                                 id: search
                                 Layout.fillWidth: true
-                                font.family: Appearance.font.main
-                                font.pixelSize: 16
+                                font.family: Appearance.font.mono
+                                font.pixelSize: 15
+                                cursorDelegate: Rectangle {
+                                    width: 8
+                                    color: Colors.m3primary
+                                    opacity: 0.8
+                                    visible: search.activeFocus
+                                }
                                 color: Colors.m3onSurface
                                 selectionColor: Colors.m3primary
                                 selectedTextColor: Colors.m3onPrimary
@@ -535,6 +553,8 @@ Scope {
 
                                 StyledText {
                                     anchors.verticalCenter: parent.verticalCenter
+                                    // Past the block cursor.
+                                    x: 14
                                     visible: search.text === ""
                                     text: root.prefixes.length > 0 ? Translation.tr("Search apps, or type %1").arg(root.prefixes.map(p => p.key).join(" ")) : Translation.tr("Search apps")
                                     font: search.font
@@ -589,6 +609,7 @@ Scope {
                         visible: list.count === 0 && search.text !== ""
                         text: root.mode === "" ? Translation.tr("No apps match “%1”").arg(root.query) : root.mode === ":" && root.emoji.length === 0 ? Translation.tr("Loading emoji…") : root.term === "" ? Translation.tr("Type to search") : Translation.tr("Nothing found")
                         horizontalAlignment: Text.AlignHCenter
+                        font.family: Appearance.font.mono
                         font.pixelSize: 13
                         color: Colors.m3onSurfaceVariant
                     }
@@ -602,7 +623,7 @@ Scope {
                 x: card.x + card.width + window.gap
                 width: window.showPreview ? window.previewWidth : 0
                 height: card.implicitHeight
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Appearance.translucent(Colors.m3surfaceContainer)
                 border.width: width > 0 ? Appearance.edge : 0
                 border.color: Colors.m3outlineVariant

@@ -131,18 +131,29 @@ Scope {
 
                         width: window.cellWidth
                         height: window.cellHeight
-                        radius: Appearance.rounding.large
+                        radius: Appearance.shape.card
                         clip: true
-                        color: drop.containsDrag ? Colors.m3primaryContainer : Colors.m3surfaceContainer
+                        color: drop.containsDrag ? Qt.alpha(Colors.m3primary, 0.18) : Appearance.translucent(Colors.m3surfaceContainerLow)
                         border.width: isActive ? 2 : 1
-                        border.color: isActive ? Colors.m3primary : Qt.alpha(Colors.m3outlineVariant, 0.8)
+                        border.color: isActive || drop.containsDrag ? Colors.m3primary : Colors.m3outlineVariant
 
                         StyledText {
                             anchors.centerIn: parent
                             visible: cell.toplevels.length === 0
                             text: cell.wsId
+                            font.family: Appearance.font.mono
                             font.pixelSize: Appearance.font.size.headlineLarge
-                            color: Colors.m3outline
+                            color: Colors.m3outlineVariant
+                        }
+
+                        // The workspace's number in the corner, over its windows.
+                        MonoLabel {
+                            z: 20
+                            x: 8
+                            y: 6
+                            visible: cell.toplevels.length > 0
+                            text: "ws " + cell.wsId
+                            color: cell.isActive ? Colors.m3primary : Colors.m3onSurfaceVariant
                         }
 
                         MouseArea {
@@ -190,7 +201,7 @@ Scope {
                                 Rectangle {
                                     id: tile
 
-                                    // The tile's color varies by app, from the palette's three container roles.
+                                    // The tile's tone varies by app, from the palette's three container roles.
                                     readonly property string appId: win.modelData.wayland?.appId ?? ""
                                     readonly property color base: [Colors.m3primaryContainer, Colors.m3secondaryContainer, Colors.m3tertiaryContainer][hash(appId) % 3]
                                     readonly property string icon: AppIcons.path(appId)
@@ -203,14 +214,12 @@ Scope {
                                     }
 
                                     anchors.fill: parent
-                                    radius: 6
+                                    radius: Appearance.rounding.small
                                     clip: true
-                                    border.width: hover.hovered ? 2 : 0
-                                    border.color: Colors.m3primary
-                                    gradient: Gradient {
-                                        GradientStop { position: 0; color: Qt.lighter(tile.base, 1.12) }
-                                        GradientStop { position: 1; color: Qt.darker(tile.base, 1.18) }
-                                    }
+                                    // A wireframe of the window: a dark fill in the app's tone, outlined.
+                                    color: Qt.alpha(tile.base, 0.45)
+                                    border.width: hover.hovered ? 2 : 1
+                                    border.color: hover.hovered ? Colors.m3primary : Qt.lighter(tile.base, 1.6)
 
                                     IconImage {
                                         anchors.centerIn: parent

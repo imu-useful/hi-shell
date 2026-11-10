@@ -193,13 +193,13 @@ Scope {
                 anchors.centerIn: parent
                 width: grid.implicitWidth + 32
                 height: grid.implicitHeight + 32
-                radius: Appearance.rounding.extraLarge
+                radius: Appearance.shape.panel
                 color: Appearance.translucent(Colors.m3surfaceContainerLow)
                 border.width: Appearance.edge
-                border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
+                border.color: Colors.m3outlineVariant
 
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.85
+                scale: loader.revealed ? 1 : 0.97
                 Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
                 Behavior on scale { SpringAnim {} }
 
@@ -225,10 +225,10 @@ Scope {
 
                             implicitWidth: card.tileWidth
                             implicitHeight: 196
-                            radius: Appearance.rounding.large
-                            color: selected ? Colors.m3secondaryContainer : "transparent"
-                            border.width: selected ? 2 : 0
-                            border.color: Colors.m3primary
+                            radius: Appearance.shape.card
+                            color: selected ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
+                            border.width: selected ? 2 : Math.max(1, Appearance.edge)
+                            border.color: selected ? Colors.m3primary : Colors.m3outlineVariant
                             Behavior on color { ColorAnim { duration: Appearance.anim.fast } }
 
                             ColumnLayout {
@@ -240,7 +240,7 @@ Scope {
                                 ClippingRectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: 128
-                                    radius: Appearance.rounding.medium
+                                    radius: Appearance.rounding.small
                                     color: Colors.m3surfaceContainerHighest
 
                                     ScreencopyView {
@@ -268,12 +268,13 @@ Scope {
                                             text: tile.modelData.title || tile.modelData.appId
                                             elide: Text.ElideRight
                                             font.weight: tile.selected ? Font.Medium : Font.Normal
-                                            color: tile.selected ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                                            color: tile.selected ? Colors.m3primary : Colors.m3onSurface
                                         }
                                         StyledText {
                                             Layout.fillWidth: true
-                                            text: `${tile.modelData.appId} · ${tile.modelData.workspace}`
+                                            text: `${tile.modelData.appId} · ws ${tile.modelData.workspace}`
                                             elide: Text.ElideRight
+                                            font.family: Appearance.font.mono
                                             font.pixelSize: Appearance.font.size.labelSmall
                                             color: Colors.m3onSurfaceVariant
                                         }
