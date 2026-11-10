@@ -135,10 +135,12 @@ Singleton {
                 root.focusLeft -= dt;
                 if (root.focusLeft <= 0) {
                     root.onBreak = !root.onBreak;
-                    root.focusLeft = (root.onBreak ? root.breakMinutes : root.focusMinutes) * 60;
+                    // Back to focus for the length set for it (typed in the sidebar too), not the default.
+                    root.focusLeft = root.onBreak ? root.breakMinutes * 60 : root.focusTotal;
+                    const focusMin = Math.round(root.focusTotal / 60);
                     Sounds.play("phase");
                     root.notify(root.onBreak ? Translation.tr("Time for a break") : Translation.tr("Back to focus"),
-                                root.onBreak ? Translation.trn("%1 minute break", "%1 minute break", root.breakMinutes) : Translation.trn("%1 minute of focus", "%1 minutes of focus", root.focusMinutes));
+                                root.onBreak ? Translation.trn("%1 minute break", "%1 minute break", root.breakMinutes) : Translation.trn("%1 minute of focus", "%1 minutes of focus", focusMin));
                 }
             }
         }
