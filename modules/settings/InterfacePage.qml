@@ -232,6 +232,22 @@ ColumnLayout {
             from: 0; to: 200; step: 10; suffix: "%"
             onMoved: value => a.animationBounce = value / 100
         }
+        ChoiceRow {
+            icon: "open_in_full"
+            title: Translation.tr("Popup effect")
+            subtitle: Translation.tr("How the calendar, weather, AI and overview appear")
+            value: a.popupEffect
+            options: [{ value: "pop", text: Translation.tr("Pop") }, { value: "drop", text: Translation.tr("Drop") }, { value: "slide", text: Translation.tr("Slide") }, { value: "fade", text: Translation.tr("Fade") }]
+            onSelected: value => a.popupEffect = value
+        }
+        ChoiceRow {
+            icon: "side_navigation"
+            title: Translation.tr("Sidebar effect")
+            subtitle: Translation.tr("How the side panels appear")
+            value: a.sidebarEffect
+            options: [{ value: "slide", text: Translation.tr("Slide") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
+            onSelected: value => a.sidebarEffect = value
+        }
         SwitchRow {
             icon: "blur_on"
             title: Translation.tr("Transparency")

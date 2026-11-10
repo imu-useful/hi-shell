@@ -49,6 +49,10 @@ JsonAdapter {
         property real animationSpeed: 1
         // The feel of motion: expressive (springy) | smooth (gentle, slower) | snappy (quick, little spring)
         property string motionStyle: "expressive"
+        // How popups (calendar, weather, AI, overview) appear: pop (grow) | drop (grow from the edge) | slide | fade
+        property string popupEffect: "pop"
+        // How the sidebars appear: slide | pop (grow) | fade
+        property string sidebarEffect: "slide"
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
         property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant

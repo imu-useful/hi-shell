@@ -110,9 +110,13 @@ Scope {
                 columns: root.columns
                 spacing: 16
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.85
+                scale: loader.revealed ? 1 : Appearance.anim.popScale
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
+                transform: Translate {
+                    y: loader.revealed ? 0 : Appearance.anim.popShift * (1)
+                    Behavior on y { SpringAnim {} }
+                }
 
                 Repeater {
                     model: root.perGroup

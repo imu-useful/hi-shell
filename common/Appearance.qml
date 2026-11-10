@@ -126,6 +126,15 @@ Singleton {
         readonly property list<real> emphasizedDecel: [0.05, 0.70, 0.10, 1.00, 1, 1]
         readonly property list<real> emphasizedAccel: [0.30, 0.00, 0.80, 0.15, 1, 1]
 
+        // How popups (calendar, weather, AI, overview) and the sidebars appear: appearance.popupEffect and
+        // appearance.sidebarEffect. A popup starts at `popScale` and `popShift` px away, and settles.
+        readonly property string popupEffect: root.options.popupEffect
+        readonly property real popScale: ({ "pop": 0.85, "drop": 0.55 })[popupEffect] ?? 1
+        readonly property real popShift: popupEffect === "slide" ? 28 : 0
+        readonly property string sidebarEffect: root.options.sidebarEffect
+        readonly property real sidebarSlide: sidebarEffect === "slide" ? 1 : 0
+        readonly property real sidebarScale: sidebarEffect === "pop" ? 0.9 : 1
+
         readonly property int fast: 150 * speed
         readonly property int normal: 250 * speed
         readonly property int slow: 400 * speed

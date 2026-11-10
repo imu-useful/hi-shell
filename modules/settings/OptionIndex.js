@@ -105,6 +105,18 @@ const options = [
         "advanced": false
     },
     {
+        "path": "appearance.popupEffect",
+        "page": "interface",
+        "text": "How popups (calendar, weather, AI, overview) appear: pop (grow) | drop (grow from the edge) | slide | fade",
+        "advanced": false
+    },
+    {
+        "path": "appearance.sidebarEffect",
+        "page": "interface",
+        "text": "How the sidebars appear: slide | pop (grow) | fade",
+        "advanced": false
+    },
+    {
         "path": "appearance.animationBounce",
         "page": "interface",
         "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",

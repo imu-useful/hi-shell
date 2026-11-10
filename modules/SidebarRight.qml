@@ -104,7 +104,9 @@ Scope {
             Rectangle {
                 id: panel
 
-                x: loader.revealed ? window.bounceRoom : window.bounceRoom + window.panelWidth + 8
+                x: loader.revealed ? window.bounceRoom : window.bounceRoom + (window.panelWidth + 8) * Appearance.anim.sidebarSlide
+                scale: loader.revealed ? 1 : Appearance.anim.sidebarScale
+                transformOrigin: Item.Right
                 // Slides and fades together, on the spatial curve (as caelestia's sidebar).
                 opacity: loader.revealed ? 1 : 0
                 width: window.panelWidth
@@ -117,6 +119,7 @@ Scope {
 
                 Behavior on x { SpatialAnim {} }
                 Behavior on opacity { SpatialAnim {} }
+                Behavior on scale { SpringAnim {} }
 
                 // Main page
                 ColumnLayout {

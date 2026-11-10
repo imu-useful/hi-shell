@@ -116,10 +116,14 @@ Scope {
                 border.color: Colors.m3outlineVariant
 
                 opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.85
+                scale: loader.revealed ? 1 : Appearance.anim.popScale
                 transformOrigin: Item.Top
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
+                transform: Translate {
+                    y: loader.revealed ? 0 : Appearance.anim.popShift * (-1)
+                    Behavior on y { SpringAnim {} }
+                }
 
                 ColumnLayout {
                     id: column

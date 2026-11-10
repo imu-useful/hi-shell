@@ -9,6 +9,8 @@ const rules = {
     "appearance.transparencyLevel": { min: 0, max: 1, def: 0.12 },
     "appearance.animationSpeed": { min: 0, max: 4, def: 1 },
     "appearance.motionStyle": { enum: ["expressive", "smooth", "snappy"], def: "expressive" },
+    "appearance.popupEffect": { enum: ["pop", "drop", "slide", "fade"], def: "pop" },
+    "appearance.sidebarEffect": { enum: ["slide", "pop", "fade"], def: "slide" },
     "appearance.animationBounce": { min: 0, max: 2, def: 1 },
     "appearance.cornerScale": { min: 0, max: 2, def: 1 },
     "appearance.fontScale": { min: 0.6, max: 2, def: 1 },
