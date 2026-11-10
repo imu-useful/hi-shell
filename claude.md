@@ -19,7 +19,13 @@
 3. **Hyprland IPC:** Use Quickshell's built-in Hyprland module for workspaces and window titles.
 4. **Python Backend:** If Quickshell's QML cannot handle the Claude CLI streaming properly, create a Python daemon (`ai_bridge.py`) that runs `claude` and streams the output to QML via a Unix socket.
 5. **Git Workflow:** Commit and push after every stage.
-6. **Language:** ALWAYS think and respond in English to save tokens, even if I write in Russian.
+6. **Language:** Reply to me in Russian. Code, comments, commits, docs and release notes stay in English.
+7. **Releases and the PKGBUILD:** With every release tag (`vX.Y.Z`), update `packaging/aur/hi-shell/` without asking:
+   push the tag and publish the GitHub release first, then set `pkgver` to the new version and `pkgrel=1`, put the
+   sha256 of `https://github.com/imu-useful/hi-shell/archive/refs/tags/vX.Y.Z.tar.gz` in `sha256sums` (never `SKIP`),
+   regenerate `.SRCINFO` (`makepkg --printsrcinfo > .SRCINFO`), check that `makepkg -f --nodeps` builds from the
+   downloaded archive in a scratch folder, then commit (`chore: PKGBUILD: vX.Y.Z`) and push to main. Once the package is
+   on the AUR, push the same PKGBUILD and .SRCINFO there too. A packaging-only fix keeps `pkgver` and bumps `pkgrel`.
 
 ## Structure
 - `shell.qml` (Main entry point for hi-shell)
