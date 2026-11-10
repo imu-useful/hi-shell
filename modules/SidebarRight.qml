@@ -117,9 +117,9 @@ Scope {
                 border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
-                Behavior on x { SpatialAnim {} }
-                Behavior on opacity { SpatialAnim {} }
-                Behavior on scale { SpringAnim {} }
+                Behavior on x { SpatialAnim { speed: Appearance.anim.panelSpeed } }
+                Behavior on opacity { SpatialAnim { speed: Appearance.anim.panelSpeed } }
+                Behavior on scale { SpringAnim { speed: Appearance.anim.panelSpeed } }
 
                 // Main page
                 ColumnLayout {

@@ -232,6 +232,14 @@ ColumnLayout {
             from: 0; to: 200; step: 10; suffix: "%"
             onMoved: value => a.animationBounce = value / 100
         }
+        SliderRow {
+            icon: "palette"
+            title: Translation.tr("Color fade")
+            subtitle: Translation.tr("How long colors take to change to a new palette; 0 is at once")
+            value: a.paletteFade
+            from: 0; to: 1500; step: 50; suffix: " ms"
+            onMoved: value => a.paletteFade = value
+        }
         ChoiceRow {
             icon: "open_in_full"
             title: Translation.tr("Popup effect")
@@ -239,6 +247,41 @@ ColumnLayout {
             value: a.popupEffect
             options: [{ value: "pop", text: Translation.tr("Pop") }, { value: "drop", text: Translation.tr("Drop") }, { value: "slide", text: Translation.tr("Slide") }, { value: "fade", text: Translation.tr("Fade") }]
             onSelected: value => a.popupEffect = value
+        }
+        SliderRow {
+            visible: Config.options.settingsAdvanced
+            icon: "dock_to_left"
+            title: Translation.tr("Panels speed")
+            subtitle: Translation.tr("Sidebars, popups and the launcher")
+            value: Math.round(a.panelSpeed * 100)
+            from: 25; to: 400; step: 25; suffix: "%"
+            onMoved: value => a.panelSpeed = value / 100
+        }
+        SliderRow {
+            visible: Config.options.settingsAdvanced
+            icon: "toolbar"
+            title: Translation.tr("Bar speed")
+            subtitle: Translation.tr("The workspace indicator")
+            value: Math.round(a.barSpeed * 100)
+            from: 25; to: 400; step: 25; suffix: "%"
+            onMoved: value => a.barSpeed = value / 100
+        }
+        SliderRow {
+            visible: Config.options.settingsAdvanced
+            icon: "notifications"
+            title: Translation.tr("Notifications speed")
+            subtitle: Translation.tr("How fast notification cards move")
+            value: Math.round(a.notificationSpeed * 100)
+            from: 25; to: 400; step: 25; suffix: "%"
+            onMoved: value => a.notificationSpeed = value / 100
+        }
+        ChoiceRow {
+            icon: "apps"
+            title: Translation.tr("Launcher effect")
+            subtitle: Translation.tr("How the launcher appears")
+            value: a.launcherEffect
+            options: [{ value: "rise", text: Translation.tr("Rise") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
+            onSelected: value => a.launcherEffect = value
         }
         ChoiceRow {
             icon: "side_navigation"

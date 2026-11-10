@@ -406,8 +406,8 @@ Scope {
             anchors.bottom: true
             // 0 when shown; below the edge while hidden (the close animation runs as it goes down).
             property real offsetScale: loader.revealed ? 0 : 1
-            Behavior on offsetScale { SpatialAnim { duration: Appearance.anim.normal } }
-            margins.bottom: Appearance.sizes.barMargin - (implicitHeight + 8) * offsetScale
+            Behavior on offsetScale { SpatialAnim { duration: Appearance.anim.normal; speed: Appearance.anim.panelSpeed } }
+            margins.bottom: Appearance.sizes.barMargin - (implicitHeight + 8) * offsetScale * Appearance.anim.launcherRise
             // Wide and symmetric, so the card can slide to the left for the preview of a clipboard
             // image without the window itself moving; only the card and the preview take input.
             readonly property int cardWidth: 600
@@ -481,6 +481,8 @@ Scope {
 
                 // The window's offsetScale is already animated; a second animation here would lag it.
                 opacity: 1 - window.offsetScale
+                scale: 1 - window.offsetScale * (1 - Appearance.anim.launcherScale)
+                transformOrigin: Item.Bottom
 
                 ColumnLayout {
                     id: column

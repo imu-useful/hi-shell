@@ -53,6 +53,16 @@ JsonAdapter {
         property string popupEffect: "pop"
         // How the sidebars appear: slide | pop (grow) | fade
         property string sidebarEffect: "slide"
+        // How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once
+        property int paletteFade: 400
+        // How the launcher appears: rise (from the screen's edge) | pop (grow) | fade
+        property string launcherEffect: "rise"
+        // Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast.
+        property real panelSpeed: 1
+        // Speed of the bar's motion (the workspace indicator) on top of the global speed.
+        property real barSpeed: 1
+        // Speed of the notification cards' motion on top of the global speed.
+        property real notificationSpeed: 1
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
         property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant

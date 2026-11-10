@@ -133,6 +133,12 @@ Singleton {
         readonly property real popShift: popupEffect === "slide" ? 28 : 0
         readonly property string sidebarEffect: root.options.sidebarEffect
         readonly property real sidebarSlide: sidebarEffect === "slide" ? 1 : 0
+        readonly property real panelSpeed: 1 / Math.max(0.1, root.options.panelSpeed)
+        readonly property real barSpeed: 1 / Math.max(0.1, root.options.barSpeed)
+        readonly property real notificationSpeed: 1 / Math.max(0.1, root.options.notificationSpeed)
+        readonly property string launcherEffect: root.options.launcherEffect
+        readonly property real launcherRise: launcherEffect === "rise" ? 1 : 0
+        readonly property real launcherScale: launcherEffect === "pop" ? 0.85 : 1
         readonly property real sidebarScale: sidebarEffect === "pop" ? 0.9 : 1
 
         readonly property int fast: 150 * speed

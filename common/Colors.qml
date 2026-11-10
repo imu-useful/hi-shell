@@ -27,7 +27,40 @@ Singleton {
         const own = Config.options.appearance.colorOverrides;
         if (own && own[name] !== undefined && /^#[0-9a-fA-F]{6,8}$/.test(own[name]))
             return own[name];
-        return scheme[name] ?? fallback;
+        const next = scheme[name] ?? fallback;
+        const was = prevScheme[name];
+        if (fade >= 1 || was === undefined)
+            return next;
+        // A new palette (wallpaper, mode or scheme change) fades in from the old one.
+        const a = Qt.color(was), b = Qt.color(next);
+        return Qt.rgba(a.r + (b.r - a.r) * fade, a.g + (b.g - a.g) * fade, a.b + (b.b - a.b) * fade, a.a + (b.a - a.a) * fade);
+    }
+
+    // The palette before the last change and how far the change has come (0 .. 1).
+    property var prevScheme: ({})
+    property real fade: 1
+    NumberAnimation {
+        id: fadeAnim
+        target: root
+        property: "fade"
+        from: 0
+        to: 1
+        easing.type: Easing.OutCubic
+    }
+
+    function applyScheme(next) {
+        const ms = Config.options.appearance.paletteFade * Math.max(0, Config.options.appearance.animationSpeed);
+        const changed = JSON.stringify(next) !== JSON.stringify(scheme);
+        if (ms > 0 && changed && Object.keys(scheme).length > 0) {
+            fadeAnim.stop();
+            prevScheme = scheme;
+            fade = 0;
+            fadeAnim.duration = ms;
+            scheme = next;
+            fadeAnim.start();
+        } else {
+            scheme = next;
+        }
     }
 
     readonly property color m3primary: role("primary", "#d0bcff")
@@ -80,7 +113,7 @@ Singleton {
         onLoaded: {
             try {
                 const data = JSON.parse(text());
-                root.scheme = data.colors ?? {};
+                root.applyScheme(data.colors ?? {});
                 root.mode = data.mode ?? "dark";
                 root.wallpaper = data.wallpaper ?? "";
             } catch (e) {

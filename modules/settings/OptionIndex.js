@@ -117,6 +117,36 @@ const options = [
         "advanced": false
     },
     {
+        "path": "appearance.paletteFade",
+        "page": "interface",
+        "text": "How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once",
+        "advanced": false
+    },
+    {
+        "path": "appearance.launcherEffect",
+        "page": "interface",
+        "text": "How the launcher appears: rise (from the screen's edge) | pop (grow) | fade",
+        "advanced": false
+    },
+    {
+        "path": "appearance.panelSpeed",
+        "page": "interface",
+        "text": "Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast.",
+        "advanced": false
+    },
+    {
+        "path": "appearance.barSpeed",
+        "page": "interface",
+        "text": "Speed of the bar's motion (the workspace indicator) on top of the global speed.",
+        "advanced": false
+    },
+    {
+        "path": "appearance.notificationSpeed",
+        "page": "interface",
+        "text": "Speed of the notification cards' motion on top of the global speed.",
+        "advanced": false
+    },
+    {
         "path": "appearance.animationBounce",
         "page": "interface",
         "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",

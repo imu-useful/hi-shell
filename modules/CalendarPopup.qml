@@ -92,10 +92,10 @@ Scope {
                 scale: loader.revealed ? 1 : Appearance.anim.popScale
                 transformOrigin: window.atBottom ? Item.Bottom : Item.Top
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { SpringAnim {} }
+                Behavior on scale { SpringAnim { speed: Appearance.anim.panelSpeed } }
                 transform: Translate {
                     y: loader.revealed ? 0 : Appearance.anim.popShift * (window.atBottom ? 1 : -1)
-                    Behavior on y { SpringAnim {} }
+                    Behavior on y { SpringAnim { speed: Appearance.anim.panelSpeed } }
                 }
 
                 // The month on the left; the player and the screen time on the right.

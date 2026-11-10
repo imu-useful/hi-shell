@@ -119,10 +119,10 @@ Scope {
                 scale: loader.revealed ? 1 : Appearance.anim.popScale
                 transformOrigin: Item.Top
                 Behavior on opacity { EffectAnim {} }
-                Behavior on scale { SpringAnim {} }
+                Behavior on scale { SpringAnim { speed: Appearance.anim.panelSpeed } }
                 transform: Translate {
                     y: loader.revealed ? 0 : Appearance.anim.popShift * (-1)
-                    Behavior on y { SpringAnim {} }
+                    Behavior on y { SpringAnim { speed: Appearance.anim.panelSpeed } }
                 }
 
                 ColumnLayout {

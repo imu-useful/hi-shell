@@ -44,7 +44,7 @@ PanelWindow {
         width: 380
         spacing: 8
 
-        move: Transition { SpatialAnim { properties: "y"; duration: Appearance.anim.normal } }
+        move: Transition { SpatialAnim { properties: "y"; duration: Appearance.anim.normal; speed: Appearance.anim.notificationSpeed } }
 
         Repeater {
             // ScriptModel diffs by object, so existing cards survive list changes.
@@ -66,7 +66,7 @@ PanelWindow {
                 transform: Translate { x: (1 - card.enter) * 60 }
                 opacity: card.enter
                 Component.onCompleted: enter = 1
-                Behavior on enter { SpringAnim { overshoot: 1.4 } }
+                Behavior on enter { SpringAnim { overshoot: 1.4; speed: Appearance.anim.notificationSpeed } }
             }
         }
     }

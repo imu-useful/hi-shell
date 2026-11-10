@@ -70,10 +70,10 @@ BarWidget {
         radius: Appearance.rounding.full
         color: Colors.m3primary
 
-        Behavior on headStart { SpatialAnim { duration: root.stretch ? Appearance.anim.fast : Appearance.anim.slow } }
-        Behavior on headEnd { SpatialAnim { duration: root.stretch ? Appearance.anim.fast : Appearance.anim.slow } }
-        Behavior on tailStart { SpatialAnim { duration: root.stretch ? Appearance.anim.slow * 1.4 : Appearance.anim.slow } }
-        Behavior on tailEnd { SpatialAnim { duration: root.stretch ? Appearance.anim.slow * 1.4 : Appearance.anim.slow } }
+        Behavior on headStart { SpatialAnim { speed: Appearance.anim.barSpeed; duration: root.stretch ? Appearance.anim.fast : Appearance.anim.slow } }
+        Behavior on headEnd { SpatialAnim { speed: Appearance.anim.barSpeed; duration: root.stretch ? Appearance.anim.fast : Appearance.anim.slow } }
+        Behavior on tailStart { SpatialAnim { speed: Appearance.anim.barSpeed; duration: root.stretch ? Appearance.anim.slow * 1.4 : Appearance.anim.slow } }
+        Behavior on tailEnd { SpatialAnim { speed: Appearance.anim.barSpeed; duration: root.stretch ? Appearance.anim.slow * 1.4 : Appearance.anim.slow } }
     }
 
     Grid {
@@ -127,7 +127,8 @@ BarWidget {
                     height: width
                     radius: width / 2
                     color: cell.isActive ? Colors.m3onPrimary : cell.occupied ? Colors.m3onSurfaceVariant : Colors.m3outline
-                    Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
+                    Behavior on color { ColorAnim {} }
+                    Behavior on width { SpatialAnim { duration: Appearance.anim.normal; speed: Appearance.anim.barSpeed } }
                 }
 
                 StyledText {

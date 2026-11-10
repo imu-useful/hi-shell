@@ -7,7 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
-| [`appearance`](#appearance) | 25 |
+| [`appearance`](#appearance) | 30 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
 | [`launcher`](#launcher) | 2 |
@@ -72,6 +72,11 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.motionStyle` | `string` | `"expressive"` | `expressive` \| `smooth` \| `snappy` | Settings › Interface | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
 | `appearance.popupEffect` | `string` | `"pop"` | `pop` \| `drop` \| `slide` \| `fade` | Settings › Interface | How popups (calendar, weather, AI, overview) appear: pop (grow) \| drop (grow from the edge) \| slide \| fade |
 | `appearance.sidebarEffect` | `string` | `"slide"` | `slide` \| `pop` \| `fade` | Settings › Interface | How the sidebars appear: slide \| pop (grow) \| fade |
+| `appearance.paletteFade` | `int` | `400` | 0 … 2000 | Settings › Interface | How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once |
+| `appearance.launcherEffect` | `string` | `"rise"` | `rise` \| `pop` \| `fade` | Settings › Interface | How the launcher appears: rise (from the screen's edge) \| pop (grow) \| fade |
+| `appearance.panelSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast. |
+| `appearance.barSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the bar's motion (the workspace indicator) on top of the global speed. |
+| `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the notification cards' motion on top of the global speed. |
 | `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |
