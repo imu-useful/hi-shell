@@ -24,7 +24,7 @@ Rectangle {
     Behavior on radius { SpatialAnim {} }
     Behavior on color { ColorAnim {} }
 
-    scale: layer.pressed ? Appearance.pressScale : 1
+    scale: layer.pressed ? Appearance.anim.pressScale : 1
     Behavior on scale { enabled: Appearance.anim.speed > 0; SpringAnim { overshoot: 1.4 } }
 
     RowLayout {

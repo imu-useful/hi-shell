@@ -23,7 +23,7 @@ Rectangle {
     Behavior on color { ColorAnim {} }
 
     // Pressing squeezes the button a little and it springs back.
-    scale: layer.pressed ? Appearance.pressScale : 1
+    scale: layer.pressed ? Appearance.anim.pressScale : 1
     Behavior on scale { enabled: Appearance.anim.speed > 0; SpringAnim { overshoot: 1.4 } }
 
     Text {

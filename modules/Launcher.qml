@@ -85,8 +85,9 @@ Scope {
         case "/":
             return (term ? Pages.search(term, Translation.tr) : Pages.pages).map(settingsItem);
         default:
-            return sources.flatMap(id => id === "math" ? inlineMath() : id === "focus" ? focusMatches(term) : id === "windows" ? windowMatches(term)
-                : id === "settings" ? settingsMatches(term) : id === "apps" ? filterApps(term) : id === "emoji" ? emojiMatches(term) : []);
+            // No Array.flatMap in Qt's JS engine: concat the lists of each source.
+            return [].concat(...sources.map(id => id === "math" ? inlineMath() : id === "focus" ? focusMatches(term) : id === "windows" ? windowMatches(term)
+                : id === "settings" ? settingsMatches(term) : id === "apps" ? filterApps(term) : id === "emoji" ? emojiMatches(term) : []));
         }
     }
 
