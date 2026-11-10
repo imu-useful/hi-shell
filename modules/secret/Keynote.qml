@@ -17,6 +17,12 @@ Item {
     id: root
 
     required property bool revealed
+    // The arrow keys step through the slides (off for the first-run welcome, which plays it whole)
+    property bool skippable: true
+    // Text for a button that shows up once the finale's name is on screen ("" = no button)
+    property string actionText: ""
+
+    signal action()
     property real time: 0
 
     // [start, length] in seconds; the last one (the finale) has no end
@@ -95,8 +101,8 @@ Item {
         onTriggered: root.time += frameTime
     }
 
-    Shortcut { sequences: ["Right", "Space", "Return"]; onActivated: root.jump(1) }
-    Shortcut { sequence: "Left"; onActivated: root.jump(-1) }
+    Shortcut { enabled: root.skippable; sequences: ["Right", "Space", "Return"]; onActivated: root.jump(1) }
+    Shortcut { enabled: root.skippable; sequence: "Left"; onActivated: root.jump(-1) }
 
     // mpv loops the finale's part of the track (A-B); ffplay and pw-play just play it to the end
     Process {
@@ -498,5 +504,54 @@ Item {
         u: root.u
         visible: t > -0.2
         opacity: root.ease(t, 0, 0.4)
+    }
+
+    // ---- the button after the show (the welcome's "Get started") ----------------------------------
+
+    Rectangle {
+        id: actionButton
+
+        readonly property real shown: root.actionText !== "" ? root.ease(root.time - root.finaleStart, 4, 0.8) : 0
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: root.u * 0.13
+        width: buttonLabel.implicitWidth + root.headline * 0.9
+        height: root.headline * 0.62
+        radius: height / 2
+        visible: shown > 0
+        opacity: shown
+        scale: (0.9 + 0.1 * shown) * (buttonHover.hovered ? 1.05 : 1) * (1 + 0.02 * root.kick)
+        color: buttonHover.hovered ? "white" : "#f2f2f7"
+        Behavior on scale { NumberAnimation { duration: 120 } }
+
+        // A soft halo around it, breathing with the music
+        Rectangle {
+            anchors.centerIn: parent
+            z: -1
+            width: parent.width + root.headline * 0.3 * (1 + root.kick)
+            height: parent.height + root.headline * 0.3 * (1 + root.kick)
+            radius: height / 2
+            color: Qt.alpha(Colors.m3primary, 0.16)
+        }
+
+        Text {
+            id: buttonLabel
+            anchors.centerIn: parent
+            text: root.actionText
+            color: "#111114"
+            font.family: Appearance.font.title
+            font.pixelSize: root.headline * 0.24
+            font.weight: Font.DemiBold
+        }
+
+        HoverHandler { id: buttonHover; cursorShape: Qt.PointingHandCursor }
+        TapHandler { onTapped: root.action() }
+
+        Shortcut {
+            enabled: actionButton.visible
+            sequences: ["Return", "Enter"]
+            onActivated: root.action()
+        }
     }
 }

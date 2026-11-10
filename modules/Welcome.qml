@@ -11,14 +11,21 @@ import qs.common.widgets
 import qs.common.shapes
 import qs.services
 import qs.modules.settings
+import qs.modules.secret
 
-// First-run welcome: language, look, the AI (a choice, or off), shortcuts and missing programs.
-// Shown once (until ~/.local/state/hi-shell/welcome-done exists);
-// reopen with `qs -c hi-shell ipc call welcome open`.
+// First-run welcome: first the keynote (modules/secret/Keynote.qml) full screen, watched to the end
+// on the first run, until its "Get started" button; then the setup: language, look, the AI (a
+// choice, or off), shortcuts and missing programs. Shown once (until
+// ~/.local/state/hi-shell/welcome-done exists); reopen with `qs -c hi-shell ipc call welcome open`
+// (then Escape skips the show).
 Scope {
     id: root
 
     property bool open: false
+    // The keynote plays before the setup; `keynoteLoaded` lingers while it fades out
+    property bool keynote: false
+    property bool keynoteLoaded: false
+    property bool keynoteSkippable: true
     property int step: 0
     readonly property int steps: 5
     property var missing: []
@@ -152,6 +159,27 @@ Scope {
         ["Super + Escape", "Settings"]
     ]
 
+    function startKeynote(skippable: bool): void {
+        keynoteSkippable = skippable;
+        keynote = true;
+        keynoteLoaded = true;
+        open = true;
+    }
+
+    // The show is over (or skipped): on to the setup
+    function endKeynote(): void {
+        keynote = false;
+        unloadKeynote.restart();
+        step = 0;
+        intro();
+    }
+
+    Timer {
+        id: unloadKeynote
+        interval: 700
+        onTriggered: root.keynoteLoaded = false
+    }
+
     function finish(): void {
         root.open = false;
         doneFile.setText(new Date().toISOString() + "\n");
@@ -161,8 +189,7 @@ Scope {
         target: ShellState
         function onShowWelcome() {
             root.step = 0;
-            root.open = true;
-            root.intro();
+            root.startKeynote(true);
         }
     }
 
@@ -171,8 +198,7 @@ Scope {
 
         function open(): void {
             root.step = 0;
-            root.open = true;
-            root.intro();
+            root.startKeynote(true);
         }
         function close(): void {
             root.finish();
@@ -184,10 +210,8 @@ Scope {
         path: `${Paths.state}/welcome-done`
         printErrors: false
         onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound) {
-                root.open = true;
-                root.intro();
-            }
+            if (error === FileViewError.FileNotFound)
+                root.startKeynote(false);
         }
     }
 
@@ -213,7 +237,7 @@ Scope {
             anchors.left: true
             anchors.right: true
             exclusionMode: ExclusionMode.Ignore
-            color: Qt.alpha("black", loader.revealed ? 0.45 : 0)
+            color: Qt.alpha("black", !loader.revealed ? 0 : root.keynote ? 1 : 0.45)
             Behavior on color { ColorAnim {} }
 
             WlrLayershell.namespace: "hi-shell-welcome"
@@ -222,16 +246,32 @@ Scope {
 
             Shortcut {
                 sequence: "Escape"
-                onActivated: root.finish()
+                enabled: !root.keynote || root.keynoteSkippable
+                onActivated: root.keynote ? root.endKeynote() : root.finish()
             }
             Shortcut {
                 sequences: ["Right", "Return", "Enter"]
+                enabled: !root.keynote
                 onActivated: root.step === root.steps - 1 ? root.finish() : root.step++
             }
             Shortcut {
                 sequence: "Left"
-                enabled: root.step > 0
+                enabled: root.step > 0 && !root.keynote
                 onActivated: root.step--
+            }
+
+            Loader {
+                anchors.fill: parent
+                active: root.keynoteLoaded
+                opacity: root.keynote ? 1 : 0
+                Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
+
+                sourceComponent: Keynote {
+                    revealed: loader.revealed && root.keynote
+                    skippable: false
+                    actionText: Translation.tr("Get started")
+                    onAction: root.endKeynote()
+                }
             }
 
             Rectangle {
@@ -245,8 +285,9 @@ Scope {
                 border.width: Appearance.edge
                 border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
-                opacity: loader.revealed ? 1 : 0
-                scale: loader.revealed ? 1 : 0.85
+                enabled: !root.keynote
+                opacity: loader.revealed && !root.keynote ? 1 : 0
+                scale: loader.revealed && !root.keynote ? 1 : 0.85
                 Behavior on opacity { EffectAnim {} }
                 Behavior on scale { SpringAnim {} }
 
