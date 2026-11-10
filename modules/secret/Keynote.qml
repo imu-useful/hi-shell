@@ -6,8 +6,7 @@ import qs.common.widgets
 
 // Keys "keynote", "presentation", "презентация" and "event": hi-shell presents itself the way a
 // product keynote does. Black stage, big type, its own track (sounds/secret/keynote.ogg, 120 BPM,
-// made by tools/make_secret_music.py), or a song of your own set up by tools/keynote_song.py
-// (sounds/secret/keynote-song.json: the show speeds up to its tempo and mpv plays a cut of it). Every slide starts on a bar, words and tiles land on beats
+// made by tools/make_secret_music.py). Every slide starts on a bar, words and tiles land on beats
 // and everything pulses with the kick. The slides play on their own; → or Space jumps to the next
 // one, ← back, and the music jumps with them. In order: the logo (the drums come in with it); "not
 // just a shell"; a made-up desktop coming alive (KeynoteDesktop.qml) in a device frame tilting
@@ -35,19 +34,8 @@ Item {
     // The beat: the track has drums from 4 s to 42 s and from 46 s on, a kick every half second.
     // The sound reaches the speakers a little after the player starts, so the picture waits for it.
     readonly property real latency: 0.08
-    // A song of your own (tools/keynote_song.py), or null for the show's track
-    readonly property var song: {
-        try {
-            const p = JSON.parse(songFile.text());
-            return p.bpm > 0 && p.segments?.length && p.loop?.length === 2 ? p : null;
-        } catch (e) {
-            return null;
-        }
-    }
-    // The timeline is written for 120 BPM; a song runs it at its own tempo (a beat is a beat)
-    readonly property real tempo: song ? song.bpm / 120 : 1
     readonly property real beatLength: 0.5
-    readonly property real musicTime: time - latency * tempo
+    readonly property real musicTime: time - latency
     readonly property bool groove: (musicTime >= 4 && musicTime < 42) || musicTime >= finaleStart
     readonly property real beatPhase: ((musicTime / beatLength) % 1 + 1) % 1
     readonly property bool downbeat: Math.floor(musicTime / beatLength) % 4 === 0
@@ -103,34 +91,15 @@ Item {
 
     FrameAnimation {
         running: root.revealed
-        onTriggered: root.time += frameTime * root.tempo
+        onTriggered: root.time += frameTime
     }
 
     Shortcut { sequences: ["Right", "Space", "Return"]; onActivated: root.jump(1) }
     Shortcut { sequence: "Left"; onActivated: root.jump(-1) }
 
-    FileView {
-        id: songFile
-        path: Quickshell.shellPath("sounds/secret/keynote-song.json")
-        blockLoading: true
-        printErrors: false
-    }
-
-    // mpv plays the song's cut as an EDL of its parts (a part's path goes in as %bytes%path)
-    function songCut() {
-        const bytes = str => unescape(encodeURIComponent(str)).length;
-        return "edl://" + song.segments.map(p => `%${bytes(song.file)}%${song.file},${p[0]},${p[1]}`).join(";");
-    }
-
-    Process {
-        running: root.revealed && root.musicOn && root.song !== null
-        command: ["mpv", "--no-video", "--really-quiet", `--start=${root.musicFrom / root.tempo}`,
-            `--ab-loop-a=${root.song?.loop[0] ?? 0}`, `--ab-loop-b=${root.song?.loop[1] ?? 0}`, root.song ? root.songCut() : ""]
-    }
-
     // mpv loops the finale's part of the track (A-B); ffplay and pw-play just play it to the end
     Process {
-        running: root.revealed && root.musicOn && root.song === null
+        running: root.revealed && root.musicOn
         command: ["sh", "-c", `f="$1"; at="$2"; if command -v mpv >/dev/null; then exec mpv --no-video --really-quiet --start="$at" --ab-loop-a=46 --ab-loop-b=62 "$f";
             elif command -v ffplay >/dev/null; then exec ffplay -nodisp -autoexit -loglevel quiet -ss "$at" "$f";
             else exec pw-play "$f"; fi`, "sh", Quickshell.shellPath("sounds/secret/keynote.ogg"), String(root.musicFrom)]

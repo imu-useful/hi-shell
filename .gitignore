@@ -1,6 +1,3 @@
 __pycache__/
 *.pyc
 *.log
-
-# A song of your own for the keynote (tools/keynote_song.py); somebody else's music, never committed
-sounds/secret/keynote-song.*
