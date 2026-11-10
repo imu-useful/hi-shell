@@ -7,6 +7,8 @@
 # "git" pulls the latest main with `git pull --ff-only`, "release" moves to the latest tagged
 # release. Either way, local edits that conflict stop the update instead of being overwritten.
 # Reloads Hyprland when hypr/ changed.
+#
+#   ./update.sh --check    only say whether there's an update (exit 0: there is, 1: up to date), change nothing
 set -euo pipefail
 export GIT_PAGER=cat # no pager: the output goes to a log or a terminal that may not have less
 
@@ -14,7 +16,14 @@ bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 die() { echo "${red}error:${reset} $*" >&2; exit 1; }
 
-[[ "${1:-}" =~ ^(-h|--help)$ ]] && { sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+CHECK=false
+for arg in "$@"; do
+    case "$arg" in
+        -h | --help) sed -n '2,/^set -euo/p' "$0" | sed -e '$d' -e 's/^# \{0,1\}//'; exit 0 ;;
+        --check | -c) CHECK=true ;;
+        *) die "unknown option: $arg (see --help)" ;;
+    esac
+done
 
 # The repo this script lives in (works through the ~/.config/quickshell symlink too).
 REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
@@ -22,6 +31,27 @@ REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 cd "$REPO"
 
 channel="$(python3 -c 'import json,sys; c=json.load(open(sys.argv[1])).get("update", {}).get("channel"); print("release" if c == "release" else "git")' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo git)"
+
+# --check: compare with origin without touching the checkout.
+if $CHECK; then
+    if [[ "$channel" == release ]]; then
+        latest="$(git ls-remote --tags --refs origin 'v*' | sed 's#.*refs/tags/##' | sort -V | tail -1)"
+        [[ -n "$latest" ]] || die "no release found on origin (or no connection)"
+        current="$(git describe --tags --exact-match 2>/dev/null || git describe --tags --always)"
+        if [[ "$current" == "$latest" ]]; then echo "Up to date ($current)."; exit 1; fi
+        echo "Release $latest is out (you have $current): hi update"
+    else
+        remote="$(git ls-remote origin refs/heads/main | cut -f1)"
+        [[ -n "$remote" ]] || die "couldn't reach origin"
+        if [[ "$remote" == "$(git rev-parse HEAD)" ]]; then echo "Up to date ($(git log -1 --format='%h %s'))."; exit 1; fi
+        if git merge-base --is-ancestor "$remote" HEAD 2>/dev/null; then echo "Up to date (ahead of origin/main)."; exit 1; fi
+        git fetch --quiet origin main 2>/dev/null || true
+        n="$(git rev-list --count HEAD..FETCH_HEAD 2>/dev/null || echo "?")"
+        echo "$n new commit(s) on main: hi update"
+        git log --oneline -n 10 HEAD..FETCH_HEAD 2>/dev/null || true
+    fi
+    exit 0
+fi
 
 step "Updating $REPO ($channel)"
 before=$(git rev-parse HEAD)

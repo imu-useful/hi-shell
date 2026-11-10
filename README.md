@@ -138,7 +138,9 @@ The installer:
 The optional apps (all off by default): Zen Browser, Telegram, Vesktop, osu!lazer, Steam (needs `[multilib]`), Spotify and Neovim.
 Each one goes through `pacman` if a configured repository has it, otherwise through `paru` / `yay`.
 
-Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`, `--channel=git|release`. Then tap <kbd>Super</kbd>.
+Options: `--yes` (no menu and no questions: installs everything except the optional apps), `--with-apps` (those too), `--no-deps`, `--no-start`, `--no-dots`, `--channel=git|release`,
+`--only=hypr,fish` / `--skip=deps` (pick the parts without the menu; `--list` prints their names). Later, `hi install` runs the
+installer again (it repairs the links and the Hyprland line) and `hi uninstall` removes hi-shell. Then tap <kbd>Super</kbd>.
 
 ### NixOS
 
@@ -236,15 +238,23 @@ Stops the shell, removes the line from your Hyprland config and the link. Packag
 The `hi` command (linked into `~/.local/bin` by `install.sh`) wraps the common jobs:
 
 ```sh
-hi start | stop | restart | status | log [-f] | doctor | update
-hi settings [page] | launcher | apps | overview | sidebar [left|right] | bar [show|hide|toggle] | lock | session
+hi start | stop | restart | status | log [-f] | doctor | version
+hi update [--check] | channel [git|release] | install [options] | uninstall [--purge]
+hi settings [page] | launcher | apps | overview | sidebar [left|right] | bar [show|hide|toggle] | lock
+hi session [suspend|hibernate|reboot|poweroff|logout] | boot [list|<entry>]
+hi shot [region|full|ocr|translate|record|stop] | brightness [up|down|<percent>] | display [toggle|mirror|...] | powersave [on|off]
+hi notif [list|clear|dnd] | todo [list|add <text>|done <n>] | focus [status|start|stop|task <text>] | screentime [today|limit <app> <min>]
 hi ask <prompt> | theme [dark|light|toggle|<scheme>] | wallpaper [random|<file>] | play | pause | next | prev
 hi config get <option|section> | set <option> <value> | reset [option|section] | edit | path
 hi preset list | save <name> | load <file>
+hi sounds <pack>           # download a sound pack (miui, samsung, iphone, windows, win7, winxp, android)
 hi qr [text]               # a QR code in the terminal (no text: the clipboard)
 hi keybinds [word]         # the keybinds, optionally only those matching a word
 hi ipc <target> <function> [args]   # the same as qs -c hi-shell ipc call ...  (hi ipc: list everything)
 ```
+
+`hi help` lists everything. Tab completion works in fish, bash and zsh (`install.sh` links the scripts; `hi completions zsh`
+prints one), including the option names after `hi config get` / `set`. `hi update --check` only says whether an update is out.
 
 Change the keys in `~/.config/hypr/hi-shell/keybinds.lua` (the other files in that folder hold the startup, window and layer rules; `update.sh` keeps your edits and leaves a new version of a changed file as `<name>.lua.new`; turn on Settings → Hyprland → "Keep my Hyprland files on update", `hyprland.keepFiles` in the config, and updates don't touch that folder at all, they only list what changed upstream). Every panel can also be toggled over IPC, e.g. for your own binds or scripts:
 

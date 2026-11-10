@@ -5,6 +5,7 @@ common/ConfigSchema.js), description (the comment above it) and where Settings l
     python3 tools/config_meta.py docs      # write docs/CONFIG.md and modules/settings/OptionIndex.js
     python3 tools/config_meta.py check     # exit 1 if those files are out of date or an option can't be reached
     python3 tools/config_meta.py search W  # options that match a word: path, default, where, description
+    python3 tools/config_meta.py names     # every option path and section, one per line (shell completions)
 
 Where an option is changed is found by looking for it in the settings pages (the aliases pages use, like
 `readonly property var a: Config.options.appearance`, are followed); what that can't see is in tools/config_meta.json:
@@ -274,7 +275,13 @@ def main(argv: list[str]) -> int:
         if not shown:
             print("No option matches.")
         return 0
-    print("Usage: config_meta.py docs|check|search <word...>", file=sys.stderr)
+    if cmd == "names":
+        # Every option path and section, one per line: the shell completions of `hi config get/set/reset`.
+        paths = [o.path for o in options]
+        sections = sorted({p.rsplit(".", 1)[0] for p in paths if "." in p})
+        print("\n".join(sorted(set(paths) | set(sections))))
+        return 0
+    print("Usage: config_meta.py docs|check|search <word...>|names", file=sys.stderr)
     return 1
 
 

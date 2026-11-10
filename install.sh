@@ -16,6 +16,9 @@
 #               tagged release (release, the default with --yes); asked when not given
 #   --with-apps also install the optional apps (Zen Browser, Telegram, Vesktop, osu!lazer,
 #               Steam, Spotify, Neovim) with --yes; in the menu they're off by default
+#   --only=a,b  only these parts (and the hi-shell files, always), e.g. --only=hypr,fish
+#   --skip=a,b  everything else but these parts; the part names: --list
+#   --list      print the part names and exit
 #
 # What it does: installs the packages hi-shell uses, links the repo to
 # ~/.config/quickshell/hi-shell, copies hypr/hi-shell/ into ~/.config/hypr and loads it from
@@ -28,7 +31,7 @@ QS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell"
 HYPR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
 MARKER="-- hi-shell (added by install.sh)"
 
-DEPS=true YES=false START=true DOTS=true APPS=false CHANNEL=""
+DEPS=true YES=false START=true DOTS=true APPS=false CHANNEL="" ONLY="" SKIP="" LIST=false
 NOCONFIRM=()
 for arg in "$@"; do
     case "$arg" in
@@ -39,7 +42,10 @@ for arg in "$@"; do
         --no-start) START=false ;;
         --no-dots) DOTS=false ;;
         --with-apps) APPS=true ;;
-        -h | --help) sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --only=*) ONLY="${arg#--only=}" ;;
+        --skip=*) SKIP="${arg#--skip=}" ;;
+        --list) LIST=true ;;
+        -h | --help) sed -n '2,/^set -euo/p' "$0" | sed -e '$d' -e 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
     esac
 done
@@ -90,8 +96,31 @@ declare -A APP_PKG=(
 )
 declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]=$DOTS [btop]=$DOTS [dolphin]=$DOTS [start]=$START
     [zen]=$APPS [telegram]=$APPS [vesktop]=$APPS [osu]=$APPS [steam]=$APPS [spotify]=$APPS [neovim]=$APPS)
+# --only / --skip: the parts named switch on (the rest off) / off; a name that isn't a part stops the install.
+apply_part_flags() {
+    local list n
+    if $LIST; then
+        for n in "${PARTS[@]}"; do printf '  %-10s %s\n' "$n" "${PART_NAME[$n]}"; done
+        exit 0
+    fi
+    for list in "$ONLY" "$SKIP"; do
+        for n in ${list//,/ }; do
+            [[ -v PART_NAME[$n] ]] || die "no part called \"$n\" (see --list)"
+        done
+    done
+    if [[ -n "$ONLY" ]]; then
+        for n in "${PARTS[@]}"; do WANT[$n]=false; done
+        for n in ${ONLY//,/ }; do WANT[$n]=true; done
+    fi
+    for n in ${SKIP//,/ }; do WANT[$n]=false; done
+    DEPS=${WANT[deps]} START=${WANT[start]}
+}
+apply_part_flags
+
 choose_parts() {
     $YES && return
+    # The parts were given on the command line: no menu.
+    [[ -n "$ONLY$SKIP" ]] && return
     [[ -r /dev/tty ]] || return
     local reply i n
     while true; do
@@ -325,10 +354,29 @@ if [[ ! -e "$short" || -L "$short" ]]; then
     ln -sfn "$REPO/sh/hi-shell" "$short"
     echo "$short -> $REPO/sh/hi-shell"
 fi
+# Completions for hi in every shell that's installed (all three ask `hi __complete`).
+data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
 if command -v fish >/dev/null; then
-    mkdir -p "$HOME/.config/fish/completions"
-    ln -sfn "$REPO/sh/completions/hi.fish" "$HOME/.config/fish/completions/hi.fish"
+    mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions"
+    ln -sfn "$REPO/sh/completions/hi.fish" "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions/hi.fish"
 fi
+if command -v bash >/dev/null; then
+    # bash-completion loads these by the command's name.
+    mkdir -p "$data_home/bash-completion/completions"
+    for n in hi hi-shell; do ln -sfn "$REPO/sh/completions/hi.bash" "$data_home/bash-completion/completions/$n"; done
+fi
+if command -v zsh >/dev/null; then
+    zfuncs="$data_home/zsh/site-functions"
+    mkdir -p "$zfuncs"
+    ln -sfn "$REPO/sh/completions/hi.zsh" "$zfuncs/_hi"
+    if ! zsh -ic 'print -l $fpath' 2>/dev/null | grep -qxF "$zfuncs"; then
+        echo "zsh: for completions of hi, add this line to ~/.zshrc before compinit: fpath+=($zfuncs)"
+    fi
+fi
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) warn "$HOME/.local/bin isn't on your PATH: add it to use the hi command (fish: fish_add_path ~/.local/bin)" ;;
+esac
 
 # --- Hyprland integration ---
 # hypr/hi-shell/ (startup, keybinds, window and layer rules, ...) is copied into your Hyprland

@@ -33,7 +33,10 @@ if [[ -L "$cli" && "$(readlink "$cli")" == */sh/hi-shell ]]; then
     echo "Removed $cli"
 fi
 
-for extra in "$HOME/.local/bin/hi" "$HOME/.config/fish/completions/hi.fish"; do
+data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+for extra in "$HOME/.local/bin/hi" "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions/hi.fish" \
+    "$data_home/bash-completion/completions/hi" "$data_home/bash-completion/completions/hi-shell" \
+    "$data_home/zsh/site-functions/_hi"; do
     if [[ -L "$extra" && "$(readlink "$extra")" == */sh/* ]]; then
         rm -f "$extra"
         echo "Removed $extra"

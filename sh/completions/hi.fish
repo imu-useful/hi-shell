@@ -1,23 +1,10 @@
 # Fish completions for the hi-shell command line (hi and hi-shell).
-set -l cmds start stop restart status log doctor update config settings launcher apps overview calendar weather processes sidebar bar lock session wait present ask theme wallpaper preset look rules dock desktop widgets script play pause next prev qr keybinds ipc help
-for c in hi hi-shell
-    complete -c $c -f
-    complete -c $c -n "not __fish_seen_subcommand_from $cmds" -a "$cmds"
-    complete -c $c -n "__fish_seen_subcommand_from config" -a "get set reset edit path reload"
-    complete -c $c -n "__fish_seen_subcommand_from sidebar" -a "left right"
-    complete -c $c -n "__fish_seen_subcommand_from bar" -a "show hide toggle edit done list add rm monitor instance"
-    complete -c $c -n "__fish_seen_subcommand_from theme" -a "dark light toggle seed tonal-spot content expressive fidelity fruit-salad monochrome neutral rainbow vibrant"
-    complete -c $c -n "__fish_seen_subcommand_from wallpaper" -a "random get"
-    complete -c $c -n "__fish_seen_subcommand_from preset" -a "list save load diff undo dump restore"
-    complete -c $c -n "__fish_seen_subcommand_from log" -a "-f"
+# The words come from `hi __complete <words before the cursor>`, so every shell completes the same.
+function __hi_complete
+    set -l words (commandline -opc)
+    set -e words[1]
+    command $argv[1] __complete $words 2>/dev/null
 end
 for c in hi hi-shell
-    complete -c $c -n "__fish_seen_subcommand_from widgets" -a "list new edit reload path"
-end
-for c in hi hi-shell
-    complete -c $c -n "__fish_seen_subcommand_from dock" -a "on off screens own"
-    complete -c $c -n "__fish_seen_subcommand_from desktop" -a "screens own edit done"
-end
-for c in hi hi-shell
-    complete -c $c -n "__fish_seen_subcommand_from rules" -a "list templates add edit show on off rm facts check"
+    complete -c $c -f -a "(__hi_complete $c)"
 end

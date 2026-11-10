@@ -151,6 +151,74 @@ class CliTest(unittest.TestCase):
             self.qs.run(*args)
             self.assertEqual(self.last(), expected, args)
 
+    def test_new_shortcuts_call_the_right_targets(self):
+        cases = [
+            (("shot",), ["region", "screenshot"]), (("shot", "full"), ["region", "fullscreen"]),
+            (("ocr",), ["region", "ocr"]), (("record",), ["region", "record"]),
+            (("session",), ["session", "toggleScreen"]), (("session", "suspend"), ["session", "suspend"]),
+            (("power", "shutdown"), ["session", "poweroff"]), (("boot", "arch.conf"), ["boot", "reboot", "arch.conf"]),
+            (("brightness", "up"), ["brightness", "increment"]), (("brightness", "40%"), ["brightness", "set", "40"]),
+            (("display", "mirror"), ["display", "set", "mirror"]), (("powersave", "on"), ["powersaving", "on"]),
+            (("notif", "clear"), ["notifications", "clear"]), (("notif", "dnd"), ["notifications", "toggleDnd"]),
+            (("notif", "dismiss", "7"), ["notifications", "dismiss", "7"]),
+            (("todo", "add", "buy", "milk"), ["todo", "add", "buy milk"]), (("todo", "done", "2"), ["todo", "toggle", "2"]),
+            (("focus", "task", "write", "docs"), ["focus", "addTask", "write docs"]), (("focus", "start"), ["focus", "start"]),
+            (("screentime", "limit", "zen", "60"), ["screentime", "limit", "zen", "60"]),
+        ]
+        for args, expected in cases:
+            r = self.qs.run(*args)
+            self.assertEqual(r.returncode, 0, (args, r.stderr))
+            self.assertEqual(self.last(), expected, args)
+
+    def test_new_commands_check_their_arguments_before_calling_the_shell(self):
+        for args in (("brightness", "101"), ("brightness", "lots"), ("todo", "done", "0"), ("todo", "done", "x"),
+                     ("todo", "add"), ("notif", "dismiss", "a"), ("screentime", "limit", "zen"),
+                     ("shot", "nope"), ("session", "nope"), ("display", "nope"), ("sounds", "nope"), ("channel", "beta")):
+            self.assertNotEqual(self.qs.run(*args).returncode, 0, args)
+        self.assertEqual(self.qs.calls, [])
+
+    def test_channel_without_a_running_shell_writes_the_config_and_keeps_the_rest(self):
+        cfgdir = self.qs.home / ".config" / "hi-shell"
+        cfgdir.mkdir(parents=True)
+        (cfgdir / "config.json").write_text(json.dumps({"bar": {"height": 40}}))
+        (self.qs.dir / "qs").write_text("#!/bin/sh\nexit 1\n")  # not running
+        r = self.qs.run("channel", "release")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(json.loads((cfgdir / "config.json").read_text()), {"bar": {"height": 40}, "update": {"channel": "release"}})
+        self.assertEqual(self.qs.run("channel").stdout.strip(), "release")
+
+    def test_complete_lists_commands_subcommands_and_option_names(self):
+        top = self.qs.run("__complete").stdout.split("\n")
+        for word in ("start", "shot", "todo", "config", "completions"):
+            self.assertIn(word, top)
+        self.assertIn("ocr", self.qs.run("__complete", "shot").stdout.split("\n"))
+        names = self.qs.run("__complete", "config", "set").stdout.split("\n")
+        self.assertIn("bar.height", names)
+        self.assertIn("bar", names)
+        self.assertEqual(self.qs.run("__complete", "config", "set", "bar.height").stdout, "")
+        self.assertEqual(self.qs.calls, [])
+
+    def test_every_command_in_the_completions_is_known_to_the_cli(self):
+        for word in self.qs.run("__complete").stdout.split():
+            if word in ("start", "stop", "restart", "update", "install", "uninstall", "help", "log", "doctor", "edit"):
+                continue  # these run things for real
+            out = self.qs.run(word)
+            self.assertNotIn("Unknown command", out.stderr, word)
+
+    def test_completions_prints_each_script(self):
+        for shell in ("bash", "zsh", "fish"):
+            r = self.qs.run("completions", shell)
+            self.assertEqual(r.returncode, 0)
+            self.assertIn("__complete", r.stdout)
+        self.assertNotEqual(self.qs.run("completions", "tcsh").returncode, 0)
+
+    def test_help_shows_the_whole_header_and_not_the_code(self):
+        out = self.qs.run("help").stdout
+        self.assertIn("hi shot", out)
+        self.assertIn("hi qr", out)
+        self.assertNotIn("set -u", out)
+        self.assertNotIn("install.sh links", out)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,10 +1,18 @@
 #!/bin/sh
 # hi-shell command line (also installed as `hi`).
 #
-#   Shell        hi start | stop | restart | status | log [-f] | doctor | update
+#   Shell        hi start | stop | restart | status | log [-f] | doctor | version
+#   Install      hi update [--check] | channel [git|release] | install [options] | uninstall [--purge]
+#                hi completions bash|zsh|fish   (install.sh sets them up)
 #   Panels       hi settings [page|search <word>] | launcher | apps | overview | calendar | weather | processes
-#                hi sidebar [left|right] | bar [show|hide|toggle|edit|done|list|add|rm|monitor|instance] | lock | session | wait | present
+#                hi sidebar [left|right] | bar [show|hide|toggle|edit|done|list|add|rm|monitor|instance] | lock | wait | present
 #                hi ask <prompt>    hi theme [dark|light|toggle|<scheme>|seed <#rrggbb>]    hi wallpaper [random|<file>]
+#   Session      hi session [suspend|hibernate|reboot|poweroff|logout|lock]   hi boot [list|<entry>]
+#   Screen       hi shot [region|full|ocr|translate|record|stop]   hi brightness [up|down|<percent>]
+#                hi display [toggle|next|internal|mirror|left|right|external]   hi powersave [on|off|toggle|status]
+#   Daily        hi notif [list|clear|dnd|dismiss <id>]   hi todo [list|add <text>|done <n>]
+#                hi focus [status|start|stop|abort|task <text>|profile <id>]   hi screentime [today|limits|limit <app> <min>]
+#                hi sounds <miui|samsung|iphone|windows|win7|winxp|android>
 #   Config       hi config get <option|section>      hi config set <option> <value>
 #                hi config reset [option|section]    hi config edit | path | reload | search <word>
 #   Screens      hi dock screens <all|name...>   hi desktop screens|own ...   hi wallpaper screen <name> <file|none>
@@ -20,7 +28,8 @@ set -u
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
+# The comment block at the top, up to the install.sh line.
+usage() { sed -n '2,/^# install\.sh links/p' "$0" | sed -e '$d' -e 's/^# \{0,1\}//'; }
 
 doctor() {
     bad=0
@@ -35,6 +44,21 @@ doctor() {
     else
         row "✘" "running" "not running: start it with run.sh or log in again"; bad=1
     fi
+    echo "Install"
+    link="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/hi-shell"
+    if [ "$(readlink -f "$link" 2>/dev/null)" = "$repo" ]; then row "✔" "link" "$link -> $repo"
+    else row "✘" "link" "$link doesn't point at $repo: run hi install"; bad=1; fi
+    case ":$PATH:" in
+        *":$HOME/.local/bin:"*) row "✔" "PATH" "~/.local/bin is on it" ;;
+        *) row "–" "PATH" "~/.local/bin isn't on PATH: hi works only by its full path" ;;
+    esac
+    hypr_dir="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
+    if grep -rqF --include='*.lua' ".config/hypr/hi-shell/init.lua" "$hypr_dir" 2>/dev/null; then row "✔" "hyprland" "loads hypr/hi-shell/init.lua"
+    else row "✘" "hyprland" "the Hyprland config doesn't load hi-shell: hi install"; bad=1; fi
+    for f in "$hypr_dir"/hi-shell/*.lua.new; do
+        [ -e "$f" ] && row "–" "$(basename "$f")" "an update waits next to your edited file: merge it by hand"
+    done
+    row "✔" "version" "$(version_line) ($(channel_get))"
     echo "Required"
     for p in qs hyprctl python3; do
         if have "$p"; then row "✔" "$p" ""; else row "✘" "$p" "missing"; bad=1; fi
@@ -398,6 +422,264 @@ update() {
     exec "$repo/update.sh" "$@"
 }
 
+# The repo's scripts: hi install re-runs the installer (repairs the links and the Hyprland line), hi uninstall removes it.
+repo_script() { # repo_script <file> [args]
+    [ -x "$repo/$1" ] || { echo "$1 not found in $repo" >&2; exit 1; }
+    f=$1; shift
+    exec "$repo/$f" "$@"
+}
+
+version_line() {
+    v=$(git -C "$repo" describe --tags --always 2>/dev/null) || v="unknown"
+    d=$(git -C "$repo" log -1 --format=%cs 2>/dev/null)
+    echo "hi-shell $v${d:+ ($d)}"
+}
+
+version() {
+    version_line
+    echo "channel   $(channel_get)"
+    echo "repo      $repo"
+    have qs && echo "quickshell $(qs --version 2>/dev/null | head -n1)"
+    have hyprctl && echo "hyprland  $(hyprctl version -j 2>/dev/null | python3 -I -c 'import json,sys; print(json.load(sys.stdin).get("tag", "?"))' 2>/dev/null || echo '?')"
+}
+
+# update.channel in the config: git (latest main) or release (latest tag), what update.sh follows
+channel_get() {
+    python3 -I -c 'import json,sys; c=json.load(open(sys.argv[1])).get("update", {}).get("channel"); print("release" if c == "release" else "git")' "$cfg" 2>/dev/null || echo git
+}
+
+channel() {
+    case "${1:-}" in
+        "") channel_get ;;
+        git | release)
+            if running; then ipc config set update.channel "\"$1\"" >/dev/null
+            else
+                # The shell isn't there to save it: the file, keeping the rest.
+                python3 -I - "$cfg" "$1" <<'PY' || exit 1
+import json, os, sys
+path, channel = sys.argv[1:3]
+try:
+    with open(path) as f:
+        data = json.load(f)
+except (OSError, ValueError):
+    data = {}
+data.setdefault("update", {})["channel"] = channel
+os.makedirs(os.path.dirname(path), exist_ok=True)
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+PY
+            fi
+            echo "Updates come from: $1 (hi update to get them)" ;;
+        *) echo "Usage: hi channel [git|release]" >&2; exit 1 ;;
+    esac
+}
+
+is_int() { case "$1" in "" | *[!0-9]*) return 1 ;; *) return 0 ;; esac; }
+
+session() {
+    need_running
+    case "${1:-}" in
+        "") ipc session toggleScreen ;;
+        suspend | sleep) ipc session suspend ;;
+        hibernate) ipc session hibernate ;;
+        reboot | restart) ipc session reboot ;;
+        poweroff | shutdown | off) ipc session poweroff ;;
+        logout | exit) ipc session logout ;;
+        lock) ipc session lock ;;
+        *) echo "Usage: hi session [suspend|hibernate|reboot|poweroff|logout|lock]" >&2; exit 1 ;;
+    esac
+}
+
+# hi boot: the boot entries (bootctl); hi boot <id>: reboot into one of them
+boot() {
+    need_running
+    case "${1:-list}" in
+        list) ipc boot list ;;
+        *) ipc boot reboot "$1" ;;
+    esac
+}
+
+# hi shot: a screenshot of a region (the default), the whole screen, OCR, translate, a recording
+shot() {
+    need_running
+    case "${1:-region}" in
+        region) ipc region screenshot ;;
+        full | fullscreen | screen) ipc region fullscreen ;;
+        ocr | text) ipc region ocr ;;
+        translate) ipc region translate ;;
+        record) ipc region record ;;
+        stop) ipc region stop ;;
+        cancel) ipc region cancel ;;
+        *) echo "Usage: hi shot [region|full|ocr|translate|record|stop|cancel]" >&2; exit 1 ;;
+    esac
+}
+
+brightness() {
+    need_running
+    case "${1:-}" in
+        up | +) ipc brightness increment ;;
+        down | -) ipc brightness decrement ;;
+        *)
+            p=${1%\%}
+            is_int "$p" && [ "$p" -le 100 ] || { echo "Usage: hi brightness up|down|<0-100>" >&2; exit 1; }
+            ipc brightness set "$p" ;;
+    esac
+}
+
+display() {
+    need_running
+    case "${1:-toggle}" in
+        toggle) ipc display toggle ;;
+        next) ipc display next ;;
+        internal | mirror | left | right | external) ipc display set "$1" ;;
+        screens | list) ipc displays screens ;;
+        *) echo "Usage: hi display [toggle|next|internal|mirror|left|right|external|screens]" >&2; exit 1 ;;
+    esac
+}
+
+powersave() {
+    need_running
+    case "${1:-toggle}" in
+        on | off | toggle | status) ipc powersaving "$1" ;;
+        *) echo "Usage: hi powersave [on|off|toggle|status]" >&2; exit 1 ;;
+    esac
+}
+
+notif() {
+    need_running
+    case "${1:-list}" in
+        list) out=$(ipc notifications list); if [ -n "$out" ]; then echo "$out"; else echo "No notifications."; fi ;;
+        clear) ipc notifications clear ;;
+        dnd) ipc notifications toggleDnd ;;
+        dismiss | rm)
+            is_int "${2:-}" || { echo "Usage: hi notif dismiss <id>   (the ids: hi notif list)" >&2; exit 1; }
+            ipc notifications dismiss "$2" ;;
+        *) echo "Usage: hi notif [list|clear|dnd|dismiss <id>]" >&2; exit 1 ;;
+    esac
+}
+
+todo() {
+    need_running
+    sub=${1:-list}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        list)
+            out=$(ipc todo list)
+            if [ -n "$out" ]; then printf '%s\n' "$out" | awk '{ printf "%3d  %s\n", NR, $0 }'; else echo "Nothing to do: hi todo add <text>"; fi ;;
+        add) [ $# -gt 0 ] || { echo "Usage: hi todo add <text>" >&2; exit 1; }; ipc todo add "$*" ;;
+        done | toggle | x)
+            is_int "${1:-}" && [ "$1" -ge 1 ] || { echo "Usage: hi todo done <number>   (the numbers: hi todo list)" >&2; exit 1; }
+            ipc todo toggle "$1" ;;
+        *) echo "Usage: hi todo [list|add <text>|done <n>]" >&2; exit 1 ;;
+    esac
+}
+
+focus() {
+    need_running
+    sub=${1:-status}
+    [ $# -gt 0 ] && shift
+    case "$sub" in
+        status) ipc focus status ;;
+        start | stop | abort) ipc focus "$sub" ;;
+        task) [ $# -gt 0 ] || { echo "Usage: hi focus task <text>" >&2; exit 1; }; ipc focus addTask "$*" ;;
+        profile) [ -n "${1:-}" ] || { echo "Usage: hi focus profile <id>" >&2; exit 1; }; ipc focus profile "$1" ;;
+        settings) ipc focus settings ;;
+        *) echo "Usage: hi focus [status|start|stop|abort|task <text>|profile <id>|settings]" >&2; exit 1 ;;
+    esac
+}
+
+screentime() {
+    need_running
+    case "${1:-today}" in
+        today) ipc screentime today | python3 -I -c '
+import json, sys
+rows = json.load(sys.stdin) or []
+for r in rows:
+    m = int(r.get("seconds", 0)) // 60
+    print("%5s  %s" % ("%d:%02d" % divmod(m, 60), r.get("app", "?")))
+print("%5s  total" % ("%d:%02d" % divmod(sum(int(r.get("seconds", 0)) for r in rows) // 60, 60)))' ;;
+        limits) ipc screentime limits ;;
+        limit)
+            [ -n "${2:-}" ] && is_int "${3:-}" || { echo "Usage: hi screentime limit <app> <minutes>   (0 = no limit)" >&2; exit 1; }
+            ipc screentime limit "$2" "$3" ;;
+        *) echo "Usage: hi screentime [today|limits|limit <app> <minutes>]" >&2; exit 1 ;;
+    esac
+}
+
+SOUND_PACKS="miui samsung iphone windows win7 winxp android"
+sounds() {
+    case " $SOUND_PACKS " in
+        *" ${1:-} "*) ;;
+        *) echo "Usage: hi sounds <pack>   packs: $SOUND_PACKS (downloaded into ~/.local/share/hi-shell/sounds)" >&2; exit 1 ;;
+    esac
+    have curl || { echo "curl isn't installed" >&2; exit 1; }
+    sh "$here/sound-packs.sh" "$1" && echo "Downloaded the $1 sounds. Pick them in Settings > Sounds."
+}
+
+# --- Completions ---
+# One list of words for every shell: the completion scripts call `hi __complete <words before the cursor>`.
+COMMANDS="start stop restart status log doctor version update channel install uninstall completions config settings
+launcher apps overview calendar weather processes sidebar bar lock session boot wait present ask theme wallpaper preset
+look rules dock desktop widgets script shot brightness display powersave notif todo focus screentime sounds play pause
+next prev qr keybinds ipc help"
+SETTINGS_PAGES="search quick general bar desktop lock interface sounds services hyprland autostart defaultapps screentime rules about"
+SCHEMES="dark light toggle seed tonal-spot content expressive fidelity fruit-salad monochrome neutral rainbow vibrant"
+
+subcommands() {
+    case "$1" in
+        config | cfg) echo "get set reset search edit path reload" ;;
+        settings) echo "$SETTINGS_PAGES" ;;
+        sidebar) echo "left right" ;;
+        bar) echo "show hide toggle edit done list add rm monitor instance" ;;
+        theme) echo "$SCHEMES" ;;
+        wallpaper | wall) echo "random select get screen" ;;
+        preset | presets) echo "list save load diff undo dump restore" ;;
+        look | looks) echo "list save rm apply" ;;
+        rules | rule) echo "list templates add edit show on off rm facts check" ;;
+        dock) echo "on off screens own" ;;
+        desktop) echo "screens own edit done" ;;
+        widgets | widget) echo "list new edit reload path" ;;
+        session | power) echo "suspend hibernate reboot poweroff logout lock" ;;
+        boot) echo "list" ;;
+        shot) echo "region full ocr translate record stop cancel" ;;
+        brightness) echo "up down" ;;
+        display) echo "toggle next internal mirror left right external screens" ;;
+        powersave) echo "on off toggle status" ;;
+        notif | notifications) echo "list clear dnd dismiss" ;;
+        todo) echo "list add done" ;;
+        focus) echo "status start stop abort task profile settings" ;;
+        screentime) echo "today limits limit" ;;
+        sounds) echo "$SOUND_PACKS" ;;
+        channel) echo "git release" ;;
+        update) echo "--check" ;;
+        uninstall) echo "--purge" ;;
+        install) echo "--yes --no-deps --no-start --no-dots --with-apps --channel=git --channel=release --only= --skip=" ;;
+        completions) echo "bash zsh fish" ;;
+        log | logs) echo "-f" ;;
+    esac
+}
+
+# One word per line (fish splits on lines).
+complete_words() {
+    # shellcheck disable=SC2086 # the lists are split on purpose
+    if [ $# -eq 0 ]; then printf '%s\n' $COMMANDS; return; fi
+    c=$1; shift
+    # shellcheck disable=SC2046
+    if [ $# -eq 0 ]; then printf '%s\n' $(subcommands "$c"); return; fi
+    # Option names for hi config get / set / reset (from the config reference, no running shell needed).
+    case "$c $1 $#" in
+        "config get 1" | "config set 1" | "config reset 1" | "cfg get 1" | "cfg set 1" | "cfg reset 1")
+            python3 -I "$repo/tools/config_meta.py" names 2>/dev/null ;;
+    esac
+}
+
+completions() {
+    case "${1:-}" in
+        bash | zsh | fish) cat "$here/completions/hi.$1" ;;
+        *) echo "Usage: hi completions bash|zsh|fish   (e.g. hi completions zsh > ~/.zfunc/_hi)" >&2; exit 1 ;;
+    esac
+}
+
 cmd=${1:-help}
 [ $# -gt 0 ] && shift
 case "$cmd" in
@@ -407,7 +689,13 @@ case "$cmd" in
     status) status ;;
     log | logs) log "$@" ;;
     doctor) doctor ;;
+    version | --version | -v) version ;;
     update) update "$@" ;;
+    channel) channel "$@" ;;
+    install | reinstall | repair) repo_script install.sh "$@" ;;
+    uninstall) repo_script uninstall.sh "$@" ;;
+    completions | completion) completions "$@" ;;
+    __complete) complete_words "$@" ;;
     config | cfg) config "$@" ;;
     settings | set-up)
         need_running
@@ -425,7 +713,19 @@ case "$cmd" in
     sidebar) sidebar "$@" ;;
     bar) barcmd "$@" ;;
     lock) need_running; ipc lock lock ;;
-    session | power) need_running; ipc session toggleScreen ;;
+    session | power) session "$@" ;;
+    boot) boot "$@" ;;
+    shot | screenshot) shot "$@" ;;
+    ocr) shot ocr ;;
+    record) shot record ;;
+    brightness | bright) brightness "$@" ;;
+    display) display "$@" ;;
+    powersave | powersaving) powersave "$@" ;;
+    notif | notifications | notify) notif "$@" ;;
+    todo) todo "$@" ;;
+    focus) focus "$@" ;;
+    screentime) screentime "$@" ;;
+    sounds) sounds "$@" ;;
     wait) need_running; ipc waitmode toggle ;;
     present | presentation) need_running; ipc presentation toggle ;;
     ask | ai) need_running; if [ $# -gt 0 ]; then ipc ai ask "$*"; else ipc ai toggle; fi ;;
