@@ -206,11 +206,18 @@ Singleton {
             n.read = true;
     }
 
+    // The clock relativeTime() reads, so the labels that show it ("now", "5m") move on.
+    property real now: Date.now()
+    SystemClock {
+        precision: SystemClock.Minutes
+        onDateChanged: root.now = Date.now()
+    }
+
     // "now", "5m", "2h", "Mon"
     function relativeTime(time) {
-        const s = (Date.now() - time) / 1000;
+        const s = (Math.max(now, Date.now()) - time) / 1000;
         if (s < 60)
-            return "now";
+            return Translation.tr("now");
         if (s < 3600)
             return Translation.tr("%1m").arg(Math.floor(s / 60));
         if (s < 86400)

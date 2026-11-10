@@ -422,6 +422,7 @@
     "The `claude` CLI was not found. Install Claude Code and make sure `claude` is on PATH.": "Команда `claude` не найдена. Установите Claude Code и убедитесь, что `claude` есть в PATH.",
     "claude exited with code %1.": "claude завершился с кодом %1.",
     "No media": "Ничего не играет",
+    "now": "сейчас",
     "%1m": "%1 мин",
     "%1h": "%1 ч",
     "Timer finished": "Таймер завершён",
