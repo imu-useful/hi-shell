@@ -28,11 +28,9 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true
 
-        StyledText {
+        MonoLabel {
             Layout.fillWidth: true
-            text: Notifications.list.length === 0 ? "" : Translation.trn("%1 notification", "%1 notifications", Notifications.list.length)
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurfaceVariant
+            text: Notifications.list.length === 0 ? "" : "// " + Translation.trn("%1 notification", "%1 notifications", Notifications.list.length)
         }
         Chip {
             icon: Notifications.dnd ? "notifications_off" : "do_not_disturb_on"
@@ -96,11 +94,9 @@ ColumnLayout {
                         Layout.fillWidth: true
                         Layout.leftMargin: 4
 
-                        StyledText {
+                        MonoLabel {
                             Layout.fillWidth: true
-                            text: group.modelData.app
-                            font.pixelSize: Appearance.font.size.labelMedium
-                            font.weight: Font.Medium
+                            text: "> " + group.modelData.app
                             color: Colors.m3primary
                         }
                         Chip {
@@ -116,7 +112,7 @@ ColumnLayout {
                         Rectangle {
                             implicitWidth: 26
                             implicitHeight: 26
-                            radius: 13
+                            radius: Appearance.shape.button
                             color: "transparent"
                             MaterialIcon {
                                 anchors.centerIn: parent

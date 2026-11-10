@@ -70,7 +70,9 @@ ColumnLayout {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: root.locale.dayName((root.firstDay + index) % 7, Locale.ShortFormat).slice(0, 2)
-                font.family: Appearance.font.main
+                font.family: Appearance.font.mono
+                font.capitalization: Font.AllUppercase
+                font.letterSpacing: Appearance.font.labelSpacing
                 font.pixelSize: 12
                 color: Colors.m3onSurfaceVariant
             }
@@ -91,13 +93,13 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: 38
                 implicitHeight: 38
-                radius: Appearance.rounding.full
+                radius: Appearance.rounding.small
                 color: isToday ? Colors.m3primary : "transparent"
 
                 Text {
                     anchors.centerIn: parent
                     text: cell.date.getDate()
-                    font.family: Appearance.font.main
+                    font.family: Appearance.font.mono
                     font.pixelSize: 13
                     font.weight: cell.isToday ? Font.Bold : Font.Normal
                     color: cell.isToday ? Colors.m3onPrimary : Colors.m3onSurface

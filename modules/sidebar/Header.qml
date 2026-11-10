@@ -39,13 +39,13 @@ ColumnLayout {
         ShapeImage {
             implicitWidth: 52
             implicitHeight: 52
-            shape: "cookie9"
+            shape: "square"
             source: `file://${Paths.home}/.face`
 
             MaterialShape {
                 anchors.fill: parent
                 visible: parent.status !== Image.Ready
-                shape: "cookie9"
+                shape: "square"
                 color: Colors.m3primaryContainer
                 MaterialIcon {
                     anchors.centerIn: parent

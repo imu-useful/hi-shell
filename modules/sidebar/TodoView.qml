@@ -12,9 +12,11 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 44
-        radius: 22
-        color: Colors.m3surfaceContainerHighest
+        implicitHeight: 40
+        radius: Appearance.shape.field
+        color: "transparent"
+        border.width: Math.max(1, Appearance.edge)
+        border.color: input.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
 
         TextInput {
             id: input
@@ -96,8 +98,10 @@ ColumnLayout {
                     clip: leave > 0
                     opacity: 1 - leave
                     transform: Translate { x: task.leave * task.width * 0.5 }
-                    radius: Appearance.rounding.large
-                    color: modelData.done ? Colors.m3surfaceContainer : Colors.m3secondaryContainer
+                    radius: Appearance.shape.card
+                    color: "transparent"
+                    border.width: Math.max(1, Appearance.edge)
+                    border.color: modelData.done ? Qt.alpha(Colors.m3outlineVariant, 0.5) : Colors.m3outlineVariant
 
                     RowLayout {
                         anchors.top: parent.top
@@ -111,15 +115,15 @@ ColumnLayout {
                         IconButton {
                             implicitWidth: 36
                             implicitHeight: 36
-                            icon: modelData.done ? "check_circle" : "radio_button_unchecked"
-                            iconColor: modelData.done ? Colors.m3primary : Colors.m3onSecondaryContainer
+                            icon: modelData.done ? "check_box" : "check_box_outline_blank"
+                            iconColor: modelData.done ? Colors.m3primary : Colors.m3onSurfaceVariant
                             onClicked: Todo.toggle(index)
                         }
                         StyledText {
                             Layout.fillWidth: true
                             text: modelData.text
                             font.strikeout: modelData.done
-                            color: modelData.done ? Colors.m3onSurfaceVariant : Colors.m3onSecondaryContainer
+                            color: modelData.done ? Colors.m3onSurfaceVariant : Colors.m3onSurface
                         }
                         IconButton {
                             implicitWidth: 36

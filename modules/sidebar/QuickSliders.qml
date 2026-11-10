@@ -53,6 +53,7 @@ ColumnLayout {
             Layout.rightMargin: 40
             horizontalAlignment: Text.AlignRight
             text: `${Math.round((root.screen?.brightness ?? 0) * 100)}%`
+            font.family: Appearance.font.mono
             font.pixelSize: Appearance.font.size.labelMedium
             font.features: { "tnum": 1 }
             color: Colors.m3onSurfaceVariant

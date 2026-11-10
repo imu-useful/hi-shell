@@ -68,10 +68,11 @@ Item {
 
         width: parent.width
         implicitHeight: content.implicitHeight + 28
-        radius: Appearance.rounding.large
-        color: root.popup ? Colors.m3surfaceContainer : Colors.m3surfaceContainerHigh
-        border.width: root.notif.critical ? 1.5 : root.popup ? 1 : 0
-        border.color: root.notif.critical ? Colors.m3error : Qt.alpha(Colors.m3outlineVariant, 0.6)
+        radius: Appearance.shape.card
+        color: root.popup ? Colors.m3surfaceContainer : Appearance.translucent(Colors.m3surfaceContainerLow)
+        border.width: Math.max(1, Appearance.edge)
+        border.color: root.notif.critical ? Colors.m3error : hover.hovered ? Colors.m3outline : Colors.m3outlineVariant
+        Behavior on border.color { ColorAnim {} }
         opacity: (1 - Math.min(0.8, Math.abs(x) / width)) * (1 - root.leave)
         transform: Translate { x: root.leaveDir * root.leave * card.width * 0.5 }
 
@@ -121,30 +122,42 @@ Item {
             onTapped: root.dismiss()
         }
 
+        // A bar down the left side, like a marked log line: the accent, red when critical.
+        Rectangle {
+            width: 3
+            height: parent.height
+            topLeftRadius: parent.radius
+            bottomLeftRadius: parent.radius
+            color: root.notif.critical ? Colors.m3error : Colors.m3primary
+        }
+
         RowLayout {
             id: content
             anchors.fill: parent
             anchors.margins: 14
+            anchors.leftMargin: 16
             spacing: 12
 
             // Image (contact photo, album art) with the app icon as a badge, or just the app icon.
             Item {
                 Layout.alignment: Qt.AlignTop
-                implicitWidth: 44
-                implicitHeight: 44
+                implicitWidth: 40
+                implicitHeight: 40
 
                 ShapeImage {
                     anchors.fill: parent
                     visible: root.hasImage
-                    shape: "circle"
+                    shape: "square"
                     source: root.imageSource
                 }
 
                 Rectangle {
                     visible: !root.hasImage
                     anchors.fill: parent
-                    radius: width / 2
-                    color: root.notif.critical ? Colors.m3errorContainer : Colors.m3secondaryContainer
+                    radius: Appearance.rounding.small
+                    color: "transparent"
+                    border.width: 1
+                    border.color: root.notif.critical ? Colors.m3error : Colors.m3outlineVariant
 
                     IconImage {
                         id: bigIcon
@@ -157,8 +170,7 @@ Item {
                         anchors.centerIn: parent
                         visible: !bigIcon.visible
                         icon: root.notif.critical ? "priority_high" : "notifications"
-                        fill: 1
-                        color: root.notif.critical ? Colors.m3onErrorContainer : Colors.m3onSecondaryContainer
+                        color: root.notif.critical ? Colors.m3error : Colors.m3onSurfaceVariant
                     }
                 }
 
@@ -180,15 +192,16 @@ Item {
                     Layout.fillWidth: true
                     spacing: 6
 
-                    StyledText {
+                    MonoLabel {
+                        Layout.maximumWidth: content.width * 0.5
                         text: root.notif.appName
-                        font.pixelSize: Appearance.font.size.labelMedium
-                        color: Colors.m3onSurfaceVariant
+                        color: root.notif.critical ? Colors.m3error : Colors.m3primary
                     }
                     StyledText {
                         Layout.fillWidth: true
-                        text: "· " + Notifications.relativeTime(root.notif.time)
-                        font.pixelSize: Appearance.font.size.labelMedium
+                        text: Notifications.relativeTime(root.notif.time)
+                        font.family: Appearance.font.mono
+                        font.pixelSize: Appearance.font.size.labelSmall
                         color: Colors.m3outline
                     }
                     MaterialIcon {
@@ -199,7 +212,7 @@ Item {
                     Rectangle {
                         implicitWidth: 24
                         implicitHeight: 24
-                        radius: 12
+                        radius: Appearance.shape.button
                         color: "transparent"
                         MaterialIcon {
                             anchors.centerIn: parent
@@ -257,9 +270,11 @@ Item {
                     Layout.fillWidth: true
                     Layout.topMargin: 6
                     visible: root.notif.notification?.hasInlineReply ?? false
-                    implicitHeight: 36
-                    radius: 18
-                    color: Colors.m3surfaceContainerHighest
+                    implicitHeight: 34
+                    radius: Appearance.shape.field
+                    color: "transparent"
+                    border.width: Math.max(1, Appearance.edge)
+                    border.color: reply.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
 
                     TextInput {
                         id: reply
@@ -310,12 +325,11 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: 1
-            anchors.leftMargin: Appearance.rounding.large
-            width: (parent.width - Appearance.rounding.large * 2) * root.notif.remaining
+            anchors.leftMargin: 3
+            width: (parent.width - 4) * root.notif.remaining
             // The countdown ticks 20 times a second; smooth out the steps.
             Behavior on width { NumberAnimation { duration: 60; easing.type: Easing.Linear } }
             height: 2
-            radius: 1
             color: Qt.alpha(Colors.m3primary, 0.7)
         }
     }

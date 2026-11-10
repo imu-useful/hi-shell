@@ -25,9 +25,12 @@ StyledFlickable {
 
         Layout.fillWidth: true
         implicitHeight: layout.implicitHeight + 28
-        radius: Appearance.rounding.extraLarge
-        color: running ? Colors.m3primaryContainer : Colors.m3surfaceContainer
+        radius: Appearance.shape.card
+        color: running ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
+        border.width: Math.max(1, Appearance.edge)
+        border.color: running ? Colors.m3primary : Colors.m3outlineVariant
         Behavior on color { ColorAnim {} }
+        Behavior on border.color { ColorAnim {} }
 
         RowLayout {
             id: layout
@@ -41,14 +44,13 @@ StyledFlickable {
                 lineWidth: 4
                 value: card.progress < 0 ? 0 : card.progress
                 color: Colors.m3primary
-                trackColor: card.running ? Qt.alpha(Colors.m3onPrimaryContainer, 0.15) : Colors.m3secondaryContainer
+                trackColor: Colors.m3outlineVariant
 
                 MaterialIcon {
                     anchors.centerIn: parent
                     icon: card.icon
-                    fill: 1
                     iconSize: 24
-                    color: card.running ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                    color: card.running ? Colors.m3primary : Colors.m3onSurfaceVariant
                 }
             }
 
@@ -58,18 +60,22 @@ StyledFlickable {
                 StyledText {
                     Layout.fillWidth: true
                     text: card.title
-                    font.pixelSize: Appearance.font.size.labelMedium
-                    color: card.running ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                    font.family: Appearance.font.mono
+                    font.capitalization: Font.AllUppercase
+                    font.letterSpacing: Appearance.font.labelSpacing
+                    font.pixelSize: Appearance.font.size.labelSmall
+                    color: card.running ? Colors.m3primary : Colors.m3onSurfaceVariant
                 }
                 StyledText {
                     id: shownTime
                     Layout.fillWidth: true
                     visible: !typing.visible
                     text: card.time
+                    font.family: Appearance.font.mono
                     font.pixelSize: Appearance.font.size.headlineSmall
                     font.weight: Font.Medium
                     font.features: { "tnum": 1 }
-                    color: card.running ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                    color: card.running ? Colors.m3primary : Colors.m3onSurface
                     MouseArea {
                         anchors.fill: parent
                         enabled: card.editable
@@ -86,6 +92,7 @@ StyledFlickable {
                     id: typing
                     Layout.fillWidth: true
                     visible: false
+                    font.family: Appearance.font.mono
                     font.pixelSize: Appearance.font.size.headlineSmall
                     font.weight: Font.Medium
                     font.features: { "tnum": 1 }
