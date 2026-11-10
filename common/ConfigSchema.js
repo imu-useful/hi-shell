@@ -8,6 +8,8 @@ const rules = {
     "language": { enum: ["auto", "en", "ru"], def: "auto", allowOther: true }, // custom languages add codes
     "appearance.transparencyLevel": { min: 0, max: 1, def: 0.12 },
     "appearance.animationSpeed": { min: 0, max: 4, def: 1 },
+    "appearance.motionStyle": { enum: ["expressive", "smooth", "snappy"], def: "expressive" },
+    "appearance.animationBounce": { min: 0, max: 2, def: 1 },
     "appearance.cornerScale": { min: 0, max: 2, def: 1 },
     "appearance.fontScale": { min: 0.6, max: 2, def: 1 },
     "appearance.density": { enum: ["compact", "comfortable", "spacious"], def: "comfortable" },

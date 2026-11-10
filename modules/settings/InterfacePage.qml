@@ -216,6 +216,22 @@ ColumnLayout {
             from: 0; to: 2; step: 0.1; decimals: 1; suffix: "×"
             onMoved: value => a.animationSpeed = value
         }
+        ChoiceRow {
+            icon: "animation"
+            title: Translation.tr("Motion style")
+            subtitle: Translation.tr("Springy, gentle or quick")
+            value: a.motionStyle
+            options: [{ value: "expressive", text: Translation.tr("Expressive") }, { value: "smooth", text: Translation.tr("Smooth") }, { value: "snappy", text: Translation.tr("Snappy") }]
+            onSelected: value => a.motionStyle = value
+        }
+        SliderRow {
+            icon: "waves"
+            title: Translation.tr("Spring")
+            subtitle: Translation.tr("How far panels overshoot; 0 is none")
+            value: Math.round(a.animationBounce * 100)
+            from: 0; to: 200; step: 10; suffix: "%"
+            onMoved: value => a.animationBounce = value / 100
+        }
         SwitchRow {
             icon: "blur_on"
             title: Translation.tr("Transparency")

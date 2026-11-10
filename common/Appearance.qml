@@ -103,11 +103,25 @@ Singleton {
     // curves don't; use spatial for position/size and effects for opacity/color.
     // Durations are scaled by Config appearance.animationSpeed.
     readonly property QtObject anim: QtObject {
-        readonly property real speed: ShellState.zen ? 0 : Math.max(0, root.options.animationSpeed)
+        // appearance.motionStyle sets the feel (duration factor, how much the spatial curves overshoot);
+        // appearance.animationBounce scales the overshoot on top of it (0 = no spring at all).
+        readonly property var styleParams: ({
+                "expressive": { time: 1, bounce: 1 },
+                "smooth": { time: 1.2, bounce: 0.25 },
+                "snappy": { time: 0.7, bounce: 0.6 }
+            })[root.options.motionStyle] ?? { time: 1, bounce: 1 }
+        readonly property real speed: ShellState.zen ? 0 : Math.max(0, root.options.animationSpeed) * styleParams.time
+        readonly property real bounce: Math.max(0, root.options.animationBounce) * styleParams.bounce
 
-        readonly property list<real> spatialFast: [0.42, 1.67, 0.21, 0.90, 1, 1]
-        readonly property list<real> spatialDefault: [0.38, 1.21, 0.22, 1.00, 1, 1]
-        readonly property list<real> spatialSlow: [0.39, 1.29, 0.35, 0.98, 1, 1]
+        // Overshoot of a spatial curve (its control points above 1) scaled by `bounce`.
+        function _spring(c) {
+            const k = bounce;
+            return [c[0], c[1] > 1 ? 1 + (c[1] - 1) * k : c[1], c[2], c[3] > 1 ? 1 + (c[3] - 1) * k : c[3], 1, 1];
+        }
+
+        readonly property list<real> spatialFast: _spring([0.42, 1.67, 0.21, 0.90])
+        readonly property list<real> spatialDefault: _spring([0.38, 1.21, 0.22, 1.00])
+        readonly property list<real> spatialSlow: _spring([0.39, 1.29, 0.35, 0.98])
         readonly property list<real> effects: [0.34, 0.80, 0.34, 1.00, 1, 1]
         readonly property list<real> emphasizedDecel: [0.05, 0.70, 0.10, 1.00, 1, 1]
         readonly property list<real> emphasizedAccel: [0.30, 0.00, 0.80, 0.15, 1, 1]

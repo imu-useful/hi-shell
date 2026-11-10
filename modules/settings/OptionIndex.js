@@ -99,6 +99,18 @@ const options = [
         "advanced": false
     },
     {
+        "path": "appearance.motionStyle",
+        "page": "interface",
+        "text": "The feel of motion: expressive (springy) | smooth (gentle, slower) | snappy (quick, little spring)",
+        "advanced": false
+    },
+    {
+        "path": "appearance.animationBounce",
+        "page": "interface",
+        "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",
+        "advanced": false
+    },
+    {
         "path": "appearance.scheme",
         "page": "quick",
         "text": "matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant",

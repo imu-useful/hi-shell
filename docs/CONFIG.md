@@ -7,7 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
-| [`appearance`](#appearance) | 21 |
+| [`appearance`](#appearance) | 23 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
 | [`launcher`](#launcher) | 2 |
@@ -69,6 +69,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.contrast` | `real` | `0` | -1 … 1 | Settings › Interface | -1 (soft) .. 1 (strong): the palette's contrast. |
 | `appearance.colorOverrides` | `var` | `{}` |  | file only: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '"#ff6a00"' (advanced) | Colors of your own over the palette: role -> "#rrggbb", e.g. { "primary": "#ff6a00", "surface": "#101010" }. The roles are the names in the palette file (~/.local/state/hi-shell/colors.json). |
 | `appearance.animationSpeed` | `real` | `1` | 0 … 4 | Settings › Interface | Global multiplier for animation durations (0 disables animations). |
+| `appearance.motionStyle` | `string` | `"expressive"` | `expressive` \| `smooth` \| `snappy` | Settings › Interface | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
+| `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |
 | `appearance.gtkColorScheme` | `bool` | `true` |  | Settings › Interface (advanced) | Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light. |

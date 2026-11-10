@@ -47,6 +47,10 @@ JsonAdapter {
         property var colorOverrides: ({})
         // Global multiplier for animation durations (0 disables animations).
         property real animationSpeed: 1
+        // The feel of motion: expressive (springy) | smooth (gentle, slower) | snappy (quick, little spring)
+        property string motionStyle: "expressive"
+        // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
+        property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
         property string scheme: "tonal-spot"
         // Switch dark / light at sunset / sunrise (from the weather service's location).
