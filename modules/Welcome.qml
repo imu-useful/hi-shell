@@ -197,15 +197,13 @@ Scope {
                         implicitHeight: 120
                         shape: "cookie9"
                         color: Colors.m3primaryContainer
-                        // A waving hand: pops in, then waves from the wrist every few seconds.
-                        Text {
+                        // The hi-shell hand: pops in, then waves (the arcs pulsing) every few seconds.
+                        HandLogo {
                             id: hand
                             anchors.centerIn: parent
-                            anchors.horizontalCenterOffset: 2
-                            text: "👋"
-                            font.pixelSize: 60
-                            // Pivot at the wrist (bottom right of the glyph).
-                            transformOrigin: Item.BottomRight
+                            size: 66
+                            color: Colors.m3onPrimaryContainer
+                            arcColor: Colors.m3tertiary
                             scale: 0
 
                             Component.onCompleted: popIn.start()
@@ -215,18 +213,14 @@ Scope {
                                 property: "scale"
                                 from: 0
                                 to: 1
-                                onFinished: wave.start()
+                                onFinished: waveTimer.start()
                             }
-                            SequentialAnimation {
-                                id: wave
-                                loops: Animation.Infinite
-                                NumberAnimation { target: hand; property: "rotation"; to: 14; duration: 150; easing.type: Easing.InOutSine }
-                                NumberAnimation { target: hand; property: "rotation"; to: -8; duration: 180; easing.type: Easing.InOutSine }
-                                NumberAnimation { target: hand; property: "rotation"; to: 14; duration: 180; easing.type: Easing.InOutSine }
-                                NumberAnimation { target: hand; property: "rotation"; to: -4; duration: 180; easing.type: Easing.InOutSine }
-                                NumberAnimation { target: hand; property: "rotation"; to: 10; duration: 180; easing.type: Easing.InOutSine }
-                                NumberAnimation { target: hand; property: "rotation"; to: 0; duration: 220; easing.type: Easing.OutSine }
-                                PauseAnimation { duration: 1500 }
+                            Timer {
+                                id: waveTimer
+                                interval: 2800
+                                repeat: true
+                                triggeredOnStart: true
+                                onTriggered: hand.wave()
                             }
                         }
                     }
