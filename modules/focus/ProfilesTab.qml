@@ -52,7 +52,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 implicitHeight: 68
                 radius: Appearance.rounding.medium
-                color: active ? Colors.m3secondaryContainer : "transparent"
+                color: active ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                 Behavior on color { ColorAnim {} }
 
                 RowLayout {

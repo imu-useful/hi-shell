@@ -72,7 +72,7 @@ DesktopCard {
                         implicitWidth: 30
                         implicitHeight: 30
                         radius: 15
-                        color: isToday ? Colors.m3secondaryContainer : "transparent"
+                        color: isToday ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                         StyledText {
                             anchors.centerIn: parent
                             text: date.getDate()

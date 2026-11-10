@@ -105,7 +105,7 @@ Scope {
                             Layout.fillWidth: true
                             implicitHeight: 48
                             radius: 24
-                            color: active ? Colors.m3secondaryContainer : "transparent"
+                            color: active ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                             Behavior on color { ColorAnim {} }
 
                             RowLayout {

@@ -207,23 +207,33 @@ Scope {
                     // Prompt input
                     Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 56
-                        radius: Appearance.rounding.full
-                        color: Colors.m3surfaceContainerHighest
+                        implicitHeight: 48
+                        radius: Appearance.shape.field
+                        color: Qt.alpha(Colors.m3surfaceContainerLowest, 0.5)
+                        border.width: Math.max(1, Appearance.edge)
+                        border.color: input.text !== "" ? Colors.m3primary : Colors.m3outlineVariant
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 20
+                            anchors.leftMargin: 14
                             anchors.rightMargin: 8
-                            spacing: 12
+                            spacing: 10
+
+                            StyledText {
+                                text: "❯"
+                                font.family: Appearance.font.mono
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: Colors.m3primary
+                            }
 
                             TextInput {
                                 id: input
                                 Layout.fillWidth: true
                                 Component.onCompleted: text = root.draft
                                 onTextChanged: root.draft = text
-                                font.family: Appearance.font.main
-                                font.pixelSize: 16
+                                font.family: Appearance.font.mono
+                                font.pixelSize: 15
                                 color: Colors.m3onSurface
                                 selectionColor: Colors.m3primary
                                 selectedTextColor: Colors.m3onPrimary

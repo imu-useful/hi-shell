@@ -32,7 +32,7 @@ BarWidget {
         x: root.vertical ? (parent.width - width) / 2 : 0
         width: root.artSize
         height: root.artSize
-        shape: "square"
+        shape: "box"
         source: Mpris.artUrl
         // Spinning turns a cached texture instead of re-masking the cover every frame.
         layer.enabled: spin.running

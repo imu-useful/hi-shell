@@ -55,6 +55,8 @@ function ellipse(b) {
 const radial = {
     circle: () => 1,
     square: squircle(5),
+    // Nearly sharp corners (the Terminal look's covers and avatars).
+    box: squircle(30),
     // Scalloped "cookie" badges (M3 names: cookie4Sided ... cookie12Sided).
     cookie4: lobes(4, 0.16, 1.8),
     cookie6: lobes(6, 0.15, 2),

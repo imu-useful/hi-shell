@@ -147,7 +147,7 @@ Item {
                 ShapeImage {
                     anchors.fill: parent
                     visible: root.hasImage
-                    shape: "square"
+                    shape: "box"
                     source: root.imageSource
                 }
 

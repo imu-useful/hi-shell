@@ -121,7 +121,7 @@ ColumnLayout {
                 title: "Claude"
                 subtitle: Translation.tr("Through the claude CLI (Claude Code)")
                 clickable: true
-                color: Claude.provider === "claude" ? Colors.m3secondaryContainer : "transparent"
+                color: Claude.provider === "claude" ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                 onClicked: {
                     Claude.provider = "claude";
                     root.showProviders = false;
@@ -140,7 +140,7 @@ ColumnLayout {
                     title: modelData.name
                     subtitle: !ready ? (modelData.urlRequired ? Translation.tr("Set the server address in Settings → General") : Translation.tr("Add an API key in Settings → General")) : Translation.tr(modelData.note ?? "")
                     clickable: true
-                    color: Claude.provider === modelData.id ? Colors.m3secondaryContainer : "transparent"
+                    color: Claude.provider === modelData.id ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                     onClicked: {
                         Claude.provider = modelData.id;
                         root.showProviders = false;
@@ -158,10 +158,12 @@ ColumnLayout {
     // --- The provider's models ---
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 36
-        radius: 18
+        implicitHeight: 34
+        radius: Appearance.shape.field
         visible: root.showModels
-        color: Colors.m3surfaceContainerHighest
+        color: "transparent"
+        border.width: Math.max(1, Appearance.edge)
+        border.color: modelSearch.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
 
         TextInput {
             id: modelSearch
@@ -217,7 +219,7 @@ ColumnLayout {
                     title: modelData.name
                     subtitle: modelData.id
                     clickable: true
-                    color: modelData.id === Claude.apiModel ? Colors.m3secondaryContainer : "transparent"
+                    color: modelData.id === Claude.apiModel ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                     onClicked: {
                         Claude.setModel(Claude.provider, modelData.id);
                         root.showModels = false;
@@ -258,7 +260,7 @@ ColumnLayout {
                     title: modelData.title
                     subtitle: `${Notifications.relativeTime(modelData.updated)} · ${Translation.trn("%1 message", "%1 messages", Math.ceil(modelData.messages.length / 2))}${modelData.model ? " · " + modelData.model : ""}`
                     clickable: true
-                    color: modelData.id === Claude.chatId ? Colors.m3secondaryContainer : "transparent"
+                    color: modelData.id === Claude.chatId ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
                     onClicked: {
                         Claude.open(modelData.id);
                         root.showHistory = false;
@@ -362,13 +364,27 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: Math.min(160, input.implicitHeight + 24)
-        radius: 26
-        color: Colors.m3surfaceContainerHighest
+        radius: Appearance.shape.field
+        color: Qt.alpha(Colors.m3surfaceContainerLowest, 0.5)
+        border.width: Math.max(1, Appearance.edge)
+        border.color: input.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
+        Behavior on border.color { ColorAnim {} }
+
+        // The prompt.
+        StyledText {
+            x: 12
+            y: 12
+            text: "❯"
+            font.family: Appearance.font.mono
+            font.pixelSize: Appearance.font.size.bodyMedium
+            font.weight: Font.Bold
+            color: Colors.m3primary
+        }
 
         Flickable {
             id: inputFlick
             anchors.fill: parent
-            anchors.leftMargin: 18
+            anchors.leftMargin: 30
             anchors.rightMargin: 54
             anchors.topMargin: 12
             anchors.bottomMargin: 12

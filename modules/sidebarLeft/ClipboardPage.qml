@@ -36,9 +36,11 @@ ColumnLayout {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 44
-            radius: 22
-            color: Colors.m3surfaceContainerHighest
+            implicitHeight: 40
+            radius: Appearance.shape.field
+            color: "transparent"
+            border.width: Math.max(1, Appearance.edge)
+            border.color: search.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
 
             MaterialIcon {
                 id: searchIcon
@@ -141,8 +143,10 @@ ColumnLayout {
 
             width: list.width
             implicitHeight: e.image ? 120 : Math.min(84, label.implicitHeight + 24)
-            radius: Appearance.rounding.large
-            color: Colors.m3surfaceContainer
+            radius: Appearance.shape.card
+            color: "transparent"
+            border.width: Math.max(1, Appearance.edge)
+            border.color: Colors.m3outlineVariant
 
             Component.onCompleted: if (e.image) Clipboard.decodeThumbnail(e, url => entry.thumb = url)
 
@@ -216,8 +220,10 @@ ColumnLayout {
             y: Math.max(0, Math.min(root.menuAt.y, list.height - height))
             width: 170
             height: menuColumn.implicitHeight + 12
-            radius: Appearance.rounding.medium
+            radius: Appearance.shape.popup
             color: Colors.m3surfaceContainerHighest
+            border.width: Math.max(1, Appearance.edge)
+            border.color: Colors.m3outlineVariant
 
             Column {
                 id: menuColumn

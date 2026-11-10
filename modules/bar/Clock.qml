@@ -160,7 +160,7 @@ BarWidget {
         ShapeImage {
             Layout.preferredWidth: root.artSize
             Layout.preferredHeight: root.artSize
-            shape: "square"
+            shape: "box"
             source: Mpris.artUrl
             opacity: Mpris.playing ? 1 : 0.6
         }
