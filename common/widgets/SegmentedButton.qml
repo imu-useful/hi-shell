@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.common
 
-// M3 Expressive connected button group: the selected segment becomes a pill.
+// Connected button group: one outlined strip split by hairlines, the selected segment filled with the accent.
 // `model`: list of strings or { text, icon } objects.
 RowLayout {
     id: root
@@ -12,7 +12,8 @@ RowLayout {
 
     signal selected(int index)
 
-    spacing: 2
+    // Neighbours share their edge: each one's outline lies over the last one's.
+    spacing: -Appearance.edge
 
     Repeater {
         model: root.model
@@ -26,24 +27,23 @@ RowLayout {
             readonly property bool active: index === root.currentIndex
             readonly property string label: typeof modelData === "string" ? modelData : modelData.text ?? ""
             readonly property string glyph: typeof modelData === "string" ? "" : modelData.icon ?? ""
-            readonly property real outer: height / 2
-            readonly property real inner: active ? height / 2 : Appearance.rounding.small
-            readonly property color contentColor: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
+            readonly property real outer: Appearance.shape.button
+            readonly property color contentColor: active ? Colors.m3onPrimary : layer.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
 
             Layout.fillWidth: true
-            implicitHeight: 36
-            implicitWidth: content.implicitWidth + 28
-            topLeftRadius: index === 0 ? outer : inner
-            bottomLeftRadius: index === 0 ? outer : inner
-            topRightRadius: index === root.model.length - 1 ? outer : inner
-            bottomRightRadius: index === root.model.length - 1 ? outer : inner
-            color: active ? Colors.m3secondaryContainer : Colors.m3surfaceContainerHigh
+            implicitHeight: 32
+            implicitWidth: content.implicitWidth + 24
+            // Over its neighbours' edges while selected, so the accent edge isn't cut by theirs.
+            z: active ? 1 : 0
+            topLeftRadius: index === 0 ? outer : 0
+            bottomLeftRadius: index === 0 ? outer : 0
+            topRightRadius: index === root.model.length - 1 ? outer : 0
+            bottomRightRadius: index === root.model.length - 1 ? outer : 0
+            color: active ? Colors.m3primary : "transparent"
+            border.width: Appearance.edge
+            border.color: active ? Colors.m3primary : Colors.m3outlineVariant
 
             Behavior on color { ColorAnim {} }
-            Behavior on topLeftRadius { SpatialAnim { duration: Appearance.anim.normal } }
-            Behavior on bottomLeftRadius { SpatialAnim { duration: Appearance.anim.normal } }
-            Behavior on topRightRadius { SpatialAnim { duration: Appearance.anim.normal } }
-            Behavior on bottomRightRadius { SpatialAnim { duration: Appearance.anim.normal } }
 
             RowLayout {
                 id: content
@@ -53,23 +53,22 @@ RowLayout {
                 MaterialIcon {
                     visible: segment.glyph !== ""
                     icon: segment.glyph
-                    iconSize: 18
-                    fill: segment.active ? 1 : 0
+                    iconSize: 16
                     color: segment.contentColor
                 }
 
                 StyledText {
                     visible: segment.label !== ""
                     text: segment.label
-                    font.pixelSize: Appearance.font.size.labelMedium + 1
+                    font.pixelSize: Appearance.font.size.labelMedium
                     font.weight: Font.Medium
                     color: segment.contentColor
                 }
             }
 
             StateLayer {
+                id: layer
                 tint: segment.contentColor
-                // The segment rounds each corner on its own; the hover tint follows.
                 topLeftRadius: segment.topLeftRadius
                 topRightRadius: segment.topRightRadius
                 bottomLeftRadius: segment.bottomLeftRadius

@@ -58,10 +58,10 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.transparency` | `bool` | `true` |  | Settings › Quick | Translucent surfaces (the compositor blurs what's behind them). |
 | `appearance.transparencyLevel` | `real` | `0.12` | 0 … 1 | Settings › Interface | How see-through the panels are when transparency is on: 0 = solid, 0.5 = half. |
 | `appearance.coverBackdrop` | `bool` | `true` |  | Settings › Interface | The playing track's cover, blurred, behind the media cards. |
-| `appearance.fonts.main` | `string` | `"Google Sans Flex"` |  | Settings › Interface | The interface font. |
-| `appearance.fonts.title` | `string` | `"Google Sans Flex"` |  | Settings › Interface | The font of titles and headings. |
+| `appearance.fonts.main` | `string` | `"Space Grotesk"` |  | Settings › Interface | The interface font. |
+| `appearance.fonts.title` | `string` | `"Space Grotesk"` |  | Settings › Interface | The font of titles and headings. |
 | `appearance.fonts.mono` | `string` | `"JetBrains Mono"` |  | Settings › Interface | The monospace font (code, terminal-like text). |
-| `appearance.fonts.icon` | `string` | `"Material Symbols Rounded"` |  | file only: the icon font is made by the shell; only change it for a different Material Symbols build (advanced) | The icon font; the shell makes its own cut-down copy of it at start. |
+| `appearance.fonts.icon` | `string` | `"Material Symbols Sharp"` |  | file only: the icon font is made by the shell; only change it for a different Material Symbols build (advanced) | The icon font; the shell makes its own cut-down copy of it at start. |
 | `appearance.cornerScale` | `real` | `1` | 0 … 2 | Settings › Interface | Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's. |
 | `appearance.fontScale` | `real` | `1` | 0.6 … 2 | Settings › Interface | Multiplier for every text size (0.6 – 2). |
 | `appearance.density` | `string` | `"comfortable"` | `compact` \| `comfortable` \| `spacious` | Settings › Interface | compact \| comfortable \| spacious: the spacing between and inside elements. |
@@ -69,22 +69,22 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.contrast` | `real` | `0` | -1 … 1 | Settings › Interface | -1 (soft) .. 1 (strong): the palette's contrast. |
 | `appearance.colorOverrides` | `var` | `{}` |  | file only: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '"#ff6a00"' (advanced) | Colors of your own over the palette: role -> "#rrggbb", e.g. { "primary": "#ff6a00", "surface": "#101010" }. The roles are the names in the palette file (~/.local/state/hi-shell/colors.json). |
 | `appearance.animationSpeed` | `real` | `1` | 0 … 4 | Settings › Interface | Global multiplier for animation durations (0 disables animations). |
-| `appearance.motionStyle` | `string` | `"expressive"` | `expressive` \| `smooth` \| `snappy` | Settings › Interface | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
-| `appearance.popupEffect` | `string` | `"pop"` | `pop` \| `drop` \| `slide` \| `fade` | Settings › Interface | How popups (calendar, weather, AI, overview) appear: pop (grow) \| drop (grow from the edge) \| slide \| fade |
+| `appearance.motionStyle` | `string` | `"snappy"` | `expressive` \| `smooth` \| `snappy` | Settings › Interface | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
+| `appearance.popupEffect` | `string` | `"fade"` | `pop` \| `drop` \| `slide` \| `fade` | Settings › Interface | How popups (calendar, weather, AI, overview) appear: pop (grow) \| drop (grow from the edge) \| slide \| fade |
 | `appearance.sidebarEffect` | `string` | `"slide"` | `slide` \| `pop` \| `fade` | Settings › Interface | How the sidebars appear: slide \| pop (grow) \| fade |
 | `appearance.paletteFade` | `int` | `400` | 0 … 2000 | Settings › Interface | How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once |
-| `appearance.launcherEffect` | `string` | `"rise"` | `rise` \| `pop` \| `fade` | Settings › Interface | How the launcher appears: rise (from the screen's edge) \| pop (grow) \| fade |
+| `appearance.launcherEffect` | `string` | `"fade"` | `rise` \| `pop` \| `fade` | Settings › Interface | How the launcher appears: rise (from the screen's edge) \| pop (grow) \| fade |
 | `appearance.panelSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast. |
 | `appearance.barSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the bar's motion (the workspace indicator) on top of the global speed. |
 | `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the notification cards' motion on top of the global speed. |
-| `appearance.ripple` | `bool` | `true` |  | Settings › Interface | A wave grows from the point you press on buttons and rows. |
-| `appearance.pressScale` | `real` | `0.9` | 0.7 … 1 | Settings › Interface | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
+| `appearance.ripple` | `bool` | `false` |  | Settings › Interface | A wave grows from the point you press on buttons and rows. |
+| `appearance.pressScale` | `real` | `1` | 0.7 … 1 | Settings › Interface | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
 | `appearance.surfaceStyle` | `string` | `"tonal"` | `tonal` \| `glass` \| `flat` | Settings › Interface | How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) \| glass (always see-through, with an edge) \| flat (solid, with an edge) |
 | `appearance.borderWidth` | `int` | `-1` | -1 … 4 | Settings › Interface | Width of the outline of panels and cards in px; -1 = by the surface style. |
 | `appearance.textWeight` | `string` | `"normal"` | `light` \| `normal` \| `medium` | Settings › Interface | The default weight of the interface text: light \| normal \| medium. |
 | `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Interface | Extra space between letters in px (negative = tighter). |
 | `appearance.looks` | `var` | `{}` |  | Settings > Interface > Save this look (a map of name -> options; hi look save <name>) | Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface). |
-| `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
+| `appearance.animationBounce` | `real` | `0` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |
 | `appearance.gtkColorScheme` | `bool` | `true` |  | Settings › Interface (advanced) | Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light. |

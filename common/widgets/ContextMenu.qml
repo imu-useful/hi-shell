@@ -87,13 +87,13 @@ PopupWindow {
         y: root.shadowPad + (root.edge === Edges.Bottom ? -slide : slide)
         width: root.menuWidth
         height: column.implicitHeight + (root.pill ? 8 : 16)
-        radius: Appearance.rounding.large
+        radius: Appearance.shape.popup
         color: root.pill ? Colors.m3surfaceContainerLow : Colors.m3surfaceContainer
         border.width: root.pill ? 0 : Appearance.edge
-        border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
+        border.color: Colors.m3outlineVariant
 
         opacity: root.shown ? 1 : 0
-        scale: root.shown ? 1 : (root.pill ? 0.8 : 0.9)
+        scale: root.shown ? 1 : (root.pill ? 0.8 : 0.97)
         transformOrigin: root.edge === Edges.Bottom ? Item.Top : Item.Bottom
         Behavior on opacity { enabled: root.animated; EffectAnim { duration: Appearance.anim.fast } }
         Behavior on scale { enabled: root.animated; SpringAnim {} }
@@ -123,7 +123,7 @@ PopupWindow {
 
             width: parent?.width ?? 0
             height: root.pill ? 36 : 40
-            radius: root.pill ? height / 2 : Appearance.rounding.medium
+            radius: root.pill ? height / 2 : Appearance.rounding.small
             // The caelestia look: the back row is a filled pill.
             color: root.pill && back ? Colors.m3secondaryContainer : "transparent"
             opacity: enabled ? 1 : Appearance.state.disabledContent

@@ -3,8 +3,9 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Material 3 Expressive design tokens: shape, typography, motion, sizes.
-// Colors live in Colors.qml; user-tunable values come from Config.
+// Design tokens of the Terminal look: small square corners, a hairline outline on every surface,
+// Space Grotesk text with monospace figures, short motion without spring. The colors stay
+// Material You (Colors.qml, from the wallpaper); user-tunable values come from Config.
 Singleton {
     id: root
 
@@ -25,23 +26,23 @@ Singleton {
         return Math.round(px * densityScale);
     }
 
-    // M3 shape scale (corner radii).
+    // Corner radii. Small and square on purpose: nothing is a pill, `full` included (a "pill" is a
+    // slightly softened rectangle, a "circle" a softened square); appearance.cornerScale scales them all.
     readonly property QtObject rounding: QtObject {
-        readonly property int extraSmall: root.corner(4)
-        readonly property int small: root.corner(8)
-        readonly property int medium: root.corner(12)
-        readonly property int large: root.corner(16)
-        readonly property int largeIncreased: root.corner(20)
-        readonly property int extraLarge: root.corner(28)
-        readonly property int extraLargeIncreased: root.corner(32)
-        readonly property int extraExtraLarge: root.corner(48)
-        readonly property int full: 9999
+        readonly property int extraSmall: root.corner(2)
+        readonly property int small: root.corner(2)
+        readonly property int medium: root.corner(3)
+        readonly property int large: root.corner(4)
+        readonly property int largeIncreased: root.corner(4)
+        readonly property int extraLarge: root.corner(6)
+        readonly property int extraLargeIncreased: root.corner(6)
+        readonly property int extraExtraLarge: root.corner(8)
+        readonly property int full: root.corner(4)
     }
 
-    // Outline width for floating surfaces: depth comes from tone, so the outline is only
-    // there when the surface is see-through (otherwise its edge would dissolve into the wallpaper).
-    // appearance.borderWidth (-1 = by the surface style) sets it by hand; glass and flat surfaces always have one.
-    readonly property int edge: options.borderWidth >= 0 ? options.borderWidth : (options.surfaceStyle !== "tonal" || (options.transparency && !ShellState.zen)) ? 1 : 0
+    // Outline width of panels, cards and controls: surfaces are told apart by their edge, not by tone,
+    // so there's always one. appearance.borderWidth (-1 = auto) sets it by hand, 0 turns it off.
+    readonly property int edge: options.borderWidth >= 0 ? options.borderWidth : 1
 
     // Spacing scale (px); use these instead of loose numbers in layouts.
     readonly property QtObject space: QtObject {
@@ -64,14 +65,14 @@ Singleton {
         readonly property real disabledContainer: 0.12
     }
 
-    // Corner radius per component kind; the "Soft Tonal" look is tuned here.
+    // Corner radius per component kind.
     readonly property QtObject shape: QtObject {
         readonly property int panel: rounding.extraLarge
         readonly property int card: rounding.large
-        readonly property int button: rounding.full
+        readonly property int button: rounding.medium
         readonly property int chip: rounding.small
-        readonly property int field: rounding.full
-        readonly property int tile: rounding.largeIncreased
+        readonly property int field: rounding.medium
+        readonly property int tile: rounding.large
         readonly property int popup: rounding.large
     }
 
@@ -82,6 +83,8 @@ Singleton {
         readonly property real letterSpacing: root.options.letterSpacing
         readonly property string title: root.options.fonts.title
         readonly property string mono: root.options.fonts.mono
+        // Small UPPERCASE labels (section names, units, keys): monospace, tracked out.
+        readonly property real labelSpacing: 1.2
         // The shell's own cut-down copy when it's there (IconFont).
         readonly property string icon: IconFont.name || root.options.fonts.icon
 

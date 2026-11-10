@@ -1,28 +1,28 @@
 import QtQuick
 import qs.common
 
-// Material 3 icon button (standard or filled) using Material Symbols.
+// Square icon button using Material Symbols: standard (bare, outlined on hover) or filled in the accent.
 Rectangle {
     id: root
 
     property string icon: ""
     property bool filled: false
-    property color iconColor: filled ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
+    property color iconColor: filled ? Colors.m3onPrimary : layer.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
     property string tooltip: ""
 
     signal clicked
 
-    implicitWidth: 40
-    implicitHeight: 40
-    // Pressing morphs the circle into a rounded square, and it springs back.
-    radius: layer.pressed ? Appearance.rounding.medium : Appearance.shape.button
+    implicitWidth: 36
+    implicitHeight: 36
+    radius: Appearance.shape.button
     color: filled ? Colors.m3primary : "transparent"
+    border.width: filled ? 0 : Appearance.edge
+    border.color: layer.containsMouse ? Colors.m3outline : "transparent"
     opacity: enabled ? 1 : Appearance.state.disabledContent
 
-    Behavior on radius { SpatialAnim {} }
     Behavior on color { ColorAnim {} }
+    Behavior on border.color { ColorAnim {} }
 
-    // Pressing squeezes the button a little and it springs back.
     scale: layer.pressed ? Appearance.anim.pressScale : 1
     Behavior on scale { enabled: Appearance.anim.speed > 0; SpringAnim { overshoot: 1.4 } }
 
@@ -31,26 +31,25 @@ Rectangle {
         anchors.centerIn: parent
         text: root.icon
         font.family: Appearance.font.icon
-        font.pixelSize: 22
+        font.pixelSize: 20
         color: root.iconColor
         Behavior on color { ColorAnimation { duration: 120 } }
 
-        // A changed icon (play/pause) shrinks in instead of snapping.
+        // A changed icon (play/pause) flicks in instead of snapping.
         onTextChanged: if (Appearance.anim.speed > 0) swap.restart()
         NumberAnimation {
             id: swap
             target: glyph
-            property: "scale"
-            from: 0.5
+            property: "opacity"
+            from: 0
             to: 1
-            duration: Appearance.anim.normal
-            easing.type: Easing.OutBack
+            duration: Appearance.anim.fast
         }
     }
 
     StateLayer {
         id: layer
-        tint: root.iconColor
+        tint: root.filled ? Colors.m3onPrimary : Colors.m3primary
         onClicked: root.clicked()
     }
 }

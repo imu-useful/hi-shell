@@ -11,7 +11,7 @@ fi
 # before the shell starts: a font that changes while it runs shows other icons. Quick when
 # nothing changed (a check of the icon names against the last build).
 dir=$(cd "$(dirname "$(readlink -f "$0")")" && pwd)
-family=$(python3 -c 'import json,os,sys; print(json.load(open(sys.argv[1])).get("appearance", {}).get("fonts", {}).get("icon", "Material Symbols Rounded"))' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo "Material Symbols Rounded")
-python3 "$dir/services/icon_font.py" --family "${family:-Material Symbols Rounded}" --scan "$dir" --out "${XDG_CACHE_HOME:-$HOME/.cache}/hi-shell/icons" >/dev/null 2>&1 || true
+family=$(python3 -c 'import json,os,sys; print(json.load(open(sys.argv[1])).get("appearance", {}).get("fonts", {}).get("icon", "Material Symbols Sharp"))' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo "Material Symbols Sharp")
+python3 "$dir/services/icon_font.py" --family "${family:-Material Symbols Sharp}" --scan "$dir" --out "${XDG_CACHE_HOME:-$HOME/.cache}/hi-shell/icons" >/dev/null 2>&1 || true
 
 exec qs -c hi-shell "$@"

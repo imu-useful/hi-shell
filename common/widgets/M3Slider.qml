@@ -2,7 +2,7 @@ import QtQuick
 import qs.common
 import qs.services
 
-// Material 3 slider: thick track, active part in primary, bar-shaped handle.
+// Slider: a hairline for the rest of the track, a thick accent bar for the value, a narrow handle.
 // Emits moved(value) on drag / click / scroll; `value` is 0..1 and owned by the caller.
 // Changes animate (scroll, keys, other apps), except while the handle is dragged.
 Item {
@@ -17,7 +17,7 @@ Item {
     signal moved(real value)
 
     implicitWidth: 200
-    implicitHeight: 40
+    implicitHeight: 28
 
     readonly property real clamped: Math.max(0, Math.min(1, value))
     // What's drawn: follows `clamped` with an animation.
@@ -52,32 +52,31 @@ Item {
         root.moved(Math.max(0, Math.min(1, (x - handle.width / 2) / (width - handle.width))));
     }
 
-    // A player's progress: thin track with a wave for the played part.
+    // A player's progress: a wave for the played part.
     readonly property bool wavy: playback && Config.options.desktop.waveProgress
-    readonly property int trackHeight: wavy ? 4 : 16
+    readonly property int trackHeight: wavy ? 4 : 6
 
-    // Inactive track
+    // Inactive track: a hairline.
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
-        x: root.handleX + handle.width + 4
+        x: root.handleX + handle.width + 3
         width: Math.max(0, root.width - x)
-        height: root.trackHeight
-        radius: height / 2
-        color: Colors.m3secondaryContainer
+        height: Math.max(1, Appearance.edge)
+        color: Colors.m3outline
     }
 
     // Active track
     Rectangle {
         visible: !root.wavy
         anchors.verticalCenter: parent.verticalCenter
-        width: Math.max(0, root.handleX - 4)
-        height: 16
-        radius: 8
+        width: Math.max(0, root.handleX - 3)
+        height: root.trackHeight
+        radius: Math.min(Appearance.rounding.extraSmall, height / 2)
         color: Colors.m3primary
     }
     WaveFill {
         visible: root.wavy
-        fill: Math.max(0, root.handleX - 4)
+        fill: Math.max(0, root.handleX - 3)
         thickness: root.trackHeight
         playing: Mpris.playing
     }
@@ -86,16 +85,17 @@ Item {
         id: handle
         x: root.handleX
         anchors.verticalCenter: parent.verticalCenter
-        width: 4
-        height: mouse.pressed ? 40 : 32
-        radius: 2
-        color: Colors.m3primary
+        width: 3
+        height: mouse.pressed ? 22 : mouse.containsMouse ? 20 : 16
+        radius: 1
+        color: Colors.m3onSurface
         Behavior on height { NumberAnimation { duration: 100 } }
     }
 
     MouseArea {
         id: mouse
         anchors.fill: parent
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         preventStealing: true
         onPressed: mouse => root.moveTo(mouse.x)

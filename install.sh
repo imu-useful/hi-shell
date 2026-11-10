@@ -151,16 +151,16 @@ choose_channel
 PACMAN_PKGS=(
     matugen python pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
     libnotify hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
-    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools wtype ffmpeg qt6-multimedia-ffmpeg starship
+    cava imagemagick curl libqalculate tesseract tesseract-data-eng tesseract-data-rus wf-recorder pacman-contrib git python-fonttools wtype ffmpeg qt6-multimedia-ffmpeg starship ttf-jetbrains-mono
 )
-AUR_PKGS=(quickshell-git ttf-material-symbols-variable-git)
+AUR_PKGS=(quickshell-git ttf-material-symbols-variable-git otf-space-grotesk)
 
 # NixOS names of the same packages (nixpkgs).
 NIX_PKGS=(
     matugen python3 pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
     libnotify hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
     cava imagemagick curl libqalculate tesseract wf-recorder git python3Packages.fonttools wtype ffmpeg
-    quickshell material-symbols
+    quickshell material-symbols space-grotesk jetbrains-mono
 )
 
 if $DEPS && $IS_NIXOS; then

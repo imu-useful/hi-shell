@@ -168,8 +168,8 @@ ColumnLayout {
         icon: "text_fields"
         title: Translation.tr("Fonts")
 
-        TextRow { icon: "font_download"; title: Translation.tr("Interface"); value: a.fonts.main; onEdited: text => a.fonts.main = text || "Google Sans Flex" }
-        TextRow { icon: "title"; title: Translation.tr("Titles"); value: a.fonts.title; onEdited: text => a.fonts.title = text || "Google Sans Flex" }
+        TextRow { icon: "font_download"; title: Translation.tr("Interface"); value: a.fonts.main; onEdited: text => a.fonts.main = text || "Space Grotesk" }
+        TextRow { icon: "title"; title: Translation.tr("Titles"); value: a.fonts.title; onEdited: text => a.fonts.title = text || "Space Grotesk" }
         TextRow { icon: "code"; title: Translation.tr("Monospace"); value: a.fonts.mono; onEdited: text => a.fonts.mono = text || "JetBrains Mono" }
         ChoiceRow {
             icon: "format_bold"
