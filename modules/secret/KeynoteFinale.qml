@@ -94,7 +94,7 @@ Item {
         id: wall
 
         readonly property real shown: root.within(3, 0.35, 0.3)
-        readonly property real cardWidth: root.u * 0.3
+        readonly property real cardWidth: root.u * 0.4
         readonly property real cardHeight: root.u * 0.13
         readonly property real gap: root.u * 0.025
 
@@ -160,7 +160,9 @@ Item {
 
                         Text {
                             x: parent.height * 0.98
+                            width: parent.width - x - parent.height * 0.25
                             anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
                             text: parent.card[1]
                             color: "white"
                             font.family: Appearance.font.title
