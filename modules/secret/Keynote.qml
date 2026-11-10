@@ -52,6 +52,7 @@ Item {
 
     property real qmlLines: 0
     property real commands: 0
+    property real settings: 0
 
     function clamp(x) {
         return Math.max(0, Math.min(1, x));
@@ -109,12 +110,14 @@ Item {
         running: true
         command: ["sh", "-c", `cd "$1" || exit 1
             find -L . -name '*.qml' -not -path './.git/*' -exec cat {} + | wc -l
-            sed -n '/^COMMANDS="/,/"$/p' sh/hi-shell | tr -d '"' | sed 's/^COMMANDS=//' | wc -w`, "sh", Quickshell.shellPath("")]
+            sed -n '/^COMMANDS="/,/"$/p' sh/hi-shell | tr -d '"' | sed 's/^COMMANDS=//' | wc -w
+            grep -cE '^\\s*property (var|bool|int|real|string|list|color|url)' common/ConfigOptions.qml`, "sh", Quickshell.shellPath("")]
         stdout: StdioCollector {
             onStreamFinished: {
                 const n = text.trim().split(/\s+/).map(Number);
                 root.qmlLines = n[0] || 40000;
                 root.commands = n[1] || 50;
+                root.settings = n[2] || 200;
             }
         }
     }
@@ -311,9 +314,8 @@ Item {
 
             KeynoteSlides.Stat {
                 kick: root.kick
-                value: 0
-                suffix: " MB"
-                label: Translation.tr("of Electron")
+                value: root.settings
+                label: Translation.tr("settings")
                 size: root.headline * 0.95
                 colors: ["#30d158", "#64d2ff", "#30d158"]
                 time: root.time

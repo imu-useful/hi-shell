@@ -1455,7 +1455,6 @@
     "Built different.": "Сделан иначе.",
     "lines of QML": "строк QML",
     "commands in hi": "команд в hi",
-    "of Electron": "Electron",
     "Everything. In one place.": "Всё. В одном месте.",
     "Claude, built in": "Claude внутри",
     "Ask anything, right from the desktop.": "Спроси что угодно прямо с рабочего стола.",
@@ -1472,5 +1471,6 @@
     "Free. Open source. Yours.": "Бесплатно. Открыто. Твоё.",
     "Wi-Fi, Bluetooth and sound.": "Wi-Fi, Bluetooth и звук.",
     "Live, glanceable, yours.": "Живые, наглядные, твои.",
-    "Your desktop is ready.": "Рабочий стол готов."
+    "Your desktop is ready.": "Рабочий стол готов.",
+    "settings": "настроек"
 }
