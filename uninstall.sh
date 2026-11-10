@@ -96,5 +96,9 @@ else
     echo "Your settings are kept in $CONFIG (use --purge to delete them)."
 fi
 
-[[ -n "$repo" ]] && echo "The repo is still at $repo; delete it if you don't need it."
+if [[ -n "$repo" && -f "$repo/.package" ]]; then
+    echo "The package stays installed; remove it with: sudo pacman -R $(cut -d' ' -f1 "$repo/.package")"
+elif [[ -n "$repo" ]]; then
+    echo "The repo is still at $repo; delete it if you don't need it."
+fi
 echo "hi-shell is uninstalled."

@@ -48,10 +48,14 @@ doctor() {
     link="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/hi-shell"
     if [ "$(readlink -f "$link" 2>/dev/null)" = "$repo" ]; then row "✔" "link" "$link -> $repo"
     else row "✘" "link" "$link doesn't point at $repo: run hi install"; bad=1; fi
-    case ":$PATH:" in
-        *":$HOME/.local/bin:"*) row "✔" "PATH" "~/.local/bin is on it" ;;
-        *) row "–" "PATH" "~/.local/bin isn't on PATH: hi works only by its full path" ;;
-    esac
+    if [ -f "$repo/.package" ]; then
+        row "✔" "package" "installed with pacman, hi is in /usr/bin"
+    else
+        case ":$PATH:" in
+            *":$HOME/.local/bin:"*) row "✔" "PATH" "~/.local/bin is on it" ;;
+            *) row "–" "PATH" "~/.local/bin isn't on PATH: hi works only by its full path" ;;
+        esac
+    fi
     hypr_dir="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
     if grep -rqF --include='*.lua' ".config/hypr/hi-shell/init.lua" "$hypr_dir" 2>/dev/null; then row "✔" "hyprland" "loads hypr/hi-shell/init.lua"
     else row "✘" "hyprland" "the Hyprland config doesn't load hi-shell: hi install"; bad=1; fi
@@ -430,6 +434,11 @@ repo_script() { # repo_script <file> [args]
 }
 
 version_line() {
+    # The pacman package: its version (.package is "<name> <version>"), there's no git there.
+    if [ -f "$repo/.package" ]; then
+        echo "hi-shell $(cut -d' ' -f2 "$repo/.package") (pacman package $(cut -d' ' -f1 "$repo/.package"))"
+        return
+    fi
     v=$(git -C "$repo" describe --tags --always 2>/dev/null) || v="unknown"
     d=$(git -C "$repo" log -1 --format=%cs 2>/dev/null)
     echo "hi-shell $v${d:+ ($d)}"
@@ -452,6 +461,7 @@ channel() {
     case "${1:-}" in
         "") channel_get ;;
         git | release)
+            [ -f "$repo/.package" ] && { echo "hi-shell is installed with pacman: it updates with the package, not from a channel" >&2; exit 1; }
             if running; then ipc config set update.channel "\"$1\"" >/dev/null
             else
                 # The shell isn't there to save it: the file, keeping the rest.

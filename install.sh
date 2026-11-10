@@ -50,6 +50,15 @@ for arg in "$@"; do
     esac
 done
 
+# Run from the pacman package (/usr/share/hi-shell, which has .package): pacman put the files and the
+# packages in place and updates them, so this only sets up your user: the link, Hyprland, the dots.
+self="${BASH_SOURCE[0]:-$0}"
+SCRIPT_DIR="$(cd -P "$(dirname "$(readlink -f "$self" 2>/dev/null || echo "$self")")" 2>/dev/null && pwd -P || true)"
+PACKAGED=false
+if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/.package" && -f "$SCRIPT_DIR/shell.qml" ]]; then
+    PACKAGED=true DEPS=false CHANNEL=release
+fi
+
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 warn() { echo "${yellow}warning:${reset} $*" >&2; }
@@ -72,6 +81,8 @@ ask() { # ask "Should I do x?" -> 0 for yes; "a" answers yes to this and every l
 # One line per part; the hi-shell files themselves (source and link) are always installed.
 APP_PARTS=(zen telegram vesktop osu steam spotify neovim)
 PARTS=(deps hypr fish kitty fastfetch btop dolphin "${APP_PARTS[@]}" start)
+# The package brings its packages itself.
+$PACKAGED && PARTS=("${PARTS[@]:1}")
 declare -A PART_NAME=(
     [deps]="Packages hi-shell needs (pacman and AUR)"
     [hypr]="Load hi-shell from your Hyprland config"
@@ -157,6 +168,7 @@ else
     command -v pacman >/dev/null || die "hi-shell targets Arch Linux and NixOS (pacman not found)"
 fi
 choose_parts
+$PACKAGED && DEPS=false
 
 # Where update.sh gets updates from; kept in the config (update.channel).
 choose_channel() {
@@ -283,9 +295,10 @@ fi
 step "Source"
 # The real folder, symlinks resolved: run as ~/.config/quickshell/hi-shell/install.sh it would otherwise
 # take the link for the checkout and point the link at itself ("Too many levels of symbolic links").
-self="${BASH_SOURCE[0]:-$0}"
-SCRIPT_DIR="$(cd -P "$(dirname "$(readlink -f "$self" 2>/dev/null || echo "$self")")" 2>/dev/null && pwd -P || true)"
-if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/shell.qml" && -d "$SCRIPT_DIR/.git" ]]; then
+if $PACKAGED; then
+    REPO="$SCRIPT_DIR"
+    echo "Using the pacman package: $REPO (it updates with the system)"
+elif [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/shell.qml" && -d "$SCRIPT_DIR/.git" ]]; then
     REPO="$SCRIPT_DIR"
     echo "Using this checkout: $REPO"
 elif [[ -d "$CLONE_DIR/.git" ]]; then
@@ -339,44 +352,49 @@ else
 fi
 echo "$target -> $REPO"
 
-# The command line (hi-shell doctor, qr, keybinds, ipc) in ~/.local/bin, if nothing else uses that name.
-cli="$HOME/.local/bin/hi-shell"
-mkdir -p "$HOME/.local/bin"
-if [[ ! -e "$cli" || -L "$cli" ]]; then
-    ln -sfn "$REPO/sh/hi-shell" "$cli"
-    echo "$cli -> $REPO/sh/hi-shell"
+# The package puts hi in /usr/bin and its completions in the system folders.
+if $PACKAGED; then
+    echo "hi and its completions come with the package"
 else
-    warn "$cli exists and isn't a link, left alone"
-fi
-# The short name, `hi`, and its fish completions.
-short="$HOME/.local/bin/hi"
-if [[ ! -e "$short" || -L "$short" ]]; then
-    ln -sfn "$REPO/sh/hi-shell" "$short"
-    echo "$short -> $REPO/sh/hi-shell"
-fi
-# Completions for hi in every shell that's installed (all three ask `hi __complete`).
-data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
-if command -v fish >/dev/null; then
-    mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions"
-    ln -sfn "$REPO/sh/completions/hi.fish" "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions/hi.fish"
-fi
-if command -v bash >/dev/null; then
-    # bash-completion loads these by the command's name.
-    mkdir -p "$data_home/bash-completion/completions"
-    for n in hi hi-shell; do ln -sfn "$REPO/sh/completions/hi.bash" "$data_home/bash-completion/completions/$n"; done
-fi
-if command -v zsh >/dev/null; then
-    zfuncs="$data_home/zsh/site-functions"
-    mkdir -p "$zfuncs"
-    ln -sfn "$REPO/sh/completions/hi.zsh" "$zfuncs/_hi"
-    if ! zsh -ic 'print -l $fpath' 2>/dev/null | grep -qxF "$zfuncs"; then
-        echo "zsh: for completions of hi, add this line to ~/.zshrc before compinit: fpath+=($zfuncs)"
+    # The command line (hi-shell doctor, qr, keybinds, ipc) in ~/.local/bin, if nothing else uses that name.
+    cli="$HOME/.local/bin/hi-shell"
+    mkdir -p "$HOME/.local/bin"
+    if [[ ! -e "$cli" || -L "$cli" ]]; then
+        ln -sfn "$REPO/sh/hi-shell" "$cli"
+        echo "$cli -> $REPO/sh/hi-shell"
+    else
+        warn "$cli exists and isn't a link, left alone"
     fi
+    # The short name, `hi`, and its fish completions.
+    short="$HOME/.local/bin/hi"
+    if [[ ! -e "$short" || -L "$short" ]]; then
+        ln -sfn "$REPO/sh/hi-shell" "$short"
+        echo "$short -> $REPO/sh/hi-shell"
+    fi
+    # Completions for hi in every shell that's installed (all three ask `hi __complete`).
+    data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+    if command -v fish >/dev/null; then
+        mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions"
+        ln -sfn "$REPO/sh/completions/hi.fish" "${XDG_CONFIG_HOME:-$HOME/.config}/fish/completions/hi.fish"
+    fi
+    if command -v bash >/dev/null; then
+        # bash-completion loads these by the command's name.
+        mkdir -p "$data_home/bash-completion/completions"
+        for n in hi hi-shell; do ln -sfn "$REPO/sh/completions/hi.bash" "$data_home/bash-completion/completions/$n"; done
+    fi
+    if command -v zsh >/dev/null; then
+        zfuncs="$data_home/zsh/site-functions"
+        mkdir -p "$zfuncs"
+        ln -sfn "$REPO/sh/completions/hi.zsh" "$zfuncs/_hi"
+        if ! zsh -ic 'print -l $fpath' 2>/dev/null | grep -qxF "$zfuncs"; then
+            echo "zsh: for completions of hi, add this line to ~/.zshrc before compinit: fpath+=($zfuncs)"
+        fi
+    fi
+    case ":$PATH:" in
+        *":$HOME/.local/bin:"*) ;;
+        *) warn "$HOME/.local/bin isn't on your PATH: add it to use the hi command (fish: fish_add_path ~/.local/bin)" ;;
+    esac
 fi
-case ":$PATH:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) warn "$HOME/.local/bin isn't on your PATH: add it to use the hi command (fish: fish_add_path ~/.local/bin)" ;;
-esac
 
 # --- Hyprland integration ---
 # hypr/hi-shell/ (startup, keybinds, window and layer rules, ...) is copied into your Hyprland
@@ -405,24 +423,24 @@ copy_hypr_lua() {
     # "Keep my Hyprland files on update" (Settings > Hyprland): add only the files you don't have.
     keep="$(python3 -c 'import json,sys; print(str(bool(json.load(open(sys.argv[1])).get("hyprland", {}).get("keepFiles"))).lower())' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo false)"
     if [[ "$keep" == true ]]; then
-        for src in "$REPO"/hypr/hi-shell/*.lua; do
+        for src in "$REPO"/hypr/hi-shell/*.{lua,sh}; do
             [[ -e "$HYPR_LUA_DIR/$(basename "$src")" ]] || cp "$src" "$HYPR_LUA_DIR/"
         done
         echo "Kept your files in $HYPR_LUA_DIR (Settings > Hyprland > Keep my Hyprland files on update)"
         return 0
     fi
-    for src in "$REPO"/hypr/hi-shell/*.lua; do
+    for src in "$REPO"/hypr/hi-shell/*.{lua,sh}; do
         name="$(basename "$src")"
         [[ -f "$HYPR_LUA_DIR/$name" ]] && ! cmp -s "$src" "$HYPR_LUA_DIR/$name" && changed=true
     done
     if $changed && ! ask "Files in $HYPR_LUA_DIR differ from hi-shell's. Replace them (yours are kept as <name>.backup-<date>)?"; then
         # Only the files you don't have yet.
-        for src in "$REPO"/hypr/hi-shell/*.lua; do
+        for src in "$REPO"/hypr/hi-shell/*.{lua,sh}; do
             [[ -e "$HYPR_LUA_DIR/$(basename "$src")" ]] || cp "$src" "$HYPR_LUA_DIR/"
         done
         return 0
     fi
-    for src in "$REPO"/hypr/hi-shell/*.lua; do
+    for src in "$REPO"/hypr/hi-shell/*.{lua,sh}; do
         name="$(basename "$src")"
         if [[ -f "$HYPR_LUA_DIR/$name" ]] && ! cmp -s "$src" "$HYPR_LUA_DIR/$name"; then
             cp "$HYPR_LUA_DIR/$name" "$HYPR_LUA_DIR/$name.backup-$(date +%Y%m%d-%H%M%S)"

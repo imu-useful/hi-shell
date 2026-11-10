@@ -1,0 +1,70 @@
+# Maintainer: imu-useful <https://github.com/imu-useful>
+# hi-shell from its tagged releases. The files go to /usr/share/hi-shell; each user then runs
+# `hi install` once (the ~/.config/quickshell link and the line in the Hyprland config).
+pkgname=hi-shell
+pkgver=2.1.0
+pkgrel=1
+pkgdesc="A Quickshell desktop shell for Hyprland: bar, dock, launcher, sidebars, notifications, Material You colors"
+arch=('any')
+url="https://github.com/imu-useful/hi-shell"
+license=('GPL-2.0-only')
+depends=(
+    'bash' 'python' 'python-fonttools'
+    'hyprland' 'quickshell' 'qt6-multimedia-ffmpeg' 'ttf-material-symbols-variable'
+    'matugen' 'imagemagick' 'curl'
+    'pipewire' 'wireplumber' 'networkmanager' 'bluez' 'upower' 'libnotify'
+    'wl-clipboard' 'cliphist'
+)
+optdepends=(
+    'grim: screenshots'
+    'slurp: screenshots of a region'
+    'wf-recorder: screen recording'
+    'ffmpeg: screen recording, video wallpapers'
+    'tesseract: text from the screen (OCR)'
+    'tesseract-data-eng: OCR in English'
+    'tesseract-data-rus: OCR in Russian'
+    'translate-shell: the translator'
+    'libqalculate: the calculator in the launcher'
+    'hyprlock: the lock screen'
+    'hypridle: idle lock and sleep'
+    'hyprsunset: night light'
+    'hyprpicker: the color picker'
+    'brightnessctl: screen brightness'
+    'ddcutil: brightness of external monitors'
+    'cava: the music visualizer'
+    'wtype: typing emoji and clipboard entries'
+    'pacman-contrib: the package updates in the bar (checkupdates)'
+    'paru: AUR updates in the bar'
+    'yay: AUR updates in the bar'
+    'fd: file search in the launcher'
+    'qrencode: hi qr'
+    'starship: the prompt of the fish config'
+    'claude-code: the AI chat and palette'
+)
+install=hi-shell.install
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+    cd "$pkgname-$pkgver"
+    local dest="$pkgdir/usr/share/hi-shell"
+
+    install -dm755 "$dest"
+    # The shell's files; not the tests and notes for working on it.
+    cp -r --no-preserve=ownership common docs dots hypr modules services sh sounds tools translations wait-mode \
+        shell.qml run.sh install.sh update.sh uninstall.sh README.md KEYBINDS.md "$dest/"
+    find "$dest" -name '__pycache__' -prune -exec rm -rf {} +
+    # Marks a pacman install: update.sh, hi and Settings leave the updates to pacman.
+    echo "$pkgname $pkgver-$pkgrel" >"$dest/.package"
+
+    install -dm755 "$pkgdir/usr/bin"
+    ln -s /usr/share/hi-shell/sh/hi-shell "$pkgdir/usr/bin/hi-shell"
+    ln -s /usr/share/hi-shell/sh/hi-shell "$pkgdir/usr/bin/hi"
+
+    install -Dm644 sh/completions/hi.fish "$pkgdir/usr/share/fish/vendor_completions.d/hi.fish"
+    install -Dm644 sh/completions/hi.bash "$pkgdir/usr/share/bash-completion/completions/hi"
+    ln -s hi "$pkgdir/usr/share/bash-completion/completions/hi-shell"
+    install -Dm644 sh/completions/hi.zsh "$pkgdir/usr/share/zsh/site-functions/_hi"
+
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

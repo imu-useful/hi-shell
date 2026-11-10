@@ -142,6 +142,22 @@ Options: `--yes` (no menu and no questions: installs everything except the optio
 `--only=hypr,fish` / `--skip=deps` (pick the parts without the menu; `--list` prints their names). Later, `hi install` runs the
 installer again (it repairs the links and the Hyprland line) and `hi uninstall` removes hi-shell. Then tap <kbd>Super</kbd>.
 
+### As a pacman package
+
+The repo has a `PKGBUILD` (`packaging/aur/hi-shell/`). It builds hi-shell from the latest tagged release and pulls
+in the packages it needs:
+
+```sh
+git clone https://github.com/imu-useful/hi-shell.git && cd hi-shell/packaging/aur/hi-shell
+makepkg -si
+hi install    # once, as your user: the ~/.config/quickshell link and the line in your Hyprland config
+```
+
+The files go to `/usr/share/hi-shell` and `hi` to `/usr/bin`. The shell then updates with the system (`paru -Syu`, `yay -Syu`),
+not from Settings → About; after an update, `hi restart`, and `hi install` brings new keybinds and rules to
+`~/.config/hypr/hi-shell/` (it asks before replacing a file you edited). To remove it: `hi uninstall`, then `sudo pacman -R hi-shell`.
+The optional programs (screenshots, OCR, night light, ...) are listed by `pacman -Qi hi-shell` and checked by `hi doctor`.
+
 ### NixOS
 
 The installer runs on NixOS too, but it doesn't install packages there: it prints the nixpkgs names of what hi-shell

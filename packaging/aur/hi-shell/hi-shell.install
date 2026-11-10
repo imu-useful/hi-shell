@@ -1,0 +1,17 @@
+post_install() {
+    echo ":: hi-shell is installed. To use it, run once as your user (not root):"
+    echo "     hi install"
+    echo "   It links hi-shell into ~/.config/quickshell and loads it from your Hyprland config."
+    echo "   To remove it later: hi uninstall first, then pacman -R hi-shell."
+}
+
+post_upgrade() {
+    echo ":: hi-shell updated: restart it with  hi restart"
+    echo "   New keybinds or rules reach ~/.config/hypr/hi-shell with  hi install  (it asks before"
+    echo "   replacing a file you edited)."
+}
+
+post_remove() {
+    echo ":: hi-shell removed. If you didn't run hi uninstall before, take the dofile(... hypr/hi-shell/init.lua)"
+    echo "   line out of your Hyprland config and delete the ~/.config/quickshell/hi-shell link."
+}

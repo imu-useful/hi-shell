@@ -26,6 +26,10 @@ Singleton {
     // The shell itself: how many changes its update would bring (-1: not checked, or no network).
     // A git checkout, so it's the repo's upstream (git channel) or its newest release tag (release).
     readonly property string repo: Quickshell.shellDir
+    // Installed with pacman (the package writes .package, "<name> <version>"): the shell updates with the
+    // system upgrade, so it has no update of its own (the package shows among the AUR updates).
+    property bool packaged: false
+    property string packageVersion: ""
     property int shellBehind: -1
     // What the update brings: the release's tag and notes, or the new commits (git)
     property string shellRelease: ""
@@ -102,7 +106,7 @@ Singleton {
     Process {
         id: shellChecker
         // Line 1: how many changes. Release: line 2 is the tag, then its notes. Git: the new commits ("hash subject").
-        command: ["sh", "-c", `cd "${root.repo}" && git fetch -q --tags 2>/dev/null || exit 1; ` + (Config.options.update.channel === "release"
+        command: ["sh", "-c", `cd "${root.repo}" || exit 1; [ -f .package ] && { echo 0; exit 0; }; git fetch -q --tags 2>/dev/null || exit 1; ` + (Config.options.update.channel === "release"
             ? `latest=$(git tag -l 'v*' --sort=-v:refname | head -1); current=$(git describe --tags --abbrev=0 2>/dev/null); if [ "$latest" = "$current" ]; then echo 0; else echo 1; echo "$latest"; git for-each-ref --format='%(contents)' "refs/tags/$latest" | head -30; fi`
             : `git rev-list --count HEAD..@{u} || exit 1; git log -10 --format='%h %s' HEAD..@{u}`)]
         stdout: StdioCollector {
@@ -119,6 +123,16 @@ Singleton {
         onExited: code => {
             if (code !== 0)
                 root.shellBehind = -1;
+        }
+    }
+
+    FileView {
+        path: `${root.repo}/.package`
+        printErrors: false
+        onLoaded: {
+            const f = text().trim().split(/\s+/);
+            root.packaged = f[0] !== "";
+            root.packageVersion = f[1] ?? "";
         }
     }
 

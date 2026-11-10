@@ -27,6 +27,13 @@ done
 
 # The repo this script lives in (works through the ~/.config/quickshell symlink too).
 REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+# Installed with pacman (the AUR package writes .package): pacman updates it, along with the system.
+if [[ -f "$REPO/.package" ]]; then
+    read -r pkg ver <"$REPO/.package" || true
+    echo "hi-shell ${ver:-} is installed with pacman (package ${pkg:-hi-shell}): it updates with the system,"
+    echo "e.g. paru -Syu or yay -Syu. Then restart the shell: hi restart"
+    exit 1
+fi
 [[ -d "$REPO/.git" ]] || die "$REPO is not a git checkout; reinstall with install.sh"
 cd "$REPO"
 
@@ -108,7 +115,7 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
             git diff --name-only "$before" "$after" -- hypr/hi-shell | sed 's#^hypr/hi-shell/#  #'
             echo "  see them with: git -C $REPO diff $before $after -- hypr/hi-shell"
         else
-            for src in "$REPO"/hypr/hi-shell/*.lua; do
+            for src in "$REPO"/hypr/hi-shell/*.{lua,sh}; do
                 name="$(basename "$src")"
                 mine="$hypr_dir/hi-shell/$name"
                 if [[ ! -f "$mine" ]]; then

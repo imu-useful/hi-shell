@@ -38,7 +38,7 @@ ColumnLayout {
 
     Process {
         running: true
-        command: ["sh", "-c", 'git -C "$1" log -1 --format="%h · %cs" 2>/dev/null; qs --version 2>/dev/null | head -1', "sh", Quickshell.shellDir]
+        command: ["sh", "-c", 'git -C "$1" log -1 --format="%h · %cs" 2>/dev/null || cut -s -d" " -f2 "$1/.package" 2>/dev/null || echo; qs --version 2>/dev/null | head -1', "sh", Quickshell.shellDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const l = text.trim().split("\n");
@@ -219,6 +219,7 @@ ColumnLayout {
         title: Translation.tr("Updates")
 
         ChoiceRow {
+            visible: !Updates.packaged
             icon: "sync_alt"
             title: Translation.tr("Update from")
             subtitle: Config.options.update.channel === "release" ? Translation.tr("Release: update.sh moves to the latest tagged release") : Translation.tr("Git: update.sh pulls the latest main, the newest features")
@@ -237,14 +238,16 @@ ColumnLayout {
             Layout.fillWidth: true
             icon: "deployed_code"
             title: Translation.tr("hi-shell")
-            subtitle: root.shellStatus
+            subtitle: Updates.packaged ? Translation.tr("Installed with pacman: it updates with the system upgrade") : root.shellStatus
             IconButton {
+                visible: !Updates.packaged
                 icon: "sync"
                 tooltip: Translation.tr("Check for updates")
                 enabled: !Updates.shellChecking
                 onClicked: Updates.checkShell()
             }
             M3Button {
+                visible: !Updates.packaged
                 text: Updates.updating ? Translation.tr("Updating…") : Translation.tr("Update the shell")
                 icon: "system_update_alt"
                 enabled: !Updates.updating

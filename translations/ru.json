@@ -1441,5 +1441,6 @@
     "Pictures": "Изображения",
     "Welcome back": "С возвращением",
     "Everything is shiny and where you left it.": "Всё блестит и лежит там, где ты оставил.",
-    "Please wait…": "Подождите…"
+    "Please wait…": "Подождите…",
+    "Installed with pacman: it updates with the system upgrade": "Установлен через pacman: обновляется вместе с системой"
 }
