@@ -18,7 +18,7 @@ Singleton {
     readonly property int tick: 5 // seconds
     readonly property int daysKept: 60
     readonly property string file: Paths.state + "/screentime.json"
-    readonly property string today: dayKey(new Date())
+    readonly property string today: dayKey(Calendar.today)
 
     // { days: { "YYYY-MM-DD": { appId: seconds } }, limits: { appId: minutes }, warned: { "YYYY-MM-DD": [appId] } }
     property var data: ({ days: {}, limits: {}, warned: {} })
@@ -78,7 +78,8 @@ Singleton {
     ]
     function verdict(seconds) {
         const range = phrases.find(p => seconds / 3600 < p.upTo);
-        const dayNumber = Math.floor(new Date() / 86400000);
+        // The local day (a UTC day number would switch the phrase at 03:00 in Moscow).
+        const dayNumber = Math.round((Calendar.today - new Date(2000, 0, 1)) / 86400000);
         return { icon: range.icon, text: range.set[dayNumber % range.set.length] };
     }
 
@@ -118,7 +119,9 @@ Singleton {
         const days = {};
         for (const key of Object.keys(data.days).sort().slice(-daysKept))
             days[key] = data.days[key];
-        store.setText(JSON.stringify(Object.assign({}, data, { days }), null, 2) + "\n");
+        // Only today's warnings matter; the older ones would pile up for ever.
+        const warned = data.warned[today] ? { [today]: data.warned[today] } : {};
+        store.setText(JSON.stringify(Object.assign({}, data, { days, warned }), null, 2) + "\n");
     }
 
     Timer {

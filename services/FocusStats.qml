@@ -32,12 +32,12 @@ Singleton {
 
     readonly property int totalFocus: sum(sessions, "focus") // minutes
     readonly property int totalTasks: sum(sessions, "tasks")
-    readonly property int todayFocus: sum(onDay(Date.now()), "focus")
-    readonly property int todayTasks: sum(onDay(Date.now()), "tasks")
+    readonly property int todayFocus: sum(onDay(Calendar.today.getTime()), "focus")
+    readonly property int todayTasks: sum(onDay(Calendar.today.getTime()), "tasks")
     // The last 7 days, oldest first: [{ time, focus, tasks }]
     readonly property var week: {
         const out = [];
-        const now = new Date();
+        const now = Calendar.today;
         for (let i = 6; i >= 0; i--) {
             const t = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 12).getTime();
             const day = onDay(t);
@@ -49,7 +49,7 @@ Singleton {
     // Days in a row with a session, up to today (or yesterday, if today has none yet).
     readonly property int streak: {
         const days = new Set(sessions.filter(s => s.focus > 0).map(s => dayKey(s.end)));
-        const now = new Date();
+        const now = Calendar.today;
         let n = 0;
         for (let i = days.has(dayKey(now.getTime())) ? 0 : 1; ; i++) {
             const t = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 12).getTime();

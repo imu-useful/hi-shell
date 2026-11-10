@@ -19,8 +19,8 @@ ColumnLayout {
     // Qt.DayOfWeek is 1 = Monday .. 7 = Sunday; JS getDay() is 0 = Sunday.
     readonly property int firstDay: locale.firstDayOfWeek % 7
     readonly property var gridStart: new Date(month.getFullYear(), month.getMonth(), 1 - (month.getDay() - firstDay + 7) % 7)
-    readonly property string todayIso: Calendar.iso(new Date())
-    readonly property bool isCurrentMonth: Calendar.iso(month) === Calendar.iso(Calendar.firstOfMonth(new Date()))
+    readonly property string todayIso: Calendar.iso(Calendar.today)
+    readonly property bool isCurrentMonth: Calendar.iso(month) === Calendar.iso(Calendar.firstOfMonth(Calendar.today))
 
     spacing: 8
 

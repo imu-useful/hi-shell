@@ -9,6 +9,13 @@ Singleton {
     id: root
 
     property var viewMonth: firstOfMonth(new Date())
+    // Today at midnight. A binding on new Date() is read once, so whatever is "today" (the calendar's
+    // mark, screen time, Focus stats) reads this, and it moves on at midnight in a shell left running.
+    property var today: dayOf(new Date())
+
+    function dayOf(d) {
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
 
     function iso(d) {
         return Qt.formatDate(d, "yyyy-MM-dd");
@@ -24,5 +31,14 @@ Singleton {
 
     function resetMonth() {
         viewMonth = firstOfMonth(new Date());
+    }
+
+    SystemClock {
+        precision: SystemClock.Minutes
+        onDateChanged: {
+            const day = root.dayOf(date);
+            if (day.getTime() !== root.today.getTime())
+                root.today = day;
+        }
     }
 }
