@@ -7,7 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
-| [`appearance`](#appearance) | 36 |
+| [`appearance`](#appearance) | 37 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
 | [`launcher`](#launcher) | 2 |
@@ -83,6 +83,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.borderWidth` | `int` | `-1` | -1 … 4 | Settings › Interface | Width of the outline of panels and cards in px; -1 = by the surface style. |
 | `appearance.textWeight` | `string` | `"normal"` | `light` \| `normal` \| `medium` | Settings › Interface | The default weight of the interface text: light \| normal \| medium. |
 | `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Interface | Extra space between letters in px (negative = tighter). |
+| `appearance.looks` | `var` | `{}` |  | Settings > Interface > Save this look (a map of name -> options; hi look save <name>) | Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface). |
 | `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |

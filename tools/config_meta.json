@@ -13,6 +13,9 @@
         "ui": "file: older option, use ai.models",
         "advanced": true
     },
+    "appearance.looks": {
+        "ui": "elsewhere: Settings > Interface > Save this look (a map of name -> options; hi look save <name>)"
+    },
     "appearance.colorOverrides": {
         "ui": "file: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '\"#ff6a00\"'",
         "advanced": true

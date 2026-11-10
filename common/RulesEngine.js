@@ -309,6 +309,22 @@ const templates = {
         then: [{ profile: "desk", only: "bar,dock,desktop" }],
         else: [{ profile: "undo" }]
     },
+    "battery-calm": {
+        name: "Quiet motion on battery below 30%",
+        when: { all: [{ battery: "discharging" }, { battery: { below: 30 } }] },
+        then: [{ set: "appearance.motionStyle", value: "snappy" }, { set: "appearance.animationBounce", value: 0 }, { set: "appearance.ripple", value: false }]
+    },
+    "night-look": {
+        name: "The Calm look from 22:00 to 07:00",
+        when: { time: ["22:00", "07:00"] },
+        then: [{ ipc: "looks apply Calm" }],
+        else: [{ ipc: "looks apply Soft" }]
+    },
+    "fullscreen-still": {
+        name: "No animations over a fullscreen window",
+        when: { fullscreen: true },
+        then: [{ set: "appearance.animationSpeed", value: 0 }]
+    },
     "game-mode": {
         name: "Presentation mode while Steam is open",
         when: { appOpen: "steam_app" },

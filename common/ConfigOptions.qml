@@ -75,6 +75,8 @@ JsonAdapter {
         property string textWeight: "normal"
         // Extra space between letters in px (negative = tighter).
         property real letterSpacing: 0
+        // Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface).
+        property var looks: ({})
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
         property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
