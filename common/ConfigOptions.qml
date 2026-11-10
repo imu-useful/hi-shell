@@ -24,13 +24,13 @@ JsonAdapter {
         property bool coverBackdrop: true
         property JsonObject fonts: JsonObject {
             // The interface font.
-            property string main: "Space Grotesk"
+            property string main: "Google Sans Flex"
             // The font of titles and headings.
-            property string title: "Space Grotesk"
+            property string title: "Google Sans Flex"
             // The monospace font (code, terminal-like text).
             property string mono: "JetBrains Mono"
             // The icon font; the shell makes its own cut-down copy of it at start.
-            property string icon: "Material Symbols Sharp"
+            property string icon: "Material Symbols Rounded"
         }
         // Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's.
         property real cornerScale: 1
@@ -48,15 +48,15 @@ JsonAdapter {
         // Global multiplier for animation durations (0 disables animations).
         property real animationSpeed: 1
         // The feel of motion: expressive (springy) | smooth (gentle, slower) | snappy (quick, little spring)
-        property string motionStyle: "snappy"
+        property string motionStyle: "expressive"
         // How popups (calendar, weather, AI, overview) appear: pop (grow) | drop (grow from the edge) | slide | fade
-        property string popupEffect: "fade"
+        property string popupEffect: "pop"
         // How the sidebars appear: slide | pop (grow) | fade
         property string sidebarEffect: "slide"
         // How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once
         property int paletteFade: 400
         // How the launcher appears: rise (from the screen's edge) | pop (grow) | fade
-        property string launcherEffect: "fade"
+        property string launcherEffect: "rise"
         // Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast.
         property real panelSpeed: 1
         // Speed of the bar's motion (the workspace indicator) on top of the global speed.
@@ -64,9 +64,9 @@ JsonAdapter {
         // Speed of the notification cards' motion on top of the global speed.
         property real notificationSpeed: 1
         // A wave grows from the point you press on buttons and rows.
-        property bool ripple: false
+        property bool ripple: true
         // How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller.
-        property real pressScale: 1
+        property real pressScale: 0.9
         // How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) | glass (always see-through, with an edge) | flat (solid, with an edge)
         property string surfaceStyle: "tonal"
         // Width of the outline of panels and cards in px; -1 = by the surface style.
@@ -78,7 +78,7 @@ JsonAdapter {
         // Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface).
         property var looks: ({})
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
-        property real animationBounce: 0
+        property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
         property string scheme: "tonal-spot"
         // Switch dark / light at sunset / sunrise (from the weather service's location).

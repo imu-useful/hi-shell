@@ -95,29 +95,26 @@ BarWidget {
         anchors.right: parent.right
         spacing: 8
 
-        MonoLabel {
+        StyledText {
             Layout.leftMargin: 6
             text: clock.date.toLocaleString(Translation.locale, root.options.dateFormat)
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurface
+            font.pixelSize: Appearance.font.size.normal
         }
 
         Rectangle {
-            implicitWidth: time.implicitWidth + 14
+            implicitWidth: time.implicitWidth + 16
             implicitHeight: root.thickness - 8
-            radius: Appearance.shape.chip
-            color: Qt.alpha(Colors.m3primary, 0.14)
-            border.width: Math.max(1, Appearance.edge)
-            border.color: Colors.m3primary
+            radius: Appearance.rounding.full
+            color: Colors.m3primary
 
             StyledText {
                 id: time
                 anchors.centerIn: parent
                 text: Qt.formatDateTime(clock.date, root.options.timeFormat)
-                font.family: Appearance.font.mono
                 font.pixelSize: Appearance.font.size.normal
-                font.weight: Font.Bold
-                color: Colors.m3primary
+                font.weight: Font.DemiBold
+                font.features: { "tnum": 1 }
+                color: Colors.m3onPrimary
             }
         }
     }
@@ -138,10 +135,8 @@ BarWidget {
                 required property string modelData
                 Layout.alignment: Qt.AlignHCenter
                 text: modelData
-                font.family: Appearance.font.mono
                 font.pixelSize: Appearance.font.size.bodyMedium
-                font.weight: Font.Bold
-                color: Colors.m3primary
+                font.weight: Font.DemiBold
             }
         }
     }
@@ -160,7 +155,7 @@ BarWidget {
         ShapeImage {
             Layout.preferredWidth: root.artSize
             Layout.preferredHeight: root.artSize
-            shape: "box"
+            shape: "cookie7"
             source: Mpris.artUrl
             opacity: Mpris.playing ? 1 : 0.6
         }

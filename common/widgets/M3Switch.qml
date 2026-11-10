@@ -1,7 +1,7 @@
 import QtQuick
 import qs.common
 
-// Switch: an outlined box with a square thumb; on, the box fills with the accent.
+// M3 switch; the thumb grows and shows a check when on.
 Rectangle {
     id: root
 
@@ -9,12 +9,12 @@ Rectangle {
 
     signal toggled(bool checked)
 
-    implicitWidth: 40
-    implicitHeight: 22
-    radius: Appearance.rounding.small
-    color: checked ? Colors.m3primary : "transparent"
-    border.width: checked ? 0 : Math.max(1, Appearance.edge)
-    border.color: mouse.containsMouse ? Colors.m3onSurfaceVariant : Colors.m3outline
+    implicitWidth: 52
+    implicitHeight: 32
+    radius: height / 2
+    color: checked ? Colors.m3primary : Colors.m3surfaceContainerHighest
+    border.width: checked ? 0 : 1
+    border.color: Colors.m3outlineVariant
     opacity: enabled ? 1 : Appearance.state.disabledContent
 
     Behavior on color { ColorAnim {} }
@@ -22,24 +22,33 @@ Rectangle {
     Rectangle {
         id: thumb
 
-        readonly property real size: root.height - 8
+        readonly property real size: mouse.pressed ? 28 : root.checked ? 24 : 16
 
         anchors.verticalCenter: parent.verticalCenter
-        x: root.checked ? root.width - width - 4 : 4
-        width: mouse.pressed ? size + 4 : size
+        x: root.checked ? root.width - width - 4 : (root.height - width) / 2
+        width: size
         height: size
-        radius: Math.max(0, root.radius - 1)
+        radius: width / 2
         color: root.checked ? Colors.m3onPrimary : Colors.m3outline
 
-        Behavior on x { SpatialAnim { duration: Appearance.anim.fast } }
-        Behavior on width { SpatialAnim { duration: Appearance.anim.fast } }
+        Behavior on x { SpatialAnim { duration: Appearance.anim.normal } }
+        Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
+        Behavior on height { SpatialAnim { duration: Appearance.anim.normal } }
         Behavior on color { ColorAnim {} }
+
+        MaterialIcon {
+            anchors.centerIn: parent
+            icon: "check"
+            iconSize: 16
+            color: Colors.m3onPrimaryContainer
+            opacity: root.checked ? 1 : 0
+            Behavior on opacity { EffectAnim {} }
+        }
     }
 
     MouseArea {
         id: mouse
         anchors.fill: parent
-        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             root.checked = !root.checked;

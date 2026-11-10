@@ -91,9 +91,7 @@ StyledFlickable {
                     title: entry.modelData.name
                     subtitle: entry.modelData.stateChanging ? Translation.tr("Connecting…") : entry.modelData.connected ? Translation.tr("Connected") : entry.failure || (entry.modelData.known ? Translation.tr("Saved") : entry.secured ? Translation.tr("Secured") : Translation.tr("Open"))
                     clickable: true
-                    color: entry.modelData.connected ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
-                    border.width: entry.modelData.connected ? Math.max(1, Appearance.edge) : 0
-                    border.color: Colors.m3primary
+                    color: entry.modelData.connected ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
                         if (entry.modelData.connected || entry.modelData.known && entry.failure === "") {
                             root.expanded = entry.open ? null : entry.modelData;
@@ -125,11 +123,9 @@ StyledFlickable {
                     Rectangle {
                         visible: !entry.modelData.connected && (!entry.modelData.known || entry.failure !== "")
                         Layout.fillWidth: true
-                        implicitHeight: 36
-                        radius: Appearance.shape.field
-                        color: "transparent"
-                        border.width: Math.max(1, Appearance.edge)
-                        border.color: password.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
+                        implicitHeight: 40
+                        radius: 20
+                        color: Colors.m3surfaceContainerHighest
 
                         TextInput {
                             id: password

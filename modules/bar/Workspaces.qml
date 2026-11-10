@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.services
 
 // Workspace slots for this monitor, in groups of `bar.workspaces.shown`:
-// empty = small square, occupied = the icons of its apps, up to `appsPerWorkspace` of them and
+// empty = small dot, occupied = the icons of its apps, up to `appsPerWorkspace` of them and
 // a "+N" for the rest (or a dot), active = sliding (or stretching) pill.
 // Click to switch, scroll to move to the previous / next workspace.
 BarWidget {
@@ -125,7 +125,7 @@ BarWidget {
                     visible: !root.options.numbers && !cell.hasIcons
                     width: cell.isActive ? 8 : cell.occupied ? 6 : 4
                     height: width
-                    radius: 1
+                    radius: width / 2
                     color: cell.isActive ? Colors.m3onPrimary : cell.occupied ? Colors.m3onSurfaceVariant : Colors.m3outline
                     Behavior on color { ColorAnim {} }
                     Behavior on width { SpatialAnim { duration: Appearance.anim.normal; speed: Appearance.anim.barSpeed } }
@@ -135,7 +135,6 @@ BarWidget {
                     anchors.centerIn: parent
                     visible: root.options.numbers && !cell.hasIcons
                     text: cell.wsId
-                    font.family: Appearance.font.mono
                     font.pixelSize: Appearance.font.size.labelMedium
                     font.weight: cell.isActive ? Font.DemiBold : Font.Normal
                     color: cell.isActive ? Colors.m3onPrimary : cell.occupied ? Colors.m3onSurface : Colors.m3outline
@@ -165,7 +164,6 @@ BarWidget {
                     StyledText {
                         visible: cell.extra > 0
                         text: `+${cell.extra}`
-                        font.family: Appearance.font.mono
                         font.pixelSize: Appearance.font.size.labelSmall
                         font.weight: Font.DemiBold
                         color: cell.isActive ? Colors.m3onPrimary : Colors.m3onSurfaceVariant

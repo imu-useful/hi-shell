@@ -97,11 +97,11 @@ ColumnLayout {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 34
-            radius: Appearance.shape.field
-            color: "transparent"
-            border.width: Math.max(1, Appearance.edge)
-            border.color: search.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
+            implicitHeight: 36
+            radius: 18
+            color: Colors.m3surfaceContainerHighest
+            border.width: search.activeFocus ? 2 : 0
+            border.color: Colors.m3primary
 
             RowLayout {
                 anchors.fill: parent
@@ -191,8 +191,8 @@ ColumnLayout {
 
             width: list.width
             height: 48
-            radius: Appearance.rounding.small
-            color: modelData.playing ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
+            radius: Appearance.rounding.medium
+            color: modelData.playing ? Colors.m3secondaryContainer : "transparent"
 
             RowLayout {
                 anchors.fill: parent
@@ -203,7 +203,7 @@ ColumnLayout {
                 Rectangle {
                     implicitWidth: 36
                     implicitHeight: 36
-                    radius: Appearance.rounding.small
+                    radius: 8
                     color: Colors.m3surfaceContainerHighest
                     clip: true
                     Image {

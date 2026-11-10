@@ -4,9 +4,8 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 
-// A single chat message, drawn as a block of a terminal log: a bar down the left side and a header line
-// ("❯ YOU", "◆ AI", "✕ ERROR"), then the prompt, the answer (Markdown with code blocks in their own
-// outlined cards, each with a copy button) or the error.
+// A single chat message: user prompt (right-aligned pill), Claude's answer
+// (Markdown with code blocks in their own cards, each with a copy button), or an error card.
 Item {
     id: root
 
@@ -17,8 +16,7 @@ Item {
     readonly property bool isUser: role === "user"
     readonly property bool isError: role === "error"
     readonly property bool thinking: role === "assistant" && !done && text === ""
-    readonly property color textColor: isError ? Colors.m3error : Colors.m3onSurface
-    readonly property color accent: isUser ? Colors.m3primary : isError ? Colors.m3error : Colors.m3tertiary
+    readonly property color textColor: isUser ? Colors.m3onPrimaryContainer : isError ? Colors.m3onErrorContainer : Colors.m3onSurface
 
     // Split into prose and ``` fenced code; a fence still streaming in runs to the end.
     readonly property var segments: {
@@ -45,30 +43,26 @@ Item {
     Rectangle {
         id: bubble
 
-        width: root.width
-        height: content.implicitHeight + 20
-        radius: Appearance.rounding.small
-        color: root.isUser ? Qt.alpha(Colors.m3primary, 0.08) : root.isError ? Qt.alpha(Colors.m3error, 0.1) : "transparent"
+        anchors.right: root.isUser ? parent.right : undefined
+        width: root.isUser ? Math.min(userMetrics.advanceWidth + 34, root.width * 0.8) : root.width
+        height: content.implicitHeight + 24
+        radius: 20
+        color: root.isUser ? Colors.m3primaryContainer : root.isError ? Colors.m3errorContainer : Colors.m3surfaceContainerHigh
 
-        Rectangle {
-            width: 2
-            height: parent.height
-            color: root.accent
-            opacity: root.isUser || root.isError ? 1 : 0.6
+        TextMetrics {
+            id: userMetrics
+            font.family: Appearance.font.main
+            font.pixelSize: 14
+            text: root.isUser ? root.text : ""
         }
 
         ColumnLayout {
             id: content
             anchors.fill: parent
-            anchors.margins: 10
-            anchors.leftMargin: 14
-            anchors.rightMargin: 12
-            spacing: 6
-
-            MonoLabel {
-                text: root.isUser ? "❯ " + Translation.tr("You") : root.isError ? "✕ " + Translation.tr("Error") : "◆ AI"
-                color: root.accent
-            }
+            anchors.margins: 12
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            spacing: 8
 
             RowLayout {
                 visible: root.thinking
@@ -117,10 +111,10 @@ Item {
                         id: codeBlock
                         Rectangle {
                             implicitHeight: codeColumn.implicitHeight
-                            radius: Appearance.rounding.small
-                            color: Colors.m3surfaceContainerLowest
+                            radius: Appearance.rounding.medium
+                            color: Colors.m3surfaceContainerLow
                             border.width: 1
-                            border.color: Colors.m3outlineVariant
+                            border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
                             ColumnLayout {
                                 id: codeColumn

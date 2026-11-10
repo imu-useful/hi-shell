@@ -4,8 +4,8 @@ import qs.common
 import qs.common.widgets
 
 // Base for bar widgets. Lives inside a BarSection Loader, which provides `bar`
-// (orientation, style, popup edge). Draws the widget's outlined box in every style but
-// "islands", where the section itself is the box.
+// (orientation, style, popup edge). Draws the widget's pill in every style but
+// "islands", where the section itself is the pill.
 //
 // Children go into a content area (the widget minus padding); declare the
 // preferred content size with `contentWidth` / `contentHeight`.
@@ -49,12 +49,11 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.pill || root.active
-        radius: Appearance.shape.button
-        color: root.active ? Qt.alpha(Colors.m3primary, 0.14) : root.bar?.style === "m3" ? Colors.m3surfaceContainerHigh : "transparent"
-        border.width: Appearance.edge
-        border.color: root.active ? Colors.m3primary : Colors.m3outlineVariant
+        // Pressing a clickable widget morphs its pill into a rounded rectangle, and it springs back.
+        radius: root.clickable && area.pressed ? Appearance.rounding.medium : Appearance.shape.button
+        Behavior on radius { SpatialAnim {} }
+        color: root.active ? Colors.m3secondaryContainer : (root.bar?.style === "m3" ? Colors.m3surfaceContainerHighest : Colors.m3surfaceContainerHigh)
         Behavior on color { ColorAnim {} }
-        Behavior on border.color { ColorAnim {} }
     }
 
     HoverHandler {
@@ -80,8 +79,8 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: Appearance.shape.button
-            color: Colors.m3primary
+            radius: root.clickable && area.pressed ? Appearance.rounding.medium : Appearance.shape.button
+            color: Colors.m3onSurface
             opacity: parent.pressed ? Appearance.state.press + 0.02 : root.hovered ? Appearance.state.hover : 0
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
         }

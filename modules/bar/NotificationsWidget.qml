@@ -33,14 +33,13 @@ BarWidget {
             anchors.verticalCenter: parent.verticalCenter
             implicitWidth: Math.max(18, count.implicitWidth + 8)
             implicitHeight: 18
-            radius: Appearance.rounding.extraSmall
+            radius: 9
             color: Colors.m3primary
 
             StyledText {
                 id: count
                 anchors.centerIn: parent
                 text: Notifications.unread > 99 ? "99+" : Notifications.unread
-                font.family: Appearance.font.mono
                 font.pixelSize: Appearance.font.size.labelSmall
                 font.weight: Font.DemiBold
                 color: Colors.m3onPrimary

@@ -9,12 +9,11 @@ const keys = ["cornerScale", "surfaceStyle", "borderWidth", "textWeight", "lette
     "animationBounce", "density", "transparency", "transparencyLevel", "pressScale", "popupEffect", "sidebarEffect", "launcherEffect"];
 
 const builtin = {
-    "Terminal": { icon: "terminal", set: { cornerScale: 1, surfaceStyle: "tonal", borderWidth: -1, textWeight: "normal", letterSpacing: 0, motionStyle: "snappy", animationBounce: 0, density: "comfortable", pressScale: 1, popupEffect: "fade", sidebarEffect: "slide", launcherEffect: "fade" } },
-    "Soft": { icon: "spa", set: { cornerScale: 2, surfaceStyle: "tonal", borderWidth: -1, textWeight: "normal", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1, density: "comfortable", popupEffect: "pop", sidebarEffect: "slide" } },
-    "Glass": { icon: "blur_on", set: { cornerScale: 1.8, surfaceStyle: "glass", borderWidth: 1, textWeight: "normal", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0.4, density: "comfortable", popupEffect: "drop", sidebarEffect: "fade" } },
-    "Sharp": { icon: "crop_square", set: { cornerScale: 0, surfaceStyle: "flat", borderWidth: 2, textWeight: "medium", letterSpacing: 0.3, motionStyle: "snappy", animationBounce: 0, density: "compact", popupEffect: "fade", sidebarEffect: "slide" } },
-    "Playful": { icon: "celebration", set: { cornerScale: 2, surfaceStyle: "tonal", borderWidth: -1, textWeight: "medium", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1.8, density: "spacious", popupEffect: "drop", sidebarEffect: "pop" } },
-    "Calm": { icon: "self_improvement", set: { cornerScale: 1.6, surfaceStyle: "tonal", borderWidth: 0, textWeight: "light", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0, density: "spacious", popupEffect: "fade", sidebarEffect: "fade" } }
+    "Soft": { icon: "spa", set: { cornerScale: 1, surfaceStyle: "tonal", borderWidth: -1, textWeight: "normal", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1, density: "comfortable", popupEffect: "pop", sidebarEffect: "slide" } },
+    "Glass": { icon: "blur_on", set: { cornerScale: 1.2, surfaceStyle: "glass", borderWidth: 1, textWeight: "normal", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0.4, density: "comfortable", popupEffect: "drop", sidebarEffect: "fade" } },
+    "Sharp": { icon: "crop_square", set: { cornerScale: 0.2, surfaceStyle: "flat", borderWidth: 2, textWeight: "medium", letterSpacing: 0.3, motionStyle: "snappy", animationBounce: 0, density: "compact", popupEffect: "fade", sidebarEffect: "slide" } },
+    "Playful": { icon: "celebration", set: { cornerScale: 1.6, surfaceStyle: "tonal", borderWidth: -1, textWeight: "medium", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1.8, density: "spacious", popupEffect: "drop", sidebarEffect: "pop" } },
+    "Calm": { icon: "self_improvement", set: { cornerScale: 1, surfaceStyle: "tonal", borderWidth: 0, textWeight: "light", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0, density: "spacious", popupEffect: "fade", sidebarEffect: "fade" } }
 };
 
 // A look's name: letters, digits, space, . _ - (it is a key in config).

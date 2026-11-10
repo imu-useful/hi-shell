@@ -308,62 +308,56 @@ ColumnLayout {
                     id: body
                     anchors.fill: parent
                     anchors.margins: root.android ? 0 : 2
-                    radius: Appearance.shape.tile
-                    // Off: an outlined box; on: the accent edge over an accent tint, and a bar down the left side.
-                    color: tile.t.active ? Qt.alpha(Colors.m3primary, 0.14) : Appearance.translucent(Colors.m3surfaceContainerLow)
-                    border.width: Math.max(1, Appearance.edge)
-                    border.color: tile.t.active ? Colors.m3primary : root.editing ? Colors.m3outline : Colors.m3outlineVariant
+                    radius: root.android ? (tile.t.active ? Appearance.shape.button : Appearance.shape.tile) : height / 2
+                    color: tile.t.active ? Colors.m3primary : Colors.m3surfaceContainerHighest
+                    border.width: root.editing ? 1 : 0
+                    border.color: Colors.m3outline
 
                     Behavior on color { ColorAnim {} }
-                    Behavior on border.color { ColorAnim {} }
+                    Behavior on radius { SpatialAnim { duration: Appearance.anim.normal } }
 
-                    Rectangle {
-                        visible: root.android
-                        x: 0
-                        width: 3
-                        height: parent.height
-                        topLeftRadius: parent.radius
-                        bottomLeftRadius: parent.radius
-                        color: Colors.m3primary
-                        opacity: tile.t.active ? 1 : 0
-                        Behavior on opacity { EffectAnim {} }
-                    }
-
-                    // Android: icon + label / state; the right side opens details.
+                    // Android: icon disc + label / state; the right side opens details.
                     RowLayout {
                         visible: root.android
                         anchors.fill: parent
-                        anchors.leftMargin: 14
-                        anchors.rightMargin: 10
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 12
+                        spacing: 10
 
-                        MaterialIcon {
-                            Layout.preferredWidth: 22
-                            icon: tile.t.icon
-                            iconSize: 20
-                            color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                        Rectangle {
+                            implicitWidth: 40
+                            implicitHeight: 40
+                            radius: 20
+                            color: tile.t.active ? Colors.m3onPrimary : Colors.m3surfaceContainerHigh
+                            MaterialIcon {
+                                anchors.centerIn: parent
+                                icon: tile.t.icon
+                                fill: tile.t.active ? 1 : 0
+                                iconSize: 20
+                                color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                            }
                         }
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 1
+                            spacing: 0
                             StyledText {
                                 Layout.fillWidth: true
                                 text: tile.t.label
                                 font.weight: Font.Medium
-                                color: tile.t.active ? Colors.m3primary : Colors.m3onSurface
+                                color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurface
                             }
-                            MonoLabel {
+                            StyledText {
                                 Layout.fillWidth: true
                                 text: tile.t.subtitle
-                                font.letterSpacing: Appearance.font.labelSpacing * 0.5
-                                color: tile.t.active ? Qt.alpha(Colors.m3primary, 0.85) : Colors.m3onSurfaceVariant
+                                font.pixelSize: Appearance.font.size.labelMedium
+                                color: tile.t.active ? Qt.alpha(Colors.m3onPrimary, 0.8) : Colors.m3onSurfaceVariant
                             }
                         }
                         MaterialIcon {
                             visible: (!!tile.t.page || !!tile.t.more) && !root.editing
                             icon: "chevron_right"
                             iconSize: 18
-                            color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                            color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
                         }
                     }
 
@@ -372,12 +366,13 @@ ColumnLayout {
                         visible: !root.android
                         anchors.centerIn: parent
                         icon: tile.t.icon
+                        fill: tile.t.active ? 1 : 0
                         iconSize: 22
-                        color: tile.t.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                        color: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
                     }
 
                     StateLayer {
-                        tint: tile.t.active ? Colors.m3primary : Colors.m3onSurface
+                        tint: tile.t.active ? Colors.m3onPrimary : Colors.m3onSurface
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: mouse => {
                             if (root.editing)
@@ -404,15 +399,13 @@ ColumnLayout {
                             required property var modelData
                             width: 20
                             height: 20
-                            radius: Appearance.rounding.extraSmall
-                            color: Colors.m3surfaceContainerHighest
-                            border.width: 1
-                            border.color: Colors.m3outline
+                            radius: 10
+                            color: Colors.m3secondaryContainer
                             MaterialIcon {
                                 anchors.centerIn: parent
                                 icon: modelData.icon
                                 iconSize: 14
-                                color: Colors.m3onSurface
+                                color: Colors.m3onSecondaryContainer
                             }
                             StateLayer {
                                 onClicked: root.move(tile.modelData, modelData.delta)
@@ -448,18 +441,16 @@ ColumnLayout {
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
-            width: 26
-            height: 26
-            radius: Appearance.shape.button
-            color: "transparent"
-            border.width: Math.max(1, Appearance.edge)
-            border.color: Colors.m3outlineVariant
+            width: 28
+            height: 28
+            radius: 14
+            color: Colors.m3secondaryContainer
             opacity: root.currentPage > 0 ? 1 : 0.4
             MaterialIcon {
                 anchors.centerIn: parent
                 icon: "chevron_left"
                 iconSize: 18
-                color: Colors.m3onSurfaceVariant
+                color: Colors.m3onSecondaryContainer
             }
             StateLayer {
                 enabled: root.currentPage > 0
@@ -473,9 +464,9 @@ ColumnLayout {
             Rectangle {
                 required property int index
                 anchors.verticalCenter: parent.verticalCenter
-                width: index === root.currentPage ? 18 : 6
-                height: index === root.currentPage ? 4 : 6
-                radius: 1
+                width: index === root.currentPage ? 18 : 8
+                height: 8
+                radius: 4
                 color: index === root.currentPage ? Colors.m3primary : Colors.m3outlineVariant
                 Behavior on width { SpatialAnim { duration: Appearance.anim.normal } }
                 Behavior on color { ColorAnim {} }
@@ -489,18 +480,16 @@ ColumnLayout {
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
-            width: 26
-            height: 26
-            radius: Appearance.shape.button
-            color: "transparent"
-            border.width: Math.max(1, Appearance.edge)
-            border.color: Colors.m3outlineVariant
+            width: 28
+            height: 28
+            radius: 14
+            color: Colors.m3secondaryContainer
             opacity: root.currentPage < root.pageCount - 1 ? 1 : 0.4
             MaterialIcon {
                 anchors.centerIn: parent
                 icon: "chevron_right"
                 iconSize: 18
-                color: Colors.m3onSurfaceVariant
+                color: Colors.m3onSecondaryContainer
             }
             StateLayer {
                 enabled: root.currentPage < root.pageCount - 1

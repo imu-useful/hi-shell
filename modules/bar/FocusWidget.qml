@@ -50,7 +50,6 @@ BarWidget {
         StyledText {
             text: root.timeLeft
             font.weight: Font.DemiBold
-            font.family: Appearance.font.mono
             font.features: { "tnum": 1 }
         }
         // On a break, the breathing cue instead of the cycle.
@@ -95,7 +94,6 @@ BarWidget {
             Layout.alignment: Qt.AlignHCenter
             text: Math.ceil(Focus.remaining / 60)
             font.weight: Font.DemiBold
-            font.family: Appearance.font.mono
             font.features: { "tnum": 1 }
         }
         IconButton {

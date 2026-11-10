@@ -29,14 +29,12 @@ BarWidget {
             rightPadding: root.vertical ? 0 : 6
             text: NetworkSpeed.format(NetworkSpeed.download)
             font.pixelSize: Appearance.font.size.labelMedium
-            font.family: Appearance.font.mono
             font.features: { "tnum": 1 }
         }
         MaterialIcon { icon: "arrow_upward"; iconSize: 14; color: Colors.m3tertiary }
         StyledText {
             text: NetworkSpeed.format(NetworkSpeed.upload)
             font.pixelSize: Appearance.font.size.labelMedium
-            font.family: Appearance.font.mono
             font.features: { "tnum": 1 }
         }
     }

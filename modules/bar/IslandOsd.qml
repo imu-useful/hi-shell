@@ -38,7 +38,6 @@ RowLayout {
         text: Island.osd.label
         font.pixelSize: Appearance.font.size.normal
         font.weight: Font.Medium
-        font.family: Appearance.font.mono
         font.features: { "tnum": 1 }
     }
 }

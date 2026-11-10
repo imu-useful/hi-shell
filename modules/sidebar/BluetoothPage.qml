@@ -82,9 +82,7 @@ StyledFlickable {
                         : entry.modelData.connected ? Translation.tr("Connected") + (entry.modelData.batteryAvailable ? " · " + Math.round(entry.modelData.battery * 100) + "%" : "")
                         : entry.modelData.paired ? Translation.tr("Paired") : Translation.tr("Available")
                     clickable: true
-                    color: entry.modelData.connected ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
-                    border.width: entry.modelData.connected ? Math.max(1, Appearance.edge) : 0
-                    border.color: Colors.m3primary
+                    color: entry.modelData.connected ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
                         if (entry.modelData.paired)
                             root.expanded = entry.open ? null : entry.modelData;

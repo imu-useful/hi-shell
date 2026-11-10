@@ -31,7 +31,7 @@ ColumnLayout {
             ShapeImage {
                 implicitWidth: 62
                 implicitHeight: 62
-                shape: "box"
+                shape: "cookie12"
                 source: `file://${Paths.home}/.face`
             }
 
@@ -46,9 +46,10 @@ ColumnLayout {
                     font.pixelSize: Appearance.font.size.titleLarge
                     font.weight: Font.Medium
                 }
-                MonoLabel {
+                StyledText {
                     Layout.fillWidth: true
                     text: clock.date.toLocaleDateString(Translation.locale, "dddd, d MMMM") + (Todo.pending ? " · " + Translation.trn("%1 task", "%1 tasks", Todo.pending) : "")
+                    color: Colors.m3onSurfaceVariant
                 }
             }
         }
@@ -87,7 +88,7 @@ ColumnLayout {
                 ShapeImage {
                     implicitWidth: 96
                     implicitHeight: 96
-                    shape: "box"
+                    shape: "square"
                     source: Mpris.artUrl
                 }
 
@@ -256,15 +257,14 @@ ColumnLayout {
             Rectangle {
                 implicitWidth: 56
                 implicitHeight: 56
-                radius: Appearance.rounding.small
-                color: "transparent"
-                border.width: 1
-                border.color: Colors.m3tertiary
+                radius: 28
+                color: Colors.m3tertiaryContainer
                 MaterialIcon {
                     anchors.centerIn: parent
                     icon: Weather.icon
+                    fill: 1
                     iconSize: 30
-                    color: Colors.m3tertiary
+                    color: Colors.m3onTertiaryContainer
                 }
             }
             ColumnLayout {
@@ -287,13 +287,11 @@ ColumnLayout {
                 visible: Weather.daily.length > 0
                 StyledText {
                     Layout.alignment: Qt.AlignRight
-                    font.family: Appearance.font.mono
                     text: Weather.daily.length ? `↑ ${Math.round(Weather.daily[0].max)}°` : ""
                     font.pixelSize: Appearance.font.size.labelMedium
                 }
                 StyledText {
                     Layout.alignment: Qt.AlignRight
-                    font.family: Appearance.font.mono
                     text: Weather.daily.length ? `↓ ${Math.round(Weather.daily[0].min)}°` : ""
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant

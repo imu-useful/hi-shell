@@ -95,13 +95,13 @@ PopupWindow {
             implicitHeight: contentArea.childrenRect.height + root.padding * 2
             width: implicitWidth
             height: implicitHeight
-            radius: Appearance.shape.popup
+            radius: Appearance.rounding.large
             color: Colors.m3surfaceContainer
             border.width: Appearance.edge
-            border.color: Colors.m3outlineVariant
+            border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
 
             opacity: root.shown ? 1 : 0
-            scale: root.shown ? 1 : 0.97
+            scale: root.shown ? 1 : 0.88
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
             Behavior on scale { SpringAnim {} }
             Behavior on slide { SpringAnim {} }

@@ -1435,7 +1435,5 @@
     "advanced": "дополнительно",
     "Search settings": "Поиск по настройкам",
     "Show advanced settings": "Показывать дополнительные настройки",
-    "Rarely needed rows (blur passes, dock spacing, refresh times, ...). The search finds them either way": "Редко нужные строки (проходы размытия, отступы дока, интервалы обновления…). Поиск находит их в любом случае",
-    "You": "Вы",
-    "Error": "Ошибка"
+    "Rarely needed rows (blur passes, dock spacing, refresh times, ...). The search finds them either way": "Редко нужные строки (проходы размытия, отступы дока, интервалы обновления…). Поиск находит их в любом случае"
 }

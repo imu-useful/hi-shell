@@ -239,7 +239,6 @@ BarWidget {
                         StyledText {
                             text: `${Math.round(modelData.min)}° / ${Math.round(modelData.max)}°`
                             font.pixelSize: Appearance.font.size.labelMedium + 1
-                            font.family: Appearance.font.mono
                             font.features: { "tnum": 1 }
                         }
                     }

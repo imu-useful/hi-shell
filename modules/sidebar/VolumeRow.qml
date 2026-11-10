@@ -64,7 +64,6 @@ RowLayout {
         Layout.preferredWidth: 38
         horizontalAlignment: Text.AlignRight
         text: root.audio ? `${Math.round(root.audio.volume * 100)}%` : ""
-        font.family: Appearance.font.mono
         font.pixelSize: Appearance.font.size.labelMedium
         font.features: { "tnum": 1 }
         color: Colors.m3onSurfaceVariant

@@ -57,10 +57,8 @@ ColumnLayout {
         default property alias actions: actionRow.data
         Layout.fillWidth: true
         Layout.fillHeight: true
-        radius: Appearance.shape.card
-        color: Appearance.translucent(Colors.m3surfaceContainerLow)
-        border.width: Math.max(1, Appearance.edge)
-        border.color: field.activeFocus ? Colors.m3primary : Colors.m3outlineVariant
+        radius: Appearance.rounding.extraLarge
+        color: Colors.m3surfaceContainer
 
         StyledFlickable {
             id: flick

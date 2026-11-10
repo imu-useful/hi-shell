@@ -18,7 +18,7 @@ ColumnLayout {
         ShapeImage {
             implicitWidth: 88
             implicitHeight: 88
-            shape: "box"
+            shape: "cookie9"
             source: Mpris.artUrl
         }
 

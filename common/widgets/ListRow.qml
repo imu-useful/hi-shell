@@ -19,7 +19,7 @@ Rectangle {
 
     implicitHeight: Math.max(52, row.implicitHeight + 16)
     implicitWidth: row.implicitWidth + 32
-    radius: Appearance.rounding.small
+    radius: Appearance.rounding.medium
     color: "transparent"
 
     StateLayer {
@@ -57,19 +57,18 @@ Rectangle {
                     id: tagLabel
                     visible: root.tag !== ""
                     Layout.fillWidth: false
-                    implicitWidth: tagText.implicitWidth + 10
-                    implicitHeight: 16
-                    radius: Appearance.rounding.extraSmall
-                    color: "transparent"
-                    border.width: Math.max(1, Appearance.edge)
-                    border.color: Colors.m3tertiary
+                    implicitWidth: tagText.implicitWidth + 12
+                    implicitHeight: 18
+                    radius: height / 2
+                    color: Colors.m3tertiaryContainer
 
-                    MonoLabel {
+                    StyledText {
                         id: tagText
                         anchors.centerIn: parent
                         text: root.tag
-                        font.pixelSize: Appearance.font.size.labelSmall - 1
-                        color: Colors.m3tertiary
+                        font.pixelSize: Appearance.font.size.labelSmall
+                        font.weight: Font.Medium
+                        color: Colors.m3onTertiaryContainer
                     }
                 }
                 Item {

@@ -186,7 +186,7 @@ Scope {
                             anchors.fill: parent
                             anchors.margins: 4
                             radius: Appearance.rounding.large
-                            color: cell.selected ? Qt.alpha(Colors.m3primary, 0.12) : "transparent"
+                            color: cell.selected ? Colors.m3secondaryContainer : "transparent"
                             Behavior on color { ColorAnim {} }
                         }
 
