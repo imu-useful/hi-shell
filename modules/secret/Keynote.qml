@@ -77,6 +77,20 @@ Item {
         return clamp(t / 0.5) * clamp((s[1] - t) / 0.5);
     }
 
+    // Slides come in from a little further back and leave by flying past the camera
+    function zoom(i) {
+        const s = slides[i];
+        const t = time - s[0];
+        const inP = clamp(t / 0.5), outP = clamp((s[1] - t) / 0.5);
+        return (0.94 + 0.06 * (1 - Math.pow(1 - inP, 3))) * (1 + 0.14 * Math.pow(1 - outP, 2));
+    }
+
+    // 0 -> 1 with an overshoot
+    function back(x) {
+        const c = clamp(x), k = 2.2;
+        return 1 + (k + 1) * Math.pow(c - 1, 3) + k * Math.pow(c - 1, 2);
+    }
+
     function local(i) {
         return time - slides[i][0];
     }
@@ -135,6 +149,7 @@ Item {
         readonly property real t: root.local(0)
         visible: opacity > 0
         opacity: root.stage(0)
+        scale: root.zoom(0)
 
         KeynoteSlides.Glow {
             anchors.centerIn: parent
@@ -144,16 +159,57 @@ Item {
             strength: (0.35 + 0.12 * root.kick) * root.ease(parent.t, 4, 1.5)
         }
 
+        // "Introducing": the letters close in from wide apart, then the word is sucked into the middle
         KeynoteText {
+            id: introducing
+
+            readonly property real leave: root.clamp((parent.t - 3.5) / 0.5)
 
             kick: root.kick
             anchors.centerIn: parent
             text: Translation.tr("Introducing")
             size: root.headline * 0.42
             weight: Font.DemiBold
-            color: "#a1a1a8"
-            letterSpacing: size * 0.08
-            shown: root.ease(parent.t, 0.5, 1.2) * root.clamp((3.8 - parent.t) / 0.4)
+            color: "#c7c7cc"
+            letterSpacing: size * (0.08 + 0.9 * Math.pow(1 - root.ease(parent.t, 0.3, 3), 2))
+            shown: root.ease(parent.t, 0.3, 1.5) * (1 - leave)
+            scale: 1 - 0.7 * leave * leave
+        }
+
+        // The drums come in: a ring of light and sparks shoot out where the logo lands
+        Rectangle {
+            readonly property real q: root.clamp((parent.t - 4) / 1.2)
+
+            anchors.centerIn: parent
+            anchors.verticalCenterOffset: -root.u * 0.05
+            width: root.u * (0.2 + 1.6 * root.ease(parent.t, 4, 1.2))
+            height: width
+            radius: width / 2
+            color: "transparent"
+            border.width: Math.max(1, root.u * 0.012 * (1 - q))
+            border.color: Qt.alpha(Qt.lighter(Colors.m3primary, 1.25), 0.8 * (1 - q))
+            visible: parent.t > 4 && q < 1
+        }
+
+        Repeater {
+            model: 28
+
+            Rectangle {
+                required property int index
+                readonly property real q: root.ease(parent.t, 4, 1.1)
+                readonly property real angle: index / 28 * Math.PI * 2
+                readonly property real reach: root.u * (0.18 + 0.45 * ((index * 0.618) % 1)) * q
+
+                visible: parent.t > 4 && parent.t < 5.2
+                width: root.u * 0.06 * (1 - q * 0.7)
+                height: Math.max(2, root.u * 0.005)
+                radius: height / 2
+                x: parent.width / 2 + Math.cos(angle) * reach - width / 2
+                y: parent.height / 2 - root.u * 0.05 + Math.sin(angle) * reach - height / 2
+                rotation: angle * 180 / Math.PI
+                color: [Colors.m3primary, "white", Colors.m3tertiary][index % 3]
+                opacity: 1 - q
+            }
         }
 
         AnimatedLogo {
@@ -161,19 +217,29 @@ Item {
             anchors.verticalCenterOffset: -root.u * 0.05
             height: root.u * 0.38
             playing: parent.t > 4 && root.revealed
-            scale: (0.92 + 0.08 * root.ease(parent.t, 4, 2)) * (1 + 0.03 * root.kick)
+            opacity: parent.t > 4 ? 1 : 0
+            scale: (0.55 + 0.45 * root.back((parent.t - 4) / 0.7)) * (1 + 0.03 * root.kick)
         }
 
-        KeynoteText {
-
-            kick: root.kick
+        KeynoteWords {
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.79
             text: Translation.tr("The shell. Reimagined.")
+            t: parent.t
+            at: 6
+            step: 0.5
             size: root.headline * 0.55
             colors: root.accent
             time: root.time
-            shown: root.ease(parent.t, 6, 0.8)
+            kick: root.kick
+        }
+
+        // A flash as the drums come in
+        Rectangle {
+            anchors.fill: parent
+            color: "white"
+            opacity: parent.t > 4 ? Math.exp(-(parent.t - 4) * 8) * 0.55 : 0
+            visible: opacity > 0.01
         }
     }
 
@@ -184,28 +250,36 @@ Item {
         readonly property real t: root.local(1)
         visible: opacity > 0
         opacity: root.stage(1)
+        scale: root.zoom(1)
 
-        KeynoteText {
-
-            kick: root.kick
+        KeynoteWords {
             anchors.horizontalCenter: parent.horizontalCenter
-            y: parent.height * 0.5 - height - root.ease(parent.t, 2, 0.6) * root.headline * 0.15
+            y: parent.height * 0.5 - height - root.ease(parent.t, 2, 0.6) * root.headline * 0.2
             text: Translation.tr("It's not just a shell.")
+            t: parent.t
+            at: 0
+            step: 0.25
+            slam: 0.25
             size: root.headline * 0.8
-            shown: root.ease(parent.t, 0, 0.7) * (1 - 0.6 * root.ease(parent.t, 2, 0.6))
+            time: root.time
+            kick: root.kick
+            opacity: 1 - 0.6 * root.ease(parent.t, 2, 0.6)
+            scale: 1 - 0.12 * root.ease(parent.t, 2, 0.6)
         }
 
-        KeynoteText {
-
-            kick: root.kick
+        KeynoteWords {
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height * 0.5 + root.headline * 0.1
             text: Translation.tr("It's your whole desktop.")
+            t: parent.t
+            at: 2
+            step: 0.5
+            slam: 1
             size: root.headline * 0.95
             weight: Font.Black
             colors: root.neon
             time: root.time
-            shown: root.ease(parent.t, 2, 0.6)
+            kick: root.kick
         }
     }
 
@@ -216,6 +290,7 @@ Item {
         readonly property real t: root.local(2)
         visible: opacity > 0
         opacity: root.stage(2)
+        scale: root.zoom(2)
 
         KeynoteText {
 
@@ -282,6 +357,7 @@ Item {
         readonly property real t: root.local(3)
         visible: opacity > 0
         opacity: root.stage(3)
+        scale: root.zoom(3)
 
         KeynoteText {
 
@@ -354,6 +430,7 @@ Item {
         anchors.fill: parent
         visible: opacity > 0
         opacity: root.stage(4)
+        scale: root.zoom(4)
 
         KeynoteText {
 
@@ -389,6 +466,9 @@ Item {
                     tint: bento.tiles[index][3]
                     shown: root.ease(bento.t, 1 + index * 0.5, 0.6)
                     kick: root.kick
+                    flipFrom: index % 2 ? -80 : 80
+                    time: root.time
+                    floatPhase: index * 1.3
                 }
             }
         }
@@ -405,6 +485,7 @@ Item {
         anchors.fill: parent
         visible: opacity > 0
         opacity: root.stage(5)
+        scale: root.zoom(5)
 
         KeynoteText {
 
@@ -449,6 +530,29 @@ Item {
             }
         }
 
+        // As each swatch lands, a wave of its color spreads over the stage behind everything
+        Repeater {
+            model: colorSlide.swatches.length
+
+            Rectangle {
+                required property int index
+                readonly property real q: root.clamp((colorSlide.t - 3.2 - index * 0.25) / 1.6)
+                readonly property real size: root.u * 0.075
+                readonly property real gap: size * 0.35
+
+                z: -1
+                visible: q > 0 && q < 1
+                width: root.u * 0.1 + Math.max(colorSlide.width, colorSlide.height) * 1.6 * (1 - Math.pow(1 - q, 2))
+                height: width
+                radius: width / 2
+                x: colorSlide.width / 2 + (index - (colorSlide.swatches.length - 1) / 2) * (size + gap) - width / 2
+                y: card.y + card.height * 0.94 + size * 0.9 - height / 2
+                color: "transparent"
+                border.width: root.u * 0.05 * (1 - q)
+                border.color: Qt.alpha(colorSlide.swatches[index], 0.35 * (1 - q))
+            }
+        }
+
         Repeater {
             model: colorSlide.swatches.length
 
@@ -486,11 +590,16 @@ Item {
         kick: root.kick
         anchors.centerIn: parent
         visible: opacity > 0
-        text: Translation.tr("One more thing…")
+        // Typed a letter per eighth note; the dots blink on the beat while the camera creeps in
+        readonly property string full: Translation.tr("One more thing…")
+        readonly property string body: full.replace(/[.…]+$/, "")
+        readonly property int typed: Math.max(0, Math.floor((root.local(6) - 0.25) / 0.125))
+        text: body.slice(0, typed) + (typed >= body.length ? (Math.floor(root.local(6) * 2) % 2 ? "…" : "") : "")
         size: root.headline * 0.55
         weight: Font.DemiBold
-        color: "#a1a1a8"
-        shown: root.ease(root.local(6), 0.5, 1.4) * root.clamp((root.slides[6][1] - root.local(6)) / 0.4)
+        color: "#c7c7cc"
+        shown: root.clamp(root.local(6) / 0.2) * root.clamp((root.slides[6][1] - root.local(6)) / 0.3)
+        scale: 1 + 0.12 * root.clamp(root.local(6) / root.slides[6][1])
     }
 
     // ---- the finale (KeynoteFinale.qml) -----------------------------------------------------------

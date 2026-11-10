@@ -97,13 +97,27 @@ QtObject {
         property real shown: 1
         property real unit: 12
         property real kick: 0
+        // Which way it flips in (degrees around the vertical axis) and its clock for floating
+        property real flipFrom: 75
+        property real time: 0
+        property real floatPhase: 0
 
         radius: unit * 2.4
         color: "#141416"
         border.color: Qt.rgba(1, 1, 1, 0.07)
         opacity: shown
         scale: (0.88 + 0.12 * shown) * (1 + 0.015 * kick)
-        transform: Translate { y: (1 - tile.shown) * tile.unit * 4 }
+        transform: [
+            Rotation {
+                origin.x: tile.width / 2
+                origin.y: tile.height / 2
+                axis { x: 0; y: 1; z: 0 }
+                angle: tile.flipFrom * (1 - tile.shown)
+            },
+            Translate {
+                y: (1 - tile.shown) * tile.unit * 4 + Math.sin(tile.time * 1.3 + tile.floatPhase) * tile.unit * 0.35 * tile.shown
+            }
+        ]
 
         // Light spilling from the icon over the tile, cut to the tile's rounded shape
         Item {
@@ -171,7 +185,7 @@ QtObject {
     }
 
     // A big number that counts up to `value` while `progress` goes 0 -> 1, a label under it
-    component Stat: Column {
+    component Stat: Item {
         id: stat
 
         property real value: 0
@@ -183,27 +197,54 @@ QtObject {
         property real time: 0
         property real kick: 0
 
-        spacing: size * 0.08
-        opacity: Math.min(1, progress * 3)
+        // 0 -> 1 with an overshoot, over the first part of the count
+        readonly property real pop: {
+            const c = Math.max(0, Math.min(1, progress * 3)), k = 2.2;
+            return 1 + (k + 1) * Math.pow(c - 1, 3) + k * Math.pow(c - 1, 2);
+        }
+        readonly property real ring: Math.max(0, Math.min(1, progress * 1.6))
 
-        KeynoteText {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: Math.round(stat.value * stat.progress).toLocaleString(Qt.locale(), "f", 0) + stat.suffix
-            size: stat.size
-            weight: Font.Black
-            colors: stat.colors
-            time: stat.time
-            kick: stat.kick
-            shown: Math.min(1, stat.progress * 2)
+        implicitWidth: column.implicitWidth
+        implicitHeight: column.implicitHeight
+        opacity: Math.min(1, progress * 4)
+
+        Rectangle {
+            anchors.centerIn: column
+            anchors.verticalCenterOffset: -stat.size * 0.15
+            width: stat.size * (0.6 + 2.6 * stat.ring)
+            height: width
+            radius: width / 2
+            color: "transparent"
+            border.width: Math.max(1, stat.size * 0.04 * (1 - stat.ring))
+            border.color: Qt.alpha(stat.colors[1] ?? "white", 0.7 * (1 - stat.ring))
+            visible: stat.progress > 0 && stat.ring < 1
         }
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: stat.label
-            color: "#a1a1a8"
-            font.family: Appearance.font.title
-            font.pixelSize: stat.size * 0.26
-            font.weight: Font.Medium
+        Column {
+            id: column
+            spacing: stat.size * 0.08
+            scale: 0.4 + 0.6 * stat.pop
+
+            KeynoteText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: Math.round(stat.value * stat.progress).toLocaleString(Qt.locale(), "f", 0) + stat.suffix
+                size: stat.size
+                weight: Font.Black
+                colors: stat.colors
+                time: stat.time
+                kick: stat.kick
+                shown: 1
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: stat.label
+                color: "#a1a1a8"
+                font.family: Appearance.font.title
+                font.pixelSize: stat.size * 0.26
+                font.weight: Font.Medium
+                opacity: Math.max(0, Math.min(1, stat.progress * 3 - 0.5))
+            }
         }
     }
 }
