@@ -114,7 +114,7 @@ Item {
                 font.weight: Font.Light
             }
             Text {
-                text: Qt.formatDate(new Date(2026, 8, 9), "dddd, d MMMM")
+                text: new Date(2026, 8, 9).toLocaleDateString(Translation.locale, "dddd, d MMMM")
                 color: Qt.rgba(1, 1, 1, 0.65)
                 font.family: Appearance.font.title
                 font.pixelSize: 28

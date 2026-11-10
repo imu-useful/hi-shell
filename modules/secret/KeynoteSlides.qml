@@ -180,6 +180,8 @@ QtObject {
                 font.family: Appearance.font.title
                 font.pixelSize: tile.unit * 1.2
                 wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
             }
         }
     }
@@ -204,9 +206,18 @@ QtObject {
         }
         readonly property real ring: Math.max(0, Math.min(1, progress * 1.6))
 
-        implicitWidth: column.implicitWidth
+        // As wide as the final number from the start, so the row doesn't shift while counting
+        implicitWidth: Math.max(column.implicitWidth, finalWidth.advanceWidth)
         implicitHeight: column.implicitHeight
         opacity: Math.min(1, progress * 4)
+
+        TextMetrics {
+            id: finalWidth
+            text: Math.round(stat.value).toLocaleString(Translation.locale, "f", 0) + stat.suffix
+            font.family: Appearance.font.title
+            font.pixelSize: stat.size
+            font.weight: Font.Black
+        }
 
         Rectangle {
             anchors.centerIn: column
@@ -222,12 +233,13 @@ QtObject {
 
         Column {
             id: column
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: stat.size * 0.08
             scale: 0.4 + 0.6 * stat.pop
 
             KeynoteText {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: Math.round(stat.value * stat.progress).toLocaleString(Qt.locale(), "f", 0) + stat.suffix
+                text: Math.round(stat.value * stat.progress).toLocaleString(Translation.locale, "f", 0) + stat.suffix
                 size: stat.size
                 weight: Font.Black
                 colors: stat.colors

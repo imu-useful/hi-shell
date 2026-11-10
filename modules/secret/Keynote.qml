@@ -21,6 +21,9 @@ Item {
     property bool skippable: true
     // Text for a button that shows up once the finale's name is on screen ("" = no button)
     property string actionText: ""
+    // Driven from outside (tools/render_keynote.sh renders it frame by frame): no clock of its own,
+    // no music, no audio latency to make up for
+    property bool external: false
 
     signal action()
     property real time: 0
@@ -39,7 +42,7 @@ Item {
 
     // The beat: the track has drums from 4 s to 42 s and from 46 s on, a kick every half second.
     // The sound reaches the speakers a little after the player starts, so the picture waits for it.
-    readonly property real latency: 0.08
+    readonly property real latency: external ? 0 : 0.08
     readonly property real beatLength: 0.5
     readonly property real musicTime: time - latency
     readonly property bool groove: (musicTime >= 4 && musicTime < 42) || musicTime >= finaleStart
@@ -109,9 +112,11 @@ Item {
     }
 
     Component.onCompleted: playFrom(0)
+    // After a pause (the show hidden and shown again) the music picks up where the slides are
+    onRevealedChanged: if (revealed) playFrom(time)
 
     FrameAnimation {
-        running: root.revealed
+        running: root.revealed && !root.external
         onTriggered: root.time += frameTime
     }
 
@@ -120,7 +125,7 @@ Item {
 
     // mpv loops the finale's part of the track (A-B); ffplay and pw-play just play it to the end
     Process {
-        running: root.revealed && root.musicOn
+        running: root.revealed && root.musicOn && !root.external
         command: ["sh", "-c", `f="$1"; at="$2"; if command -v mpv >/dev/null; then exec mpv --no-video --really-quiet --start="$at" --ab-loop-a=46 --ab-loop-b=62 "$f";
             elif command -v ffplay >/dev/null; then exec ffplay -nodisp -autoexit -loglevel quiet -ss "$at" "$f";
             else exec pw-play "$f"; fi`, "sh", Quickshell.shellPath("sounds/secret/keynote.ogg"), String(root.musicFrom)]
@@ -217,6 +222,7 @@ Item {
             anchors.verticalCenterOffset: -root.u * 0.05
             height: root.u * 0.38
             playing: parent.t > 4 && root.revealed
+            clock: root.external && parent.t > 4 ? parent.t - 4 : -1
             opacity: parent.t > 4 ? 1 : 0
             scale: (0.55 + 0.45 * root.back((parent.t - 4) / 0.7)) * (1 + 0.03 * root.kick)
         }
@@ -422,10 +428,10 @@ Item {
             ["terminal", Translation.tr("One command"), Translation.tr("hi does the rest."), "#30d158"],
             ["dashboard", Translation.tr("Bar, dock and widgets"), Translation.tr("Live, glanceable, yours."), "#5ac8fa"]
         ]
-        readonly property real gridWidth: Math.min(parent.width * 0.8, parent.height * 1.22)
+        readonly property real gridWidth: Math.min(parent.width * 0.8, parent.height * 1.15)
         readonly property real gap: gridWidth * 0.018
         readonly property real cellWidth: (gridWidth - gap * 3) / 4
-        readonly property real cellHeight: cellWidth * 1.02
+        readonly property real cellHeight: cellWidth * 1.1
 
         anchors.fill: parent
         visible: opacity > 0
@@ -520,13 +526,51 @@ Item {
             scale: (0.94 + 0.06 * opacity) * (1 - 0.12 * root.ease(colorSlide.t, 2, 1.2))
             glare: root.clamp((colorSlide.t - 1) / 1.4)
 
+            // Your wallpaper; a made-up one of light in the theme's colors when there's none, or
+            // in the video (nobody's own wallpaper goes into it)
             Image {
+                id: wallpaperImage
                 anchors.fill: parent
-                source: Colors.wallpaper ? "file://" + Colors.wallpaper : ""
+                source: !root.external && Colors.wallpaper ? "file://" + Colors.wallpaper : ""
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 smooth: true
                 mipmap: true
+            }
+
+            Item {
+                anchors.fill: parent
+                visible: wallpaperImage.status !== Image.Ready
+                clip: true
+
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: Qt.darker(Colors.m3primary, 4) }
+                        GradientStop { position: 1; color: Qt.darker(Colors.m3tertiary, 5) }
+                    }
+                }
+                KeynoteSlides.Glow {
+                    width: parent.width * 1.1; height: parent.height * 1.4
+                    x: -parent.width * 0.2 + Math.sin(root.time * 0.4) * parent.width * 0.06
+                    y: -parent.height * 0.4
+                    tint: Colors.m3primary
+                    strength: 0.8
+                }
+                KeynoteSlides.Glow {
+                    width: parent.width; height: parent.height * 1.3
+                    x: parent.width * 0.35 + Math.cos(root.time * 0.35) * parent.width * 0.06
+                    y: parent.height * 0.1
+                    tint: Colors.m3tertiary
+                    strength: 0.7
+                }
+                KeynoteSlides.Glow {
+                    width: parent.width * 0.7; height: parent.height
+                    x: parent.width * 0.1
+                    y: parent.height * 0.45 + Math.sin(root.time * 0.3) * parent.height * 0.05
+                    tint: Colors.m3secondary
+                    strength: 0.5
+                }
             }
         }
 
@@ -585,21 +629,51 @@ Item {
 
     // ---- 6: one more thing ------------------------------------------------------------------------
 
-    KeynoteText {
+    // Typed a letter per eighth note from a fixed left edge (where the whole line would be centered),
+    // the dots blinking on the beat once it's all there, while the camera creeps in
+    Item {
+        id: oneMore
 
-        kick: root.kick
-        anchors.centerIn: parent
-        visible: opacity > 0
-        // Typed a letter per eighth note; the dots blink on the beat while the camera creeps in
+        readonly property real t: root.local(6)
         readonly property string full: Translation.tr("One more thing…")
         readonly property string body: full.replace(/[.…]+$/, "")
-        readonly property int typed: Math.max(0, Math.floor((root.local(6) - 0.25) / 0.125))
-        text: body.slice(0, typed) + (typed >= body.length ? (Math.floor(root.local(6) * 2) % 2 ? "…" : "") : "")
-        size: root.headline * 0.55
-        weight: Font.DemiBold
-        color: "#c7c7cc"
-        shown: root.clamp(root.local(6) / 0.2) * root.clamp((root.slides[6][1] - root.local(6)) / 0.3)
-        scale: 1 + 0.12 * root.clamp(root.local(6) / root.slides[6][1])
+        readonly property int typed: Math.max(0, Math.floor((t - 0.25) / 0.125))
+
+        anchors.fill: parent
+        visible: t > 0 && t < root.slides[6][1]
+        opacity: root.clamp(t / 0.2) * root.clamp((root.slides[6][1] - t) / 0.3)
+        scale: 1 + 0.12 * root.clamp(t / root.slides[6][1])
+
+        TextMetrics {
+            id: oneMoreWidth
+            text: oneMore.full
+            font.family: Appearance.font.title
+            font.pixelSize: root.headline * 0.55
+            font.weight: Font.DemiBold
+            font.letterSpacing: -root.headline * 0.55 * 0.02
+        }
+
+        Row {
+            x: (parent.width - oneMoreWidth.advanceWidth) / 2
+            anchors.verticalCenter: parent.verticalCenter
+
+            KeynoteText {
+                kick: root.kick
+                text: oneMore.body.slice(0, oneMore.typed)
+                size: root.headline * 0.55
+                weight: Font.DemiBold
+                color: "#c7c7cc"
+            }
+
+            KeynoteText {
+                kick: root.kick
+                text: oneMore.full.slice(oneMore.body.length)
+                size: root.headline * 0.55
+                weight: Font.DemiBold
+                color: "#c7c7cc"
+                shown: oneMore.typed >= oneMore.body.length && Math.floor(oneMore.t * 2) % 2 ? 1 : 0
+            }
+        }
     }
 
     // ---- the finale (KeynoteFinale.qml) -----------------------------------------------------------

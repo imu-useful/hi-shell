@@ -21,6 +21,10 @@ Singleton {
 
     // auto -> the first language of $LANG / $LC_MESSAGES we have, else English
     readonly property string code: {
+        // HI_SHELL_LANG overrides the setting (tools/render_keynote.sh renders the video in English)
+        const forced = Quickshell.env("HI_SHELL_LANG");
+        if (forced)
+            return forced;
         const chosen = Config.options.language;
         if (chosen && chosen !== "auto")
             return chosen;

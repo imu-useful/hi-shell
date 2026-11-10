@@ -102,7 +102,7 @@ Item {
         width: parent.width * 1.6
         height: (cardHeight + gap) * 5
         visible: shown > 0
-        opacity: shown * 0.55
+        opacity: shown * 0.42
         transform: [
             Rotation {
                 origin.x: wall.width / 2
@@ -173,14 +173,20 @@ Item {
         }
     }
 
-    // Shade behind the name, so it reads over the wall
-    KeynoteSlides.Glow {
-        anchors.centerIn: parent
-        width: root.headline * 11
-        height: root.headline * 5.5
-        tint: "black"
-        strength: 0.85 * wall.shown
-        visible: wall.visible
+    // Shade behind the name, so it reads over the wall (two layers: one wide, one dense)
+    Repeater {
+        model: [[26, 13], [17, 7.5]]
+
+        KeynoteSlides.Glow {
+            required property var modelData
+            anchors.centerIn: parent
+            anchors.verticalCenterOffset: root.headline * 0.2
+            width: root.headline * modelData[0]
+            height: root.headline * modelData[1]
+            tint: "black"
+            strength: wall.shown
+            visible: wall.visible
+        }
     }
 
     // Bokeh: soft motes of light rising slowly, twinkling, brighter on the beat
