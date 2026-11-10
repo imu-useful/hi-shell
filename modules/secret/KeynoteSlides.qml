@@ -105,13 +105,33 @@ QtObject {
         scale: (0.88 + 0.12 * shown) * (1 + 0.015 * kick)
         transform: Translate { y: (1 - tile.shown) * tile.unit * 4 }
 
-        Glow {
-            anchors.right: parent.right
-            anchors.top: parent.top
-            width: Math.min(parent.width, parent.height) * 0.9
-            height: width
-            tint: tile.tint
-            strength: 0.5
+        // Light spilling from the icon over the tile, cut to the tile's rounded shape
+        Item {
+            anchors.fill: parent
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                maskEnabled: true
+                maskSource: tileMask
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 1
+            }
+
+            Glow {
+                x: tile.unit * 3.7 - width / 2
+                y: tile.unit * 3.7 - height / 2
+                width: Math.max(tile.width, tile.height) * 1.3
+                height: tile.height * 1.5
+                tint: tile.tint
+                strength: 0.3 + 0.12 * tile.kick
+            }
+        }
+
+        Rectangle {
+            id: tileMask
+            anchors.fill: parent
+            radius: tile.radius
+            visible: false
+            layer.enabled: true
         }
 
         Column {
