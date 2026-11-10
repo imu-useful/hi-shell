@@ -4,130 +4,15 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// Fonts, motion, transparency, sidebars.
+// Looks, palette, shape, surfaces, fonts, motion, app themes, sidebars, launcher, modes, greeting.
 ColumnLayout {
     readonly property var a: Config.options.appearance
     spacing: 24
 
     Section {
-        icon: "format_paint"
-        title: Translation.tr("App themes")
+        icon: "style"
+        title: Translation.tr("Looks")
 
-        SwitchRow {
-            icon: "web_asset"
-            title: Translation.tr("GTK apps")
-            subtitle: Translation.tr("The wallpaper's colors in GTK 3 / 4 apps (a block in ~/.config/gtk-3.0 and gtk-4.0 gtk.css; off removes it)")
-            checked: Config.options.appThemes.gtk
-            onToggled: checked => Config.options.appThemes.gtk = checked
-        }
-        SwitchRow {
-            icon: "terminal"
-            title: Translation.tr("Neovim")
-            subtitle: Translation.tr("Writes the hi-shell color scheme: use :colorscheme hi-shell in Neovim")
-            checked: Config.options.appThemes.neovim
-            onToggled: checked => Config.options.appThemes.neovim = checked
-        }
-        StyledText {
-            Layout.fillWidth: true
-            Layout.margins: 14
-            Layout.topMargin: 0
-            wrapMode: Text.WordWrap
-            text: Translation.tr("Terminals, btop, fish and starship follow the palette without a switch.")
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurfaceVariant
-        }
-    }
-
-    Section {
-        icon: "text_fields"
-        title: Translation.tr("Fonts")
-
-        TextRow { icon: "font_download"; title: Translation.tr("Interface"); value: a.fonts.main; onEdited: text => a.fonts.main = text || "Google Sans Flex" }
-        TextRow { icon: "title"; title: Translation.tr("Titles"); value: a.fonts.title; onEdited: text => a.fonts.title = text || "Google Sans Flex" }
-        TextRow { icon: "code"; title: Translation.tr("Monospace"); value: a.fonts.mono; onEdited: text => a.fonts.mono = text || "JetBrains Mono" }
-    }
-
-    Section {
-        icon: "straighten"
-        title: Translation.tr("Shape & size")
-
-        ChoiceRow {
-            icon: "density_medium"
-            title: Translation.tr("Density")
-            subtitle: Translation.tr("The spacing between and inside elements")
-            value: a.density
-            options: [{ value: "compact", text: Translation.tr("Compact") }, { value: "comfortable", text: Translation.tr("Comfortable") }, { value: "spacious", text: Translation.tr("Spacious") }]
-            onSelected: value => a.density = value
-        }
-        SliderRow {
-            icon: "rounded_corner"
-            title: Translation.tr("Corner roundness")
-            subtitle: Translation.tr("0 makes every corner square")
-            value: Math.round(a.cornerScale * 100)
-            from: 0; to: 200; step: 5; suffix: "%"
-            onMoved: value => a.cornerScale = value / 100
-        }
-        SliderRow {
-            icon: "format_size"
-            title: Translation.tr("Text size")
-            value: Math.round(a.fontScale * 100)
-            from: 60; to: 200; step: 5; suffix: "%"
-            onMoved: value => a.fontScale = value / 100
-        }
-    }
-
-    Section {
-        icon: "palette"
-        title: Translation.tr("Palette")
-
-        TextRow {
-            icon: "colorize"
-            title: Translation.tr("Seed color")
-            subtitle: Translation.tr("A color like #ff6a00 to make the palette from; empty = from the wallpaper")
-            placeholder: "#ff6a00"
-            value: a.seedColor
-            onEdited: text => {
-                const t = text.trim();
-                a.seedColor = t === "" || /^#[0-9a-fA-F]{6}$/.test(t) ? t : a.seedColor;
-            }
-        }
-        SliderRow {
-            icon: "contrast"
-            title: Translation.tr("Contrast")
-            value: Math.round(a.contrast * 100)
-            from: -100; to: 100; step: 10; suffix: "%"
-            onMoved: value => a.contrast = value / 100
-        }
-        ChoiceRow {
-            icon: "layers"
-            title: Translation.tr("Surfaces")
-            subtitle: Translation.tr("Tonal: by tone; glass: always see-through; flat: solid with an edge")
-            value: a.surfaceStyle
-            options: [{ value: "tonal", text: Translation.tr("Tonal") }, { value: "glass", text: Translation.tr("Glass") }, { value: "flat", text: Translation.tr("Flat") }]
-            onSelected: value => a.surfaceStyle = value
-        }
-        SliderRow {
-            icon: "border_style"
-            title: Translation.tr("Outline")
-            subtitle: Translation.tr("Width of the edge of panels and cards; auto follows the surface")
-            value: a.borderWidth
-            from: -1; to: 4; step: 1; suffix: " px"
-            onMoved: value => a.borderWidth = value
-        }
-        ChoiceRow {
-            icon: "format_bold"
-            title: Translation.tr("Text weight")
-            value: a.textWeight
-            options: [{ value: "light", text: Translation.tr("Light") }, { value: "normal", text: Translation.tr("Normal") }, { value: "medium", text: Translation.tr("Medium") }]
-            onSelected: value => a.textWeight = value
-        }
-        SliderRow {
-            icon: "format_letter_spacing"
-            title: Translation.tr("Letter spacing")
-            value: Math.round(a.letterSpacing * 10)
-            from: -10; to: 30; step: 1; decimals: 0; suffix: " ‰"
-            onMoved: value => a.letterSpacing = value / 10
-        }
         StyledText {
             Layout.fillWidth: true
             Layout.margins: 14
@@ -168,107 +53,143 @@ ColumnLayout {
     }
 
     Section {
-        icon: "right_panel_open"
-        title: Translation.tr("Right sidebar")
+        icon: "palette"
+        title: Translation.tr("Palette")
 
-        StyledText {
-            Layout.fillWidth: true
-            Layout.margins: 14
-            Layout.bottomMargin: 0
-            wrapMode: Text.WordWrap
-            text: Translation.tr("What the sidebar shows under its header, and in what order")
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurfaceVariant
+        TextRow {
+            icon: "colorize"
+            title: Translation.tr("Seed color")
+            subtitle: Translation.tr("A color like #ff6a00 to make the palette from; empty = from the wallpaper")
+            placeholder: "#ff6a00"
+            value: a.seedColor
+            onEdited: text => {
+                const t = text.trim();
+                a.seedColor = t === "" || /^#[0-9a-fA-F]{6}$/.test(t) ? t : a.seedColor;
+            }
         }
-        OrderedChips {
-            options: [
-                { id: "quickToggles", text: Translation.tr("Quick toggles"), icon: "toggle_on" },
-                { id: "quickSliders", text: Translation.tr("Sliders"), icon: "tune" },
-                { id: "tabs", text: Translation.tr("Tabs"), icon: "tab" }
-            ]
-            minimum: 0
-            value: Config.options.sidebar.sections
-            onChanged: list => Config.options.sidebar.sections = list
-        }
-        StyledText {
-            Layout.fillWidth: true
-            Layout.margins: 14
-            Layout.bottomMargin: 0
-            wrapMode: Text.WordWrap
-            text: Translation.tr("Tabs")
-            font.weight: Font.Medium
-        }
-        OrderedChips {
-            options: [
-                { id: "notifications", text: Translation.tr("Notifications"), icon: "notifications" },
-                { id: "calendar", text: Translation.tr("Calendar"), icon: "calendar_month" },
-                { id: "todo", text: Translation.tr("To-do"), icon: "checklist" },
-                { id: "timers", text: Translation.tr("Timers"), icon: "timer" }
-            ]
-            value: Config.options.sidebar.tabs
-            onChanged: list => Config.options.sidebar.tabs = list
+        SliderRow {
+            icon: "contrast"
+            title: Translation.tr("Contrast")
+            value: Math.round(a.contrast * 100)
+            from: -100; to: 100; step: 10; suffix: "%"
+            onMoved: value => a.contrast = value / 100
         }
     }
 
     Section {
-        icon: "search"
-        title: Translation.tr("Launcher")
+        icon: "straighten"
+        title: Translation.tr("Shape & size")
 
-        StyledText {
-            Layout.fillWidth: true
-            Layout.margins: 14
-            Layout.bottomMargin: 0
-            wrapMode: Text.WordWrap
-            text: Translation.tr("What a plain search looks through, in the order of the results")
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurfaceVariant
+        ChoiceRow {
+            icon: "density_medium"
+            title: Translation.tr("Density")
+            subtitle: Translation.tr("The spacing between and inside elements")
+            value: a.density
+            options: [{ value: "compact", text: Translation.tr("Compact") }, { value: "comfortable", text: Translation.tr("Comfortable") }, { value: "spacious", text: Translation.tr("Spacious") }]
+            onSelected: value => a.density = value
         }
-        OrderedChips {
-            options: [
-                { id: "math", text: Translation.tr("Calculator"), icon: "calculate" },
-                { id: "focus", text: Translation.tr("Focus Mode"), icon: "target" },
-                { id: "windows", text: Translation.tr("Open windows"), icon: "web_asset" },
-                { id: "settings", text: Translation.tr("Settings"), icon: "settings" },
-                { id: "apps", text: Translation.tr("Apps"), icon: "apps" },
-                { id: "emoji", text: Translation.tr("Emoji"), icon: "mood" }
-            ]
-            value: Config.options.launcher.sources
-            onChanged: list => Config.options.launcher.sources = list
+        SliderRow {
+            icon: "rounded_corner"
+            title: Translation.tr("Corner roundness")
+            subtitle: Translation.tr("0 makes every corner square")
+            value: Math.round(a.cornerScale * 100)
+            from: 0; to: 200; step: 5; suffix: "%"
+            onMoved: value => a.cornerScale = value / 100
         }
-        StyledText {
-            Layout.fillWidth: true
-            Layout.margins: 14
-            Layout.bottomMargin: 0
-            wrapMode: Text.WordWrap
-            text: Translation.tr("Prefixes: a first character that switches the search to one source")
-            font.pixelSize: Appearance.font.size.labelMedium
-            color: Colors.m3onSurfaceVariant
+        SliderRow {
+            icon: "format_size"
+            title: Translation.tr("Text size")
+            value: Math.round(a.fontScale * 100)
+            from: 60; to: 200; step: 5; suffix: "%"
+            onMoved: value => a.fontScale = value / 100
         }
-        OrderedChips {
-            minimum: 0
-            options: [
-                { id: "=", text: "=  " + Translation.tr("Calculator"), icon: "calculate" },
-                { id: ">", text: ">  " + Translation.tr("Run command"), icon: "terminal" },
-                { id: "<", text: "<  " + Translation.tr("Keybinds"), icon: "keyboard" },
-                { id: ":", text: ":  " + Translation.tr("Emoji"), icon: "mood" },
-                { id: ";", text: ";  " + Translation.tr("Clipboard"), icon: "content_paste" },
-                { id: "/", text: "/  " + Translation.tr("Settings"), icon: "settings" },
-                { id: "~", text: "~  " + Translation.tr("Files"), icon: "folder" }
-            ]
-            value: Config.options.launcher.prefixes
-            onChanged: list => Config.options.launcher.prefixes = list
+        SliderRow {
+            icon: "rounded_corner"
+            title: Translation.tr("Screen corners")
+            subtitle: Translation.tr("0 turns them off")
+            value: a.screenCorners
+            from: 0; to: 32; suffix: Translation.tr(" px")
+            onMoved: value => a.screenCorners = value
         }
-        M3Button {
-            Layout.margins: 14
-            tonal: true
-            text: Translation.tr("Reset the sidebar and launcher")
-            onClicked: ["sidebar.sections", "sidebar.tabs", "launcher"].forEach(k => Config.reset(k))
+    }
+
+    Section {
+        icon: "layers"
+        title: Translation.tr("Surfaces")
+
+        ChoiceRow {
+            icon: "layers"
+            title: Translation.tr("Surfaces")
+            subtitle: Translation.tr("Tonal: by tone; glass: always see-through; flat: solid with an edge")
+            value: a.surfaceStyle
+            options: [{ value: "tonal", text: Translation.tr("Tonal") }, { value: "glass", text: Translation.tr("Glass") }, { value: "flat", text: Translation.tr("Flat") }]
+            onSelected: value => a.surfaceStyle = value
+        }
+        SliderRow {
+            icon: "border_style"
+            title: Translation.tr("Outline")
+            subtitle: Translation.tr("Width of the edge of panels and cards; auto follows the surface")
+            value: a.borderWidth
+            from: -1; to: 4; step: 1; suffix: " px"
+            onMoved: value => a.borderWidth = value
+        }
+        SwitchRow {
+            icon: "blur_on"
+            title: Translation.tr("Transparency")
+            checked: a.transparency
+            onToggled: checked => a.transparency = checked
+        }
+        SliderRow {
+            visible: a.transparency
+            icon: "opacity"
+            title: Translation.tr("Panel transparency")
+            value: Math.round(a.transparencyLevel * 100)
+            from: 0; to: 50; suffix: "%"
+            onMoved: value => a.transparencyLevel = value / 100
+        }
+        SwitchRow {
+            icon: "album"
+            title: Translation.tr("Blurred cover behind the player")
+            subtitle: Translation.tr("The playing track's cover, blurred, fills the media cards")
+            checked: a.coverBackdrop
+            onToggled: checked => a.coverBackdrop = checked
+        }
+        ChoiceRow {
+            icon: "menu_open"
+            title: Translation.tr("Context menus")
+            subtitle: Translation.tr("The tray's right-click menus")
+            value: a.contextMenu
+            options: [{ value: "material", text: Translation.tr("New") }, { value: "caelestia", text: "Caelestia" }, { value: "standard", text: Translation.tr("Standard") }]
+            onSelected: value => a.contextMenu = value
+        }
+    }
+
+    Section {
+        icon: "text_fields"
+        title: Translation.tr("Fonts")
+
+        TextRow { icon: "font_download"; title: Translation.tr("Interface"); value: a.fonts.main; onEdited: text => a.fonts.main = text || "Google Sans Flex" }
+        TextRow { icon: "title"; title: Translation.tr("Titles"); value: a.fonts.title; onEdited: text => a.fonts.title = text || "Google Sans Flex" }
+        TextRow { icon: "code"; title: Translation.tr("Monospace"); value: a.fonts.mono; onEdited: text => a.fonts.mono = text || "JetBrains Mono" }
+        ChoiceRow {
+            icon: "format_bold"
+            title: Translation.tr("Text weight")
+            value: a.textWeight
+            options: [{ value: "light", text: Translation.tr("Light") }, { value: "normal", text: Translation.tr("Normal") }, { value: "medium", text: Translation.tr("Medium") }]
+            onSelected: value => a.textWeight = value
+        }
+        SliderRow {
+            icon: "format_letter_spacing"
+            title: Translation.tr("Letter spacing")
+            value: Math.round(a.letterSpacing * 10)
+            from: -10; to: 30; step: 1; decimals: 0; suffix: " ‰"
+            onMoved: value => a.letterSpacing = value / 10
         }
     }
 
     Section {
         icon: "animation"
-        title: Translation.tr("Motion & surfaces")
+        title: Translation.tr("Motion")
 
         SliderRow {
             icon: "speed"
@@ -325,6 +246,22 @@ ColumnLayout {
             options: [{ value: "pop", text: Translation.tr("Pop") }, { value: "drop", text: Translation.tr("Drop") }, { value: "slide", text: Translation.tr("Slide") }, { value: "fade", text: Translation.tr("Fade") }]
             onSelected: value => a.popupEffect = value
         }
+        ChoiceRow {
+            icon: "apps"
+            title: Translation.tr("Launcher effect")
+            subtitle: Translation.tr("How the launcher appears")
+            value: a.launcherEffect
+            options: [{ value: "rise", text: Translation.tr("Rise") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
+            onSelected: value => a.launcherEffect = value
+        }
+        ChoiceRow {
+            icon: "side_navigation"
+            title: Translation.tr("Sidebar effect")
+            subtitle: Translation.tr("How the side panels appear")
+            value: a.sidebarEffect
+            options: [{ value: "slide", text: Translation.tr("Slide") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
+            onSelected: value => a.sidebarEffect = value
+        }
         SliderRow {
             visible: Config.options.settingsAdvanced
             icon: "dock_to_left"
@@ -352,42 +289,32 @@ ColumnLayout {
             from: 25; to: 400; step: 25; suffix: "%"
             onMoved: value => a.notificationSpeed = value / 100
         }
-        ChoiceRow {
-            icon: "apps"
-            title: Translation.tr("Launcher effect")
-            subtitle: Translation.tr("How the launcher appears")
-            value: a.launcherEffect
-            options: [{ value: "rise", text: Translation.tr("Rise") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
-            onSelected: value => a.launcherEffect = value
-        }
-        ChoiceRow {
-            icon: "side_navigation"
-            title: Translation.tr("Sidebar effect")
-            subtitle: Translation.tr("How the side panels appear")
-            value: a.sidebarEffect
-            options: [{ value: "slide", text: Translation.tr("Slide") }, { value: "pop", text: Translation.tr("Pop") }, { value: "fade", text: Translation.tr("Fade") }]
-            onSelected: value => a.sidebarEffect = value
+    }
+
+    Section {
+        icon: "format_paint"
+        title: Translation.tr("App themes")
+
+        SwitchRow {
+            icon: "web_asset"
+            title: Translation.tr("GTK apps")
+            subtitle: Translation.tr("The wallpaper's colors in GTK 3 / 4 apps (a block in ~/.config/gtk-3.0 and gtk-4.0 gtk.css; off removes it)")
+            checked: Config.options.appThemes.gtk
+            onToggled: checked => Config.options.appThemes.gtk = checked
         }
         SwitchRow {
-            icon: "blur_on"
-            title: Translation.tr("Transparency")
-            checked: a.transparency
-            onToggled: checked => a.transparency = checked
-        }
-        SliderRow {
-            visible: a.transparency
-            icon: "opacity"
-            title: Translation.tr("Panel transparency")
-            value: Math.round(a.transparencyLevel * 100)
-            from: 0; to: 50; suffix: "%"
-            onMoved: value => a.transparencyLevel = value / 100
+            visible: Config.options.settingsAdvanced
+            icon: "contrast"
+            title: Translation.tr("Switch GTK apps with dark and light")
+            checked: Config.options.appearance.gtkColorScheme
+            onToggled: checked => Config.options.appearance.gtkColorScheme = checked
         }
         SwitchRow {
-            icon: "album"
-            title: Translation.tr("Blurred cover behind the player")
-            subtitle: Translation.tr("The playing track's cover, blurred, fills the media cards")
-            checked: a.coverBackdrop
-            onToggled: checked => a.coverBackdrop = checked
+            icon: "terminal"
+            title: Translation.tr("Neovim")
+            subtitle: Translation.tr("Writes the hi-shell color scheme: use :colorscheme hi-shell in Neovim")
+            checked: Config.options.appThemes.neovim
+            onToggled: checked => Config.options.appThemes.neovim = checked
         }
         SwitchRow {
             icon: "palette"
@@ -404,123 +331,14 @@ ColumnLayout {
             checked: Config.options.appearance.restartOnIconTheme
             onToggled: checked => Config.options.appearance.restartOnIconTheme = checked
         }
-        SwitchRow {
-            visible: Config.options.settingsAdvanced
-            icon: "contrast"
-            title: Translation.tr("Switch GTK apps with dark and light")
-            checked: Config.options.appearance.gtkColorScheme
-            onToggled: checked => Config.options.appearance.gtkColorScheme = checked
-        }
-        SwitchRow {
-            icon: "movie"
-            title: Translation.tr("Viewing mode when a video fills the screen")
-            subtitle: Translation.tr("A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on")
-            checked: Config.options.viewing.auto
-            onToggled: checked => Config.options.viewing.auto = checked
-        }
-        SwitchRow {
-            icon: "co_present"
-            title: Translation.tr("Presentation mode")
-            subtitle: Translation.tr("For sharing the screen: holds notifications, keeps the screen on, turns the night light off and hides the desktop widgets")
-            checked: Presentation.active
-            onToggled: checked => Presentation.set(checked)
-        }
-        SwitchRow {
-            icon: "notifications_paused"
-            title: Translation.tr("Presentation: hold notifications")
-            checked: Config.options.presentation.holdNotifications
-            onToggled: checked => Config.options.presentation.holdNotifications = checked
-        }
-        SwitchRow {
-            icon: "coffee"
-            title: Translation.tr("Presentation: keep the screen on")
-            checked: Config.options.presentation.keepAwake
-            onToggled: checked => Config.options.presentation.keepAwake = checked
-        }
-        SwitchRow {
-            icon: "nightlight"
-            title: Translation.tr("Presentation: night light off")
-            checked: Config.options.presentation.nightLightOff
-            onToggled: checked => Config.options.presentation.nightLightOff = checked
-        }
-        SwitchRow {
-            icon: "widgets"
-            title: Translation.tr("Presentation: hide the desktop widgets")
-            checked: Config.options.presentation.hideDesktopWidgets
-            onToggled: checked => Config.options.presentation.hideDesktopWidgets = checked
-        }
-        SwitchRow {
-            icon: "web_asset_off"
-            title: Translation.tr("Presentation: hide the bar")
-            checked: Config.options.presentation.hideBar
-            onToggled: checked => Config.options.presentation.hideBar = checked
-        }
-        ChoiceRow {
-            icon: "menu_open"
-            title: Translation.tr("Context menus")
-            subtitle: Translation.tr("The tray's right-click menus")
-            value: a.contextMenu
-            options: [{ value: "material", text: Translation.tr("New") }, { value: "caelestia", text: "Caelestia" }, { value: "standard", text: Translation.tr("Standard") }]
-            onSelected: value => a.contextMenu = value
-        }
-        SliderRow {
-            icon: "rounded_corner"
-            title: Translation.tr("Screen corners")
-            subtitle: Translation.tr("0 turns them off")
-            value: a.screenCorners
-            from: 0; to: 32; suffix: Translation.tr(" px")
-            onMoved: value => a.screenCorners = value
-        }
-    }
-
-    Section {
-        icon: "waving_hand"
-        title: Translation.tr("Startup greeting")
-
-        SwitchRow {
-            icon: "waving_hand"
-            title: Translation.tr("Greeting at startup")
-            subtitle: Translation.tr("A black screen and a line of text when the shell starts. The very first start always has its own animation")
-            checked: Config.options.greeting.enabled
-            onToggled: checked => Config.options.greeting.enabled = checked
-        }
-        TextRow {
-            visible: Config.options.greeting.enabled
-            icon: "edit"
-            title: Translation.tr("Text")
-            placeholder: "Welcome back!"
-            value: Config.options.greeting.text
-            onEdited: text => Config.options.greeting.text = text.trim() || "Welcome back!"
-        }
-        ChoiceRow {
-            visible: Config.options.greeting.enabled
-            icon: "animation"
-            title: Translation.tr("Animation")
-            value: Config.options.greeting.style
-            options: [
-                { value: "random", text: Translation.tr("Random") },
-                { value: "rise", text: Translation.tr("Rise") },
-                { value: "drop", text: Translation.tr("Drop") },
-                { value: "pop", text: Translation.tr("Pop") },
-                { value: "slide", text: Translation.tr("Slide") },
-                { value: "spin", text: Translation.tr("Spin") }
-            ]
-            onSelected: value => Config.options.greeting.style = value
-        }
-        SwitchRow {
-            visible: Config.options.greeting.enabled
-            icon: "emoji_symbols"
-            title: Translation.tr("Logo")
-            checked: Config.options.greeting.logo
-            onToggled: checked => Config.options.greeting.logo = checked
-        }
-        ListRow {
-            visible: Config.options.greeting.enabled
-            icon: "play_arrow"
-            title: Translation.tr("Preview")
-            subtitle: Translation.tr("Play it now")
-            clickable: true
-            onClicked: ShellState.previewGreeting()
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.topMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Terminals, btop, fish and starship follow the palette without a switch.")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
         }
     }
 
@@ -528,6 +346,43 @@ ColumnLayout {
         icon: "side_navigation"
         title: Translation.tr("Sidebars")
 
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("What the sidebar shows under its header, and in what order")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            options: [
+                { id: "quickToggles", text: Translation.tr("Quick toggles"), icon: "toggle_on" },
+                { id: "quickSliders", text: Translation.tr("Sliders"), icon: "tune" },
+                { id: "tabs", text: Translation.tr("Tabs"), icon: "tab" }
+            ]
+            minimum: 0
+            value: Config.options.sidebar.sections
+            onChanged: list => Config.options.sidebar.sections = list
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Tabs")
+            font.weight: Font.Medium
+        }
+        OrderedChips {
+            options: [
+                { id: "notifications", text: Translation.tr("Notifications"), icon: "notifications" },
+                { id: "calendar", text: Translation.tr("Calendar"), icon: "calendar_month" },
+                { id: "todo", text: Translation.tr("To-do"), icon: "checklist" },
+                { id: "timers", text: Translation.tr("Timers"), icon: "timer" }
+            ]
+            value: Config.options.sidebar.tabs
+            onChanged: list => Config.options.sidebar.tabs = list
+        }
         ChoiceRow {
             icon: "toggle_on"
             title: Translation.tr("Quick toggles")
@@ -588,6 +443,163 @@ ColumnLayout {
             value: Config.options.sidebar.nightLightTemperature
             from: 2500; to: 6000; step: 100; suffix: " K"
             onMoved: value => Config.options.sidebar.nightLightTemperature = value
+        }
+    }
+
+    Section {
+        icon: "search"
+        title: Translation.tr("Launcher")
+
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("What a plain search looks through, in the order of the results")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            options: [
+                { id: "math", text: Translation.tr("Calculator"), icon: "calculate" },
+                { id: "focus", text: Translation.tr("Focus Mode"), icon: "target" },
+                { id: "windows", text: Translation.tr("Open windows"), icon: "web_asset" },
+                { id: "settings", text: Translation.tr("Settings"), icon: "settings" },
+                { id: "apps", text: Translation.tr("Apps"), icon: "apps" },
+                { id: "emoji", text: Translation.tr("Emoji"), icon: "mood" }
+            ]
+            value: Config.options.launcher.sources
+            onChanged: list => Config.options.launcher.sources = list
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Prefixes: a first character that switches the search to one source")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        OrderedChips {
+            minimum: 0
+            options: [
+                { id: "=", text: "=  " + Translation.tr("Calculator"), icon: "calculate" },
+                { id: ">", text: ">  " + Translation.tr("Run command"), icon: "terminal" },
+                { id: "<", text: "<  " + Translation.tr("Keybinds"), icon: "keyboard" },
+                { id: ":", text: ":  " + Translation.tr("Emoji"), icon: "mood" },
+                { id: ";", text: ";  " + Translation.tr("Clipboard"), icon: "content_paste" },
+                { id: "/", text: "/  " + Translation.tr("Settings"), icon: "settings" },
+                { id: "~", text: "~  " + Translation.tr("Files"), icon: "folder" }
+            ]
+            value: Config.options.launcher.prefixes
+            onChanged: list => Config.options.launcher.prefixes = list
+        }
+        M3Button {
+            Layout.margins: 14
+            tonal: true
+            text: Translation.tr("Reset the sidebar and launcher")
+            onClicked: ["sidebar.sections", "sidebar.tabs", "launcher"].forEach(k => Config.reset(k))
+        }
+    }
+
+    Section {
+        icon: "co_present"
+        title: Translation.tr("Modes")
+
+        SwitchRow {
+            icon: "co_present"
+            title: Translation.tr("Presentation mode")
+            subtitle: Translation.tr("For sharing the screen: holds notifications, keeps the screen on, turns the night light off and hides the desktop widgets")
+            checked: Presentation.active
+            onToggled: checked => Presentation.set(checked)
+        }
+        SwitchRow {
+            icon: "notifications_paused"
+            title: Translation.tr("Presentation: hold notifications")
+            checked: Config.options.presentation.holdNotifications
+            onToggled: checked => Config.options.presentation.holdNotifications = checked
+        }
+        SwitchRow {
+            icon: "coffee"
+            title: Translation.tr("Presentation: keep the screen on")
+            checked: Config.options.presentation.keepAwake
+            onToggled: checked => Config.options.presentation.keepAwake = checked
+        }
+        SwitchRow {
+            icon: "nightlight"
+            title: Translation.tr("Presentation: night light off")
+            checked: Config.options.presentation.nightLightOff
+            onToggled: checked => Config.options.presentation.nightLightOff = checked
+        }
+        SwitchRow {
+            icon: "widgets"
+            title: Translation.tr("Presentation: hide the desktop widgets")
+            checked: Config.options.presentation.hideDesktopWidgets
+            onToggled: checked => Config.options.presentation.hideDesktopWidgets = checked
+        }
+        SwitchRow {
+            icon: "web_asset_off"
+            title: Translation.tr("Presentation: hide the bar")
+            checked: Config.options.presentation.hideBar
+            onToggled: checked => Config.options.presentation.hideBar = checked
+        }
+        SwitchRow {
+            icon: "movie"
+            title: Translation.tr("Viewing mode when a video fills the screen")
+            subtitle: Translation.tr("A fullscreen window with something playing hides the bar and holds notifications, and keeps the screen on")
+            checked: Config.options.viewing.auto
+            onToggled: checked => Config.options.viewing.auto = checked
+        }
+    }
+
+    Section {
+        icon: "waving_hand"
+        title: Translation.tr("Startup greeting")
+
+        SwitchRow {
+            icon: "waving_hand"
+            title: Translation.tr("Greeting at startup")
+            subtitle: Translation.tr("A black screen and a line of text when the shell starts. The very first start always has its own animation")
+            checked: Config.options.greeting.enabled
+            onToggled: checked => Config.options.greeting.enabled = checked
+        }
+        TextRow {
+            visible: Config.options.greeting.enabled
+            icon: "edit"
+            title: Translation.tr("Text")
+            placeholder: "Welcome back!"
+            value: Config.options.greeting.text
+            onEdited: text => Config.options.greeting.text = text.trim() || "Welcome back!"
+        }
+        ChoiceRow {
+            visible: Config.options.greeting.enabled
+            icon: "animation"
+            title: Translation.tr("Animation")
+            value: Config.options.greeting.style
+            options: [
+                { value: "random", text: Translation.tr("Random") },
+                { value: "rise", text: Translation.tr("Rise") },
+                { value: "drop", text: Translation.tr("Drop") },
+                { value: "pop", text: Translation.tr("Pop") },
+                { value: "slide", text: Translation.tr("Slide") },
+                { value: "spin", text: Translation.tr("Spin") }
+            ]
+            onSelected: value => Config.options.greeting.style = value
+        }
+        SwitchRow {
+            visible: Config.options.greeting.enabled
+            icon: "emoji_symbols"
+            title: Translation.tr("Logo")
+            checked: Config.options.greeting.logo
+            onToggled: checked => Config.options.greeting.logo = checked
+        }
+        ListRow {
+            visible: Config.options.greeting.enabled
+            icon: "play_arrow"
+            title: Translation.tr("Preview")
+            subtitle: Translation.tr("Play it now")
+            clickable: true
+            onClicked: ShellState.previewGreeting()
         }
     }
 }

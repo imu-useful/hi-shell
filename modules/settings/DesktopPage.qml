@@ -114,9 +114,11 @@ ColumnLayout {
     }
 
     Section {
-        icon: "desktop_windows"
-        title: Translation.tr("Desktop")
+        icon: "wallpaper"
+        title: Translation.tr("Wallpaper")
 
+        SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
+        SwitchRow { icon: "animated_images"; title: Translation.tr("Play live wallpapers"); subtitle: Translation.tr("A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture"); checked: Config.options.wallpapers.animate; onToggled: checked => Config.options.wallpapers.animate = checked }
         StepperRow {
             icon: "shuffle"
             title: Translation.tr("Slideshow")
@@ -136,15 +138,6 @@ ColumnLayout {
             fieldWidth: 260
             onEdited: text => Config.options.wallpapers.downloadDirectory = text.trim() || "~/Pictures/Wallpapers/online"
         }
-        SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
-        SwitchRow { icon: "animated_images"; title: Translation.tr("Play live wallpapers"); subtitle: Translation.tr("A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture"); checked: Config.options.wallpapers.animate; onToggled: checked => Config.options.wallpapers.animate = checked }
-        SwitchRow {
-            icon: "layers_clear"
-            title: Translation.tr("Clean desktop")
-            subtitle: Translation.tr("With windows open: sharp wallpaper, widgets and frame hidden")
-            checked: root.d.focusMode
-            onToggled: checked => root.d.focusMode = checked
-        }
         SwitchRow {
             icon: "album"
             title: Translation.tr("Cover mode")
@@ -152,11 +145,20 @@ ColumnLayout {
             checked: root.d.coverMode
             onToggled: checked => root.d.coverMode = checked
         }
+        SwitchRow {
+            icon: "layers_clear"
+            title: Translation.tr("Clean desktop")
+            subtitle: Translation.tr("With windows open: sharp wallpaper, widgets and frame hidden")
+            checked: root.d.focusMode
+            onToggled: checked => root.d.focusMode = checked
+        }
+    }
+
+    Section {
+        icon: "widgets"
+        title: Translation.tr("Widgets")
+
         SwitchRow { icon: "widgets"; title: Translation.tr("Widgets"); checked: root.d.widgets; onToggled: checked => root.d.widgets = checked }
-        SwitchRow { icon: "graphic_eq"; title: Translation.tr("Visualizer while music plays"); subtitle: Translation.tr("Needs cava"); checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
-        SwitchRow { icon: "timer"; title: Translation.tr("Seconds in the digital clock"); checked: root.d.clockSeconds; onToggled: checked => root.d.clockSeconds = checked }
-        SwitchRow { icon: "waves"; title: Translation.tr("Wavy progress bar in the player"); subtitle: Translation.tr("Off: a plain bar"); checked: root.d.waveProgress; onToggled: checked => root.d.waveProgress = checked }
-        SwitchRow { icon: "music_note"; title: Translation.tr("Wave kicks to the beat"); subtitle: Translation.tr("Needs cava"); enabled: root.d.waveProgress; checked: root.d.waveBeat; onToggled: checked => root.d.waveBeat = checked }
         ChoiceRow {
             icon: "monitor"
             title: Translation.tr("Widgets on")
@@ -192,6 +194,10 @@ ColumnLayout {
                 }
             }
         }
+        SwitchRow { icon: "graphic_eq"; title: Translation.tr("Visualizer while music plays"); subtitle: Translation.tr("Needs cava"); checked: root.d.visualizer; onToggled: checked => root.d.visualizer = checked }
+        SwitchRow { icon: "timer"; title: Translation.tr("Seconds in the digital clock"); checked: root.d.clockSeconds; onToggled: checked => root.d.clockSeconds = checked }
+        SwitchRow { icon: "waves"; title: Translation.tr("Wavy progress bar in the player"); subtitle: Translation.tr("Off: a plain bar"); checked: root.d.waveProgress; onToggled: checked => root.d.waveProgress = checked }
+        SwitchRow { icon: "music_note"; title: Translation.tr("Wave kicks to the beat"); subtitle: Translation.tr("Needs cava"); enabled: root.d.waveProgress; checked: root.d.waveBeat; onToggled: checked => root.d.waveBeat = checked }
     }
 
     Section {
