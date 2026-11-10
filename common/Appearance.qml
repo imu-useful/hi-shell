@@ -40,7 +40,8 @@ Singleton {
 
     // Outline width for floating surfaces: depth comes from tone, so the outline is only
     // there when the surface is see-through (otherwise its edge would dissolve into the wallpaper).
-    readonly property int edge: options.transparency && !ShellState.zen ? 1 : 0
+    // appearance.borderWidth (-1 = by the surface style) sets it by hand; glass and flat surfaces always have one.
+    readonly property int edge: options.borderWidth >= 0 ? options.borderWidth : (options.surfaceStyle !== "tonal" || (options.transparency && !ShellState.zen)) ? 1 : 0
 
     // Spacing scale (px); use these instead of loose numbers in layouts.
     readonly property QtObject space: QtObject {
@@ -76,6 +77,9 @@ Singleton {
 
     readonly property QtObject font: QtObject {
         readonly property string main: root.options.fonts.main
+        // appearance.textWeight and appearance.letterSpacing: the default weight and tracking of every text.
+        readonly property int weight: ({ "light": Font.Light, "normal": Font.Normal, "medium": Font.Medium })[root.options.textWeight] ?? Font.Normal
+        readonly property real letterSpacing: root.options.letterSpacing
         readonly property string title: root.options.fonts.title
         readonly property string mono: root.options.fonts.mono
         // The shell's own cut-down copy when it's there (IconFont).
@@ -160,8 +164,10 @@ Singleton {
     // so the compositor blur shows through.
     function translucent(color, level) {
         // Focus Mode turns blur off, so nothing shows through either.
-        if (!options.transparency || ShellState.zen)
+        // flat: always solid; glass: always see-through, at least a quarter, whatever the transparency switch.
+        if (options.surfaceStyle === "flat" || ShellState.zen || (!options.transparency && options.surfaceStyle !== "glass"))
             return color;
-        return Qt.alpha(color, 1 - (level ?? options.transparencyLevel));
+        const see = level ?? options.transparencyLevel;
+        return Qt.alpha(color, 1 - (options.surfaceStyle === "glass" ? Math.max(see, 0.25) : see));
     }
 }

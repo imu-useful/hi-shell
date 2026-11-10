@@ -7,7 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
-| [`appearance`](#appearance) | 32 |
+| [`appearance`](#appearance) | 36 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
 | [`launcher`](#launcher) | 2 |
@@ -79,6 +79,10 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the notification cards' motion on top of the global speed. |
 | `appearance.ripple` | `bool` | `true` |  | Settings › Interface | A wave grows from the point you press on buttons and rows. |
 | `appearance.pressScale` | `real` | `0.9` | 0.7 … 1 | Settings › Interface | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
+| `appearance.surfaceStyle` | `string` | `"tonal"` | `tonal` \| `glass` \| `flat` | Settings › Interface | How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) \| glass (always see-through, with an edge) \| flat (solid, with an edge) |
+| `appearance.borderWidth` | `int` | `-1` | -1 … 4 | Settings › Interface | Width of the outline of panels and cards in px; -1 = by the surface style. |
+| `appearance.textWeight` | `string` | `"normal"` | `light` \| `normal` \| `medium` | Settings › Interface | The default weight of the interface text: light \| normal \| medium. |
+| `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Interface | Extra space between letters in px (negative = tighter). |
 | `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |

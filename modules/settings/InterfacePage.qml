@@ -98,10 +98,68 @@ ColumnLayout {
             from: -100; to: 100; step: 10; suffix: "%"
             onMoved: value => a.contrast = value / 100
         }
+        ChoiceRow {
+            icon: "layers"
+            title: Translation.tr("Surfaces")
+            subtitle: Translation.tr("Tonal: by tone; glass: always see-through; flat: solid with an edge")
+            value: a.surfaceStyle
+            options: [{ value: "tonal", text: Translation.tr("Tonal") }, { value: "glass", text: Translation.tr("Glass") }, { value: "flat", text: Translation.tr("Flat") }]
+            onSelected: value => a.surfaceStyle = value
+        }
+        SliderRow {
+            icon: "border_style"
+            title: Translation.tr("Outline")
+            subtitle: Translation.tr("Width of the edge of panels and cards; auto follows the surface")
+            value: a.borderWidth
+            from: -1; to: 4; step: 1; suffix: " px"
+            onMoved: value => a.borderWidth = value
+        }
+        ChoiceRow {
+            icon: "format_bold"
+            title: Translation.tr("Text weight")
+            value: a.textWeight
+            options: [{ value: "light", text: Translation.tr("Light") }, { value: "normal", text: Translation.tr("Normal") }, { value: "medium", text: Translation.tr("Medium") }]
+            onSelected: value => a.textWeight = value
+        }
+        SliderRow {
+            icon: "format_letter_spacing"
+            title: Translation.tr("Letter spacing")
+            value: Math.round(a.letterSpacing * 10)
+            from: -10; to: 30; step: 1; decimals: 0; suffix: " ‰"
+            onMoved: value => a.letterSpacing = value / 10
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            Layout.bottomMargin: 0
+            text: Translation.tr("Looks: one tap sets shape, surfaces, text and motion together")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        Flow {
+            Layout.fillWidth: true
+            Layout.margins: 14
+            spacing: 8
+            Repeater {
+                model: [
+                    { text: Translation.tr("Soft"), icon: "spa", set: { cornerScale: 1, surfaceStyle: "tonal", borderWidth: -1, textWeight: "normal", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1, density: "comfortable" } },
+                    { text: Translation.tr("Glass"), icon: "blur_on", set: { cornerScale: 1.2, surfaceStyle: "glass", borderWidth: 1, textWeight: "normal", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0.4, density: "comfortable" } },
+                    { text: Translation.tr("Sharp"), icon: "crop_square", set: { cornerScale: 0.2, surfaceStyle: "flat", borderWidth: 2, textWeight: "medium", letterSpacing: 0.3, motionStyle: "snappy", animationBounce: 0, density: "compact" } },
+                    { text: Translation.tr("Playful"), icon: "celebration", set: { cornerScale: 1.6, surfaceStyle: "tonal", borderWidth: -1, textWeight: "medium", letterSpacing: 0, motionStyle: "expressive", animationBounce: 1.8, density: "spacious" } },
+                    { text: Translation.tr("Calm"), icon: "self_improvement", set: { cornerScale: 1, surfaceStyle: "tonal", borderWidth: 0, textWeight: "light", letterSpacing: 0.2, motionStyle: "smooth", animationBounce: 0, density: "spacious" } }
+                ]
+                Chip {
+                    required property var modelData
+                    text: modelData.text
+                    icon: modelData.icon
+                    onClicked: Object.keys(modelData.set).forEach(k => a[k] = modelData.set[k])
+                }
+            }
+        }
         M3Button {
             Layout.margins: 14
             text: Translation.tr("Reset shape, size and palette")
-            onClicked: ["cornerScale", "fontScale", "density", "seedColor", "contrast"].forEach(k => Config.reset("appearance." + k))
+            onClicked: ["cornerScale", "fontScale", "density", "seedColor", "contrast", "surfaceStyle", "borderWidth", "textWeight", "letterSpacing"].forEach(k => Config.reset("appearance." + k))
         }
     }
 

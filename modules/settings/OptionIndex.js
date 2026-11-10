@@ -159,6 +159,30 @@ const options = [
         "advanced": false
     },
     {
+        "path": "appearance.surfaceStyle",
+        "page": "interface",
+        "text": "How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) | glass (always see-through, with an edge) | flat (solid, with an edge)",
+        "advanced": false
+    },
+    {
+        "path": "appearance.borderWidth",
+        "page": "interface",
+        "text": "Width of the outline of panels and cards in px; -1 = by the surface style.",
+        "advanced": false
+    },
+    {
+        "path": "appearance.textWeight",
+        "page": "interface",
+        "text": "The default weight of the interface text: light | normal | medium.",
+        "advanced": false
+    },
+    {
+        "path": "appearance.letterSpacing",
+        "page": "interface",
+        "text": "Extra space between letters in px (negative = tighter).",
+        "advanced": false
+    },
+    {
         "path": "appearance.animationBounce",
         "page": "interface",
         "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",

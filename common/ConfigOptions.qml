@@ -67,6 +67,14 @@ JsonAdapter {
         property bool ripple: true
         // How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller.
         property real pressScale: 0.9
+        // How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) | glass (always see-through, with an edge) | flat (solid, with an edge)
+        property string surfaceStyle: "tonal"
+        // Width of the outline of panels and cards in px; -1 = by the surface style.
+        property int borderWidth: -1
+        // The default weight of the interface text: light | normal | medium.
+        property string textWeight: "normal"
+        // Extra space between letters in px (negative = tighter).
+        property real letterSpacing: 0
         // How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful
         property real animationBounce: 1
         // matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant
