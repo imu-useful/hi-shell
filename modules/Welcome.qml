@@ -411,23 +411,15 @@ Scope {
                             }
                         }
                     }
-                    Row {
+                    // One line, so "hi-shell" (in the accent color) sits on the same baseline
+                    StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: 12
                         opacity: root.rise(1)
                         transform: Rise { index: 1 }
-                        StyledText {
-                            text: Translation.tr("Welcome to")
-                            font.family: Appearance.font.title
-                            font.pixelSize: Appearance.font.size.displaySmall
-                        }
-                        StyledText {
-                            text: "hi-shell"
-                            font.family: Appearance.font.title
-                            font.pixelSize: Appearance.font.size.displaySmall
-                            font.weight: Font.DemiBold
-                            color: Colors.m3primary
-                        }
+                        textFormat: Text.StyledText
+                        text: `${Translation.tr("Welcome to")} <font color="${Colors.m3primary}"><b>hi-shell</b></font>`
+                        font.family: Appearance.font.title
+                        font.pixelSize: Appearance.font.size.displaySmall
                     }
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
