@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.modules.secret
 
 // Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
-// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"), "hyperos" (also "hyper os", "xiaomi"), "aero" (also "frutiger", "frutiger aero"), "rice" (also "ricing", "eye candy", "eyecandy", "trip"). A click or Esc closes it.
+// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"), "hyperos" (also "hyper os", "xiaomi"), "aero" (also "frutiger", "frutiger aero"), "rice" (also "ricing", "eye candy", "eyecandy", "trip"), "keynote" (also "presentation", "презентация", "event"). A click or Esc closes it.
 Scope {
     id: root
 
@@ -73,6 +73,10 @@ Scope {
                         nothing: nothing,
                         aero: aero,
                         rice: eyecandy,
+                        keynote: keynote,
+                        presentation: keynote,
+                        "презентация": keynote,
+                        event: keynote,
                         ricing: eyecandy,
                         "eye candy": eyecandy,
                         eyecandy: eyecandy,
@@ -110,6 +114,7 @@ Scope {
                 Component { id: confetti; Confetti { revealed: loader.revealed } }
                 Component { id: disco; Disco { revealed: loader.revealed } }
                 Component { id: nyan; Nyan { revealed: loader.revealed } }
+                Component { id: keynote; Keynote { revealed: loader.revealed } }
                 Component { id: eyecandy; EyeCandy { revealed: loader.revealed } }
                 Component { id: aero; FrutigerAero { revealed: loader.revealed } }
                 Component { id: hyperos; HyperOS { revealed: loader.revealed } }
