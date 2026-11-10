@@ -1435,5 +1435,11 @@
     "advanced": "дополнительно",
     "Search settings": "Поиск по настройкам",
     "Show advanced settings": "Показывать дополнительные настройки",
-    "Rarely needed rows (blur passes, dock spacing, refresh times, ...). The search finds them either way": "Редко нужные строки (проходы размытия, отступы дока, интервалы обновления…). Поиск находит их в любом случае"
+    "Rarely needed rows (blur passes, dock spacing, refresh times, ...). The search finds them either way": "Редко нужные строки (проходы размытия, отступы дока, интервалы обновления…). Поиск находит их в любом случае",
+    "Glass and gloss": "Стекло и глянец",
+    "Almost there": "Почти готово",
+    "Pictures": "Изображения",
+    "Welcome back": "С возвращением",
+    "Everything is shiny and where you left it.": "Всё блестит и лежит там, где ты оставил.",
+    "Please wait…": "Подождите…"
 }
