@@ -79,15 +79,58 @@ Singleton {
             imperial ? "temperature_unit=fahrenheit&wind_speed_unit=mph" : "wind_speed_unit=ms"
         ];
         get(`https://api.open-meteo.com/v1/forecast?${params.join("&")}`, data => {
+            updatedAt = Date.now();
             apply(data);
+            loading = false;
             cache.setText(JSON.stringify({ city, latitude, longitude, imperial, updatedAt, data }));
         });
     }
 
+    // The last forecast as it came, so the lists can be cut again as the hours go by.
+    property var raw: null
+    property string shownHour: ""
+
+    // "YYYY-MM-DDTHH" now at the forecast's place (timezone=auto gives its UTC offset).
+    // Index of the first entry at or after key; past the end when they are all before it.
+    function firstFrom(list, key) {
+        const i = list.findIndex(t => t >= key);
+        return i < 0 ? list.length : i;
+    }
+
+    function placeHour(data) {
+        return new Date(Date.now() + (data.utc_offset_seconds ?? 0) * 1000).toISOString().slice(0, 13);
+    }
+
+    // The forecast from now on: an old one (cached, or no network for hours) starts at the current
+    // hour and today too, and "now" is the forecast for this hour instead of a reading from back then.
     function apply(data) {
+        raw = data;
+        const hour = placeHour(data);
+        shownHour = hour;
+        const h = data.hourly;
+        const first = firstFrom(h.time.map(t => t.slice(0, 13)), hour);
+        hourly = h.time.slice(first, first + 24).map((time, i) => {
+            const k = first + i;
+            return { time, temp: h.temperature_2m[k], code: h.weather_code[k], isDay: h.is_day[k] === 1, precipitation: h.precipitation_probability[k] };
+        });
+        const d = data.daily;
+        const today = firstFrom(d.time, hour.slice(0, 10));
+        daily = d.time.slice(today).map((date, j) => {
+            const i = today + j;
+            return {
+                date,
+                max: d.temperature_2m_max[i],
+                min: d.temperature_2m_min[i],
+                code: d.weather_code[i],
+                precipitation: d.precipitation_probability_max[i],
+                sunrise: d.sunrise[i],
+                sunset: d.sunset[i]
+            };
+        });
         const c = data.current;
+        const stale = c.time.slice(0, 13) < hour && hourly.length > 0 && hourly[0].time.slice(0, 13) === hour;
         current = {
-            temp: c.temperature_2m,
+            temp: stale ? hourly[0].temp : c.temperature_2m,
             feelsLike: c.apparent_temperature,
             humidity: c.relative_humidity_2m,
             wind: c.wind_speed_10m,
@@ -95,28 +138,9 @@ Singleton {
             pressure: c.pressure_msl,
             visibility: c.visibility,
             cloudCover: c.cloud_cover,
-            code: c.weather_code,
-            isDay: c.is_day === 1
+            code: stale ? hourly[0].code : c.weather_code,
+            isDay: stale ? hourly[0].isDay : c.is_day === 1
         };
-        const d = data.daily;
-        daily = d.time.map((date, i) => ({
-            date,
-            max: d.temperature_2m_max[i],
-            min: d.temperature_2m_min[i],
-            code: d.weather_code[i],
-            precipitation: d.precipitation_probability_max[i],
-            sunrise: d.sunrise[i],
-            sunset: d.sunset[i]
-        }));
-        const h = data.hourly;
-        // Start at the current hour (current.time is e.g. "2026-10-25T12:45").
-        const now = h.time.findIndex(t => t.slice(0, 13) >= c.time.slice(0, 13));
-        hourly = h.time.slice(Math.max(0, now), Math.max(0, now) + 24).map((time, i) => {
-            const k = Math.max(0, now) + i;
-            return { time, temp: h.temperature_2m[k], code: h.weather_code[k], isDay: h.is_day[k] === 1, precipitation: h.precipitation_probability[k] };
-        });
-        updatedAt = Date.now();
-        loading = false;
     }
 
     function fail(message) {
@@ -210,6 +234,17 @@ Singleton {
         repeat: true
         triggeredOnStart: true
         onTriggered: root.refresh()
+    }
+
+    // Move the lists on at each new hour, also while there is no network to fetch a new forecast.
+    Timer {
+        running: root.raw !== null
+        interval: 60000
+        repeat: true
+        onTriggered: {
+            if (root.placeHour(root.raw) !== root.shownHour)
+                root.apply(root.raw);
+        }
     }
 
     Timer {
