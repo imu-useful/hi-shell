@@ -41,7 +41,7 @@ class TranslationsTest(unittest.TestCase):
 
     def test_the_settings_pages_we_added_are_translated(self):
         ru = json.loads((ROOT / "translations" / "ru.json").read_text())
-        files = ["modules/settings/BarPage.qml", "modules/settings/StylePage.qml", "modules/settings/MotionPage.qml", "modules/settings/PanelsPage.qml", "modules/settings/ModesPage.qml", "modules/BarEditor.qml", "modules/settings/OrderedChips.qml",
+        files = ["modules/settings/BarPage.qml", "modules/settings/StylePage.qml", "modules/settings/MotionPage.qml", "modules/settings/PanelsPage.qml", "modules/settings/ModesPage.qml", "modules/settings/WallpaperPage.qml", "modules/settings/DockPage.qml", "modules/settings/NotificationsPage.qml", "modules/settings/PowerPage.qml", "modules/settings/ContentFilterPage.qml", "modules/BarEditor.qml", "modules/settings/OrderedChips.qml",
                  "services/UserWidgets.qml", "modules/settings/DesktopPage.qml", "modules/settings/HomePage.qml", "modules/Settings.qml", "modules/settings/RulesPage.qml", "services/Presets.qml"]
         missing = []
         for f in files:

@@ -4,29 +4,10 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// Notifications, battery, weather, updates, screen capture, online wallpapers, Spotify, content filter.
+// Weather, updates, screen capture and Spotify.
 ColumnLayout {
     readonly property var o: Config.options
     spacing: 24
-
-    Section {
-        icon: "notifications"
-        title: Translation.tr("Notifications")
-
-        SwitchRow { icon: "do_not_disturb_on"; title: Translation.tr("Do not disturb"); checked: Notifications.dnd; onToggled: checked => Notifications.dnd = checked }
-        SliderRow { icon: "timer"; title: Translation.tr("Popup timeout"); value: o.notifications.defaultTimeout / 1000; from: 2; to: 20; suffix: " " + Translation.tr("s"); onMoved: value => o.notifications.defaultTimeout = value * 1000 }
-        SwitchRow { icon: "hourglass_top"; title: Translation.tr("Hold notifications in Focus Mode"); subtitle: Translation.tr("They wait for the break instead of popping up"); checked: o.notifications.holdInFocus; onToggled: checked => o.notifications.holdInFocus = checked }
-        SliderRow { visible: Config.options.settingsAdvanced; icon: "history"; title: Translation.tr("History size"); value: o.notifications.historyLimit; from: 10; to: 300; step: 10; onMoved: value => o.notifications.historyLimit = value }
-    }
-
-    Section {
-        icon: "battery_alert"
-        title: Translation.tr("Battery")
-
-        SwitchRow { icon: "notifications"; title: Translation.tr("Low battery warnings"); checked: o.battery.warnings; onToggled: checked => o.battery.warnings = checked }
-        SliderRow { icon: "battery_3_bar"; title: Translation.tr("Low"); value: o.battery.low; from: 5; to: 50; suffix: "%"; onMoved: value => o.battery.low = value }
-        SliderRow { icon: "battery_1_bar"; title: Translation.tr("Critical"); value: o.battery.critical; from: 2; to: 25; suffix: "%"; onMoved: value => o.battery.critical = value }
-    }
 
     Section {
         icon: "partly_cloudy_day"
@@ -92,41 +73,6 @@ ColumnLayout {
     }
 
     Section {
-        icon: "public"
-        title: Translation.tr("Online wallpapers")
-
-        TextRow {
-            icon: "key"
-            title: Translation.tr("Unsplash access key")
-            subtitle: Translation.tr("Free at unsplash.com/developers; enables Unsplash in the picker")
-            value: o.wallpapers.unsplashKey
-            secret: true
-            fieldWidth: 300
-            onEdited: text => o.wallpapers.unsplashKey = text.trim()
-        }
-        TextRow {
-            icon: "key"
-            title: Translation.tr("Wallhaven API key")
-            subtitle: Translation.tr("Optional")
-            value: o.wallpapers.wallhavenKey
-            secret: true
-            fieldWidth: 300
-            onEdited: text => o.wallpapers.wallhavenKey = text.trim()
-        }
-        TextRow {
-            icon: "folder"
-            title: Translation.tr("Wallpaper folders")
-            subtitle: Translation.tr("Comma separated")
-            value: o.wallpapers.directories.join(", ")
-            fieldWidth: 300
-            onEdited: text => {
-                o.wallpapers.directories = text.split(",").map(d => d.trim()).filter(d => d);
-                Wallpapers.scan();
-            }
-        }
-    }
-
-    Section {
         icon: "music_note"
         title: Translation.tr("Spotify")
 
@@ -137,48 +83,6 @@ ColumnLayout {
             value: o.spotify.clientId
             fieldWidth: 300
             onEdited: text => o.spotify.clientId = text.trim()
-        }
-    }
-
-    Section {
-        icon: "shield"
-        title: Translation.tr("Content filter")
-
-        ListRow {
-            Layout.fillWidth: true
-            icon: "block"
-            title: Translation.tr("Block adult sites")
-            subtitle: AdultFilter.busy ? Translation.tr("Changing /etc/hosts…")
-                : AdultFilter.error !== "" ? AdultFilter.error
-                : AdultFilter.applied ? Translation.tr("On in every browser and app here, until it's switched off. The list: services/adult_domains.txt")
-                : Translation.tr("Off. Switching it on or off asks for your password")
-            M3Switch {
-                id: adultSwitch
-                enabled: !AdultFilter.busy
-                // The click changes the switch itself: when the change doesn't happen, it goes back to the real state.
-                Binding {
-                    target: adultSwitch
-                    property: "checked"
-                    value: AdultFilter.applied
-                    when: !AdultFilter.busy
-                }
-                onToggled: checked => AdultFilter.set(checked)
-            }
-        }
-        SwitchRow {
-            icon: "label"
-            title: Translation.tr("Close tabs with these words in the title")
-            subtitle: Translation.tr("A browser tab whose title has one of the words is closed (Ctrl+W), and a notice says so")
-            checked: o.contentFilter.keywordsOn
-            onToggled: checked => o.contentFilter.keywordsOn = checked
-        }
-        TextRow {
-            icon: "spellcheck"
-            title: Translation.tr("Words")
-            subtitle: Translation.tr("Separated by commas. Matches anywhere in a title, in any case")
-            value: o.contentFilter.keywords.join(", ")
-            fieldWidth: 320
-            onEdited: text => o.contentFilter.keywords = text.split(",").map(w => w.trim()).filter(w => w !== "")
         }
     }
 }

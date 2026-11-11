@@ -291,7 +291,7 @@ qs -c hi-shell ipc call overview toggle
 qs -c hi-shell ipc call switcher next                # prev, commit, cancel (Alt+Tab)
 qs -c hi-shell ipc call bar toggle                   # show, hide
 qs -c hi-shell ipc call display set mirror           # internal, left, right, external; toggle, next (the display key)
-qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: home style motion panels bar desktop services hyprland about
+qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: home style motion wallpaper bar dock desktop notifications power services hyprland about
 qs -c hi-shell ipc call focus settings               # Focus Mode settings window; openTab timer|wallpaper|lists|profiles|todo|exit, profile <id>, current
 qs -c hi-shell ipc call focus start                  # Focus Mode session with the active profile; stop (Manual mode only), abort (emergency), status, addTask <text>
 # Focus Mode blocks sites through /etc/hosts (services/focus_hosts.py via pkexec, backup in /etc/hosts.hi-shell.bak);

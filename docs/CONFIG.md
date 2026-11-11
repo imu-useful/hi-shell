@@ -46,7 +46,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `language` | `string` | `"auto"` | `auto` \| `en` \| `ru` | Settings › General | Interface language: auto (from $LANG), en, ru |
 | `customLanguages` | `var` | `[]` |  | Settings › General | Languages made with AI (Settings > General > Language): [{ code, name }]; their files are in ~/.config/hi-shell/translations. |
 | `rules` | `var` | `[]` |  | Settings › About | Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs; when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all. |
-| `settingsAdvanced` | `bool` | `false` |  | Settings › Style | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
+| `settingsAdvanced` | `bool` | `false` |  | Settings › Wallpaper | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
 | `rulesEnabled` | `bool` | `true` |  | Settings › Rules | Off stops every rule and puts back what they changed. |
 
 ## appearance
@@ -157,17 +157,17 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `wallpapers.directories` | `list<string>` | `["~/Pictures/Wallpapers"]` |  | Settings › Services | Folders the wallpaper picker looks in. |
-| `wallpapers.slideshowMinutes` | `int` | `0` | 0 … 100000 | Settings › Desktop | A slideshow: a random picture from the folders every this many minutes (0 = off). |
-| `wallpapers.downloadDirectory` | `string` | `"~/Pictures/Wallpapers/online"` |  | Settings › Desktop (advanced) | Online pictures are saved here before being set. |
-| `wallpapers.unsplashKey` | `string` | `""` |  | Settings › Services | Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one. |
-| `wallpapers.wallhavenKey` | `string` | `""` |  | Settings › Services | Optional Wallhaven API key (only needed for NSFW / account features). |
-| `wallpapers.animate` | `bool` | `true` |  | Settings › Desktop | Play a video or gif wallpaper (off: its still picture is shown). It pauses while a window covers the desktop. |
-| `wallpapers.frame` | `string` | `""` |  | Settings › Desktop | Shape the wallpaper is shown in on the desktop ("" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ... |
-| `wallpapers.frameDance` | `bool` | `true` |  | Settings › Desktop | The frame turns and pulses to the music while something plays. |
-| `wallpapers.frameBeatShape` | `bool` | `true` |  | Settings › Desktop | On a beat the frame turns into another shape (it morphs), going through a set of shapes. |
-| `wallpapers.frameX` | `real` | `0.5` | 0 … 1 | Settings › Desktop | Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle). Moved by dragging it in the desktop's edit mode. |
-| `wallpapers.frameY` | `real` | `0.5` | 0 … 1 | Settings › Desktop | The vertical center of the wallpaper frame, as a fraction of the screen height. |
+| `wallpapers.directories` | `list<string>` | `["~/Pictures/Wallpapers"]` |  | Settings › Wallpaper | Folders the wallpaper picker looks in. |
+| `wallpapers.slideshowMinutes` | `int` | `0` | 0 … 100000 | Settings › Wallpaper | A slideshow: a random picture from the folders every this many minutes (0 = off). |
+| `wallpapers.downloadDirectory` | `string` | `"~/Pictures/Wallpapers/online"` |  | Settings › Wallpaper (advanced) | Online pictures are saved here before being set. |
+| `wallpapers.unsplashKey` | `string` | `""` |  | Settings › Wallpaper | Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one. |
+| `wallpapers.wallhavenKey` | `string` | `""` |  | Settings › Wallpaper | Optional Wallhaven API key (only needed for NSFW / account features). |
+| `wallpapers.animate` | `bool` | `true` |  | Settings › Wallpaper | Play a video or gif wallpaper (off: its still picture is shown). It pauses while a window covers the desktop. |
+| `wallpapers.frame` | `string` | `""` |  | Settings › Wallpaper | Shape the wallpaper is shown in on the desktop ("" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ... |
+| `wallpapers.frameDance` | `bool` | `true` |  | Settings › Wallpaper | The frame turns and pulses to the music while something plays. |
+| `wallpapers.frameBeatShape` | `bool` | `true` |  | Settings › Wallpaper | On a beat the frame turns into another shape (it morphs), going through a set of shapes. |
+| `wallpapers.frameX` | `real` | `0.5` | 0 … 1 | Settings › Wallpaper | Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle). Moved by dragging it in the desktop's edit mode. |
+| `wallpapers.frameY` | `real` | `0.5` | 0 … 1 | Settings › Wallpaper | The vertical center of the wallpaper frame, as a fraction of the screen height. |
 | `wallpapers.frameSize` | `real` | `0.62` | 0.1 … 2 | drag the frame's corner in the desktop's edit mode | The frame's size, as a fraction of the screen's shorter side. |
 | `wallpapers.perScreen` | `var` | `{}` |  | Settings › Desktop | Screen name -> a picture of its own for that screen (a path; images and gifs). The palette still follows `current`. |
 
@@ -175,7 +175,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `desktop.wallpaper` | `bool` | `true` |  | Settings › Desktop | Draw the wallpaper (the theme's current one) behind the widgets. |
+| `desktop.wallpaper` | `bool` | `true` |  | Settings › Wallpaper | Draw the wallpaper (the theme's current one) behind the widgets. |
 | `desktop.widgets` | `bool` | `true` |  | Settings › Desktop | Show the desktop widgets. |
 | `desktop.monitor` | `string` | `""` |  | Settings › Desktop | Screen name (e.g. "eDP-1") for the widgets; empty = first screen. |
 | `desktop.monitors` | `list<string>` | `[]` |  | Settings › Desktop | The screens that show the widgets: names, or ["*"] for every screen. Empty = `monitor`, else the first screen. |
@@ -184,9 +184,9 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `desktop.toolbar.x` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Where the desktop edit toolbar was dragged to (horizontal); -1 = the default place. |
 | `desktop.toolbar.y` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Where the desktop edit toolbar was dragged to (vertical); -1 = the default place. |
 | `desktop.worldClocks` | `list<string>` | `["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]` |  | Settings › Desktop | IANA time zones the world clock widget shows. |
-| `desktop.image` | `string` | `""` |  | Settings › Desktop | Picture for the image frame widget (empty = the wallpaper). |
-| `desktop.focusMode` | `bool` | `true` |  | Settings › Desktop | Focus mode: with windows open, the wallpaper is sharp and widgets and frame hide. |
-| `desktop.coverMode` | `bool` | `false` |  | Settings › Desktop | Cover mode: the playing track's cover instead of the wallpaper (and its colors). |
+| `desktop.image` | `string` | `""` |  | Settings › Wallpaper | Picture for the image frame widget (empty = the wallpaper). |
+| `desktop.focusMode` | `bool` | `true` |  | Settings › Wallpaper | Focus mode: with windows open, the wallpaper is sharp and widgets and frame hide. |
+| `desktop.coverMode` | `bool` | `false` |  | Settings › Wallpaper | Cover mode: the playing track's cover instead of the wallpaper (and its colors). |
 | `desktop.visualizer` | `bool` | `true` |  | Settings › Desktop | Full-width audio visualizer along the bottom while media plays (needs cava). |
 | `desktop.clockSeconds` | `bool` | `false` |  | Settings › Desktop | The big digital clock also shows the seconds (HH:MM:SS). |
 | `desktop.waveProgress` | `bool` | `true` |  | Settings › Desktop | The player card's progress bar: a travelling wave while playing (off: a plain bar), and the wave kicks to the beat (needs cava). |
@@ -256,8 +256,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `contentFilter.keywordsOn` | `bool` | `false` |  | Settings › Services | Close a browser tab whose title has one of these words (services/KeywordFilter.qml). |
-| `contentFilter.keywords` | `list<string>` | `["porn", "hentai", "порно", "хентай"]` |  | Settings › Services | The words that close a browser tab when `keywordsOn` is true. |
+| `contentFilter.keywordsOn` | `bool` | `false` |  | Settings › Content filter | Close a browser tab whose title has one of these words (services/KeywordFilter.qml). |
+| `contentFilter.keywords` | `list<string>` | `["porn", "hentai", "порно", "хентай"]` |  | Settings › Content filter | The words that close a browser tab when `keywordsOn` is true. |
 
 ## greeting
 
@@ -288,7 +288,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `powerSaving.enabled` | `bool` | `false` |  | Settings › Overview | Power saving is on (use `hi ipc powersaving on\|off`, not this option, so the saved values are kept). |
+| `powerSaving.enabled` | `bool` | `false` |  | Settings › Power & battery | Power saving is on (use `hi ipc powersaving on\|off`, not this option, so the saved values are kept). |
 | `powerSaving.saved` | `var` | `{}` |  | file only: kept by the shell while power saving is on (advanced) | The values power saving changed, to put back when it is turned off (kept by the shell). |
 
 ## ai
@@ -332,9 +332,9 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `battery.low` | `int` | `20` | 1 … 100 | Settings › Services | The charge (%) that counts as low. |
-| `battery.critical` | `int` | `10` | 1 … 100 | Settings › Services | The charge (%) that counts as critical. |
-| `battery.warnings` | `bool` | `true` |  | Settings › Services | Send notifications when the battery is low or critical. |
+| `battery.low` | `int` | `20` | 1 … 100 | Settings › Power & battery | The charge (%) that counts as low. |
+| `battery.critical` | `int` | `10` | 1 … 100 | Settings › Power & battery | The charge (%) that counts as critical. |
+| `battery.warnings` | `bool` | `true` |  | Settings › Power & battery | Send notifications when the battery is low or critical. |
 
 ## focus
 
@@ -346,9 +346,9 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `notifications.defaultTimeout` | `int` | `6000` | 500 … 600000 | Settings › Services | Popup timeout (ms) when the app doesn't set one. |
-| `notifications.historyLimit` | `int` | `100` | 0 … 5000 | Settings › Services (advanced) | How many notifications the notification center keeps. |
-| `notifications.holdInFocus` | `bool` | `true` |  | Settings › Services | Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus). |
+| `notifications.defaultTimeout` | `int` | `6000` | 500 … 600000 | Settings › Notifications | Popup timeout (ms) when the app doesn't set one. |
+| `notifications.historyLimit` | `int` | `100` | 0 … 5000 | Settings › Notifications (advanced) | How many notifications the notification center keeps. |
+| `notifications.holdInFocus` | `bool` | `true` |  | Settings › Notifications | Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus). |
 
 ## updates
 
@@ -376,19 +376,19 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dock.enabled` | `bool` | `false` |  | Settings › Desktop | Show a dock. |
-| `dock.position` | `string` | `"bottom"` | `bottom` \| `top` \| `left` \| `right` | Settings › Desktop | Screen edge: "bottom", "top", "left" or "right". |
-| `dock.autoHide` | `bool` | `true` |  | Settings › Desktop | Hide the dock until the pointer reaches the screen edge. |
-| `dock.magnify` | `bool` | `true` |  | Settings › Desktop | Icons grow toward the pointer. |
-| `dock.showWhenEmpty` | `bool` | `true` |  | Settings › Desktop | With auto-hide: also show the dock while the workspace has no windows. |
-| `dock.showRunning` | `bool` | `true` |  | Settings › Desktop | Running apps that aren't pinned get an icon too. |
-| `dock.appsButton` | `bool` | `true` |  | Settings › Desktop | A button first in the dock that opens the full-screen list of every app. |
-| `dock.showIndicators` | `bool` | `true` |  | Settings › Desktop | The dots under an icon, one per window. |
-| `dock.magnifyAmount` | `int` | `45` | 0 … 200 | Settings › Desktop (advanced) | How much an icon grows toward the pointer (percent), the gap between icons, the corner radius and the distance from the screen edge (px). |
-| `dock.spacing` | `int` | `2` | 0 … 40 | Settings › Desktop (advanced) | The gap between icons, in px. |
-| `dock.cornerRadius` | `int` | `28` | 0 … 64 | Settings › Desktop (advanced) | The dock's corner radius, in px. |
-| `dock.edgeMargin` | `int` | `8` | 0 … 64 | Settings › Desktop (advanced) | The distance from the screen edge, in px. |
-| `dock.iconSize` | `int` | `44` | 16 … 128 | Settings › Desktop | Icon size in px. |
+| `dock.enabled` | `bool` | `false` |  | Settings › Dock | Show a dock. |
+| `dock.position` | `string` | `"bottom"` | `bottom` \| `top` \| `left` \| `right` | Settings › Dock | Screen edge: "bottom", "top", "left" or "right". |
+| `dock.autoHide` | `bool` | `true` |  | Settings › Dock | Hide the dock until the pointer reaches the screen edge. |
+| `dock.magnify` | `bool` | `true` |  | Settings › Dock | Icons grow toward the pointer. |
+| `dock.showWhenEmpty` | `bool` | `true` |  | Settings › Dock | With auto-hide: also show the dock while the workspace has no windows. |
+| `dock.showRunning` | `bool` | `true` |  | Settings › Dock | Running apps that aren't pinned get an icon too. |
+| `dock.appsButton` | `bool` | `true` |  | Settings › Dock | A button first in the dock that opens the full-screen list of every app. |
+| `dock.showIndicators` | `bool` | `true` |  | Settings › Dock | The dots under an icon, one per window. |
+| `dock.magnifyAmount` | `int` | `45` | 0 … 200 | Settings › Dock (advanced) | How much an icon grows toward the pointer (percent), the gap between icons, the corner radius and the distance from the screen edge (px). |
+| `dock.spacing` | `int` | `2` | 0 … 40 | Settings › Dock (advanced) | The gap between icons, in px. |
+| `dock.cornerRadius` | `int` | `28` | 0 … 64 | Settings › Dock (advanced) | The dock's corner radius, in px. |
+| `dock.edgeMargin` | `int` | `8` | 0 … 64 | Settings › Dock (advanced) | The distance from the screen edge, in px. |
+| `dock.iconSize` | `int` | `44` | 16 … 128 | Settings › Dock | Icon size in px. |
 | `dock.monitor` | `string` | `""` |  | Settings › Desktop | Screen name; empty = first screen. |
 | `dock.monitors` | `list<string>` | `[]` |  | Settings › Desktop | The screens that have a dock: names, or ["*"] for every screen. Empty = `monitor`, else the first screen. |
 | `dock.perScreen` | `var` | `{}` |  | Settings › Desktop | Screen name -> overrides of position, autoHide, magnify, showWhenEmpty, showRunning, appsButton, showIndicators, magnifyAmount, spacing, cornerRadius, edgeMargin and iconSize for that screen's dock. (The pinned apps are shared.) |

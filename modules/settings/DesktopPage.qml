@@ -6,7 +6,7 @@ import qs.common.widgets
 import qs.services
 import "../desktop/Layout.js" as DesktopLayout
 
-// Desktop layer: wallpaper, widgets, frame, world clocks, visualizer.
+// The desktop on each screen, the desktop widgets and the world clocks.
 ColumnLayout {
     id: root
 
@@ -114,47 +114,6 @@ ColumnLayout {
     }
 
     Section {
-        icon: "wallpaper"
-        title: Translation.tr("Wallpaper")
-
-        SwitchRow { icon: "wallpaper"; title: Translation.tr("Draw the wallpaper"); subtitle: Translation.tr("Turn off if another tool (swww, hyprpaper) draws it"); checked: root.d.wallpaper; onToggled: checked => root.d.wallpaper = checked }
-        SwitchRow { icon: "animated_images"; title: Translation.tr("Play live wallpapers"); subtitle: Translation.tr("A video or gif wallpaper moves; it pauses while a window covers the desktop. Off: its still picture"); checked: Config.options.wallpapers.animate; onToggled: checked => Config.options.wallpapers.animate = checked }
-        StepperRow {
-            icon: "shuffle"
-            title: Translation.tr("Slideshow")
-            subtitle: Config.options.wallpapers.slideshowMinutes > 0 ? Translation.tr("A random wallpaper every %1 minutes").arg(Config.options.wallpapers.slideshowMinutes) : Translation.tr("Off: 0 minutes")
-            value: Config.options.wallpapers.slideshowMinutes
-            step: 5
-            from: 0
-            to: 180
-            onChanged: value => Config.options.wallpapers.slideshowMinutes = value
-        }
-        TextRow {
-            visible: Config.options.settingsAdvanced
-            icon: "download"
-            title: Translation.tr("Download folder")
-            subtitle: Translation.tr("Where wallpapers from Wallhaven and Unsplash are saved")
-            value: Config.options.wallpapers.downloadDirectory
-            fieldWidth: 260
-            onEdited: text => Config.options.wallpapers.downloadDirectory = text.trim() || "~/Pictures/Wallpapers/online"
-        }
-        SwitchRow {
-            icon: "album"
-            title: Translation.tr("Cover mode")
-            subtitle: Translation.tr("The playing track's cover instead of the wallpaper, colors included")
-            checked: root.d.coverMode
-            onToggled: checked => root.d.coverMode = checked
-        }
-        SwitchRow {
-            icon: "layers_clear"
-            title: Translation.tr("Clean desktop")
-            subtitle: Translation.tr("With windows open: sharp wallpaper, widgets and frame hidden")
-            checked: root.d.focusMode
-            onToggled: checked => root.d.focusMode = checked
-        }
-    }
-
-    Section {
         icon: "widgets"
         title: Translation.tr("Widgets")
 
@@ -198,91 +157,6 @@ ColumnLayout {
         SwitchRow { icon: "timer"; title: Translation.tr("Seconds in the digital clock"); checked: root.d.clockSeconds; onToggled: checked => root.d.clockSeconds = checked }
         SwitchRow { icon: "waves"; title: Translation.tr("Wavy progress bar in the player"); subtitle: Translation.tr("Off: a plain bar"); checked: root.d.waveProgress; onToggled: checked => root.d.waveProgress = checked }
         SwitchRow { icon: "music_note"; title: Translation.tr("Wave kicks to the beat"); subtitle: Translation.tr("Needs cava"); enabled: root.d.waveProgress; checked: root.d.waveBeat; onToggled: checked => root.d.waveBeat = checked }
-    }
-
-    Section {
-        icon: "dock_to_bottom"
-        title: Translation.tr("Dock")
-
-        SwitchRow { icon: "dock_to_bottom"; title: Translation.tr("Dock"); checked: Config.options.dock.enabled; onToggled: checked => Config.options.dock.enabled = checked }
-        ChoiceRow {
-            icon: "open_with"
-            title: Translation.tr("Dock position")
-            value: Config.options.dock.position
-            options: [{ value: "bottom", text: Translation.tr("Bottom") }, { value: "top", text: Translation.tr("Top") }, { value: "left", text: Translation.tr("Left") }, { value: "right", text: Translation.tr("Right") }]
-            onSelected: value => Config.options.dock.position = value
-        }
-        SwitchRow { icon: "visibility_off"; title: Translation.tr("Hide until the pointer reaches the screen edge"); checked: Config.options.dock.autoHide; onToggled: checked => Config.options.dock.autoHide = checked }
-        SwitchRow { icon: "desktop_windows"; title: Translation.tr("Show on an empty workspace"); checked: Config.options.dock.showWhenEmpty; onToggled: checked => Config.options.dock.showWhenEmpty = checked }
-        SwitchRow { icon: "apps"; title: Translation.tr("Apps button"); subtitle: Translation.tr("Opens the full-screen list of every app"); checked: Config.options.dock.appsButton; onToggled: checked => Config.options.dock.appsButton = checked }
-        SwitchRow { icon: "apps"; title: Translation.tr("Show running apps that aren't pinned"); checked: Config.options.dock.showRunning; onToggled: checked => Config.options.dock.showRunning = checked }
-        SwitchRow { icon: "more_horiz"; title: Translation.tr("Window dots under the icons"); checked: Config.options.dock.showIndicators; onToggled: checked => Config.options.dock.showIndicators = checked }
-        SwitchRow { icon: "zoom_in"; title: Translation.tr("Magnify on hover"); checked: Config.options.dock.magnify; onToggled: checked => Config.options.dock.magnify = checked }
-        SliderRow { visible: Config.options.settingsAdvanced; icon: "zoom_out_map"; title: Translation.tr("Magnify amount"); value: Config.options.dock.magnifyAmount; from: 10; to: 100; suffix: "%"; onMoved: value => Config.options.dock.magnifyAmount = value }
-        SliderRow { visible: Config.options.settingsAdvanced; icon: "space_bar"; title: Translation.tr("Gap between icons"); value: Config.options.dock.spacing; from: 0; to: 20; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.spacing = value }
-        SliderRow { visible: Config.options.settingsAdvanced; icon: "rounded_corner"; title: Translation.tr("Corner radius"); value: Config.options.dock.cornerRadius; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.cornerRadius = value }
-        SliderRow { visible: Config.options.settingsAdvanced; icon: "vertical_align_bottom"; title: Translation.tr("Distance from the screen edge"); value: Config.options.dock.edgeMargin; from: 0; to: 40; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.edgeMargin = value }
-        SliderRow { icon: "photo_size_select_large"; title: Translation.tr("Icon size"); value: Config.options.dock.iconSize; from: 28; to: 72; suffix: Translation.tr(" px"); onMoved: value => Config.options.dock.iconSize = value }
-    }
-
-    Section {
-        icon: "crop_free"
-        title: Translation.tr("Wallpaper frame")
-
-        FramePicker {
-            Layout.fillWidth: true
-            Layout.margins: 12
-            current: Config.options.wallpapers.frame
-            onPicked: id => Config.options.wallpapers.frame = id
-        }
-        ListRow {
-            Layout.fillWidth: true
-            icon: "open_with"
-            title: Translation.tr("Move the frame")
-            subtitle: Translation.tr("Drag it on the desktop, in edit mode")
-            M3Button {
-                tonal: true
-                visible: Config.options.wallpapers.frameX !== 0.5 || Config.options.wallpapers.frameY !== 0.5
-                text: Translation.tr("Center")
-                onClicked: {
-                    Config.options.wallpapers.frameX = 0.5;
-                    Config.options.wallpapers.frameY = 0.5;
-                }
-            }
-            M3Button {
-                tonal: true
-                text: Translation.tr("Move")
-                onClicked: {
-                    ShellState.settingsOpen = false;
-                    ShellState.desktopEditing = true;
-                }
-            }
-        }
-        SwitchRow {
-            icon: "graphic_eq"
-            title: Translation.tr("Move to the music")
-            subtitle: Translation.tr("The frame turns and pulses to the bass while something plays")
-            checked: Config.options.wallpapers.frameDance
-            onToggled: checked => Config.options.wallpapers.frameDance = checked
-        }
-        SwitchRow {
-            enabled: Config.options.wallpapers.frameDance
-            icon: "shapes"
-            title: Translation.tr("Change shape on the beat")
-            tag: Translation.tr("Beta")
-            subtitle: Translation.tr("On every beat the frame morphs into another shape, and goes back to yours when the music stops")
-            checked: Config.options.wallpapers.frameBeatShape
-            onToggled: checked => Config.options.wallpapers.frameBeatShape = checked
-        }
-        TextRow {
-            icon: "image"
-            title: Translation.tr("Image frame widget picture")
-            subtitle: Translation.tr("Empty = the wallpaper")
-            value: root.d.image
-            fieldWidth: 300
-            placeholder: "~/Pictures/photo.jpg"
-            onEdited: text => root.d.image = text.replace(/^~/, Paths.home)
-        }
     }
 
     Section {

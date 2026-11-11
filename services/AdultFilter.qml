@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// The adult-site filter (Settings > Services): the domains of services/adult_domains.txt go into
+// The adult-site filter (Settings > Content filter): the domains of services/adult_domains.txt go into
 // /etc/hosts, so every browser and app on this system can't reach them, until it's switched off.
 // Changing /etc/hosts needs the password (pkexec). Whether it's on is read from /etc/hosts itself.
 Singleton {

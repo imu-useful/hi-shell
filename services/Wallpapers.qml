@@ -29,7 +29,7 @@ Singleton {
         return videoExtensions.includes(ext) ? "video" : animatedExtensions.includes(ext) ? "gif" : "";
     }
     readonly property string kind: kindOf(current)
-    // Played on the desktop (Settings > Desktop can switch it off).
+    // Played on the desktop (Settings > Wallpaper can switch it off).
     readonly property bool live: kind !== "" && options.animate
     // A picture of the wallpaper; empty while a video's frame is being taken.
     property string videoStill: ""

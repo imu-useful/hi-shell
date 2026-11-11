@@ -42,8 +42,20 @@ Scope {
 
     // A page in the navigation.
     component NavItem: Rectangle {
+        id: navItem
         required property var modelData
         readonly property bool active: root.currentPage.id === modelData.id
+
+        // Scroll the navigation so the page shown is in view (opened from search, ipc or Ctrl+Tab).
+        function reveal() {
+            const y = navItem.mapToItem(navList, 0, 0).y;
+            if (y >= navFlick.contentY && y + height <= navFlick.contentY + navFlick.height)
+                return;
+            const centered = y - (navFlick.height - height) / 2;
+            navFlick.contentY = Math.max(0, Math.min(centered, navFlick.contentHeight - navFlick.height));
+        }
+        onActiveChanged: if (active) Qt.callLater(reveal)
+        Component.onCompleted: if (active) Qt.callLater(reveal)
 
         Layout.fillWidth: true
         implicitHeight: 42
@@ -421,7 +433,7 @@ Scope {
                                 width: flick.width - 12
                                 sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
                             home: home, general: general, bar: bar, desktop: desktop,
-                            style: style, motion: motion, panels: panels, modes: modes, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                            style: style, motion: motion, panels: panels, modes: modes, wallpaper: wallpaper, dock: dock, notifications: notifications, power: power, contentfilter: contentfilter, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
                         })[root.currentPage.id] ?? home
                                 onLoaded: {
                                     flick.targetY = 0;
@@ -440,6 +452,11 @@ Scope {
                             Component { id: motion; MotionPage {} }
                             Component { id: panels; PanelsPage {} }
                             Component { id: modes; ModesPage {} }
+                            Component { id: wallpaper; WallpaperPage {} }
+                            Component { id: dock; DockPage {} }
+                            Component { id: notifications; NotificationsPage {} }
+                            Component { id: power; PowerPage {} }
+                            Component { id: contentfilter; ContentFilterPage {} }
                             Component { id: services; ServicesPage {} }
                             Component { id: hyprland; HyprlandPage {} }
                             Component { id: autostart; AutostartPage {} }

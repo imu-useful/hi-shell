@@ -6,7 +6,7 @@ import Quickshell.Hyprland
 import qs.common
 import qs.services
 
-// Keyword filter (Settings > Services): a browser tab whose title has one of the words (porn, hentai, ...)
+// Keyword filter (Settings > Content filter): a browser tab whose title has one of the words (porn, hentai, ...)
 // is closed, the way Focus Mode closes a blocked site's tab (services/focus_close_tab.sh). Only the title
 // is known here, not the address, so a page whose title doesn't name the word is not caught.
 Singleton {

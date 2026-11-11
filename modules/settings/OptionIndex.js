@@ -454,7 +454,7 @@ const options = [
     },
     {
         "path": "settingsAdvanced",
-        "page": "style",
+        "page": "wallpaper",
         "text": "Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them.",
         "advanced": false
     },
@@ -484,67 +484,67 @@ const options = [
     },
     {
         "path": "wallpapers.directories",
-        "page": "services",
+        "page": "wallpaper",
         "text": "Folders the wallpaper picker looks in.",
         "advanced": false
     },
     {
         "path": "wallpapers.slideshowMinutes",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "A slideshow: a random picture from the folders every this many minutes (0 = off).",
         "advanced": false
     },
     {
         "path": "wallpapers.downloadDirectory",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Online pictures are saved here before being set.",
         "advanced": true
     },
     {
         "path": "wallpapers.unsplashKey",
-        "page": "services",
+        "page": "wallpaper",
         "text": "Unsplash needs a free access key (unsplash.com/developers); Wallhaven works without one.",
         "advanced": false
     },
     {
         "path": "wallpapers.wallhavenKey",
-        "page": "services",
+        "page": "wallpaper",
         "text": "Optional Wallhaven API key (only needed for NSFW / account features).",
         "advanced": false
     },
     {
         "path": "wallpapers.animate",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Play a video or gif wallpaper (off: its still picture is shown). It pauses while a window covers the desktop.",
         "advanced": false
     },
     {
         "path": "wallpapers.frame",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Shape the wallpaper is shown in on the desktop (\"\" = full screen): any id from `frames` in common/shapes/Shapes.js: sunny, cookie9, hexagon, star, blob, ...",
         "advanced": false
     },
     {
         "path": "wallpapers.frameDance",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "The frame turns and pulses to the music while something plays.",
         "advanced": false
     },
     {
         "path": "wallpapers.frameBeatShape",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "On a beat the frame turns into another shape (it morphs), going through a set of shapes.",
         "advanced": false
     },
     {
         "path": "wallpapers.frameX",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Where the frame's center sits, as fractions of the screen (0.5 / 0.5 = the middle). Moved by dragging it in the desktop's edit mode.",
         "advanced": false
     },
     {
         "path": "wallpapers.frameY",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "The vertical center of the wallpaper frame, as a fraction of the screen height.",
         "advanced": false
     },
@@ -556,7 +556,7 @@ const options = [
     },
     {
         "path": "desktop.wallpaper",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Draw the wallpaper (the theme's current one) behind the widgets.",
         "advanced": false
     },
@@ -598,19 +598,19 @@ const options = [
     },
     {
         "path": "desktop.image",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Picture for the image frame widget (empty = the wallpaper).",
         "advanced": false
     },
     {
         "path": "desktop.focusMode",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Focus mode: with windows open, the wallpaper is sharp and widgets and frame hide.",
         "advanced": false
     },
     {
         "path": "desktop.coverMode",
-        "page": "desktop",
+        "page": "wallpaper",
         "text": "Cover mode: the playing track's cover instead of the wallpaper (and its colors).",
         "advanced": false
     },
@@ -880,13 +880,13 @@ const options = [
     },
     {
         "path": "contentFilter.keywordsOn",
-        "page": "services",
+        "page": "contentfilter",
         "text": "Close a browser tab whose title has one of these words (services/KeywordFilter.qml).",
         "advanced": false
     },
     {
         "path": "contentFilter.keywords",
-        "page": "services",
+        "page": "contentfilter",
         "text": "The words that close a browser tab when `keywordsOn` is true.",
         "advanced": false
     },
@@ -952,7 +952,7 @@ const options = [
     },
     {
         "path": "powerSaving.enabled",
-        "page": "home",
+        "page": "power",
         "text": "Power saving is on (use `hi ipc powersaving on|off`, not this option, so the saved values are kept).",
         "advanced": false
     },
@@ -1030,37 +1030,37 @@ const options = [
     },
     {
         "path": "battery.low",
-        "page": "services",
+        "page": "power",
         "text": "The charge (%) that counts as low.",
         "advanced": false
     },
     {
         "path": "battery.critical",
-        "page": "services",
+        "page": "power",
         "text": "The charge (%) that counts as critical.",
         "advanced": false
     },
     {
         "path": "battery.warnings",
-        "page": "services",
+        "page": "power",
         "text": "Send notifications when the battery is low or critical.",
         "advanced": false
     },
     {
         "path": "notifications.defaultTimeout",
-        "page": "services",
+        "page": "notifications",
         "text": "Popup timeout (ms) when the app doesn't set one.",
         "advanced": false
     },
     {
         "path": "notifications.historyLimit",
-        "page": "services",
+        "page": "notifications",
         "text": "How many notifications the notification center keeps.",
         "advanced": true
     },
     {
         "path": "notifications.holdInFocus",
-        "page": "services",
+        "page": "notifications",
         "text": "Focus Mode: the notifications that arrive in a focus period wait for the break (Settings > Focus).",
         "advanced": false
     },
@@ -1102,79 +1102,79 @@ const options = [
     },
     {
         "path": "dock.enabled",
-        "page": "desktop",
+        "page": "dock",
         "text": "Show a dock.",
         "advanced": false
     },
     {
         "path": "dock.position",
-        "page": "desktop",
+        "page": "dock",
         "text": "Screen edge: \"bottom\", \"top\", \"left\" or \"right\".",
         "advanced": false
     },
     {
         "path": "dock.autoHide",
-        "page": "desktop",
+        "page": "dock",
         "text": "Hide the dock until the pointer reaches the screen edge.",
         "advanced": false
     },
     {
         "path": "dock.magnify",
-        "page": "desktop",
+        "page": "dock",
         "text": "Icons grow toward the pointer.",
         "advanced": false
     },
     {
         "path": "dock.showWhenEmpty",
-        "page": "desktop",
+        "page": "dock",
         "text": "With auto-hide: also show the dock while the workspace has no windows.",
         "advanced": false
     },
     {
         "path": "dock.showRunning",
-        "page": "desktop",
+        "page": "dock",
         "text": "Running apps that aren't pinned get an icon too.",
         "advanced": false
     },
     {
         "path": "dock.appsButton",
-        "page": "desktop",
+        "page": "dock",
         "text": "A button first in the dock that opens the full-screen list of every app.",
         "advanced": false
     },
     {
         "path": "dock.showIndicators",
-        "page": "desktop",
+        "page": "dock",
         "text": "The dots under an icon, one per window.",
         "advanced": false
     },
     {
         "path": "dock.magnifyAmount",
-        "page": "desktop",
+        "page": "dock",
         "text": "How much an icon grows toward the pointer (percent), the gap between icons, the corner radius and the distance from the screen edge (px).",
         "advanced": true
     },
     {
         "path": "dock.spacing",
-        "page": "desktop",
+        "page": "dock",
         "text": "The gap between icons, in px.",
         "advanced": true
     },
     {
         "path": "dock.cornerRadius",
-        "page": "desktop",
+        "page": "dock",
         "text": "The dock's corner radius, in px.",
         "advanced": true
     },
     {
         "path": "dock.edgeMargin",
-        "page": "desktop",
+        "page": "dock",
         "text": "The distance from the screen edge, in px.",
         "advanced": true
     },
     {
         "path": "dock.iconSize",
-        "page": "desktop",
+        "page": "dock",
         "text": "Icon size in px.",
         "advanced": false
     },
