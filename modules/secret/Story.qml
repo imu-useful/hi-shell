@@ -3,7 +3,7 @@ import qs.common
 import qs.common.widgets
 
 // Keys "undertale" and "story": a short picture-book intro in the manner of old pixel RPGs, with
-// a story of its own (a little shell wakes up in a city whose lights went out). Pixel scenes in a
+// a story of its own (a little comet slows down and learns to say hi). Pixel scenes in a
 // frame, the text typed out below; a click moves on, the last click closes.
 Item {
     id: root
@@ -12,12 +12,12 @@ Item {
     signal finished()
 
     readonly property var lines: [
-        Translation.tr("Long ago, the desktop was a quiet place."),
-        Translation.tr("Windows lived there, and every window kept a little light on."),
-        Translation.tr("Then came the Great Freeze. One by one, the lights went out."),
-        Translation.tr("But in the dark, a tiny shell woke up."),
-        Translation.tr("It didn't know much. It only knew one word."),
-        Translation.tr("\"hi.\"")
+        Translation.tr("Far above the desktop, a little comet drifted alone."),
+        Translation.tr("It was the fastest thing in the sky, and nobody ever noticed it."),
+        Translation.tr("One night it passed an old star, who said: \"Slow down.\""),
+        Translation.tr("So the comet slowed down, and for the first time it saw the city below."),
+        Translation.tr("In one window, a child looked up and made a wish."),
+        Translation.tr("The comet stayed. And every night since, it says \"hi.\"")
     ]
     property int panel: 0
     property int typed: 0
@@ -138,94 +138,94 @@ Item {
                 }
             }
 
-            function shell(ctx, cx, cy, wave, glow) {
+            // A comet: bright head, a tail of fading sparks behind it (up and to the left)
+            function comet(ctx, cx, cy, tail, glow) {
                 if (glow > 0) {
-                    const g = ctx.createRadialGradient(cx * u, cy * u, 0, cx * u, cy * u, 22 * u);
-                    g.addColorStop(0, `rgba(255, 220, 140, ${0.55 * glow})`);
-                    g.addColorStop(1, "rgba(255, 220, 140, 0)");
+                    const g = ctx.createRadialGradient(cx * u, cy * u, 0, cx * u, cy * u, 14 * u);
+                    g.addColorStop(0, `rgba(255, 230, 160, ${0.6 * glow})`);
+                    g.addColorStop(1, "rgba(255, 230, 160, 0)");
                     ctx.fillStyle = g;
                     ctx.fillRect(0, 0, width, height);
                 }
-                // Spiral shell: a round body in rings of lighter and darker sand
-                const rings = ["#8a5a3c", "#d9a066", "#f2d2a0", "#d9a066", "#f2d2a0", "#8a5a3c"];
-                for (let r = 0; r < rings.length; r++) {
-                    const rad = 7 - r * 1.1;
-                    for (let dy = -rad; dy <= rad; dy++) {
-                        const half = Math.floor(Math.sqrt(Math.max(0, rad * rad - dy * dy)));
-                        px(ctx, cx - half - 2, cy + dy - 2, half * 2 + 1, 1, rings[r]);
-                    }
+                for (let i = tail; i > 0; i--) {
+                    const t = 1 - i / tail;
+                    const col = t > 0.6 ? "#fff1c4" : (t > 0.3 ? "#ffc96b" : "#b5683c");
+                    px(ctx, cx - i, cy - i * 0.35, 2, 2, col);
+                    if (i % 3 === 0)
+                        px(ctx, cx - i, cy - i * 0.35 + 3 + Math.floor(rnd(i) * 2), 1, 1, col);
                 }
-                // The soft body peeking out from under it, with two eyes
-                px(ctx, cx - 9, cy + 3, 9, 4, "#ffb7a8");
-                px(ctx, cx - 8, cy + 3, 1, 2, "#2b1a1a");
-                px(ctx, cx - 5, cy + 3, 1, 2, "#2b1a1a");
-                // One little arm; it waves when `wave` is on
-                const swing = wave ? Math.floor(Math.sin(root.clock * 9) * 2) : 0;
-                px(ctx, cx - 11, cy + 2 + swing - (wave ? 3 : 0), 2, 3, "#ffb7a8");
+                px(ctx, cx - 1, cy - 1, 4, 4, "#ffb347");
+                px(ctx, cx, cy, 2, 2, "#ffffff");
+            }
+
+            // An old star with a cross of light
+            function bigStar(ctx, cx, cy, pulse) {
+                const r = 3 + Math.round(pulse);
+                px(ctx, cx - 1, cy - r, 3, r * 2 + 1, "#fff6d8");
+                px(ctx, cx - r, cy - 1, r * 2 + 1, 3, "#fff6d8");
+                px(ctx, cx - 2, cy - 2, 5, 5, "#ffffff");
             }
 
             onPaint: {
                 const ctx = getContext("2d");
                 const p = root.panel;
+                const c = root.clock;
                 ctx.clearRect(0, 0, width, height);
                 if (p === 0) {
-                    sky(ctx, [10, 8, 40], [60, 30, 80]);
-                    stars(ctx, 48, true);
-                    px(ctx, 46, 6, 6, 6, "#f4eed0");
-                    px(ctx, 48, 5, 2, 8, "#f4eed0");
-                    px(ctx, 45, 8, 8, 2, "#f4eed0");
-                    // Far hills
-                    for (let x = 0; x < 64; x++) {
-                        const h = 8 + Math.floor(6 * Math.sin(x / 7) + 3 * Math.sin(x / 3));
-                        px(ctx, x, 48 - h, 1, h, "#150f2a");
-                    }
+                    sky(ctx, [8, 6, 36], [50, 28, 76]);
+                    stars(ctx, 44, true);
+                    comet(ctx, 12 + c * 3, 20 - c * 0.6, 10, 0.7);
                 } else if (p === 1) {
-                    sky(ctx, [20, 14, 60], [200, 110, 90]);
-                    stars(ctx, 16, true);
-                    city(ctx, 28);
+                    sky(ctx, [6, 8, 40], [30, 40, 90]);
+                    stars(ctx, 30, true);
+                    // It races across again and again; nobody is looking
+                    const x = (c * 38) % 96 - 16;
+                    comet(ctx, x, 10 + x * 0.25, 26, 0.8);
+                    city(ctx, 6);
                 } else if (p === 2) {
-                    sky(ctx, [8, 6, 24], [40, 24, 50]);
-                    // The lights go out one by one over the time of the line
-                    const lit = Math.max(0, 28 - Math.floor(root.clock * 5));
-                    // The freeze: pale cracks spreading from the top
-                    for (let c = 0; c < 6; c++) {
-                        let x = 8 + c * 10, y = 0;
-                        for (let s = 0; s < 14; s++) {
-                            if (s > root.clock * 8)
-                                break;
-                            px(ctx, x, y, 1, 2, "#bfe6ff");
-                            x += Math.floor(rnd(c * 20 + s) * 3) - 1;
-                            y += 2;
-                        }
-                    }
-                    city(ctx, lit);
+                    sky(ctx, [10, 8, 44], [54, 30, 84]);
+                    stars(ctx, 36, true);
+                    bigStar(ctx, 46, 14, Math.sin(c * 3));
+                    // It arrives fast and eases to a stop beside the star
+                    const e = Math.min(1, c / 3.5);
+                    const x = -10 + 40 * (1 - Math.pow(1 - e, 3));
+                    comet(ctx, x, 22 - 6 * e, Math.round(24 - 18 * e), 0.8);
                 } else if (p === 3) {
-                    px(ctx, 0, 0, 64, 48, "#07050f");
-                    // Distant cold city, all dark
-                    city(ctx, 0);
-                    px(ctx, 0, 0, 64, 48, "rgba(7, 5, 15, 0.7)");
-                    shell(ctx, 34, 30, false, Math.min(1, root.clock / 2));
+                    sky(ctx, [14, 10, 56], [150, 90, 110]);
+                    stars(ctx, 20, true);
+                    comet(ctx, 30 + Math.sin(c * 1.2) * 2, 14 + Math.sin(c * 2) * 1, 6, 1);
+                    // The windows light up one by one as it looks
+                    city(ctx, Math.min(28, Math.floor(c * 5)));
                 } else if (p === 4) {
-                    px(ctx, 0, 0, 64, 48, "#0b0818");
-                    shell(ctx, 34, 28, false, 1);
-                    // A thought bubble that fills with dots
-                    const dots = Math.min(3, Math.floor(root.clock * 1.5));
-                    for (let d = 0; d < dots; d++)
-                        px(ctx, 44 + d * 4, 14 - d * 2, 2, 2, "#ffffff");
+                    sky(ctx, [10, 8, 44], [60, 34, 84]);
+                    stars(ctx, 30, false);
+                    comet(ctx, 40, 12, 5, 1);
+                    // A big window, a warm room, a child at the glass
+                    px(ctx, 14, 22, 30, 26, "#1b1535");
+                    px(ctx, 16, 24, 26, 22, "#ffd75e");
+                    px(ctx, 28, 24, 2, 22, "#1b1535");
+                    px(ctx, 16, 34, 26, 2, "#1b1535");
+                    px(ctx, 20, 38, 6, 8, "#3a2a5a");
+                    px(ctx, 21, 31, 4, 4, "#f2d2a0");
+                    px(ctx, 22, 32, 1, 1, "#2b1a1a");
+                    px(ctx, 24, 32, 1, 1, "#2b1a1a");
+                    // The wish rises as sparkles
+                    const n = Math.min(5, Math.floor(c * 1.5));
+                    for (let i = 0; i < n; i++)
+                        px(ctx, 26 + i * 3, 20 - i * 3, 1, 1, i % 2 ? "#ffffff" : "#ffd75e");
                 } else {
-                    // Dawn
                     sky(ctx, [30, 20, 70], [255, 170, 110]);
                     stars(ctx, 10, false);
-                    city(ctx, Math.min(28, Math.floor(root.clock * 6)));
-                    shell(ctx, 34, 34, true, 1);
+                    city(ctx, Math.min(28, Math.floor(c * 6)));
+                    comet(ctx, 34, 24, 4, 1);
                     // The word, as a pixel speech bubble
-                    if (root.clock > 0.6) {
-                        px(ctx, 24, 12, 18, 9, "#ffffff");
-                        px(ctx, 30, 21, 3, 3, "#ffffff");
+                    if (c > 0.6) {
+                        px(ctx, 36, 10, 18, 9, "#ffffff");
+                        px(ctx, 38, 19, 3, 3, "#ffffff");
                         ctx.fillStyle = "#1b1535";
                         ctx.font = `bold ${Math.round(6 * u)}px ${Appearance.font.mono}`;
                         ctx.textAlign = "center";
-                        ctx.fillText("hi", 33 * u, 19 * u);
+                        ctx.fillText("hi", 45 * u, 17 * u);
                     }
                 }
             }
