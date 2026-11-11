@@ -155,7 +155,7 @@ Item {
             }
 
             // A plant of growth g (0..1): sprout with two leaves, then trunk and round crown
-            function plant(ctx, x, g) {
+            function plant(ctx, x, g, face) {
                 const base = sy(x);
                 if (g < 0.3) {
                     const h = Math.max(1, Math.round(g / 0.3 * 5));
@@ -174,6 +174,45 @@ Item {
                     const half = Math.floor(Math.sqrt(r * r - dy * dy));
                     px(ctx, x - half, base - h + dy - 2, half * 2 + 1, 1, dy < -r / 3 ? "#7bd36a" : "#4caf50");
                 }
+                if (face && r >= 6) {
+                    const fy = base - h - 2;
+                    const eye = blinking() ? 1 : 2;
+                    px(ctx, x - 3, fy - 1, 1, eye, "#1b1535");
+                    px(ctx, x + 2, fy - 1, 1, eye, "#1b1535");
+                    px(ctx, x - 1, fy + 2, 3, 1, "#1b1535");
+                    px(ctx, x - 2, fy + 1, 1, 1, "#1b1535");
+                    px(ctx, x + 2, fy + 1, 1, 1, "#1b1535");
+                    px(ctx, x - 5, fy + 1, 2, 1, "#ff9aa8");
+                    px(ctx, x + 4, fy + 1, 2, 1, "#ff9aa8");
+                }
+            }
+
+            function blinking() {
+                return Math.floor(root.clock * 1.4) % 5 === 0 && (root.clock * 1.4) % 1 < 0.25;
+            }
+
+            function butterfly(ctx, x, y, color) {
+                const open = Math.floor(root.clock * 7) % 2 === 0;
+                px(ctx, x, y, 1, 2, "#2b1a1a");
+                px(ctx, x - (open ? 2 : 1), y - 1, open ? 2 : 1, 2, color);
+                px(ctx, x + 1, y - 1, open ? 2 : 1, 2, color);
+            }
+
+            function rainbow(ctx, grow) {
+                const colors = ["#ff5a5a", "#ffb04a", "#ffe24a", "#6bd05a", "#4aa8ff", "#8a6bff"];
+                for (let i = 0; i < colors.length; i++) {
+                    const r = 30 - i * 1.5;
+                    for (let a = 0; a <= grow * 180; a += 3) {
+                        const rad = a * Math.PI / 180;
+                        px(ctx, 32 - Math.cos(rad) * r, 40 - Math.sin(rad) * r, 2, 2, colors[i]);
+                    }
+                }
+            }
+
+            function note(ctx, x, y, color) {
+                px(ctx, x, y, 2, 2, color);
+                px(ctx, x + 1, y - 4, 1, 4, color);
+                px(ctx, x + 2, y - 4, 2, 1, color);
             }
 
             function bird(ctx, x, y, flap) {
@@ -197,6 +236,14 @@ Item {
                     // Dust drifting over empty sand
                     for (let i = 0; i < 8; i++)
                         px(ctx, (rnd(i) * 64 + c * (4 + i)) % 64, 30 + rnd(i + 5) * 8, 2, 1, "#e6c08a");
+                    // A little worm pops out of the sand, looks around and hides again
+                    const w = Math.sin(c * 1.6);
+                    if (w > 0) {
+                        const h = Math.round(w * 4);
+                        const look = Math.sin(c * 4) > 0 ? 1 : 0;
+                        px(ctx, 14, sy(14) - h + 1, 2, h, "#e89aa0");
+                        px(ctx, 14 + look, sy(14) - h + 1, 1, 1, "#1b1535");
+                    }
                 } else if (p === 1) {
                     sky(ctx, [90, 110, 180], [250, 195, 140]);
                     sun(ctx, 46, 12);
@@ -222,18 +269,37 @@ Item {
                         sun(ctx, 8 + (t * 2 % 1) * 48, 20 - Math.sin((t * 2 % 1) * Math.PI) * 14);
                     }
                     ground(ctx);
-                    px(ctx, 31, sy(32) - 1, 2, 2, "#4a3020");
+                    if (night) {
+                        const m = (c * 0.9) % 1;
+                        if (m < 0.35) {
+                            const k = m / 0.35;
+                            for (let i = 0; i < 6; i++)
+                                px(ctx, 50 - k * 36 + i, 4 + k * 12 - i * 0.5, 1, 1, i === 5 ? "#ffffff" : "#8899cc");
+                        }
+                    }
+                    px(ctx, 31, sy(32) - 3, 3, 3, "#4a3020");
+                    if (!blinking()) {
+                        px(ctx, 31, sy(32) - 2, 1, 1, "#ffffff");
+                        px(ctx, 33, sy(32) - 2, 1, 1, "#ffffff");
+                    }
                 } else if (p === 3) {
                     sky(ctx, [60, 70, 100], [150, 150, 170]);
                     ground(ctx);
                     cloud(ctx, 32, 8);
-                    rain(ctx, 32, 12, 20);
+                    if (c < 3.5)
+                        rain(ctx, 32, 12, 20);
+                    else
+                        rainbow(ctx, Math.min(1, (c - 3.5) / 1.2));
                     plant(ctx, 32, Math.min(0.3, c * 0.1));
                 } else if (p === 4) {
                     sky(ctx, [80, 150, 230], [250, 210, 160]);
                     sun(ctx, 52, 8);
                     ground(ctx);
-                    plant(ctx, 32, Math.min(1, 0.3 + c * 0.2));
+                    plant(ctx, 32, Math.min(1, 0.3 + c * 0.2), true);
+                    if (c > 3) {
+                        butterfly(ctx, 12 + Math.sin(c * 2) * 6, 26 + Math.cos(c * 3) * 3, "#ff8fb1");
+                        butterfly(ctx, 50 + Math.cos(c * 1.7) * 5, 24 + Math.sin(c * 2.4) * 3, "#ffe14a");
+                    }
                     // The first bird flies in and lands on the crown
                     if (c > 2.5) {
                         const e = Math.min(1, (c - 2.5) / 1.5);
@@ -251,8 +317,15 @@ Item {
                             px(ctx, fx - 1, sy(fx) - 3, 3, 1, i % 2 ? "#ff8fb1" : "#ffe14a");
                         }
                     }
-                    plant(ctx, 32, 1);
+                    plant(ctx, 32, 1, true);
                     bird(ctx, 36, 17, false);
+                    butterfly(ctx, 14 + Math.sin(c * 2) * 6, 26 + Math.cos(c * 3) * 3, "#ff8fb1");
+                    butterfly(ctx, 52 + Math.cos(c * 1.7) * 5, 24 + Math.sin(c * 2.4) * 3, "#ffe14a");
+                    // The bird sings
+                    for (let i = 0; i < 3; i++) {
+                        const k = (c * 0.8 + i / 3) % 1;
+                        note(ctx, 42 + k * 8 + Math.sin(k * 9) * 1.5, 16 - k * 10, i % 2 ? "#ffffff" : "#ffe14a");
+                    }
                     // The word, as a pixel speech bubble
                     if (c > 0.6) {
                         px(ctx, 6, 8, 18, 9, "#ffffff");
