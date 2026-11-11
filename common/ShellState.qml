@@ -71,6 +71,8 @@ Singleton {
     property string captureRequest: ""
     // quick | general | bar | desktop | interface | services | hyprland | about
     property string settingsPage: "home"
+    // The tab of that page, for pages with tabs (modules/settings/Pages.js); "" = the first.
+    property string settingsTab: ""
     property bool launcherOpen: false
     // The full-screen list of every app (the dock's apps button).
     property bool appGridOpen: false

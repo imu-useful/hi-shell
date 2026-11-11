@@ -39,6 +39,29 @@ const pages = [
     { id: "about", title: "About", icon: "info", group: "shell", description: "Version, updates, presets and credits", keywords: "about version quickshell source credits presets preset export import backup share" }
 ];
 
+// Tabs of the pages that have them: the page shows one tab at a time (the first when none
+// is picked). `options`: the option paths (or prefixes ending in ".") on that tab, so a
+// search hit opens the right one; options not listed are on the first tab.
+const tabs = {
+    bar: [
+        { id: "layout", title: "Layout", icon: "view_quilt", options: [] },
+        { id: "widgets", title: "Widgets", icon: "widgets", options: ["bar.workspaces.", "bar.clock.", "bar.media.", "bar.resources.", "bar.utilButtons.", "bar.updates.", "bar.instances"] },
+        { id: "own", title: "Your own widgets", icon: "extension", options: [] },
+        { id: "island", title: "Dynamic Island", icon: "circle_notifications", options: ["bar.island."] }
+    ]
+};
+
+function tabsOf(pageId) {
+    return tabs[resolve(pageId)] ?? [];
+}
+
+// The tab of a page an option is on ("" for a page without tabs).
+function tabFor(pageId, path) {
+    const list = tabsOf(pageId);
+    const hit = list.find(t => t.options.some(o => o.endsWith(".") ? path.startsWith(o) : path === o));
+    return (hit ?? list[0])?.id ?? "";
+}
+
 // The pages of a group, in order.
 function inGroup(groupId) {
     return pages.filter(p => p.group === groupId);

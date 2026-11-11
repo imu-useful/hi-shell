@@ -10,7 +10,7 @@ ColumnLayout {
     id: root
 
     property string query: ""
-    signal picked(string page, bool advanced)
+    signal picked(string page, string tab, bool advanced)
 
     readonly property var words: query.toLowerCase().trim().split(/\s+/).filter(w => w)
     readonly property var pageHits: Pages.search(query, Translation.tr)
@@ -47,7 +47,7 @@ ColumnLayout {
                 clickable: true
                 icon: modelData.icon
                 title: Translation.tr(modelData.title)
-                onClicked: root.picked(modelData.id, false)
+                onClicked: root.picked(modelData.id, "", false)
             }
         }
     }
@@ -67,7 +67,7 @@ ColumnLayout {
                 icon: root.pageIcon(modelData.page)
                 title: Translation.tr(modelData.text) || modelData.path
                 subtitle: `${root.pageTitle(modelData.page)} · ${modelData.path}${modelData.advanced ? " · " + Translation.tr("advanced") : ""}`
-                onClicked: root.picked(modelData.page, modelData.advanced)
+                onClicked: root.picked(modelData.page, Pages.tabFor(modelData.page, modelData.path), modelData.advanced)
             }
         }
     }

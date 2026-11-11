@@ -29,9 +29,25 @@ Scope {
     }
 
     // Show a page (and leave the search).
-    function goTo(pageId) {
+    // The tabs of the page shown, and the one picked (the first when none is).
+    readonly property var currentTabs: Pages.tabsOf(root.currentPage.id)
+    readonly property string currentTab: (currentTabs.find(t => t.id === ShellState.settingsTab) ?? currentTabs[0])?.id ?? ""
+
+    // Show a page, or one tab of it (and leave the search). "page/tab" works too: `hi settings bar/island`.
+    function goTo(pageId, tab = "") {
+        const parts = pageId.split("/");
         root.searchQuery = "";
-        ShellState.settingsPage = pageId;
+        ShellState.settingsTab = parts[1] ?? tab;
+        ShellState.settingsPage = Pages.resolve(parts[0]);
+    }
+
+    // The next or previous tab of the page, wrapping around (Ctrl+PageDown, Ctrl+PageUp).
+    function stepTab(delta) {
+        const n = root.currentTabs.length;
+        if (n < 2)
+            return;
+        const i = root.currentTabs.findIndex(t => t.id === root.currentTab);
+        ShellState.settingsTab = root.currentTabs[(i + delta + n) % n].id;
     }
 
     // The next or previous page in the navigation's order, wrapping around (Ctrl+Tab, Ctrl+Shift+Tab).
@@ -54,8 +70,14 @@ Scope {
             const centered = y - (navFlick.height - height) / 2;
             navFlick.contentY = Math.max(0, Math.min(centered, navFlick.contentHeight - navFlick.height));
         }
-        onActiveChanged: if (active) Qt.callLater(reveal)
-        Component.onCompleted: if (active) Qt.callLater(reveal)
+        // A moment later: a window that has just opened lays its navigation out first.
+        onActiveChanged: if (active) revealTimer.restart()
+        Component.onCompleted: if (active) revealTimer.restart()
+        Timer {
+            id: revealTimer
+            interval: 60
+            onTriggered: navItem.reveal()
+        }
 
         Layout.fillWidth: true
         implicitHeight: 42
@@ -92,10 +114,10 @@ Scope {
         function toggle(): void {
             root.setOpen(!root.open);
         }
-        // A page id from modules/settings/Pages.js: home, bar, desktop, hyprland, about, ...
+        // A page id from modules/settings/Pages.js (home, bar, desktop, ...), or page/tab (bar/island).
         function open(page: string): void {
             if (page)
-                ShellState.settingsPage = Pages.resolve(page);
+                root.goTo(page);
             root.setOpen(true);
         }
         // Open Settings with the search box filled: `hi settings search dock gap`.
@@ -152,6 +174,14 @@ Scope {
             Shortcut {
                 sequence: "Ctrl+F"
                 onActivated: searchField.forceActiveFocus()
+            }
+            Shortcut {
+                sequence: "Ctrl+PgDown"
+                onActivated: root.stepTab(1)
+            }
+            Shortcut {
+                sequence: "Ctrl+PgUp"
+                onActivated: root.stepTab(-1)
             }
 
             Item {
@@ -422,8 +452,81 @@ Scope {
                             }
                         }
 
+                        // The page's tabs (pages that have them).
+                        Item {
+                            Layout.fillWidth: true
+                            visible: root.currentTabs.length > 0 && root.searchQuery.trim() === ""
+                            implicitHeight: 48
+
+                            Rectangle {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                height: 1
+                                color: Colors.m3outlineVariant
+                            }
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 0
+
+                                Repeater {
+                                    model: root.currentTabs
+
+                                    Item {
+                                        id: tabItem
+                                        required property var modelData
+                                        readonly property bool active: root.currentTab === modelData.id
+
+                                        Layout.fillHeight: true
+                                        implicitWidth: tabRow.implicitWidth + 32
+
+                                        RowLayout {
+                                            id: tabRow
+                                            anchors.centerIn: parent
+                                            spacing: 8
+                                            MaterialIcon {
+                                                icon: tabItem.modelData.icon
+                                                fill: tabItem.active ? 1 : 0
+                                                iconSize: 20
+                                                color: tabItem.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                            }
+                                            StyledText {
+                                                text: Translation.tr(tabItem.modelData.title)
+                                                font.weight: Font.Medium
+                                                color: tabItem.active ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                            }
+                                        }
+                                        Rectangle {
+                                            anchors.bottom: parent.bottom
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            width: tabRow.implicitWidth
+                                            height: 3
+                                            radius: 1.5
+                                            color: Colors.m3primary
+                                            opacity: tabItem.active ? 1 : 0
+                                            Behavior on opacity { EffectAnim {} }
+                                        }
+                                        StateLayer {
+                                            radius: Appearance.rounding.small
+                                            onClicked: ShellState.settingsTab = tabItem.modelData.id
+                                        }
+                                    }
+                                }
+                                Item { Layout.fillWidth: true }
+                            }
+                        }
+
                         StyledFlickable {
                             id: flick
+
+                            // A new tab starts at the top.
+                            Connections {
+                                target: root
+                                function onCurrentTabChanged() {
+                                    flick.targetY = 0;
+                                    flick.contentY = 0;
+                                }
+                            }
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             contentHeight: page.implicitHeight + 24
@@ -441,6 +544,9 @@ Scope {
                                     // A page that's a list of its own (Keybinds) is as tall as the window and scrolls itself.
                                     if (item.viewHeight !== undefined)
                                         item.viewHeight = Qt.binding(() => flick.height - 24);
+                                    // A page with tabs shows the one picked in the tab row.
+                                    if (item.tab !== undefined)
+                                        item.tab = Qt.binding(() => root.currentTab);
                                 }
                             }
 
@@ -465,10 +571,10 @@ Scope {
                                 id: searchResults
                                 SearchResults {
                                     query: root.searchQuery
-                                    onPicked: (pageId, advanced) => {
+                                    onPicked: (pageId, tab, advanced) => {
                                         if (advanced)
                                             Config.options.settingsAdvanced = true;
-                                        root.goTo(pageId);
+                                        root.goTo(pageId, tab);
                                     }
                                 }
                             }

@@ -13,6 +13,9 @@ ColumnLayout {
     readonly property var bar: Config.options.bar
     spacing: 24
 
+    // The tab shown (set by Settings from the tab row): layout, widgets, own, island.
+    property string tab: "layout"
+
     // Which bar the layout and style rows edit: "main" (the defaults), "screen:<name>" (the main bar on one screen,
     // its own settings over the defaults) or "extra:<id>" (another bar).
     property string target: "main"
@@ -187,6 +190,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "layout"
         icon: "dock_to_bottom"
         title: Translation.tr("Which bar")
 
@@ -280,6 +284,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "layout"
         icon: "view_week"
         title: Translation.tr("Bar layout")
 
@@ -299,6 +304,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "layout"
         icon: "tune"
         title: Translation.tr("Positioning & style")
 
@@ -362,6 +368,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "widgets"
         icon: "widgets"
         title: Translation.tr("Widgets")
 
@@ -473,6 +480,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "own"
         icon: "extension"
         title: Translation.tr("Your own widgets")
 
@@ -523,6 +531,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "widgets"
         icon: "content_copy"
         title: Translation.tr("Widget copies")
 
@@ -590,6 +599,7 @@ ColumnLayout {
     }
 
     Section {
+        visible: root.tab === "island"
         icon: "circle_notifications"
         title: Translation.tr("Dynamic Island")
 
