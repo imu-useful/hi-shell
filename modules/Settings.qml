@@ -21,8 +21,23 @@ Scope {
 
     readonly property bool open: ShellState.settingsOpen && !ShellState.zen
 
+    // The page shown (the first one when the id is unknown).
+    readonly property var currentPage: Pages.find(ShellState.settingsPage) ?? Pages.pages[0]
+
     function setOpen(value) {
         ShellState.settingsOpen = value;
+    }
+
+    // Show a page (and leave the search).
+    function goTo(pageId) {
+        root.searchQuery = "";
+        ShellState.settingsPage = pageId;
+    }
+
+    // The next or previous page in the navigation's order, wrapping around (Ctrl+Tab, Ctrl+Shift+Tab).
+    function step(delta) {
+        const i = Pages.pages.indexOf(root.currentPage);
+        root.goTo(Pages.pages[(i + delta + Pages.pages.length) % Pages.pages.length].id);
     }
 
     IpcHandler {
@@ -31,10 +46,10 @@ Scope {
         function toggle(): void {
             root.setOpen(!root.open);
         }
-        // quick, general, bar, desktop, interface, services, hyprland, about
+        // A page id from modules/settings/Pages.js: quick, bar, desktop, hyprland, about, ...
         function open(page: string): void {
             if (page)
-                ShellState.settingsPage = page;
+            ShellState.settingsPage = page;
             root.setOpen(true);
         }
         // Open Settings with the search box filled: `hi settings search dock gap`.
@@ -78,6 +93,19 @@ Scope {
             Shortcut {
                 sequence: "Escape"
                 onActivated: root.setOpen(false)
+            }
+            Shortcut {
+                sequence: "Ctrl+Tab"
+                onActivated: root.step(1)
+            }
+            Shortcut {
+                // Qt sees Shift+Tab as Backtab.
+                sequences: ["Ctrl+Shift+Tab", "Ctrl+Backtab"]
+                onActivated: root.step(-1)
+            }
+            Shortcut {
+                sequence: "Ctrl+F"
+                onActivated: searchField.forceActiveFocus()
             }
 
             Item {
@@ -178,27 +206,6 @@ Scope {
                             }
                         }
 
-                        M3Button {
-                            Layout.margins: 6
-                            tonal: true
-                            icon: "edit"
-                            text: Translation.tr("Config file")
-                            onClicked: {
-                                root.setOpen(false);
-                                Qt.openUrlExternally(`file://${Config.path}`);
-                            }
-
-                            // Right click copies the path of the config file.
-                            MouseArea {
-                                anchors.fill: parent
-                                acceptedButtons: Qt.RightButton
-                                onClicked: {
-                                    Quickshell.clipboardText = Config.path;
-                                    ShellState.osdMessage("content_copy", Translation.tr("Config path copied"));
-                                }
-                            }
-                        }
-
                         // Search over the pages and every option (by name and description).
                         Rectangle {
                             Layout.fillWidth: true
@@ -264,95 +271,184 @@ Scope {
                                 width: navFlick.width
                                 spacing: 6
 
-                            Repeater {
-                                model: Pages.pages
+                                // A label per group, then its pages.
+                                Repeater {
+                                    model: Pages.groups
 
-                                Rectangle {
-                                    required property var modelData
-                                    readonly property bool active: ShellState.settingsPage === modelData.id
+                                    ColumnLayout {
+                                        id: navGroup
+                                        required property var modelData
+                                        required property int index
 
-                                    Layout.fillWidth: true
-                                    implicitHeight: 48
-                                    radius: 24
-                                    color: active ? Colors.m3secondaryContainer : "transparent"
-                                    Behavior on color { ColorAnim {} }
+                                        Layout.fillWidth: true
+                                        spacing: 2
 
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 16
-                                        spacing: 14
-                                        MaterialIcon {
-                                            icon: modelData.icon
-                                            fill: active ? 1 : 0
-                                            iconSize: 20
-                                            color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
-                                        }
                                         StyledText {
-                                            Layout.fillWidth: true
-                                            text: Translation.tr(modelData.title)
-                                            font.weight: active ? Font.Medium : Font.Normal
-                                            color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                                            Layout.leftMargin: 16
+                                            Layout.topMargin: navGroup.index === 0 ? 0 : 10
+                                            Layout.bottomMargin: 2
+                                            text: Translation.tr(navGroup.modelData.title)
+                                            font.pixelSize: Appearance.font.size.labelMedium
+                                            font.weight: Font.Medium
+                                            color: Colors.m3primary
                                         }
-                                    }
-                                    StateLayer {
-                                        onClicked: ShellState.settingsPage = modelData.id
+
+                                        Repeater {
+                                            model: Pages.inGroup(navGroup.modelData.id)
+
+                                            Rectangle {
+                                                required property var modelData
+                                                readonly property bool active: ShellState.settingsPage === modelData.id
+
+                                                Layout.fillWidth: true
+                                                implicitHeight: 42
+                                                radius: 21
+                                                color: active ? Colors.m3secondaryContainer : "transparent"
+                                                Behavior on color { ColorAnim {} }
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    anchors.leftMargin: 16
+                                                    spacing: 14
+                                                    MaterialIcon {
+                                                        icon: modelData.icon
+                                                        fill: active ? 1 : 0
+                                                        iconSize: 20
+                                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
+                                                    }
+                                                    StyledText {
+                                                        Layout.fillWidth: true
+                                                        text: Translation.tr(modelData.title)
+                                                        font.weight: active ? Font.Medium : Font.Normal
+                                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                                                        elide: Text.ElideRight
+                                                    }
+                                                }
+                                                StateLayer {
+                                                    onClicked: root.goTo(modelData.id)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
                             }
                         }
                     }
 
                     // --- Page ---
-                    StyledFlickable {
-                        id: flick
+                    ColumnLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        contentHeight: page.implicitHeight + 24
+                        spacing: 12
 
-                        Loader {
-                            id: page
-                            width: flick.width - 12
-                            sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
-                                quick: quick, general: general, bar: bar, desktop: desktop,
-                                interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
-                            })[ShellState.settingsPage] ?? quick
-                            onLoaded: {
-                                flick.targetY = 0;
-                                flick.contentY = 0;
-                                // A page that's a list of its own (Keybinds) is as tall as the window and scrolls itself.
-                                if (item.viewHeight !== undefined)
-                                    item.viewHeight = Qt.binding(() => flick.height - 24);
+                        // The page's group, title and what it is for (the query, while searching),
+                        // and the config file.
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 4
+                            Layout.topMargin: 6
+                            spacing: 12
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+
+                                readonly property bool searching: root.searchQuery.trim() !== ""
+
+                                StyledText {
+                                    text: parent.searching ? Translation.tr("Search") : Translation.tr(Pages.group(root.currentPage?.group)?.title ?? "")
+                                    font.pixelSize: Appearance.font.size.labelMedium
+                                    font.weight: Font.Medium
+                                    color: Colors.m3primary
+                                }
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    text: parent.searching ? `«${root.searchQuery.trim()}»` : Translation.tr(root.currentPage?.title ?? "")
+                                    font.family: Appearance.font.title
+                                    font.pixelSize: Appearance.font.size.headlineSmall
+                                    elide: Text.ElideRight
+                                }
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    visible: !parent.searching && text !== ""
+                                    text: Translation.tr(root.currentPage?.description ?? "")
+                                    font.pixelSize: Appearance.font.size.bodyMedium
+                                    color: Colors.m3onSurfaceVariant
+                                    elide: Text.ElideRight
+                                }
                             }
-                        }
 
-                        Component { id: quick; QuickPage {} }
-                        Component { id: general; GeneralPage {} }
-                        Component { id: bar; BarPage {} }
-                        Component { id: desktop; DesktopPage {} }
-                        Component { id: iface; InterfacePage {} }
-                        Component { id: services; ServicesPage {} }
-                        Component { id: hyprland; HyprlandPage {} }
-                        Component { id: autostart; AutostartPage {} }
-                        Component { id: keybinds; KeybindsPage {} }
-                        Component {
-                            id: searchResults
-                            SearchResults {
-                                query: root.searchQuery
-                                onPicked: (pageId, advanced) => {
-                                    if (advanced)
-                                        Config.options.settingsAdvanced = true;
-                                    root.searchQuery = "";
-                                    ShellState.settingsPage = pageId;
+                            M3Button {
+                                Layout.alignment: Qt.AlignTop
+                                tonal: true
+                                icon: "edit"
+                                text: Translation.tr("Config file")
+                                onClicked: {
+                                    root.setOpen(false);
+                                    Qt.openUrlExternally(`file://${Config.path}`);
+                                }
+
+                                // Right click copies the path of the config file.
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.RightButton
+                                    onClicked: {
+                                        Quickshell.clipboardText = Config.path;
+                                        ShellState.osdMessage("content_copy", Translation.tr("Config path copied"));
+                                    }
                                 }
                             }
                         }
-                        Component { id: screentime; ScreenTimePage {} }
-                        Component { id: rules; RulesPage {} }
-                        Component { id: defaultapps; DefaultAppsPage {} }
-                        Component { id: about; AboutPage {} }
-                        Component { id: lock; LockPage {} }
-                        Component { id: sounds; SoundsPage {} }
+
+                        StyledFlickable {
+                            id: flick
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            contentHeight: page.implicitHeight + 24
+
+                            Loader {
+                                id: page
+                                width: flick.width - 12
+                                sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
+                                        quick: quick, general: general, bar: bar, desktop: desktop,
+                                        interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                                })[ShellState.settingsPage] ?? quick
+                                onLoaded: {
+                                    flick.targetY = 0;
+                                    flick.contentY = 0;
+                                    // A page that's a list of its own (Keybinds) is as tall as the window and scrolls itself.
+                                    if (item.viewHeight !== undefined)
+                                    item.viewHeight = Qt.binding(() => flick.height - 24);
+                                }
+                            }
+
+                            Component { id: quick; QuickPage {} }
+                            Component { id: general; GeneralPage {} }
+                            Component { id: bar; BarPage {} }
+                            Component { id: desktop; DesktopPage {} }
+                            Component { id: iface; InterfacePage {} }
+                            Component { id: services; ServicesPage {} }
+                            Component { id: hyprland; HyprlandPage {} }
+                            Component { id: autostart; AutostartPage {} }
+                            Component { id: keybinds; KeybindsPage {} }
+                            Component {
+                                id: searchResults
+                                SearchResults {
+                                    query: root.searchQuery
+                                    onPicked: (pageId, advanced) => {
+                                        if (advanced)
+                                        Config.options.settingsAdvanced = true;
+                                        root.goTo(pageId);
+                                    }
+                                }
+                            }
+                            Component { id: screentime; ScreenTimePage {} }
+                            Component { id: rules; RulesPage {} }
+                            Component { id: defaultapps; DefaultAppsPage {} }
+                            Component { id: about; AboutPage {} }
+                            Component { id: lock; LockPage {} }
+                            Component { id: sounds; SoundsPage {} }
+                        }
                     }
                 }
             }

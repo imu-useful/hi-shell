@@ -19,12 +19,16 @@ ColumnLayout {
         return words.length > 0 && words.every(w => hay.includes(w));
     }).slice(0, 40)
 
+    // "Group › Page" for an option's page.
     function pageTitle(id) {
-        const p = Pages.pages.find(x => x.id === id);
-        return p ? Translation.tr(p.title) : id;
+        const p = Pages.find(id);
+        if (!p)
+            return id;
+        const g = Pages.group(p.group);
+        return g ? `${Translation.tr(g.title)} › ${Translation.tr(p.title)}` : Translation.tr(p.title);
     }
     function pageIcon(id) {
-        return Pages.pages.find(x => x.id === id)?.icon ?? "settings";
+        return Pages.find(id)?.icon ?? "settings";
     }
 
     spacing: 8
