@@ -291,7 +291,7 @@ qs -c hi-shell ipc call overview toggle
 qs -c hi-shell ipc call switcher next                # prev, commit, cancel (Alt+Tab)
 qs -c hi-shell ipc call bar toggle                   # show, hide
 qs -c hi-shell ipc call display set mirror           # internal, left, right, external; toggle, next (the display key)
-qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: quick general bar desktop interface services hyprland about
+qs -c hi-shell ipc call settings open hyprland        # toggle, close; pages: home general bar desktop interface services hyprland about
 qs -c hi-shell ipc call focus settings               # Focus Mode settings window; openTab timer|wallpaper|lists|profiles|todo|exit, profile <id>, current
 qs -c hi-shell ipc call focus start                  # Focus Mode session with the active profile; stop (Manual mode only), abort (emergency), status, addTask <text>
 # Focus Mode blocks sites through /etc/hosts (services/focus_hosts.py via pkexec, backup in /etc/hosts.hi-shell.bak);
@@ -315,7 +315,7 @@ the defaults on first start; edits apply live). The Hyprland page applies change
 A new resolution, orientation or scale for a monitor is tried first: a "Keep these display settings?" card counts down
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 A value that breaks its rule in `common/ConfigSchema.js` (a typo in `bar.position`, a `lock.brightness` of 7) is reported in the log (`qs -c hi-shell log`) and replaced by its default; `python3 tools/audit_config.py` lists the options that have no control in the settings app (`docs/CONFIG_AUDIT.md`).
-The full list of options (type, default, allowed values, where Settings changes it) is in [docs/CONFIG.md](docs/CONFIG.md), made from the source; `hi config search <word>` finds an option by name or description. Settings has a search box (also `hi settings search <word>`) and hides the rarely needed rows until you turn on Settings › Quick › Show advanced settings (`settingsAdvanced`).
+The full list of options (type, default, allowed values, where Settings changes it) is in [docs/CONFIG.md](docs/CONFIG.md), made from the source; `hi config search <word>` finds an option by name or description. Settings has a search box (also `hi settings search <word>`) and hides the rarely needed rows until you turn on Settings › Overview › Advanced settings (`settingsAdvanced`).
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`
@@ -415,7 +415,7 @@ $lock_cmd = qs -c hi-shell ipc call lock lock || pidof hyprlock || hyprlock
 
 ## Power saving
 
-Settings › Quick › **Power saving mode** turns off what costs the most CPU and GPU: animations, Hyprland's blur, panel
+Settings › Overview › **Power saving** turns off what costs the most CPU and GPU: animations, Hyprland's blur, panel
 transparency, the audio visualizer, the dancing wallpaper frame and cover mode. Weather is checked every hour instead of
 every few minutes. The values it changes are kept in `~/.config/hi-shell/config.json` (`powerSaving`), so turning the mode
 off restores them, also after a restart. It's switched on by hand only.

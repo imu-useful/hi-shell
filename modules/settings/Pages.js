@@ -10,9 +10,10 @@ const groups = [
 ];
 
 // Settings pages and the words that find them from the launcher. Pages of a group sit
-// together here, in the order the navigation shows them.
+// together here, in the order the navigation shows them; a page with no group (Overview)
+// is shown above the groups.
 const pages = [
-    { id: "quick", title: "Quick", icon: "tune", group: "personalize", description: "Wallpaper, colors and the things you change most", keywords: "wallpaper colors color scheme palette dark light mode auto transparency matugen theme" },
+    { id: "home", title: "Overview", icon: "home", group: "", description: "Wallpaper, colors, quick switches and every page", keywords: "overview home start quick wallpaper colors color scheme palette dark light mode auto transparency matugen theme power saving do not disturb dnd night light game mode advanced" },
     { id: "interface", title: "Interface", icon: "palette", group: "personalize", description: "Style, fonts, motion, sidebars and the launcher", keywords: "fonts font animation speed motion transparency opacity sidebar quick toggles night light temperature presentation mode screen share" },
     { id: "lock", title: "Lock screen", icon: "lock", group: "personalize", description: "What the lock screen shows and when it locks", keywords: "lock screen clock date greeting avatar password battery keyboard layout caps lock now playing blur brightness wallpaper" },
     { id: "sounds", title: "Sounds", icon: "volume_up", group: "personalize", description: "The sound pack and the events that play a sound", keywords: "sounds sound pack miui samsung one ui notification timer battery charger screenshot volume mute event effects" },
@@ -35,8 +36,17 @@ function inGroup(groupId) {
     return pages.filter(p => p.group === groupId);
 }
 
+// Old page ids that still open a page (`hi settings quick`, saved state).
+const aliases = { quick: "home" };
+
+function resolve(id) {
+    return aliases[id] ?? id;
+}
+
+// The page with this id (or an old id of it), or null.
 function find(id) {
-    return pages.find(p => p.id === id) ?? null;
+    const real = resolve(id);
+    return pages.find(p => p.id === real) ?? null;
 }
 
 function group(id) {

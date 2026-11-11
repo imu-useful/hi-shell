@@ -632,7 +632,7 @@ COMMANDS="start stop restart status log doctor version update channel install un
 launcher apps overview calendar weather processes sidebar bar lock session boot wait present ask theme wallpaper preset
 look rules dock desktop widgets script shot brightness display powersave notif todo focus screentime sounds play pause
 next prev qr keybinds ipc help"
-SETTINGS_PAGES="search quick general bar desktop lock interface sounds services hyprland autostart defaultapps screentime rules about"
+SETTINGS_PAGES="search home general bar desktop lock interface sounds services hyprland autostart defaultapps screentime rules about"
 SCHEMES="dark light toggle seed tonal-spot content expressive fidelity fruit-salad monochrome neutral rainbow vibrant"
 
 subcommands() {

@@ -33,7 +33,7 @@ ALIAS = re.compile(r"property\s+(?:var|QtObject|JsonObject)\s+(\w+)\s*:\s*Config
 
 # settings page file -> page id (modules/settings/Pages.js)
 PAGE_FILES = {
-    "QuickPage": "quick", "GeneralPage": "general", "BarPage": "bar", "DesktopPage": "desktop", "LockPage": "lock",
+    "HomePage": "home", "GeneralPage": "general", "BarPage": "bar", "DesktopPage": "desktop", "LockPage": "lock",
     "InterfacePage": "interface", "SoundsPage": "sounds", "ServicesPage": "services", "HyprlandPage": "hyprland",
     "AutostartPage": "autostart", "KeybindsPage": "keybinds", "DefaultAppsPage": "defaultapps",
     "ScreenTimePage": "screentime", "RulesPage": "rules", "AboutPage": "about",

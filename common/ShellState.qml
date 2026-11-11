@@ -70,7 +70,7 @@ Singleton {
     // Set to screenshot / ocr / record to open the region selector.
     property string captureRequest: ""
     // quick | general | bar | desktop | interface | services | hyprland | about
-    property string settingsPage: "quick"
+    property string settingsPage: "home"
     property bool launcherOpen: false
     // The full-screen list of every app (the dock's apps button).
     property bool appGridOpen: false

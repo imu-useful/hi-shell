@@ -1509,5 +1509,15 @@
     "How long you use your apps, and daily limits": "Сколько времени уходит на приложения и дневные лимиты",
     "When something is true, change settings or run a command": "Когда условие выполняется — менять настройки или запускать команду",
     "Language, the AI chat, translator and clipboard": "Язык, ИИ-чат, переводчик и буфер обмена",
-    "Version, updates, presets and credits": "Версия, обновления, пресеты и благодарности"
+    "Version, updates, presets and credits": "Версия, обновления, пресеты и благодарности",
+    "Overview": "Обзор",
+    "Wallpaper, colors, quick switches and every page": "Обои, цвета, быстрые переключатели и все разделы",
+    "Quick switches": "Быстрые переключатели",
+    "All settings": "Все настройки",
+    "Fewer effects, longer battery": "Меньше эффектов, дольше батарея",
+    "Notifications wait in the list": "Уведомления копятся в списке",
+    "Warmer screen colors": "Тёплые цвета экрана",
+    "Hyprland effects off": "Эффекты Hyprland выключены",
+    "Advanced settings": "Расширенные настройки",
+    "Show rarely needed rows": "Показывать редко нужные пункты"
 }

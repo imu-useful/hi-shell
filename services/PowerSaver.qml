@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Io
 import qs.common
 
-// Power saving, turned on by hand (Settings › Quick). It switches off what costs the most
+// Power saving, turned on by hand (Settings › Overview). It switches off what costs the most
 // CPU and GPU: animations, blur and transparency, the visualizer, the dancing frame and
 // cover mode, and it checks the weather less often. The values it changes are kept in
 // config (powerSaving.saved), so turning it off puts them back, also after a restart.

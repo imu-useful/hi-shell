@@ -46,7 +46,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `language` | `string` | `"auto"` | `auto` \| `en` \| `ru` | Settings › General | Interface language: auto (from $LANG), en, ru |
 | `customLanguages` | `var` | `[]` |  | Settings › General | Languages made with AI (Settings > General > Language): [{ code, name }]; their files are in ~/.config/hi-shell/translations. |
 | `rules` | `var` | `[]` |  | Settings › About | Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs; when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all. |
-| `settingsAdvanced` | `bool` | `false` |  | Settings › Bar | Settings shows the rarely needed rows too (Settings › Quick). Off hides them; the search always finds them. |
+| `settingsAdvanced` | `bool` | `false` |  | Settings › Overview | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
 | `rulesEnabled` | `bool` | `true` |  | Settings › Rules | Off stops every rule and puts back what they changed. |
 
 ## appearance
@@ -55,7 +55,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | --- | --- | --- | --- | --- | --- |
 | `appearance.themedIcons` | `bool` | `false` |  | Settings › Interface | App icons in one color, the palette's primary (dock, workspaces, launcher). |
 | `appearance.restartOnIconTheme` | `bool` | `true` |  | Settings › Interface (advanced) | Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise). |
-| `appearance.transparency` | `bool` | `true` |  | Settings › Quick | Translucent surfaces (the compositor blurs what's behind them). |
+| `appearance.transparency` | `bool` | `true` |  | Settings › Overview | Translucent surfaces (the compositor blurs what's behind them). |
 | `appearance.transparencyLevel` | `real` | `0.12` | 0 … 1 | Settings › Interface | How see-through the panels are when transparency is on: 0 = solid, 0.5 = half. |
 | `appearance.coverBackdrop` | `bool` | `true` |  | Settings › Interface | The playing track's cover, blurred, behind the media cards. |
 | `appearance.fonts.main` | `string` | `"Google Sans Flex"` |  | Settings › Interface | The interface font. |
@@ -85,8 +85,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Interface | Extra space between letters in px (negative = tighter). |
 | `appearance.looks` | `var` | `{}` |  | Settings > Interface > Save this look (a map of name -> options; hi look save <name>) | Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface). |
 | `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
-| `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Quick | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
-| `appearance.autoMode` | `bool` | `false` |  | Settings › Quick | Switch dark / light at sunset / sunrise (from the weather service's location). |
+| `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Overview | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
+| `appearance.autoMode` | `bool` | `false` |  | Settings › Overview | Switch dark / light at sunset / sunrise (from the weather service's location). |
 | `appearance.gtkColorScheme` | `bool` | `true` |  | Settings › Interface (advanced) | Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light. |
 | `appearance.screenCorners` | `int` | `16` | 0 … 64 | Settings › Interface | Rounded black screen corners, radius in px (0 = off). |
 | `appearance.contextMenu` | `string` | `"material"` | `material` \| `caelestia` \| `standard` | Settings › Interface | Context menus (the system tray's): material = the shell's own Material You menu, standard = the one the system draws. |
@@ -288,7 +288,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `powerSaving.enabled` | `bool` | `false` |  | Settings › Quick | Power saving is on (use `hi ipc powersaving on\|off`, not this option, so the saved values are kept). |
+| `powerSaving.enabled` | `bool` | `false` |  | Settings › Overview | Power saving is on (use `hi ipc powersaving on\|off`, not this option, so the saved values are kept). |
 | `powerSaving.saved` | `var` | `{}` |  | file only: kept by the shell while power saving is on (advanced) | The values power saving changed, to put back when it is turned off (kept by the shell). |
 
 ## ai

@@ -40,16 +40,50 @@ Scope {
         root.goTo(Pages.pages[(i + delta + Pages.pages.length) % Pages.pages.length].id);
     }
 
+    // A page in the navigation.
+    component NavItem: Rectangle {
+        required property var modelData
+        readonly property bool active: root.currentPage.id === modelData.id
+
+        Layout.fillWidth: true
+        implicitHeight: 42
+        radius: 21
+        color: active ? Colors.m3secondaryContainer : "transparent"
+        Behavior on color { ColorAnim {} }
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 16
+            spacing: 14
+            MaterialIcon {
+                icon: modelData.icon
+                fill: active ? 1 : 0
+                iconSize: 20
+                color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
+            }
+            StyledText {
+                Layout.fillWidth: true
+                text: Translation.tr(modelData.title)
+                font.weight: active ? Font.Medium : Font.Normal
+                color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
+                elide: Text.ElideRight
+            }
+        }
+        StateLayer {
+            onClicked: root.goTo(modelData.id)
+        }
+    }
+
     IpcHandler {
         target: "settings"
 
         function toggle(): void {
             root.setOpen(!root.open);
         }
-        // A page id from modules/settings/Pages.js: quick, bar, desktop, hyprland, about, ...
+        // A page id from modules/settings/Pages.js: home, bar, desktop, hyprland, about, ...
         function open(page: string): void {
             if (page)
-            ShellState.settingsPage = page;
+                ShellState.settingsPage = Pages.resolve(page);
             root.setOpen(true);
         }
         // Open Settings with the search box filled: `hi settings search dock gap`.
@@ -271,7 +305,13 @@ Scope {
                                 width: navFlick.width
                                 spacing: 6
 
-                                // A label per group, then its pages.
+                                // Pages with no group (Overview) first, then a label per group and its pages.
+                                Repeater {
+                                    model: Pages.inGroup("")
+                                    NavItem {}
+                                }
+                                Item { implicitHeight: 4 }
+
                                 Repeater {
                                     model: Pages.groups
 
@@ -285,7 +325,7 @@ Scope {
 
                                         StyledText {
                                             Layout.leftMargin: 16
-                                            Layout.topMargin: navGroup.index === 0 ? 0 : 10
+                                            Layout.topMargin: navGroup.index === 0 ? 0 : 8
                                             Layout.bottomMargin: 2
                                             text: Translation.tr(navGroup.modelData.title)
                                             font.pixelSize: Appearance.font.size.labelMedium
@@ -296,38 +336,7 @@ Scope {
                                         Repeater {
                                             model: Pages.inGroup(navGroup.modelData.id)
 
-                                            Rectangle {
-                                                required property var modelData
-                                                readonly property bool active: ShellState.settingsPage === modelData.id
-
-                                                Layout.fillWidth: true
-                                                implicitHeight: 42
-                                                radius: 21
-                                                color: active ? Colors.m3secondaryContainer : "transparent"
-                                                Behavior on color { ColorAnim {} }
-
-                                                RowLayout {
-                                                    anchors.fill: parent
-                                                    anchors.leftMargin: 16
-                                                    spacing: 14
-                                                    MaterialIcon {
-                                                        icon: modelData.icon
-                                                        fill: active ? 1 : 0
-                                                        iconSize: 20
-                                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurfaceVariant
-                                                    }
-                                                    StyledText {
-                                                        Layout.fillWidth: true
-                                                        text: Translation.tr(modelData.title)
-                                                        font.weight: active ? Font.Medium : Font.Normal
-                                                        color: active ? Colors.m3onSecondaryContainer : Colors.m3onSurface
-                                                        elide: Text.ElideRight
-                                                    }
-                                                }
-                                                StateLayer {
-                                                    onClicked: root.goTo(modelData.id)
-                                                }
-                                            }
+                                            NavItem {}
                                         }
                                     }
                                 }
@@ -357,6 +366,7 @@ Scope {
 
                                 StyledText {
                                     text: parent.searching ? Translation.tr("Search") : Translation.tr(Pages.group(root.currentPage?.group)?.title ?? "")
+                                visible: text !== ""
                                     font.pixelSize: Appearance.font.size.labelMedium
                                     font.weight: Font.Medium
                                     color: Colors.m3primary
@@ -410,19 +420,19 @@ Scope {
                                 id: page
                                 width: flick.width - 12
                                 sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
-                                        quick: quick, general: general, bar: bar, desktop: desktop,
-                                        interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
-                                })[ShellState.settingsPage] ?? quick
+                            home: home, general: general, bar: bar, desktop: desktop,
+                            interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                        })[root.currentPage.id] ?? home
                                 onLoaded: {
                                     flick.targetY = 0;
                                     flick.contentY = 0;
                                     // A page that's a list of its own (Keybinds) is as tall as the window and scrolls itself.
                                     if (item.viewHeight !== undefined)
-                                    item.viewHeight = Qt.binding(() => flick.height - 24);
+                                        item.viewHeight = Qt.binding(() => flick.height - 24);
                                 }
                             }
 
-                            Component { id: quick; QuickPage {} }
+                            Component { id: home; HomePage {} }
                             Component { id: general; GeneralPage {} }
                             Component { id: bar; BarPage {} }
                             Component { id: desktop; DesktopPage {} }
@@ -437,7 +447,7 @@ Scope {
                                     query: root.searchQuery
                                     onPicked: (pageId, advanced) => {
                                         if (advanced)
-                                        Config.options.settingsAdvanced = true;
+                                            Config.options.settingsAdvanced = true;
                                         root.goTo(pageId);
                                     }
                                 }

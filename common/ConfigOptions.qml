@@ -206,7 +206,7 @@ JsonAdapter {
     // Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs;
     // when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all.
     property var rules: []
-    // Settings shows the rarely needed rows too (Settings › Quick). Off hides them; the search always finds them.
+    // Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them.
     property bool settingsAdvanced: false
     // Off stops every rule and puts back what they changed.
     property bool rulesEnabled: true

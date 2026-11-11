@@ -28,7 +28,7 @@ const options = [
     },
     {
         "path": "appearance.transparency",
-        "page": "quick",
+        "page": "home",
         "text": "Translucent surfaces (the compositor blurs what's behind them).",
         "advanced": false
     },
@@ -190,13 +190,13 @@ const options = [
     },
     {
         "path": "appearance.scheme",
-        "page": "quick",
+        "page": "home",
         "text": "matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant",
         "advanced": false
     },
     {
         "path": "appearance.autoMode",
-        "page": "quick",
+        "page": "home",
         "text": "Switch dark / light at sunset / sunrise (from the weather service's location).",
         "advanced": false
     },
@@ -454,8 +454,8 @@ const options = [
     },
     {
         "path": "settingsAdvanced",
-        "page": "bar",
-        "text": "Settings shows the rarely needed rows too (Settings › Quick). Off hides them; the search always finds them.",
+        "page": "home",
+        "text": "Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them.",
         "advanced": false
     },
     {
@@ -952,7 +952,7 @@ const options = [
     },
     {
         "path": "powerSaving.enabled",
-        "page": "quick",
+        "page": "home",
         "text": "Power saving is on (use `hi ipc powersaving on|off`, not this option, so the saved values are kept).",
         "advanced": false
     },
