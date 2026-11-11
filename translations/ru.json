@@ -238,7 +238,7 @@
     "Interface": "Интерфейс",
     "Titles": "Заголовки",
     "Monospace": "Моноширинный",
-    "Motion": "Движение",
+    "Motion": "Анимации",
     "Looks": "Образы",
     "Modes": "Режимы",
     "Animation speed": "Скорость анимаций",
@@ -1497,7 +1497,6 @@
     "Shell": "Оболочка",
     "Search": "Поиск",
     "Wallpaper, colors and the things you change most": "Обои, цвета и то, что меняют чаще всего",
-    "Style, fonts, motion, sidebars and the launcher": "Стиль, шрифты, анимации, боковые панели и лаунчер",
     "What the lock screen shows and when it locks": "Что показывает экран блокировки и когда он включается",
     "The sound pack and the events that play a sound": "Набор звуков и события, которые их проигрывают",
     "Which bars, where they sit and what is on them": "Какие панели, где они стоят и что на них",
@@ -1519,5 +1518,10 @@
     "Warmer screen colors": "Тёплые цвета экрана",
     "Hyprland effects off": "Эффекты Hyprland выключены",
     "Advanced settings": "Расширенные настройки",
-    "Show rarely needed rows": "Показывать редко нужные пункты"
+    "Show rarely needed rows": "Показывать редко нужные пункты",
+    "Sidebars & launcher": "Боковые панели и меню",
+    "Animation speed and feel, effects and the startup greeting": "Скорость и характер анимаций, эффекты и приветствие при запуске",
+    "Looks, palette, shape, surfaces, fonts and app themes": "Образы, палитра, форма, поверхности, шрифты и темы приложений",
+    "Presentation mode, and viewing mode for fullscreen video": "Режим презентации и режим просмотра для видео на весь экран",
+    "What the sidebars show and what the launcher searches": "Что показывают боковые панели и где ищет меню приложений"
 }

@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Io
 import qs.common
 
-// The wallpaper's palette for other apps, each one opt-in (Settings > Interface > App themes):
+// The wallpaper's palette for other apps, each one opt-in (Settings > Style > App themes):
 //   gtk     a block of named colors in ~/.config/gtk-3.0/gtk.css and gtk-4.0/gtk.css (libadwaita and
 //           GTK3 apps pick them up); only the block between the "hi-shell begin/end" markers is
 //           touched, the rest of those files stays as it is. Switched off, the block is removed.

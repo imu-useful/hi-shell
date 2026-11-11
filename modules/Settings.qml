@@ -179,8 +179,8 @@ Scope {
                     ColumnLayout {
                         // Nested layouts with filling children default to filling too.
                         Layout.fillWidth: false
-                        Layout.preferredWidth: 220
-                        Layout.maximumWidth: 220
+                        Layout.preferredWidth: 240
+                        Layout.maximumWidth: 240
                         Layout.fillHeight: true
                         spacing: 6
 
@@ -421,7 +421,7 @@ Scope {
                                 width: flick.width - 12
                                 sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
                             home: home, general: general, bar: bar, desktop: desktop,
-                            interface: iface, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                            style: style, motion: motion, panels: panels, modes: modes, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
                         })[root.currentPage.id] ?? home
                                 onLoaded: {
                                     flick.targetY = 0;
@@ -436,7 +436,10 @@ Scope {
                             Component { id: general; GeneralPage {} }
                             Component { id: bar; BarPage {} }
                             Component { id: desktop; DesktopPage {} }
-                            Component { id: iface; InterfacePage {} }
+                            Component { id: style; StylePage {} }
+                            Component { id: motion; MotionPage {} }
+                            Component { id: panels; PanelsPage {} }
+                            Component { id: modes; ModesPage {} }
                             Component { id: services; ServicesPage {} }
                             Component { id: hyprland; HyprlandPage {} }
                             Component { id: autostart; AutostartPage {} }

@@ -10,7 +10,7 @@ Singleton {
 
     readonly property var options: Config.options.appearance
 
-    // User scales (Settings > Interface): corners, text and spacing, applied to the token scales below.
+    // User scales (Settings > Style): corners, text and spacing, applied to the token scales below.
     readonly property real cornerScale: Math.max(0, Math.min(2, options.cornerScale))
     readonly property real fontScale: Math.max(0.6, Math.min(2, options.fontScale))
     readonly property real densityScale: ({ "compact": 0.75, "comfortable": 1, "spacious": 1.25 })[options.density] ?? 1

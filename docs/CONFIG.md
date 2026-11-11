@@ -46,50 +46,50 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `language` | `string` | `"auto"` | `auto` \| `en` \| `ru` | Settings › General | Interface language: auto (from $LANG), en, ru |
 | `customLanguages` | `var` | `[]` |  | Settings › General | Languages made with AI (Settings > General > Language): [{ code, name }]; their files are in ~/.config/hi-shell/translations. |
 | `rules` | `var` | `[]` |  | Settings › About | Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs; when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all. |
-| `settingsAdvanced` | `bool` | `false` |  | Settings › Overview | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
+| `settingsAdvanced` | `bool` | `false` |  | Settings › Style | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
 | `rulesEnabled` | `bool` | `true` |  | Settings › Rules | Off stops every rule and puts back what they changed. |
 
 ## appearance
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance.themedIcons` | `bool` | `false` |  | Settings › Interface | App icons in one color, the palette's primary (dock, workspaces, launcher). |
-| `appearance.restartOnIconTheme` | `bool` | `true` |  | Settings › Interface (advanced) | Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise). |
-| `appearance.transparency` | `bool` | `true` |  | Settings › Overview | Translucent surfaces (the compositor blurs what's behind them). |
-| `appearance.transparencyLevel` | `real` | `0.12` | 0 … 1 | Settings › Interface | How see-through the panels are when transparency is on: 0 = solid, 0.5 = half. |
-| `appearance.coverBackdrop` | `bool` | `true` |  | Settings › Interface | The playing track's cover, blurred, behind the media cards. |
-| `appearance.fonts.main` | `string` | `"Google Sans Flex"` |  | Settings › Interface | The interface font. |
-| `appearance.fonts.title` | `string` | `"Google Sans Flex"` |  | Settings › Interface | The font of titles and headings. |
-| `appearance.fonts.mono` | `string` | `"JetBrains Mono"` |  | Settings › Interface | The monospace font (code, terminal-like text). |
+| `appearance.themedIcons` | `bool` | `false` |  | Settings › Style | App icons in one color, the palette's primary (dock, workspaces, launcher). |
+| `appearance.restartOnIconTheme` | `bool` | `true` |  | Settings › Style (advanced) | Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise). |
+| `appearance.transparency` | `bool` | `true` |  | Settings › Style | Translucent surfaces (the compositor blurs what's behind them). |
+| `appearance.transparencyLevel` | `real` | `0.12` | 0 … 1 | Settings › Style | How see-through the panels are when transparency is on: 0 = solid, 0.5 = half. |
+| `appearance.coverBackdrop` | `bool` | `true` |  | Settings › Style | The playing track's cover, blurred, behind the media cards. |
+| `appearance.fonts.main` | `string` | `"Google Sans Flex"` |  | Settings › Style | The interface font. |
+| `appearance.fonts.title` | `string` | `"Google Sans Flex"` |  | Settings › Style | The font of titles and headings. |
+| `appearance.fonts.mono` | `string` | `"JetBrains Mono"` |  | Settings › Style | The monospace font (code, terminal-like text). |
 | `appearance.fonts.icon` | `string` | `"Material Symbols Rounded"` |  | file only: the icon font is made by the shell; only change it for a different Material Symbols build (advanced) | The icon font; the shell makes its own cut-down copy of it at start. |
-| `appearance.cornerScale` | `real` | `1` | 0 … 2 | Settings › Interface | Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's. |
-| `appearance.fontScale` | `real` | `1` | 0.6 … 2 | Settings › Interface | Multiplier for every text size (0.6 – 2). |
-| `appearance.density` | `string` | `"comfortable"` | `compact` \| `comfortable` \| `spacious` | Settings › Interface | compact \| comfortable \| spacious: the spacing between and inside elements. |
-| `appearance.seedColor` | `string` | `""` | `#rrggbb` or empty | Settings › Interface | A color (#rrggbb) to make the palette from instead of the wallpaper; empty = from the wallpaper. |
-| `appearance.contrast` | `real` | `0` | -1 … 1 | Settings › Interface | -1 (soft) .. 1 (strong): the palette's contrast. |
+| `appearance.cornerScale` | `real` | `1` | 0 … 2 | Settings › Style | Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's. |
+| `appearance.fontScale` | `real` | `1` | 0.6 … 2 | Settings › Style | Multiplier for every text size (0.6 – 2). |
+| `appearance.density` | `string` | `"comfortable"` | `compact` \| `comfortable` \| `spacious` | Settings › Style | compact \| comfortable \| spacious: the spacing between and inside elements. |
+| `appearance.seedColor` | `string` | `""` | `#rrggbb` or empty | Settings › Style | A color (#rrggbb) to make the palette from instead of the wallpaper; empty = from the wallpaper. |
+| `appearance.contrast` | `real` | `0` | -1 … 1 | Settings › Style | -1 (soft) .. 1 (strong): the palette's contrast. |
 | `appearance.colorOverrides` | `var` | `{}` |  | file only: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '"#ff6a00"' (advanced) | Colors of your own over the palette: role -> "#rrggbb", e.g. { "primary": "#ff6a00", "surface": "#101010" }. The roles are the names in the palette file (~/.local/state/hi-shell/colors.json). |
-| `appearance.animationSpeed` | `real` | `1` | 0 … 4 | Settings › Interface | Global multiplier for animation durations (0 disables animations). |
-| `appearance.motionStyle` | `string` | `"expressive"` | `expressive` \| `smooth` \| `snappy` | Settings › Interface | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
-| `appearance.popupEffect` | `string` | `"pop"` | `pop` \| `drop` \| `slide` \| `fade` | Settings › Interface | How popups (calendar, weather, AI, overview) appear: pop (grow) \| drop (grow from the edge) \| slide \| fade |
-| `appearance.sidebarEffect` | `string` | `"slide"` | `slide` \| `pop` \| `fade` | Settings › Interface | How the sidebars appear: slide \| pop (grow) \| fade |
-| `appearance.paletteFade` | `int` | `400` | 0 … 2000 | Settings › Interface | How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once |
-| `appearance.launcherEffect` | `string` | `"rise"` | `rise` \| `pop` \| `fade` | Settings › Interface | How the launcher appears: rise (from the screen's edge) \| pop (grow) \| fade |
-| `appearance.panelSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast. |
-| `appearance.barSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the bar's motion (the workspace indicator) on top of the global speed. |
-| `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Interface | Speed of the notification cards' motion on top of the global speed. |
-| `appearance.ripple` | `bool` | `true` |  | Settings › Interface | A wave grows from the point you press on buttons and rows. |
-| `appearance.pressScale` | `real` | `0.9` | 0.7 … 1 | Settings › Interface | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
-| `appearance.surfaceStyle` | `string` | `"tonal"` | `tonal` \| `glass` \| `flat` | Settings › Interface | How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) \| glass (always see-through, with an edge) \| flat (solid, with an edge) |
-| `appearance.borderWidth` | `int` | `-1` | -1 … 4 | Settings › Interface | Width of the outline of panels and cards in px; -1 = by the surface style. |
-| `appearance.textWeight` | `string` | `"normal"` | `light` \| `normal` \| `medium` | Settings › Interface | The default weight of the interface text: light \| normal \| medium. |
-| `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Interface | Extra space between letters in px (negative = tighter). |
-| `appearance.looks` | `var` | `{}` |  | Settings > Interface > Save this look (a map of name -> options; hi look save <name>) | Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Interface). |
-| `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Interface | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
+| `appearance.animationSpeed` | `real` | `1` | 0 … 4 | Settings › Motion | Global multiplier for animation durations (0 disables animations). |
+| `appearance.motionStyle` | `string` | `"expressive"` | `expressive` \| `smooth` \| `snappy` | Settings › Motion | The feel of motion: expressive (springy) \| smooth (gentle, slower) \| snappy (quick, little spring) |
+| `appearance.popupEffect` | `string` | `"pop"` | `pop` \| `drop` \| `slide` \| `fade` | Settings › Motion | How popups (calendar, weather, AI, overview) appear: pop (grow) \| drop (grow from the edge) \| slide \| fade |
+| `appearance.sidebarEffect` | `string` | `"slide"` | `slide` \| `pop` \| `fade` | Settings › Motion | How the sidebars appear: slide \| pop (grow) \| fade |
+| `appearance.paletteFade` | `int` | `400` | 0 … 2000 | Settings › Motion | How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once |
+| `appearance.launcherEffect` | `string` | `"rise"` | `rise` \| `pop` \| `fade` | Settings › Motion | How the launcher appears: rise (from the screen's edge) \| pop (grow) \| fade |
+| `appearance.panelSpeed` | `real` | `1` | 0.25 … 4 | Settings › Motion | Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast. |
+| `appearance.barSpeed` | `real` | `1` | 0.25 … 4 | Settings › Motion | Speed of the bar's motion (the workspace indicator) on top of the global speed. |
+| `appearance.notificationSpeed` | `real` | `1` | 0.25 … 4 | Settings › Motion | Speed of the notification cards' motion on top of the global speed. |
+| `appearance.ripple` | `bool` | `true` |  | Settings › Motion | A wave grows from the point you press on buttons and rows. |
+| `appearance.pressScale` | `real` | `0.9` | 0.7 … 1 | Settings › Motion | How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller. |
+| `appearance.surfaceStyle` | `string` | `"tonal"` | `tonal` \| `glass` \| `flat` | Settings › Style | How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) \| glass (always see-through, with an edge) \| flat (solid, with an edge) |
+| `appearance.borderWidth` | `int` | `-1` | -1 … 4 | Settings › Style | Width of the outline of panels and cards in px; -1 = by the surface style. |
+| `appearance.textWeight` | `string` | `"normal"` | `light` \| `normal` \| `medium` | Settings › Style | The default weight of the interface text: light \| normal \| medium. |
+| `appearance.letterSpacing` | `real` | `0` | -1 … 3 | Settings › Style | Extra space between letters in px (negative = tighter). |
+| `appearance.looks` | `var` | `{}` |  | Settings > Interface > Save this look (a map of name -> options; hi look save <name>) | Your saved looks: name -> the appearance options it sets (hi look save <name>, Settings > Style). |
+| `appearance.animationBounce` | `real` | `1` | 0 … 2 | Settings › Motion | How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful |
 | `appearance.scheme` | `string` | `"tonal-spot"` | `tonal-spot` \| `content` \| `expressive` \| `fidelity` \| `fruit-salad` \| `monochrome` \| `neutral` \| `rainbow` \| `vibrant` | Settings › Overview | matugen scheme: tonal-spot, content, expressive, fidelity, fruit-salad, monochrome, neutral, rainbow, vibrant |
 | `appearance.autoMode` | `bool` | `false` |  | Settings › Overview | Switch dark / light at sunset / sunrise (from the weather service's location). |
-| `appearance.gtkColorScheme` | `bool` | `true` |  | Settings › Interface (advanced) | Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light. |
-| `appearance.screenCorners` | `int` | `16` | 0 … 64 | Settings › Interface | Rounded black screen corners, radius in px (0 = off). |
-| `appearance.contextMenu` | `string` | `"material"` | `material` \| `caelestia` \| `standard` | Settings › Interface | Context menus (the system tray's): material = the shell's own Material You menu, standard = the one the system draws. |
+| `appearance.gtkColorScheme` | `bool` | `true` |  | Settings › Style (advanced) | Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light. |
+| `appearance.screenCorners` | `int` | `16` | 0 … 64 | Settings › Style | Rounded black screen corners, radius in px (0 = off). |
+| `appearance.contextMenu` | `string` | `"material"` | `material` \| `caelestia` \| `standard` | Settings › Style | Context menus (the system tray's): material = the shell's own Material You menu, standard = the one the system draws. |
 
 ## bar
 
@@ -131,21 +131,21 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `sidebar.quickToggles.style` | `string` | `"android"` | `android` \| `classic` | Settings › Interface | android: two-column pills with labels \| classic: round icon buttons |
-| `sidebar.quickToggles.perPage` | `int` | `6` | 0 … 30 | Settings › Interface | Tiles per page in the android style (the rest go to further pages); 0 = all on one page |
-| `sidebar.quickToggles.slide` | `bool` | `true` |  | Settings › Interface | Slide between pages (off: switch instantly) |
+| `sidebar.quickToggles.style` | `string` | `"android"` | `android` \| `classic` | Settings › Sidebars & launcher | android: two-column pills with labels \| classic: round icon buttons |
+| `sidebar.quickToggles.perPage` | `int` | `6` | 0 … 30 | Settings › Sidebars & launcher | Tiles per page in the android style (the rest go to further pages); 0 = all on one page |
+| `sidebar.quickToggles.slide` | `bool` | `true` |  | Settings › Sidebars & launcher | Slide between pages (off: switch instantly) |
 | `sidebar.quickToggles.shown` | `list<string>` | `["wifi", "bluetooth", "darkMode", "nightLight", "dnd", "keepAwake", "mic", "gameMode", "focusSession", "colorPicker", "screenshot"]` |  | the pencil button in the right sidebar | Order matters. Available: wifi, bluetooth, darkMode, nightLight, dnd, keepAwake, mic, gameMode, vpn, happ, colorPicker, screenshot, coverMode, focusMode, displayMode, focusSession, waitMode (hidden by default: add it in the sidebar's tile editor) |
-| `sidebar.sections` | `list<string>` | `["quickToggles", "quickSliders", "tabs"]` |  | Settings › Interface | What the right sidebar shows under its header and in what order: quickToggles, quickSliders, tabs. Leave one out to hide it. |
-| `sidebar.tabs` | `list<string>` | `["notifications", "calendar", "todo", "timers"]` |  | Settings › Interface | The tabs of the "tabs" section, in order: notifications, calendar, todo, timers. |
-| `sidebar.nightLightTemperature` | `int` | `4500` | 1000 … 10000 | Settings › Interface | Night light color temperature (K) for hyprsunset. |
-| `sidebar.game` | `string` | `"dino"` |  | Settings › Interface | The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout |
+| `sidebar.sections` | `list<string>` | `["quickToggles", "quickSliders", "tabs"]` |  | Settings › Sidebars & launcher | What the right sidebar shows under its header and in what order: quickToggles, quickSliders, tabs. Leave one out to hide it. |
+| `sidebar.tabs` | `list<string>` | `["notifications", "calendar", "todo", "timers"]` |  | Settings › Sidebars & launcher | The tabs of the "tabs" section, in order: notifications, calendar, todo, timers. |
+| `sidebar.nightLightTemperature` | `int` | `4500` | 1000 … 10000 | Settings › Sidebars & launcher | Night light color temperature (K) for hyprsunset. |
+| `sidebar.game` | `string` | `"dino"` |  | Settings › Sidebars & launcher | The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout |
 
 ## launcher
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `launcher.prefixes` | `list<string>` | `["=", ">", "<", ":", ";", "/", "~"]` |  | Settings › Interface | The prefixes that switch the source, in the order of the chips under the empty search: = calculator, > run a command, < keybinds, : emoji, ; clipboard, / settings, ~ files. |
-| `launcher.sources` | `list<string>` | `["math", "focus", "windows", "settings", "apps", "emoji"]` |  | Settings › Interface | What a plain search looks through, and in what order the results come: math (a typed calculation), focus (Focus Mode), windows (open windows), settings (settings pages), apps, emoji. |
+| `launcher.prefixes` | `list<string>` | `["=", ">", "<", ":", ";", "/", "~"]` |  | Settings › Sidebars & launcher | The prefixes that switch the source, in the order of the chips under the empty search: = calculator, > run a command, < keybinds, : emoji, ; clipboard, / settings, ~ files. |
+| `launcher.sources` | `list<string>` | `["math", "focus", "windows", "settings", "apps", "emoji"]` |  | Settings › Sidebars & launcher | What a plain search looks through, and in what order the results come: math (a typed calculation), focus (Focus Mode), windows (open windows), settings (settings pages), apps, emoji. |
 
 ## spotify
 
@@ -204,8 +204,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appThemes.gtk` | `bool` | `false` |  | Settings › Interface | Write the wallpaper's colors into GTK 3 and 4 apps' gtk.css. |
-| `appThemes.neovim` | `bool` | `false` |  | Settings › Interface | Write the hi-shell color scheme for Neovim (`:colorscheme hi-shell`). |
+| `appThemes.gtk` | `bool` | `false` |  | Settings › Style | Write the wallpaper's colors into GTK 3 and 4 apps' gtk.css. |
+| `appThemes.neovim` | `bool` | `false` |  | Settings › Style | Write the hi-shell color scheme for Neovim (`:colorscheme hi-shell`). |
 
 ## idle
 
@@ -263,26 +263,26 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `greeting.enabled` | `bool` | `true` |  | Settings › Interface | Play the greeting at every start. |
-| `greeting.text` | `string` | `"Welcome back!"` |  | Settings › Interface | The greeting's text. |
-| `greeting.style` | `string` | `"random"` | `random` \| `rise` \| `drop` \| `pop` \| `slide` \| `spin` | Settings › Interface | random, or one of: rise, drop, pop, slide, spin |
-| `greeting.logo` | `bool` | `true` |  | Settings › Interface | The animated logo with the text |
+| `greeting.enabled` | `bool` | `true` |  | Settings › Motion | Play the greeting at every start. |
+| `greeting.text` | `string` | `"Welcome back!"` |  | Settings › Motion | The greeting's text. |
+| `greeting.style` | `string` | `"random"` | `random` \| `rise` \| `drop` \| `pop` \| `slide` \| `spin` | Settings › Motion | random, or one of: rise, drop, pop, slide, spin |
+| `greeting.logo` | `bool` | `true` |  | Settings › Motion | The animated logo with the text |
 
 ## viewing
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `viewing.auto` | `bool` | `true` |  | Settings › Interface | Viewing mode by itself: a fullscreen window while something plays. |
+| `viewing.auto` | `bool` | `true` |  | Settings › Modes | Viewing mode by itself: a fullscreen window while something plays. |
 
 ## presentation
 
 | Option | Type | Default | Values | Where | Description |
 | --- | --- | --- | --- | --- | --- |
-| `presentation.holdNotifications` | `bool` | `true` |  | Settings › Interface | What Presentation mode does while it's on. |
-| `presentation.keepAwake` | `bool` | `true` |  | Settings › Interface | Presentation mode keeps the screen awake. |
-| `presentation.nightLightOff` | `bool` | `true` |  | Settings › Interface | Presentation mode turns the night light off. |
-| `presentation.hideDesktopWidgets` | `bool` | `true` |  | Settings › Interface | Presentation mode hides the desktop widgets. |
-| `presentation.hideBar` | `bool` | `false` |  | Settings › Interface | Presentation mode hides the bar. |
+| `presentation.holdNotifications` | `bool` | `true` |  | Settings › Modes | What Presentation mode does while it's on. |
+| `presentation.keepAwake` | `bool` | `true` |  | Settings › Modes | Presentation mode keeps the screen awake. |
+| `presentation.nightLightOff` | `bool` | `true` |  | Settings › Modes | Presentation mode turns the night light off. |
+| `presentation.hideDesktopWidgets` | `bool` | `true` |  | Settings › Modes | Presentation mode hides the desktop widgets. |
+| `presentation.hideBar` | `bool` | `false` |  | Settings › Modes | Presentation mode hides the bar. |
 
 ## powerSaving
 

@@ -83,7 +83,7 @@ Singleton {
 
     // Open the first-run welcome again (five taps on the avatar in Settings).
     signal showWelcome()
-    // Play the startup greeting once more (Settings › Interface).
+    // Play the startup greeting once more (Settings › Motion).
     signal previewGreeting()
     // The easter egg in Settings › About: a key typed into the secret setting ("" = none).
     property string secretEgg: ""

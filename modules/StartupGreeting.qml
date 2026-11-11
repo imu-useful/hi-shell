@@ -72,7 +72,7 @@ Scope {
         command: ["sh", "-c", `mkdir -p "$(dirname "$1")" && date -Is > "$1"`, "sh", marker.path]
     }
 
-    // Settings › Interface › Preview
+    // Settings › Motion › Preview
     Connections {
         target: ShellState
         function onPreviewGreeting() {

@@ -16,175 +16,175 @@ const options = [
     },
     {
         "path": "appearance.themedIcons",
-        "page": "interface",
+        "page": "style",
         "text": "App icons in one color, the palette's primary (dock, workspaces, launcher).",
         "advanced": false
     },
     {
         "path": "appearance.restartOnIconTheme",
-        "page": "interface",
+        "page": "style",
         "text": "Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise).",
         "advanced": true
     },
     {
         "path": "appearance.transparency",
-        "page": "home",
+        "page": "style",
         "text": "Translucent surfaces (the compositor blurs what's behind them).",
         "advanced": false
     },
     {
         "path": "appearance.transparencyLevel",
-        "page": "interface",
+        "page": "style",
         "text": "How see-through the panels are when transparency is on: 0 = solid, 0.5 = half.",
         "advanced": false
     },
     {
         "path": "appearance.coverBackdrop",
-        "page": "interface",
+        "page": "style",
         "text": "The playing track's cover, blurred, behind the media cards.",
         "advanced": false
     },
     {
         "path": "appearance.fonts.main",
-        "page": "interface",
+        "page": "style",
         "text": "The interface font.",
         "advanced": false
     },
     {
         "path": "appearance.fonts.title",
-        "page": "interface",
+        "page": "style",
         "text": "The font of titles and headings.",
         "advanced": false
     },
     {
         "path": "appearance.fonts.mono",
-        "page": "interface",
+        "page": "style",
         "text": "The monospace font (code, terminal-like text).",
         "advanced": false
     },
     {
         "path": "appearance.cornerScale",
-        "page": "interface",
+        "page": "style",
         "text": "Scales for the design tokens (common/Appearance.qml): 0 = square corners, 1 = Material's.",
         "advanced": false
     },
     {
         "path": "appearance.fontScale",
-        "page": "interface",
+        "page": "style",
         "text": "Multiplier for every text size (0.6 – 2).",
         "advanced": false
     },
     {
         "path": "appearance.density",
-        "page": "interface",
+        "page": "style",
         "text": "compact | comfortable | spacious: the spacing between and inside elements.",
         "advanced": false
     },
     {
         "path": "appearance.seedColor",
-        "page": "interface",
+        "page": "style",
         "text": "A color (#rrggbb) to make the palette from instead of the wallpaper; empty = from the wallpaper.",
         "advanced": false
     },
     {
         "path": "appearance.contrast",
-        "page": "interface",
+        "page": "style",
         "text": "-1 (soft) .. 1 (strong): the palette's contrast.",
         "advanced": false
     },
     {
         "path": "appearance.animationSpeed",
-        "page": "interface",
+        "page": "motion",
         "text": "Global multiplier for animation durations (0 disables animations).",
         "advanced": false
     },
     {
         "path": "appearance.motionStyle",
-        "page": "interface",
+        "page": "motion",
         "text": "The feel of motion: expressive (springy) | smooth (gentle, slower) | snappy (quick, little spring)",
         "advanced": false
     },
     {
         "path": "appearance.popupEffect",
-        "page": "interface",
+        "page": "motion",
         "text": "How popups (calendar, weather, AI, overview) appear: pop (grow) | drop (grow from the edge) | slide | fade",
         "advanced": false
     },
     {
         "path": "appearance.sidebarEffect",
-        "page": "interface",
+        "page": "motion",
         "text": "How the sidebars appear: slide | pop (grow) | fade",
         "advanced": false
     },
     {
         "path": "appearance.paletteFade",
-        "page": "interface",
+        "page": "motion",
         "text": "How long the colors take to change into a new palette (wallpaper, dark / light), in ms; 0 = at once",
         "advanced": false
     },
     {
         "path": "appearance.launcherEffect",
-        "page": "interface",
+        "page": "motion",
         "text": "How the launcher appears: rise (from the screen's edge) | pop (grow) | fade",
         "advanced": false
     },
     {
         "path": "appearance.panelSpeed",
-        "page": "interface",
+        "page": "motion",
         "text": "Speed of the panels (sidebars, popups, launcher) on top of the global speed: 1 = as is, 2 = twice as fast.",
         "advanced": false
     },
     {
         "path": "appearance.barSpeed",
-        "page": "interface",
+        "page": "motion",
         "text": "Speed of the bar's motion (the workspace indicator) on top of the global speed.",
         "advanced": false
     },
     {
         "path": "appearance.notificationSpeed",
-        "page": "interface",
+        "page": "motion",
         "text": "Speed of the notification cards' motion on top of the global speed.",
         "advanced": false
     },
     {
         "path": "appearance.ripple",
-        "page": "interface",
+        "page": "motion",
         "text": "A wave grows from the point you press on buttons and rows.",
         "advanced": false
     },
     {
         "path": "appearance.pressScale",
-        "page": "interface",
+        "page": "motion",
         "text": "How small a pressed button gets: 1 = not at all, 0.9 = a tenth smaller.",
         "advanced": false
     },
     {
         "path": "appearance.surfaceStyle",
-        "page": "interface",
+        "page": "style",
         "text": "How panels and cards are drawn: tonal (the tone of the surface, a thin edge when see-through) | glass (always see-through, with an edge) | flat (solid, with an edge)",
         "advanced": false
     },
     {
         "path": "appearance.borderWidth",
-        "page": "interface",
+        "page": "style",
         "text": "Width of the outline of panels and cards in px; -1 = by the surface style.",
         "advanced": false
     },
     {
         "path": "appearance.textWeight",
-        "page": "interface",
+        "page": "style",
         "text": "The default weight of the interface text: light | normal | medium.",
         "advanced": false
     },
     {
         "path": "appearance.letterSpacing",
-        "page": "interface",
+        "page": "style",
         "text": "Extra space between letters in px (negative = tighter).",
         "advanced": false
     },
     {
         "path": "appearance.animationBounce",
-        "page": "interface",
+        "page": "motion",
         "text": "How far springy animations overshoot: 0 = none, 1 = Material's, 2 = playful",
         "advanced": false
     },
@@ -202,19 +202,19 @@ const options = [
     },
     {
         "path": "appearance.gtkColorScheme",
-        "page": "interface",
+        "page": "style",
         "text": "Also switch GTK apps (org.gnome.desktop.interface color-scheme) with dark / light.",
         "advanced": true
     },
     {
         "path": "appearance.screenCorners",
-        "page": "interface",
+        "page": "style",
         "text": "Rounded black screen corners, radius in px (0 = off).",
         "advanced": false
     },
     {
         "path": "appearance.contextMenu",
-        "page": "interface",
+        "page": "style",
         "text": "Context menus (the system tray's): material = the shell's own Material You menu, standard = the one the system draws.",
         "advanced": false
     },
@@ -406,43 +406,43 @@ const options = [
     },
     {
         "path": "sidebar.quickToggles.style",
-        "page": "interface",
+        "page": "panels",
         "text": "android: two-column pills with labels | classic: round icon buttons",
         "advanced": false
     },
     {
         "path": "sidebar.quickToggles.perPage",
-        "page": "interface",
+        "page": "panels",
         "text": "Tiles per page in the android style (the rest go to further pages); 0 = all on one page",
         "advanced": false
     },
     {
         "path": "sidebar.quickToggles.slide",
-        "page": "interface",
+        "page": "panels",
         "text": "Slide between pages (off: switch instantly)",
         "advanced": false
     },
     {
         "path": "sidebar.sections",
-        "page": "interface",
+        "page": "panels",
         "text": "What the right sidebar shows under its header and in what order: quickToggles, quickSliders, tabs. Leave one out to hide it.",
         "advanced": false
     },
     {
         "path": "sidebar.tabs",
-        "page": "interface",
+        "page": "panels",
         "text": "The tabs of the \"tabs\" section, in order: notifications, calendar, todo, timers.",
         "advanced": false
     },
     {
         "path": "sidebar.nightLightTemperature",
-        "page": "interface",
+        "page": "panels",
         "text": "Night light color temperature (K) for hyprsunset.",
         "advanced": false
     },
     {
         "path": "sidebar.game",
-        "page": "interface",
+        "page": "panels",
         "text": "The game in the empty notification center: dino, snake, minesweeper, game2048, flappy, memory, tictactoe, puzzle or lightsout",
         "advanced": false
     },
@@ -454,7 +454,7 @@ const options = [
     },
     {
         "path": "settingsAdvanced",
-        "page": "home",
+        "page": "style",
         "text": "Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them.",
         "advanced": false
     },
@@ -466,13 +466,13 @@ const options = [
     },
     {
         "path": "launcher.prefixes",
-        "page": "interface",
+        "page": "panels",
         "text": "The prefixes that switch the source, in the order of the chips under the empty search: = calculator, > run a command, < keybinds, : emoji, ; clipboard, / settings, ~ files.",
         "advanced": false
     },
     {
         "path": "launcher.sources",
-        "page": "interface",
+        "page": "panels",
         "text": "What a plain search looks through, and in what order the results come: math (a typed calculation), focus (Focus Mode), windows (open windows), settings (settings pages), apps, emoji.",
         "advanced": false
     },
@@ -658,13 +658,13 @@ const options = [
     },
     {
         "path": "appThemes.gtk",
-        "page": "interface",
+        "page": "style",
         "text": "Write the wallpaper's colors into GTK 3 and 4 apps' gtk.css.",
         "advanced": false
     },
     {
         "path": "appThemes.neovim",
-        "page": "interface",
+        "page": "style",
         "text": "Write the hi-shell color scheme for Neovim (`:colorscheme hi-shell`).",
         "advanced": false
     },
@@ -892,61 +892,61 @@ const options = [
     },
     {
         "path": "greeting.enabled",
-        "page": "interface",
+        "page": "motion",
         "text": "Play the greeting at every start.",
         "advanced": false
     },
     {
         "path": "greeting.text",
-        "page": "interface",
+        "page": "motion",
         "text": "The greeting's text.",
         "advanced": false
     },
     {
         "path": "greeting.style",
-        "page": "interface",
+        "page": "motion",
         "text": "random, or one of: rise, drop, pop, slide, spin",
         "advanced": false
     },
     {
         "path": "greeting.logo",
-        "page": "interface",
+        "page": "motion",
         "text": "The animated logo with the text",
         "advanced": false
     },
     {
         "path": "viewing.auto",
-        "page": "interface",
+        "page": "modes",
         "text": "Viewing mode by itself: a fullscreen window while something plays.",
         "advanced": false
     },
     {
         "path": "presentation.holdNotifications",
-        "page": "interface",
+        "page": "modes",
         "text": "What Presentation mode does while it's on.",
         "advanced": false
     },
     {
         "path": "presentation.keepAwake",
-        "page": "interface",
+        "page": "modes",
         "text": "Presentation mode keeps the screen awake.",
         "advanced": false
     },
     {
         "path": "presentation.nightLightOff",
-        "page": "interface",
+        "page": "modes",
         "text": "Presentation mode turns the night light off.",
         "advanced": false
     },
     {
         "path": "presentation.hideDesktopWidgets",
-        "page": "interface",
+        "page": "modes",
         "text": "Presentation mode hides the desktop widgets.",
         "advanced": false
     },
     {
         "path": "presentation.hideBar",
-        "page": "interface",
+        "page": "modes",
         "text": "Presentation mode hides the bar.",
         "advanced": false
     },
