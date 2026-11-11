@@ -21,7 +21,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 
 <br>
 
-<img src="docs/screenshots/desktop.webp" alt="hi-shell desktop: bar, widgets and the wallpaper in a Material shape" width="100%">
+<img src="docs/keynote.webp" alt="hi-shell keynote: the show that opens the first run (rendered with tools/render_keynote.sh)" width="100%">
 
 </div>
 
