@@ -65,10 +65,22 @@ record() {
     echo "== $name"
     wf-recorder -o "$OUTPUT" -f "$raw" -y >/dev/null 2>&1 &
     local pid=$!
+    # Another window that asks for focus (a terminal printing, a notification) can switch the workspace
+    # mid-clip and get into the frame: watch for that, and keep the old clip when it happens.
+    local moved="$TMP/$name.moved"
+    rm -f "$moved"
+    ( while :; do [ "$(ws_info | cut -d" " -f1)" = "$TARGET" ] || touch "$moved"; sleep 0.2; done ) &
+    local watch=$!
     sleep 1.0
     "clip_$name"
     sleep 0.6
     kill -INT $pid 2>/dev/null; wait $pid 2>/dev/null
+    kill $watch 2>/dev/null; wait $watch 2>/dev/null
+    if [ -e "$moved" ]; then
+        echo "   the workspace changed while recording: $name.webp is kept as it was; run it again" >&2
+        focus_ws "$TARGET"
+        return 1
+    fi
     ffmpeg -v error -y -ss 0.5 -i "$raw" \
         -vf "fps=$FPS,scale=$WIDTH:-1:flags=lanczos" \
         -c:v libwebp_anim -lossless 0 -q:v 68 -compression_level 4 -loop 0 "$OUT/$name.webp"
@@ -88,8 +100,8 @@ clip_sidebar() {
     "${QS[@]}" sidebarRight close; sleep 0.8
 }
 clip_settings() {
-    for page in quick general bar desktop interface sounds; do
-        "${QS[@]}" settings open "$page"; sleep 1.5
+    for page in home style motion wallpaper bar bar/widgets bar/island dock notifications rules; do
+        "${QS[@]}" settings open "$page"; sleep 1.4
     done
     "${QS[@]}" settings close; sleep 0.8
 }

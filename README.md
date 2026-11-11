@@ -316,6 +316,10 @@ A new resolution, orientation or scale for a monitor is tried first: a "Keep the
 15 seconds and puts the old settings back (Revert, Esc or no answer); only Keep saves them.
 A value that breaks its rule in `common/ConfigSchema.js` (a typo in `bar.position`, a `lock.brightness` of 7) is reported in the log (`qs -c hi-shell log`) and replaced by its default; `python3 tools/audit_config.py` lists the options that have no control in the settings app (`docs/CONFIG_AUDIT.md`).
 The full list of options (type, default, allowed values, where Settings changes it) is in [docs/CONFIG.md](docs/CONFIG.md), made from the source; `hi config search <word>` finds an option by name or description. Settings has a search box (also `hi settings search <word>`) and hides the rarely needed rows until you turn on Settings › Overview › Advanced settings (`settingsAdvanced`).
+Settings opens on an Overview (wallpaper and colors, quick switches, every page); the other pages are grouped into Personalization,
+Desktop, System & apps, Habits & automation and Shell. Ctrl+Tab / Ctrl+Shift+Tab step through the pages, Ctrl+PageUp /
+Ctrl+PageDown through the tabs of a page (Bar: Layout, Widgets, Your own widgets, Dynamic Island), Ctrl+F jumps to the search;
+`hi settings bar/island` opens one tab.
 Sections:
 
 - `language`: `auto` (from `$LANG`), `en` or `ru`

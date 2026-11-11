@@ -97,7 +97,8 @@ Notes:
 | Function | What it does |
 |---|---|
 | `toggle` / `close` | As usual |
-| `open [page]` | Open, optionally on a page: `quick`, `general`, `bar`, `desktop`, `interface`, `services`, `hyprland`, `about` |
+| `open [page]` | Open, optionally on a page (`home`, `style`, `motion`, `wallpaper`, `bar`, `dock`, `desktop`, `notifications`, `power`, `services`, `hyprland`, `rules`, `about`, ...; the full list is `modules/settings/Pages.js`) or one tab of it: `bar/island`. The old ids `quick` and `interface` still work |
+| `search <text>` | Open with the search box filled |
 
 ### processes: the process manager
 
