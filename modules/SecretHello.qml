@@ -7,7 +7,7 @@ import qs.common.widgets
 import qs.modules.secret
 
 // Easter egg (Settings › About, the key "hi"): a full-screen surprise picked by the key: "hi" the animated
-// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"), "hyperos" (also "hyper os", "xiaomi"), "aero" (also "frutiger", "frutiger aero"), "rice" (also "ricing", "eye candy", "eyecandy", "trip"), "keynote" (also "presentation", "презентация", "event"). A click or Esc closes it.
+// logo, "matrix", "confetti", "sudo", "arch", "42", "disco", "nyan", "man", "egg", "undertale", "story", "mania", "osu", "math" (also "maths", "математика"), "material" (also "material you", "m3", "expressive"), "liquid glass" (also "liquid", "glass", "lg"), "nothing" (also "nothing os", "nothingos", "nothing ui", "nothingui", "ndot"), "coloros" (also "color os", "oppo", "aquamorphic"), "oneui" (also "one ui", "samsung"), "hyperos" (also "hyper os", "xiaomi"), "aero" (also "frutiger", "frutiger aero"), "rice" (also "ricing", "eye candy", "eyecandy", "trip"), "keynote" (also "presentation", "презентация", "event"). A click or Esc closes it.
 Scope {
     id: root
 
@@ -68,6 +68,9 @@ Scope {
                         story: story,
                         mania: mania,
                         osu: mania,
+                        math: mathrush,
+                        maths: mathrush,
+                        "математика": mathrush,
                         material: material,
                         "liquid glass": glass,
                         nothing: nothing,
@@ -124,6 +127,7 @@ Scope {
                 Component { id: glass; LiquidGlass { revealed: loader.revealed } }
                 Component { id: material; MaterialYou { revealed: loader.revealed } }
                 Component { id: mania; Mania { revealed: loader.revealed } }
+                Component { id: mathrush; MathRush { revealed: loader.revealed } }
                 Component { id: man; Man { revealed: loader.revealed } }
                 Component { id: story; Story { revealed: loader.revealed; onFinished: root.close() } }
                 Component {
