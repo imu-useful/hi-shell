@@ -27,6 +27,12 @@ const options = [
         "advanced": true
     },
     {
+        "path": "appearance.cursorSize",
+        "page": "icons",
+        "text": "The cursor size in pixels (12 – 128).",
+        "advanced": false
+    },
+    {
         "path": "appearance.transparency",
         "page": "style",
         "text": "Translucent surfaces (the compositor blurs what's behind them).",

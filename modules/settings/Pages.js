@@ -15,7 +15,7 @@ const groups = [
 const pages = [
     { id: "home", title: "Overview", icon: "home", group: "", description: "Wallpaper, colors, quick switches and every page", keywords: "overview home start quick wallpaper colors color scheme palette dark light mode auto transparency matugen theme power saving do not disturb dnd night light game mode advanced" },
     { id: "style", title: "Style", icon: "palette", group: "personalize", description: "Looks, palette, shape, surfaces, fonts and app themes", keywords: "style looks look palette seed color contrast shape size density corners roundness text size screen corners surfaces tonal glass flat outline border transparency opacity blur cover context menu fonts font weight letter spacing app themes gtk neovim icons themed" },
-    { id: "icons", title: "Icons", icon: "interests", group: "personalize", description: "Icon themes, and a store to get new ones", keywords: "icons icon theme themes store shop kde store download install papirus tela breeze candy folders app icons pack packs" },
+    { id: "icons", title: "Icons & cursors", icon: "interests", group: "personalize", description: "Icon and cursor themes, and a store to get new ones", keywords: "icons icon theme themes store shop kde store download install papirus tela breeze candy folders app icons pack packs cursor cursors mouse pointer arrow bibata size" },
     { id: "motion", title: "Motion", icon: "animation", group: "personalize", description: "Animation speed and feel, effects and the startup greeting", keywords: "motion animation animations speed spring bounce overshoot ripple press squeeze color fade popup effect launcher effect sidebar effect panels bar notifications greeting startup welcome" },
     { id: "wallpaper", title: "Wallpaper", icon: "wallpaper", group: "personalize", description: "Wallpaper, slideshow, the frame and online wallpapers", keywords: "wallpaper wallpapers background draw live video gif slideshow random download folder cover mode clean desktop frame shape dance music beat image unsplash wallhaven api key folders online" },
     { id: "lock", title: "Lock screen", icon: "lock", group: "personalize", description: "What the lock screen shows and when it locks", keywords: "lock screen clock date greeting avatar password battery keyboard layout caps lock now playing blur brightness wallpaper" },
@@ -45,8 +45,10 @@ const pages = [
 // search hit opens the right one; options not listed are on the first tab.
 const tabs = {
     icons: [
-        { id: "installed", title: "Installed", icon: "interests", options: [] },
-        { id: "store", title: "Store", icon: "storefront", options: [] }
+        { id: "installed", title: "Icons", icon: "interests", options: [] },
+        { id: "store", title: "Icon store", icon: "storefront", options: [] },
+        { id: "cursors", title: "Cursors", icon: "arrow_selector_tool", options: ["appearance.cursor"] },
+        { id: "cursorstore", title: "Cursor store", icon: "shopping_bag", options: [] }
     ],
     bar: [
         { id: "layout", title: "Layout", icon: "view_quilt", options: [] },

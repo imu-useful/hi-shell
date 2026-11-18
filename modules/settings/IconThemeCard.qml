@@ -4,13 +4,15 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// An installed icon theme: a few of its icons and its name; a tap applies it, the bin removes
+// An installed icon or cursor theme: a few of its icons and its name; a tap applies it, the bin removes
 // a theme of the user's own (not the one in use).
 Rectangle {
     id: root
 
+    // IconStore.icons or IconStore.cursors
+    required property var store
     required property var theme
-    readonly property bool active: theme.id === IconStore.current
+    readonly property bool active: theme.id === root.store.current
 
     implicitHeight: col.implicitHeight + 24
     radius: Appearance.rounding.large
@@ -20,7 +22,7 @@ Rectangle {
 
     StateLayer {
         enabled: !root.active
-        onClicked: IconStore.apply(root.theme.id)
+        onClicked: root.store.apply(root.theme.id)
     }
 
     ColumnLayout {
@@ -70,7 +72,7 @@ Rectangle {
                 implicitHeight: 28
                 icon: "delete"
                 tooltip: Translation.tr("Remove")
-                onClicked: IconStore.remove(root.theme.id)
+                onClicked: root.store.remove(root.theme.id)
             }
         }
     }

@@ -20,6 +20,9 @@
         "ui": "file: a role -> #rrggbb map; hi config map appearance.colorOverrides primary '\"#ff6a00\"'",
         "advanced": true
     },
+    "appearance.cursorTheme": {
+        "ui": "elsewhere: Settings > Icons & cursors > Cursors (a tap on a theme sets it)"
+    },
     "appearance.fonts.icon": {
         "ui": "file: the icon font is made by the shell; only change it for a different Material Symbols build",
         "advanced": true

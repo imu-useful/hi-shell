@@ -43,7 +43,7 @@ class TranslationsTest(unittest.TestCase):
         ru = json.loads((ROOT / "translations" / "ru.json").read_text())
         files = ["modules/settings/BarPage.qml", "modules/settings/StylePage.qml", "modules/settings/MotionPage.qml", "modules/settings/PanelsPage.qml", "modules/settings/ModesPage.qml", "modules/settings/WallpaperPage.qml", "modules/settings/DockPage.qml", "modules/settings/NotificationsPage.qml", "modules/settings/PowerPage.qml", "modules/settings/ContentFilterPage.qml", "modules/BarEditor.qml", "modules/settings/OrderedChips.qml",
                  "services/UserWidgets.qml", "services/Ollama.qml", "modules/ai/OllamaPull.qml", "modules/settings/RuleEditor.qml", "modules/settings/RuleCondRow.qml", "modules/settings/RuleActionRow.qml", "modules/settings/DesktopPage.qml", "modules/settings/HomePage.qml", "modules/Settings.qml", "modules/settings/RulesPage.qml", "services/Presets.qml",
-                 "modules/settings/IconsPage.qml", "modules/settings/IconThemeCard.qml", "modules/settings/StoreThemeCard.qml", "services/IconStore.qml"]
+                 "modules/settings/IconsPage.qml", "modules/settings/IconThemeCard.qml", "modules/settings/StoreThemeCard.qml", "services/ThemeStore.qml"]
         missing = []
         for f in files:
             text = (ROOT / f).read_text()

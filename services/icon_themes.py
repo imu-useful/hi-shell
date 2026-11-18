@@ -9,7 +9,8 @@
     icon_themes.py remove THEME                   -> {"removed": THEME}
 
 Errors are {"error": "..."} on stdout with exit code 1. The store is store.kde.org's OCS API
-(category 132, Full Icon Themes); installed themes go to ~/.local/share/icons.
+(category 132, Full Icon Themes); installed themes go to ~/.local/share/icons. The store, download
+and unpacking parts are shared with cursor_themes.py (category 107, Cursors).
 """
 import argparse
 import json
@@ -204,8 +205,8 @@ def fetch_json(url: str) -> dict:
     return data
 
 
-def search_url(query: str, sort: str, page: int) -> str:
-    params = {"categories": CATEGORY, "format": "json", "sortmode": SORTS.get(sort, "down"),
+def search_url(query: str, sort: str, page: int, category: int = CATEGORY) -> str:
+    params = {"categories": category, "format": "json", "sortmode": SORTS.get(sort, "down"),
               "pagesize": PAGE_SIZE, "page": max(0, page)}
     if query.strip():
         params["search"] = query.strip()
@@ -258,14 +259,16 @@ def item_of(entry: dict) -> dict:
     }
 
 
-def search(query: str, sort: str, page: int) -> dict:
-    data = fetch_json(search_url(query, sort, page))
+def search(query: str, sort: str, page: int, category: int = CATEGORY) -> dict:
+    data = fetch_json(search_url(query, sort, page, category))
     items = [item_of(e) for e in data.get("data") or [] if isinstance(e, dict)]
     return {"total": int(data.get("totalitems") or 0), "page": page, "items": items}
 
 
 def is_archive(name: str) -> bool:
-    return name.lower().endswith(ARCHIVES)
+    """An archive we can unpack, and not a Windows build of the theme (.cur / .ico files)."""
+    low = name.lower()
+    return low.endswith(ARCHIVES) and "windows" not in low
 
 
 # --- installing ----------------------------------------------------------------------------------
@@ -334,19 +337,19 @@ def find_themes(root: Path) -> list[Path]:
     return found
 
 
-def unpack_all(archive: Path, work: Path) -> list[Path]:
+def unpack_all(archive: Path, work: Path, finder=find_themes) -> list[Path]:
     """Themes in the archive; archives inside it (one per variant, say) are unpacked when it has none."""
     out = work / "x"
     out.mkdir()
     extract(archive, out)
-    themes = find_themes(out)
+    themes = finder(out)
     if themes:
         return themes
     for i, inner in enumerate(p for p in sorted(out.rglob("*")) if p.is_file() and is_archive(p.name)):
         sub = work / f"inner{i}"
         sub.mkdir()
         extract(inner, sub)
-        themes += find_themes(sub)
+        themes += finder(sub)
     return themes
 
 
@@ -378,8 +381,9 @@ def pick_file(files: list[dict], index: int | None) -> dict:
     return archives[0]
 
 
-def record(product: str, themes: list[str]) -> None:
-    state = Path(os.environ.get("XDG_STATE_HOME") or home() / ".local" / "state") / "hi-shell" / "icon-store.json"
+def record(product: str, themes: list[str], state_file: str = "icon-store.json") -> None:
+    """Remember which theme folders came from which store entry (Settings shows Apply for them)."""
+    state = Path(os.environ.get("XDG_STATE_HOME") or home() / ".local" / "state") / "hi-shell" / state_file
     try:
         data = json.loads(state.read_text())
     except (OSError, ValueError):
@@ -389,7 +393,8 @@ def record(product: str, themes: list[str]) -> None:
     state.write_text(json.dumps(data, indent=1))
 
 
-def install(product: str, file_index: int | None) -> dict:
+def install(product: str, file_index: int | None, category: int = CATEGORY, finder=find_themes,
+            state_file: str = "icon-store.json", what: str = "icon theme") -> dict:
     if not product.isdigit():
         raise Failure("not a store id")
     data = fetch_json(f"{API}/{product}?format=json")
@@ -397,8 +402,8 @@ def install(product: str, file_index: int | None) -> dict:
     if not entries:
         raise Failure("no such theme in the store")
     entry = entries[0]
-    if str(entry.get("typeid")) != str(CATEGORY):
-        raise Failure("that isn't an icon theme")
+    if str(entry.get("typeid")) != str(category):
+        raise Failure(f"that isn't an {what}" if what[0] in "aeiou" else f"that isn't a {what}")
     chosen = pick_file(files_of(entry), file_index)
     link = entry.get(f"downloadlink{chosen['index']}") or ""
     if not link.startswith("https://"):
@@ -410,11 +415,11 @@ def install(product: str, file_index: int | None) -> dict:
         archive = work / Path(chosen["name"]).name
         download(link, archive)
         emit({"progress": 1, "status": "unpacking"})
-        themes = unpack_all(archive, work)
+        themes = unpack_all(archive, work, finder)
         if not themes:
-            raise Failure("no icon theme in the archive (it may need its own installer)")
+            raise Failure(f"no {what} in the archive (it may need its own installer)")
         names = [place(t, icons) for t in themes]
-    record(product, names)
+    record(product, names, state_file)
     return {"installed": names, "product": product}
 
 

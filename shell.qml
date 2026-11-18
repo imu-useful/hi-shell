@@ -40,6 +40,7 @@ ShellRoot {
     IslandOverlay {}
 
     IconThemeWatcher {}
+    CursorKeeper {}
 
     Launcher {}
 

@@ -4,14 +4,16 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// An icon theme in the KDE Store: its picture, name, author, downloads and rating; Install
+// An icon or cursor theme in the KDE Store: its picture, name, author, downloads and rating; Install
 // (a theme shipped in several variants asks which one), the download's progress, then Apply.
 Rectangle {
     id: root
 
+    // IconStore.icons or IconStore.cursors
+    required property var store
     required property var item
-    readonly property var have: IconStore.installedFrom(item.id, item.files.map(f => variant(f)).concat([item.name]))
-    readonly property bool busy: IconStore.installing === item.id
+    readonly property var have: root.store.installedFrom(item.id, item.files.map(f => variant(f)).concat([item.name]))
+    readonly property bool busy: root.store.installing === item.id
     property bool picking: false
 
     function count(n) {
@@ -90,7 +92,7 @@ Rectangle {
                 radius: 2
                 color: Colors.m3surfaceContainerHighest
                 Rectangle {
-                    width: parent.width * Math.max(0.04, IconStore.fraction)
+                    width: parent.width * Math.max(0.04, root.store.fraction)
                     height: parent.height
                     radius: 2
                     color: Colors.m3primary
@@ -100,7 +102,7 @@ Rectangle {
                 Layout.fillWidth: true
                 StyledText {
                     Layout.fillWidth: true
-                    text: IconStore.status + (IconStore.fraction >= 0 && IconStore.fraction < 1 ? ` ${Math.round(IconStore.fraction * 100)}%` : "")
+                    text: root.store.status + (root.store.fraction >= 0 && root.store.fraction < 1 ? ` ${Math.round(root.store.fraction * 100)}%` : "")
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant
                 }
@@ -109,7 +111,7 @@ Rectangle {
                     implicitHeight: 28
                     icon: "close"
                     tooltip: Translation.tr("Stop the download")
-                    onClicked: IconStore.cancelInstall()
+                    onClicked: root.store.cancelInstall()
                 }
             }
         }
@@ -127,7 +129,7 @@ Rectangle {
                     icon: "download"
                     onClicked: {
                         root.picking = false;
-                        IconStore.install(root.item, modelData.index);
+                        root.store.install(root.item, modelData.index);
                     }
                 }
             }
@@ -150,16 +152,16 @@ Rectangle {
                 model: root.have
                 M3Button {
                     required property string modelData
-                    readonly property bool inUse: modelData === IconStore.current
+                    readonly property bool inUse: modelData === root.store.current
                     tonal: inUse
                     icon: inUse ? "check" : "brush"
                     text: inUse ? Translation.tr("In use") : (root.have.length > 1 ? Translation.tr("Apply %1").arg(modelData) : Translation.tr("Apply"))
-                    onClicked: if (!inUse) IconStore.apply(modelData)
+                    onClicked: if (!inUse) root.store.apply(modelData)
                 }
             }
             M3Button {
                 tonal: root.have.length > 0
-                enabled: IconStore.installing === ""
+                enabled: root.store.installing === ""
                 icon: root.picking ? "close" : "download"
                 text: root.picking ? Translation.tr("Cancel")
                     : root.item.files.length > 1 ? Translation.tr("Install…")
@@ -168,7 +170,7 @@ Rectangle {
                     if (root.item.files.length > 1)
                         root.picking = !root.picking;
                     else
-                        IconStore.install(root.item, root.item.files[0].index);
+                        root.store.install(root.item, root.item.files[0].index);
                 }
             }
         }
