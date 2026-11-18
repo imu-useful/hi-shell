@@ -30,6 +30,8 @@ Item {
     property bool pill: (bar?.style ?? "float") !== "islands"
     property bool active: false
     property bool clickable: false
+    // The hover tint over the widget (the Dynamic Island turns it off while it is grown open).
+    property bool hoverTint: true
     property bool scrollable: false
     property real padding: 10
     property real contentWidth: 0
@@ -81,7 +83,7 @@ Item {
             anchors.fill: parent
             radius: root.clickable && area.pressed ? Appearance.rounding.medium : Appearance.shape.button
             color: Colors.m3onSurface
-            opacity: parent.pressed ? Appearance.state.press + 0.02 : root.hovered ? Appearance.state.hover : 0
+            opacity: parent.pressed ? Appearance.state.press + 0.02 : root.hovered && root.hoverTint ? Appearance.state.hover : 0
             Behavior on opacity { EffectAnim { duration: Appearance.anim.fast } }
         }
     }

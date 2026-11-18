@@ -96,6 +96,11 @@ PanelWindow {
     readonly property real islandW: islandKnown ? islandLoader.width : 0
     readonly property real islandH: islandKnown ? islandLoader.height : 0
     readonly property real narrow: islandKnown ? collapse : 0
+    // On a horizontal bar the island has a body of its own (Clock.qml) that grows out of the bar into a card:
+    // the window keeps room for it (transparent, outside the input mask while it is closed), and the bar's
+    // background under it fades out as it narrows to it, instead of a ring around the island.
+    readonly property Item islandBody: islandLoader?.item?.body ?? null
+    readonly property int islandRoom: !vertical && hasClock && Services.Island.enabled ? 340 : 0
     // Which section holds the clock, and where (index in it).
     readonly property string islandSection: leftIds.includes("clock") ? "left" : centerIds.includes("clock") ? "center" : rightIds.includes("clock") ? "right" : ""
 
@@ -215,8 +220,11 @@ PanelWindow {
     visible: !ShellState.barHidden
     exclusiveZone: thickness + margin
     implicitWidth: thickness + margin + cornerSize
-    implicitHeight: thickness + margin + cornerSize
-    mask: Region { item: barArea }
+    implicitHeight: thickness + margin + cornerSize + islandRoom
+    mask: Region {
+        item: barArea
+        regions: [Region { item: root.islandBody }]
+    }
     color: "transparent"
 
     WlrLayershell.namespace: "hi-shell-bar"
@@ -260,6 +268,7 @@ PanelWindow {
                 width: root.vertical ? parent.width : parent.width + root.narrow * (root.islandW + pad * 2 - parent.width)
                 height: root.vertical ? parent.height + root.narrow * (root.islandH + pad * 2 - parent.height) : parent.height
                 visible: root.style !== "islands"
+                opacity: root.islandBody ? 1 - root.narrow : 1
                 transform: Translate { y: Services.Island.drop }
                 radius: (root.edgeToEdge ? 0 : Appearance.rounding.full) * (1 - root.narrow) + Math.min(width, height) / 2 * root.narrow
                 color: root.barColor
@@ -405,6 +414,7 @@ PanelWindow {
                         z: -1
                         radius: Appearance.rounding.full
                         color: root.barColor
+                        opacity: modelData === root.islandSec && root.islandBody ? 1 - root.collapse : 1
                         // The island's own pill bounces with it.
                         transform: Translate { y: modelData === root.islandSec ? Services.Island.drop : 0 }
                     }
@@ -421,7 +431,7 @@ PanelWindow {
             required property int index
             readonly property bool second: index === 1
             x: root.vertical ? (root.position === "left" ? root.thickness : 0) : (second ? parent.width - width : 0)
-            y: root.vertical ? (second ? parent.height - height : 0) : (root.position === "top" ? root.thickness : 0)
+            y: root.vertical ? (second ? parent.height - height : 0) : (root.position === "top" ? root.thickness : parent.height - root.thickness - height)
             flipX: root.vertical ? root.position === "right" : second
             flipY: root.vertical ? second : root.position === "bottom"
             size: root.cornerSize

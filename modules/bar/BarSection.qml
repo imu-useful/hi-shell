@@ -25,6 +25,8 @@ GridLayout {
     // The Loader of the island (the clock) when it is in this section.
     property Item islandLoader: null
 
+    // The island's body grows over its neighbours: its section and its Loader go on top.
+    z: islandLoader ? 1 : 0
     flow: bar.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
     rows: bar.vertical ? -1 : 1
     columns: bar.vertical ? 1 : -1
@@ -50,6 +52,7 @@ GridLayout {
             readonly property int dir: root.side !== 0 ? -root.side : (index < root.islandIndex ? 1 : -1)
             readonly property real keep: isIsland ? 1 : 1 - root.collapse
 
+            z: isIsland ? 1 : 0
             Layout.alignment: Qt.AlignCenter
             // activeWindow / media may shrink to fit; Layout reads these from the item.
             Layout.fillWidth: !root.bar.vertical && (item?.Layout.fillWidth ?? false) && root.collapse === 0

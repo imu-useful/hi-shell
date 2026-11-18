@@ -105,8 +105,8 @@ Scope {
                         Behavior on width { SpatialAnim {} }
                         height: 38
                         radius: height / 2
-                        color: Appearance.translucent(Colors.m3surfaceContainerHighest, 0.05)
-                        border.width: 1
+                        color: Island.color
+                        border.width: Colors.dark ? 0 : 1
                         border.color: Qt.alpha(Colors.m3outlineVariant, 0.6)
                         // Drops in and bounces like a ball, and goes back up quickly.
                         Behavior on slide {

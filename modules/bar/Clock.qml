@@ -12,11 +12,19 @@ import qs.services
 // In the music state it shows the cover and the track, and a tap opens the player's controls.
 // A notification (Island.notif) takes the pill over until it times out (a tap dismisses it); the
 // camera / microphone indicator (PrivacyPill) sits at its start for as long as one is in use.
+// On a horizontal bar the island is a capsule of its own (Island.color), apart from the bar, and it grows
+// down out of the bar into a card in the same shape: the notification's text and buttons while the pointer
+// is on it, the player's controls after a tap in the music state. A vertical bar keeps popups for these.
 BarWidget {
     id: root
 
     readonly property var options: Config.options.bar.clock
 
+    // The island has its own body (`body` below), drawn instead of the widget's pill.
+    readonly property bool island: Island.enabled && !vertical
+    readonly property Item body: island ? islandBody : null
+    pill: !island && (bar?.style ?? "float") !== "islands"
+    hoverTint: !island || islandBody.grow < 0.01
     clickable: true
     active: ShellState.calendarOpen
     padding: 4
@@ -40,6 +48,36 @@ BarWidget {
     transform: Translate { y: Island.drop }
     // Hovering the island (with a notification) or its buttons holds the countdown.
     onHoveredChanged: Island.setHover("bar", hovered)
+    readonly property bool anyHover: hovered || bodyHover.hovered
+
+    // What the island is grown open with: "notif" (the pointer on a notification, once it has landed),
+    // "music" (a tap in the music state) or "" (closed). The notification goes on a moment after the pointer
+    // leaves, so moving from the face onto the card doesn't close it.
+    readonly property bool notifWanted: island && notifying && Island.cardReady && anyHover
+    property bool notifOpen: false
+    onNotifWantedChanged: {
+        if (notifWanted) {
+            notifClose.stop();
+            notifOpen = true;
+        } else if (!Island.cardReady) {
+            notifClose.stop();
+            notifOpen = false;
+        } else {
+            notifClose.restart();
+        }
+    }
+    Timer {
+        id: notifClose
+        interval: 250
+        onTriggered: root.notifOpen = false
+    }
+    readonly property string openKind: notifOpen && notifying ? "notif" : island && Island.musicExpanded ? "music" : ""
+    // The player's controls go when the pointer has left the island (also when opened over IPC, without it).
+    Timer {
+        interval: 700
+        running: root.island && Island.musicExpanded && !root.anyHover
+        onTriggered: Island.expanded = false
+    }
     onPressedDown: {
         if (Island.canSwitch)
             ShellState.startIslandHold();
@@ -144,7 +182,7 @@ BarWidget {
     // Music state: the cover, "title • artist", and the paused mark.
     RowLayout {
         id: musicRow
-        readonly property bool on: root.music && !root.takenOver
+        readonly property bool on: root.music && !root.takenOver && islandBody.kind !== "music"
         opacity: on ? 1 : 0
         visible: opacity > 0.01
         Behavior on opacity { FadeAnim { incoming: musicRow.on } }
@@ -227,7 +265,7 @@ BarWidget {
     StyledPopup {
         id: musicPopup
         target: root
-        hovered: Island.musicExpanded && root.hovered
+        hovered: root.vertical && Island.musicExpanded && root.hovered
         edge: root.popupEdge
         onShownChanged: if (!shown) Island.expanded = false
 
@@ -236,7 +274,7 @@ BarWidget {
     // Opened without the pointer on the island (over IPC): nothing would ever close it.
     Timer {
         interval: 1500
-        running: Island.musicExpanded && !musicPopup.shown
+        running: root.vertical && Island.musicExpanded && !musicPopup.shown
         onTriggered: Island.expanded = false
     }
 
@@ -244,7 +282,7 @@ BarWidget {
     PopupWindow {
         id: actionsPopup
 
-        readonly property bool wanted: root.notifying && (root.hovered || popupHover.hovered)
+        readonly property bool wanted: root.vertical && root.notifying && (root.hovered || popupHover.hovered)
         property bool shown: false
 
         onWantedChanged: {
@@ -266,7 +304,7 @@ BarWidget {
         anchor.gravity: root.popupEdge
         // Only while the island is still (Island.cardReady): a window made or moved under a growing island
         // stalled its animation. The mask keeps the empty part click-through.
-        visible: Island.cardReady
+        visible: root.vertical && Island.cardReady
         implicitWidth: 360
         implicitHeight: 280
         mask: Region { item: actionsPopup.shown ? card : null }
@@ -283,6 +321,71 @@ BarWidget {
             y: root.popupEdge === Edges.Top ? 0 : 14
             showMessage: actionsPopup.shown
             showButtons: actionsPopup.shown
+        }
+    }
+
+    // The island's body: the capsule behind the face, which grows down (up on a bottom bar) out of the bar into
+    // a card for `openKind`, its corners rounding off as it goes. Bar.qml makes its window tall enough for it and
+    // adds it to the input mask.
+    Rectangle {
+        id: islandBody
+
+        // What it is open with, and the last one, kept while it closes (the size is the content's).
+        readonly property string kind: root.openKind
+        property string shownKind: ""
+        onKindChanged: if (kind !== "") shownKind = kind
+        readonly property Item view: shownKind === "notif" ? details : shownKind === "music" ? player : null
+        // How far the content is from the bar's edge: past the face for a notification (the face keeps its
+        // icon and title), close to it for the player (the face's cover and title leave).
+        readonly property real inset: shownKind === "notif" ? root.height + 2 : 18
+        readonly property real openWidth: view ? Math.max(root.width, view.width + 40) : root.width
+        readonly property real openHeight: view ? Math.max(root.height, inset + view.implicitHeight + 18) : root.height
+
+        property real grow: kind !== "" ? 1 : 0
+        Behavior on grow {
+            NumberAnimation {
+                duration: islandBody.kind !== "" ? Appearance.anim.spatial * 1.2 : Appearance.anim.normal
+                easing.type: islandBody.kind !== "" ? Easing.OutBack : Easing.InOutCubic
+                easing.overshoot: 1.1 * Appearance.anim.bounce
+            }
+        }
+
+        parent: root
+        z: -1
+        visible: root.island
+        width: root.width + (openWidth - root.width) * grow
+        height: Math.max(root.height * 0.9, root.height + (openHeight - root.height) * grow)
+        x: (root.width - width) / 2
+        y: root.popupEdge === Edges.Top ? root.height - height : 0
+        radius: Math.min(height / 2, Appearance.rounding.large + 4)
+        color: Island.color
+        clip: grow > 0.001
+
+        HoverHandler {
+            id: bodyHover
+            enabled: islandBody.grow > 0.001
+            onHoveredChanged: Island.setHover("barBody", hovered)
+        }
+
+        IslandDetails {
+            id: details
+            readonly property bool on: islandBody.kind === "notif"
+            x: (islandBody.width - width) / 2
+            y: root.popupEdge === Edges.Top ? islandBody.height - islandBody.inset - implicitHeight : islandBody.inset
+            shown: on
+            opacity: on ? 1 : 0
+            visible: opacity > 0.01
+            Behavior on opacity { FadeAnim { incoming: details.on } }
+        }
+
+        MediaControls {
+            id: player
+            readonly property bool on: islandBody.kind === "music"
+            x: (islandBody.width - width) / 2
+            y: root.popupEdge === Edges.Top ? islandBody.height - islandBody.inset - implicitHeight : islandBody.inset
+            opacity: on ? 1 : 0
+            visible: opacity > 0.01
+            Behavior on opacity { FadeAnim { incoming: player.on } }
         }
     }
 }
