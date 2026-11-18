@@ -19,9 +19,10 @@ Singleton {
     readonly property bool enabled: options.enabled
     // There is a state to switch to: a hold on the island does something.
     readonly property bool canSwitch: enabled && options.music
-    // The island's own capsule: black like a cutout in a dark theme; a light one keeps a light pill, whose
-    // text (the shell's on-surface colors) a black one would hide.
-    readonly property color color: Colors.dark ? "#000000" : Colors.m3surfaceContainerHighest
+    // The island's own capsule: in a dark theme halfway between black (a cutout, darker than the bar) and the
+    // theme's containers, so it keeps the wallpaper's tint; a light one keeps a light pill, whose text (the
+    // shell's on-surface colors) a dark one would hide.
+    readonly property color color: Colors.dark ? Qt.tint(Colors.m3surfaceContainerHigh, Qt.rgba(0, 0, 0, 0.5)) : Colors.m3surfaceContainerHighest
 
     // The state asked for; `mode` is what is shown (music needs a player).
     property string wanted: "default"
