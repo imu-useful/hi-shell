@@ -574,11 +574,19 @@ Scope {
                 // Distance dragged so far, added to the saved place until the drag ends.
                 property real shiftX: 0
                 property real shiftY: 0
+                // While the right edge is dragged: the width so far, and the left edge held in place.
+                property real dragWidth: -1
+                property real pinnedX: -1
+                readonly property real minWidth: 360
+                readonly property real maxWidth: Math.max(minWidth, parent.width - 32)
+                // The chips wrap, so the default is a width they fit in a few rows at, not their single-row width.
+                readonly property real defaultWidth: Math.min(parent.width - 64, 760)
+                readonly property real wantedWidth: dragWidth > 0 ? dragWidth : saved.width > 0 ? saved.width : defaultWidth
 
                 visible: root.editing && window.hasWidgets
-                width: Math.min(parent.width - 64, toolbar.implicitWidth + 32)
+                width: Math.max(Math.min(minWidth, parent.width), Math.min(maxWidth, wantedWidth))
                 height: toolbar.implicitHeight + 24
-                x: Math.max(0, Math.min(freeX, (saved.x >= 0 ? saved.x * freeX : freeX / 2) + shiftX))
+                x: pinnedX >= 0 ? Math.min(pinnedX, freeX) : Math.max(0, Math.min(freeX, (saved.x >= 0 ? saved.x * freeX : freeX / 2) + shiftX))
                 y: Math.max(0, Math.min(freeY, (saved.y >= 0 ? saved.y * freeY : freeY - 48) + shiftY))
                 baseColor: Colors.m3surfaceContainerHigh
 
@@ -639,6 +647,7 @@ Scope {
                             onClicked: {
                                 ScreenPrefs.saveLayout(window.screenName, {});
                                 root.options.toolbar.x = root.options.toolbar.y = -1;
+                                root.options.toolbar.width = -1;
                             }
                         }
                         M3Button {
@@ -659,6 +668,58 @@ Scope {
                                 selected: DesktopLayout.entry(ScreenPrefs.layoutFor(window.screenName), modelData).enabled
                                 onClicked: root.setEnabled(modelData, !selected, window.screenName)
                             }
+                        }
+                    }
+                }
+
+                // Resize: drag the right edge for the width (the chips rewrap, the height follows);
+                // double click = the default width.
+                Rectangle {
+                    anchors.horizontalCenter: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    implicitWidth: 12
+                    implicitHeight: 36
+                    radius: 6
+                    color: stretch.pressed ? Colors.m3primary : Colors.m3secondaryContainer
+                    border.width: 2
+                    border.color: Colors.m3primary
+
+                    MouseArea {
+                        id: stretch
+                        anchors.fill: parent
+                        anchors.margins: -6
+                        cursorShape: Qt.SizeHorCursor
+                        preventStealing: true
+                        property real startW: 0
+                        property real startX: 0
+
+                        onPressed: mouse => {
+                            startW = toolbarCard.width;
+                            startX = mapToItem(toolbarCard.parent, mouse.x, mouse.y).x;
+                            toolbarCard.pinnedX = toolbarCard.x;
+                            toolbarCard.dragWidth = startW;
+                        }
+                        onPositionChanged: mouse => {
+                            if (!pressed)
+                                return;
+                            const dx = mapToItem(toolbarCard.parent, mouse.x, mouse.y).x - startX;
+                            // Not past the screen's right edge from where the left edge is held.
+                            const room = toolbarCard.parent.width - toolbarCard.pinnedX;
+                            toolbarCard.dragWidth = Math.max(toolbarCard.minWidth, Math.min(toolbarCard.maxWidth, room, Math.round(startW + dx)));
+                        }
+                        onReleased: {
+                            const w = toolbarCard.dragWidth;
+                            const left = toolbarCard.pinnedX;
+                            root.options.toolbar.width = w;
+                            // Keep the left edge where it was, as a fraction of the new free space.
+                            const free = Math.max(0, toolbarCard.parent.width - w);
+                            root.options.toolbar.x = free > 0 ? Math.min(1, left / free) : 0.5;
+                            toolbarCard.dragWidth = toolbarCard.pinnedX = -1;
+                        }
+                        onCanceled: toolbarCard.dragWidth = toolbarCard.pinnedX = -1
+                        onDoubleClicked: {
+                            toolbarCard.dragWidth = toolbarCard.pinnedX = -1;
+                            root.options.toolbar.width = -1;
                         }
                     }
                 }
