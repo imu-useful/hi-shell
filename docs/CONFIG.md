@@ -13,7 +13,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | [`launcher`](#launcher) | 2 |
 | [`spotify`](#spotify) | 1 |
 | [`wallpapers`](#wallpapers) | 13 |
-| [`desktop`](#desktop) | 17 |
+| [`desktop`](#desktop) | 18 |
 | [`processes`](#processes) | 3 |
 | [`appThemes`](#appthemes) | 2 |
 | [`idle`](#idle) | 8 |
@@ -186,6 +186,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `desktop.toolbar.x` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Where the desktop edit toolbar was dragged to (horizontal); -1 = the default place. |
 | `desktop.toolbar.y` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Where the desktop edit toolbar was dragged to (vertical); -1 = the default place. |
 | `desktop.toolbar.width` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Width of the desktop edit toolbar in px, set by dragging its right edge; -1 = the default. |
+| `desktop.toolbar.height` | `real` | `-1` |  | drag the toolbar in the desktop's edit mode | Height of the desktop edit toolbar in px, set by dragging its bottom edge; -1 = fits all the chips. |
 | `desktop.worldClocks` | `list<string>` | `["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]` |  | Settings › Desktop | IANA time zones the world clock widget shows. |
 | `desktop.image` | `string` | `""` |  | Settings › Wallpaper | Picture for the image frame widget (empty = the wallpaper). |
 | `desktop.focusMode` | `bool` | `true` |  | Settings › Wallpaper | Focus mode: with windows open, the wallpaper is sharp and widgets and frame hide. |

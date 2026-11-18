@@ -282,6 +282,8 @@ JsonAdapter {
             property real y: -1
             // Width of the desktop edit toolbar in px, set by dragging its right edge; -1 = the default.
             property real width: -1
+            // Height of the desktop edit toolbar in px, set by dragging its bottom edge; -1 = fits all the chips.
+            property real height: -1
         }
         // IANA time zones the world clock widget shows.
         property list<string> worldClocks: ["Europe/London", "America/New_York", "Asia/Tokyo", "Australia/Sydney"]

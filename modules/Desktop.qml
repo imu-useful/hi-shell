@@ -574,29 +574,76 @@ Scope {
                 // Distance dragged so far, added to the saved place until the drag ends.
                 property real shiftX: 0
                 property real shiftY: 0
-                // While the right edge is dragged: the width so far, and the left edge held in place.
+                // While a grip is dragged: the size so far, and the top left corner held in place.
                 property real dragWidth: -1
+                property real dragHeight: -1
                 property real pinnedX: -1
+                property real pinnedY: -1
+                property real startWidth: 0
+                property real startHeight: 0
                 readonly property real minWidth: 360
                 readonly property real maxWidth: Math.max(minWidth, parent.width - 32)
                 // The chips wrap, so the default is a width they fit in a few rows at, not their single-row width.
                 readonly property real defaultWidth: Math.min(parent.width - 64, 760)
                 readonly property real wantedWidth: dragWidth > 0 ? dragWidth : saved.width > 0 ? saved.width : defaultWidth
+                // Header and one row of chips at least; the default (and the most worth having) is all the chips.
+                readonly property real minHeight: header.implicitHeight + toolbar.spacing + 40 + 24
+                readonly property real naturalHeight: header.implicitHeight + toolbar.spacing + chips.implicitHeight + 24
+                readonly property real maxHeight: Math.max(minHeight, parent.height - 32)
+                readonly property real wantedHeight: dragHeight > 0 ? dragHeight : saved.height > 0 ? saved.height : naturalHeight
+
+                function beginResize() {
+                    pinnedX = x;
+                    pinnedY = y;
+                    startWidth = dragWidth = width;
+                    startHeight = dragHeight = height;
+                }
+                function resizeBy(dx, dy) {
+                    // Not past the screen's right or bottom edge from the corner held in place.
+                    dragWidth = Math.max(minWidth, Math.min(maxWidth, parent.width - pinnedX, Math.round(startWidth + dx)));
+                    dragHeight = Math.max(minHeight, Math.min(maxHeight, parent.height - pinnedY, Math.round(startHeight + dy)));
+                }
+                function endResize() {
+                    const w = dragWidth, h = dragHeight, left = pinnedX, top = pinnedY;
+                    if (w !== startWidth)
+                        root.options.toolbar.width = w;
+                    if (h !== startHeight)
+                        root.options.toolbar.height = h;
+                    // Keep the top left corner where it was, as fractions of the new free space.
+                    const fx = Math.max(0, parent.width - w), fy = Math.max(0, parent.height - h);
+                    root.options.toolbar.x = fx > 0 ? Math.min(1, left / fx) : 0.5;
+                    root.options.toolbar.y = fy > 0 ? Math.min(1, top / fy) : 1;
+                    cancelResize();
+                }
+                function cancelResize() {
+                    dragWidth = dragHeight = pinnedX = pinnedY = -1;
+                }
+                function resetSize(horizontal, vertical) {
+                    cancelResize();
+                    if (horizontal)
+                        root.options.toolbar.width = -1;
+                    if (vertical)
+                        root.options.toolbar.height = -1;
+                }
 
                 visible: root.editing && window.hasWidgets
                 width: Math.max(Math.min(minWidth, parent.width), Math.min(maxWidth, wantedWidth))
-                height: toolbar.implicitHeight + 24
+                height: Math.max(Math.min(minHeight, parent.height), Math.min(maxHeight, wantedHeight))
                 x: pinnedX >= 0 ? Math.min(pinnedX, freeX) : Math.max(0, Math.min(freeX, (saved.x >= 0 ? saved.x * freeX : freeX / 2) + shiftX))
-                y: Math.max(0, Math.min(freeY, (saved.y >= 0 ? saved.y * freeY : freeY - 48) + shiftY))
+                y: pinnedY >= 0 ? Math.min(pinnedY, freeY) : Math.max(0, Math.min(freeY, (saved.y >= 0 ? saved.y * freeY : freeY - 48) + shiftY))
                 baseColor: Colors.m3surfaceContainerHigh
 
                 ColumnLayout {
                     id: toolbar
-                    anchors.centerIn: parent
-                    width: parent.width - 32
+                    anchors.fill: parent
+                    anchors.leftMargin: 16
+                    anchors.rightMargin: 16
+                    anchors.topMargin: 12
+                    anchors.bottomMargin: 12
                     spacing: 10
 
                     RowLayout {
+                        id: header
                         Layout.fillWidth: true
 
                         // The handle: drag the toolbar by its icon and title.
@@ -647,7 +694,7 @@ Scope {
                             onClicked: {
                                 ScreenPrefs.saveLayout(window.screenName, {});
                                 root.options.toolbar.x = root.options.toolbar.y = -1;
-                                root.options.toolbar.width = -1;
+                                root.options.toolbar.width = root.options.toolbar.height = -1;
                             }
                         }
                         M3Button {
@@ -657,71 +704,47 @@ Scope {
                         }
                     }
 
-                    Flow {
+                    // Scrolls when the toolbar was made shorter than the chips need.
+                    Flickable {
                         Layout.fillWidth: true
-                        spacing: 6
-                        Repeater {
-                            model: DesktopLayout.ids
-                            Chip {
-                                required property string modelData
-                                text: Translation.tr(DesktopLayout.names[modelData])
-                                selected: DesktopLayout.entry(ScreenPrefs.layoutFor(window.screenName), modelData).enabled
-                                onClicked: root.setEnabled(modelData, !selected, window.screenName)
+                        Layout.fillHeight: true
+                        contentWidth: width
+                        contentHeight: chips.implicitHeight
+                        boundsBehavior: Flickable.StopAtBounds
+                        interactive: contentHeight > height
+                        clip: true
+
+                        Flow {
+                            id: chips
+                            width: parent.width
+                            spacing: 6
+                            Repeater {
+                                model: DesktopLayout.ids
+                                Chip {
+                                    required property string modelData
+                                    text: Translation.tr(DesktopLayout.names[modelData])
+                                    selected: DesktopLayout.entry(ScreenPrefs.layoutFor(window.screenName), modelData).enabled
+                                    onClicked: root.setEnabled(modelData, !selected, window.screenName)
+                                }
                             }
                         }
                     }
                 }
 
-                // Resize: drag the right edge for the width (the chips rewrap, the height follows);
-                // double click = the default width.
-                Rectangle {
-                    anchors.horizontalCenter: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    implicitWidth: 12
-                    implicitHeight: 36
-                    radius: 6
-                    color: stretch.pressed ? Colors.m3primary : Colors.m3secondaryContainer
-                    border.width: 2
-                    border.color: Colors.m3primary
-
-                    MouseArea {
-                        id: stretch
-                        anchors.fill: parent
-                        anchors.margins: -6
-                        cursorShape: Qt.SizeHorCursor
-                        preventStealing: true
-                        property real startW: 0
-                        property real startX: 0
-
-                        onPressed: mouse => {
-                            startW = toolbarCard.width;
-                            startX = mapToItem(toolbarCard.parent, mouse.x, mouse.y).x;
-                            toolbarCard.pinnedX = toolbarCard.x;
-                            toolbarCard.dragWidth = startW;
-                        }
-                        onPositionChanged: mouse => {
-                            if (!pressed)
-                                return;
-                            const dx = mapToItem(toolbarCard.parent, mouse.x, mouse.y).x - startX;
-                            // Not past the screen's right edge from where the left edge is held.
-                            const room = toolbarCard.parent.width - toolbarCard.pinnedX;
-                            toolbarCard.dragWidth = Math.max(toolbarCard.minWidth, Math.min(toolbarCard.maxWidth, room, Math.round(startW + dx)));
-                        }
-                        onReleased: {
-                            const w = toolbarCard.dragWidth;
-                            const left = toolbarCard.pinnedX;
-                            root.options.toolbar.width = w;
-                            // Keep the left edge where it was, as a fraction of the new free space.
-                            const free = Math.max(0, toolbarCard.parent.width - w);
-                            root.options.toolbar.x = free > 0 ? Math.min(1, left / free) : 0.5;
-                            toolbarCard.dragWidth = toolbarCard.pinnedX = -1;
-                        }
-                        onCanceled: toolbarCard.dragWidth = toolbarCard.pinnedX = -1
-                        onDoubleClicked: {
-                            toolbarCard.dragWidth = toolbarCard.pinnedX = -1;
-                            root.options.toolbar.width = -1;
-                        }
-                    }
+                // Resize: the right edge = width, the bottom edge = height, the corner = both
+                // (the chips rewrap and scroll if they don't fit); double click = the default.
+                ToolbarGrip {
+                    card: toolbarCard
+                    horizontal: true
+                }
+                ToolbarGrip {
+                    card: toolbarCard
+                    vertical: true
+                }
+                ToolbarGrip {
+                    card: toolbarCard
+                    horizontal: true
+                    vertical: true
                 }
             }
         }
