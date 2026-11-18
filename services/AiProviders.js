@@ -50,3 +50,52 @@ const providers = [
 function find(id) {
     return providers.find(p => p.id === id) ?? null;
 }
+
+// --- Ollama: its own API next to the OpenAI-compatible one (model list with sizes, pulls) ---
+
+// The server root from the chat address: "http://localhost:11434/v1" -> "http://localhost:11434".
+function ollamaBase(url) {
+    return url.replace(/\/+$/, "").replace(/\/v1$/, "");
+}
+
+function formatSize(bytes) {
+    if (!(bytes > 0))
+        return "";
+    const gb = bytes / 1e9;
+    return gb >= 1 ? `${gb.toFixed(1)} GB` : `${Math.round(bytes / 1e6)} MB`;
+}
+
+// Embedding-only models can't chat: by their capabilities (Ollama 0.6+) or, without them, the family.
+function canChat(m) {
+    if (Array.isArray(m.capabilities))
+        return m.capabilities.includes("completion");
+    const families = [m.details?.family ?? "", ...(m.details?.families ?? [])].join(" ");
+    return !/bert/.test(families) && !/embed/.test(m.name ?? "");
+}
+
+// /api/tags -> [{ id, name, details }], sorted by name; details is "8.2B · Q4_K_M · 5.2 GB".
+function ollamaModels(tags) {
+    return (tags?.models ?? [])
+        .filter(canChat)
+        .map(m => ({
+            id: m.name,
+            name: m.name,
+            details: [m.details?.parameter_size, m.details?.quantization_level, formatSize(m.size)].filter(s => s).join(" · ")
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// One line of /api/pull's stream -> { status, fraction (0..1, -1 when unknown), done, error }.
+function pullProgress(ev) {
+    return {
+        status: ev.status ?? "",
+        fraction: ev.total > 0 ? (ev.completed ?? 0) / ev.total : -1,
+        done: ev.status === "success",
+        error: typeof ev.error === "string" ? ev.error : ev.error ? String(ev.error) : ""
+    };
+}
+
+// A model name as `ollama pull` takes it: "llama3.2", "qwen3:8b", "hf.co/user/repo:Q4_K_M".
+function validModelName(name) {
+    return /^[A-Za-z0-9][A-Za-z0-9._\/:-]*$/.test(name);
+}

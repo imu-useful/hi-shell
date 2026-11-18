@@ -215,7 +215,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     icon: modelData.id === Claude.apiModel ? "check" : "smart_toy"
                     title: modelData.name
-                    subtitle: modelData.id
+                    subtitle: modelData.details || modelData.id
                     clickable: true
                     color: modelData.id === Claude.apiModel ? Colors.m3secondaryContainer : "transparent"
                     onClicked: {
@@ -223,7 +223,23 @@ ColumnLayout {
                         root.showModels = false;
                         root.focusInput();
                     }
+
+                    // A local model can be removed from the disk.
+                    IconButton {
+                        visible: Claude.provider === "ollama"
+                        implicitWidth: 32
+                        implicitHeight: 32
+                        icon: "delete"
+                        tooltip: Translation.tr("Remove from the disk")
+                        onClicked: Ollama.remove(modelData.id)
+                    }
                 }
+            }
+
+            OllamaPull {
+                visible: Claude.provider === "ollama" && !Claude.loadingModels
+                Layout.fillWidth: true
+                Layout.topMargin: 8
             }
         }
     }

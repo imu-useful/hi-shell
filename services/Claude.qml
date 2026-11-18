@@ -152,6 +152,8 @@ Singleton {
             return finishWith("error", Translation.tr("Add the %1 server address in Settings → General.").arg(spec.name));
         if (spec.key && key === "")
             return finishWith("error", Translation.tr("Add your %1 API key in Settings → General.").arg(spec.name));
+        if (apiModel === "" && provider === "ollama")
+            return finishWith("error", Translation.tr("No Ollama model yet: download one in the model list of the left sidebar's chat, or run `ollama pull llama3.2`."));
         if (apiModel === "")
             return finishWith("error", Translation.tr("Pick a %1 model first.").arg(spec.name));
         aiProc.environment = ({
@@ -182,16 +184,22 @@ Singleton {
         }
         loadingModels = true;
         modelsError = "";
+        // Ollama's own list has the sizes and tells the embedding models apart.
+        const ollama = id === "ollama";
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
             if (xhr.readyState !== XMLHttpRequest.DONE)
                 return;
             loadingModels = false;
             try {
+                if (ollama && xhr.status === 0) {
+                    modelsError = ollamaDown();
+                    return;
+                }
                 if (xhr.status !== 200)
                     throw new Error(xhr.status === 401 ? Translation.tr("invalid key") : xhr.status ? `HTTP ${xhr.status}` : Translation.tr("no connection"));
-                const rows = JSON.parse(xhr.responseText).data ?? [];
-                const list = rows
+                const body = JSON.parse(xhr.responseText);
+                const list = ollama ? Providers.ollamaModels(body) : (body.data ?? [])
                     .map(m => ({ raw: m, id: p.stripPrefix && m.id.startsWith(p.stripPrefix) ? m.id.slice(p.stripPrefix.length) : m.id }))
                     .filter(m => p.free ? Number(m.raw.pricing?.prompt) === 0 && Number(m.raw.pricing?.completion) === 0 : (p.models ? p.models(m.id) : true))
                     .map(m => ({ id: m.id, name: m.raw.name ?? m.id }))
@@ -199,15 +207,33 @@ Singleton {
                 const lists = Object.assign({}, modelLists);
                 lists[id] = list;
                 modelLists = lists;
+                // Ollama with nothing picked yet: the first model pulled is the one used.
+                if (ollama && list.length > 0 && modelFor(id) === "")
+                    setModel(id, list[0].id);
+                if (list.length === 0)
+                    modelsError = ollama ? Translation.tr("No models yet. Download one below, e.g. llama3.2 or qwen3:4b") : Translation.tr("The list of models is empty");
             } catch (e) {
                 modelsError = Translation.tr("Couldn't load the model list (%1)").arg(e.message);
             }
         };
-        xhr.open("GET", `${url}/models`);
+        xhr.open("GET", ollama ? `${Providers.ollamaBase(url)}/api/tags` : `${url}/models`);
         const key = keyFor(id);
         if (key !== "")
             xhr.setRequestHeader("Authorization", `Bearer ${key}`);
         xhr.send();
+    }
+
+    // Forgets a provider's list (after a model was downloaded or removed) and loads it again if it's the one in use.
+    function reloadModels(id) {
+        const lists = Object.assign({}, modelLists);
+        delete lists[id];
+        modelLists = lists;
+        if (id === provider)
+            loadModels();
+    }
+
+    function ollamaDown() {
+        return Translation.tr("Ollama isn't running at %1. Start it with `systemctl start ollama` (or `ollama serve`).").arg(Providers.ollamaBase(urlFor("ollama")));
     }
 
     function cancel() {
@@ -383,7 +409,17 @@ Singleton {
     }
 
     onModelChanged: if (Config.options.ai.model !== model) Config.options.ai.model = model
-    onProviderChanged: if (Config.options.ai.provider !== provider) Config.options.ai.provider = provider
+    onProviderChanged: {
+        if (Config.options.ai.provider !== provider)
+            Config.options.ai.provider = provider;
+        pickLocalModel();
+    }
+    Component.onCompleted: pickLocalModel()
+
+    function pickLocalModel() {
+        if (provider === "ollama" && modelFor("ollama") === "")
+            loadModels();
+    }
 
     IpcHandler {
         target: "claude"
@@ -459,6 +495,8 @@ Singleton {
             const cur = root.current();
             if (root.cancelled)
                 root.finish(undefined, cur.text === "" ? Translation.tr("_Stopped._") : cur.text + "\n\n_Stopped._");
+            else if (exitCode === 7 && root.provider === "ollama")
+                root.finish("error", root.ollamaDown());
             else if (exitCode !== 0)
                 root.finish("error", aiStderr.text.trim() || Translation.tr("curl exited with code %1.").arg(exitCode));
             else

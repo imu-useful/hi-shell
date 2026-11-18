@@ -20,8 +20,9 @@ Singleton {
         if (maker.running)
             return;
         const provider = Config.options.ai.provider;
-        const key = provider === "claude" ? "" : (Config.options.ai.keys[provider] ?? "");
-        const url = provider === "claude" ? "" : (Config.options.ai.urls[provider] ?? "");
+        // The provider's own address unless one was set (ai.urls only holds the overrides).
+        const key = provider === "claude" ? "" : Claude.keyFor(provider);
+        const url = provider === "claude" ? "" : Claude.urlFor(provider);
         const out = `${Config.dir}/translations/${code}.json`;
         error = "";
         status = Translation.tr("Starting…");

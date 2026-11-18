@@ -1529,5 +1529,16 @@
     "Block adult sites and close tabs by words in their title": "Блокировка сайтов для взрослых и закрытие вкладок по словам в заголовке",
     "Weather, updates, screen capture and Spotify": "Погода, обновления, захват экрана и Spotify",
     "Wallpaper, slideshow, the frame and online wallpapers": "Обои, слайд-шоу, рамка и онлайн-обои",
-    "Power & battery": "Питание и батарея"
+    "Power & battery": "Питание и батарея",
+    "Not a model name: %1": "Это не имя модели: %1",
+    "Couldn't remove %1 (%2)": "Не удалось удалить %1 (%2)",
+    "The download stopped.": "Загрузка остановлена.",
+    "No models yet. Download one below, e.g. llama3.2 or qwen3:4b": "Моделей пока нет. Скачайте любую ниже, например llama3.2 или qwen3:4b",
+    "The list of models is empty": "Список моделей пуст",
+    "Ollama isn't running at %1. Start it with `systemctl start ollama` (or `ollama serve`).": "Ollama не запущен по адресу %1. Запустите его: `systemctl start ollama` (или `ollama serve`).",
+    "Download a model: llama3.2, qwen3:4b…": "Скачать модель: llama3.2, qwen3:4b…",
+    "Stop the download": "Остановить загрузку",
+    "Download": "Скачать",
+    "Remove from the disk": "Удалить с диска",
+    "No Ollama model yet: download one in the model list of the left sidebar's chat, or run `ollama pull llama3.2`.": "Моделей Ollama пока нет: скачайте любую в списке моделей чата в левой панели или выполните `ollama pull llama3.2`."
 }
