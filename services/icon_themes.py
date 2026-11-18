@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Icon themes for Settings > Icons: the installed ones, the KDE Store's, installing, applying, removing.
+"""Icon themes for Settings > Themes and Store: the installed ones, the KDE Store's, installing, applying, removing.
 
     icon_themes.py installed                      -> {"current": ..., "themes": [{id, name, path, removable, samples}]}
     icon_themes.py search [--query Q] [--sort S] [--page N]
@@ -277,7 +277,8 @@ def emit(obj: dict) -> None:
     print(json.dumps(obj), flush=True)
 
 
-def download(url: str, target: Path) -> None:
+def download(url: str, target: Path, report: bool = True) -> None:
+    """Save url to target; report: progress lines on stdout as it comes."""
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp, open(target, "wb") as out:
@@ -290,7 +291,7 @@ def download(url: str, target: Path) -> None:
                     raise Failure("the download is too big")
                 out.write(chunk)
                 frac = got / total if total else -1
-                if frac < 0 or frac - last >= 0.02:
+                if report and (frac < 0 or frac - last >= 0.02):
                     emit({"progress": round(frac, 3), "bytes": got})
                     last = frac
     except OSError as e:
@@ -354,7 +355,7 @@ def unpack_all(archive: Path, work: Path, finder=find_themes) -> list[Path]:
 
 
 def place(theme: Path, icons: Path) -> str:
-    """Move a theme into ~/.local/share/icons under its folder name, over an older copy."""
+    """Move a theme into icons (~/.local/share/icons, say) under its folder name, over an older copy."""
     name = theme.name
     if not valid_theme_id(name) or name in NOT_THEMES:
         raise Failure(f"bad theme folder name: {name}")
@@ -394,7 +395,8 @@ def record(product: str, themes: list[str], state_file: str = "icon-store.json")
 
 
 def install(product: str, file_index: int | None, category: int = CATEGORY, finder=find_themes,
-            state_file: str = "icon-store.json", what: str = "icon theme") -> dict:
+            state_file: str = "icon-store.json", what: str = "icon theme", target: Path | None = None) -> dict:
+    """Download a store entry's archive and move the themes in it to target (~/.local/share/icons)."""
     if not product.isdigit():
         raise Failure("not a store id")
     data = fetch_json(f"{API}/{product}?format=json")
@@ -408,7 +410,7 @@ def install(product: str, file_index: int | None, category: int = CATEGORY, find
     link = entry.get(f"downloadlink{chosen['index']}") or ""
     if not link.startswith("https://"):
         raise Failure("the store gave no download link")
-    icons = user_icon_dir()
+    icons = target or user_icon_dir()
     icons.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".hi-icon-store-", dir=icons) as tmp:
         work = Path(tmp)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cursor themes for Settings > Icons & cursors: the installed ones, the KDE Store's, installing, applying, removing.
+"""Cursor themes for Settings > Themes and Store: the installed ones, the KDE Store's, installing, applying, removing.
 
     cursor_themes.py installed                    -> {"current": ..., "themes": [{id, name, path, removable, samples}]}
     cursor_themes.py search [--query Q] [--sort S] [--page N]

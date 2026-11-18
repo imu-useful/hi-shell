@@ -55,8 +55,8 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | --- | --- | --- | --- | --- | --- |
 | `appearance.themedIcons` | `bool` | `false` |  | Settings › Style | App icons in one color, the palette's primary (dock, workspaces, launcher). |
 | `appearance.restartOnIconTheme` | `bool` | `true` |  | Settings › Style (advanced) | Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise). |
-| `appearance.cursorTheme` | `string` | `""` |  | Settings > Icons & cursors > Cursors (a tap on a theme sets it) | The cursor theme picked in Settings > Icons & cursors, set in Hyprland at every start; "" = leave the cursor alone. |
-| `appearance.cursorSize` | `int` | `24` |  | Settings › Icons & cursors | The cursor size in pixels (12 – 128). |
+| `appearance.cursorTheme` | `string` | `""` |  | Settings > Themes > Cursors (a tap on a theme sets it) | The cursor theme picked in Settings > Themes, set in Hyprland at every start; "" = leave the cursor alone. |
+| `appearance.cursorSize` | `int` | `24` |  | Settings › Themes | The cursor size in pixels (12 – 128). |
 | `appearance.transparency` | `bool` | `true` |  | Settings › Style | Translucent surfaces (the compositor blurs what's behind them). |
 | `appearance.transparencyLevel` | `real` | `0.12` | 0 … 1 | Settings › Style | How see-through the panels are when transparency is on: 0 = solid, 0.5 = half. |
 | `appearance.coverBackdrop` | `bool` | `true` |  | Settings › Style | The playing track's cover, blurred, behind the media cards. |

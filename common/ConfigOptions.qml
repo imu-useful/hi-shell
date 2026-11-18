@@ -16,7 +16,7 @@ JsonAdapter {
         property bool themedIcons: false
         // Restart the shell when KDE's icon theme changes (the icons break in a running process otherwise).
         property bool restartOnIconTheme: true
-        // The cursor theme picked in Settings > Icons & cursors, set in Hyprland at every start; "" = leave the cursor alone.
+        // The cursor theme picked in Settings > Themes, set in Hyprland at every start; "" = leave the cursor alone.
         property string cursorTheme: ""
         // The cursor size in pixels (12 – 128).
         property int cursorSize: 24

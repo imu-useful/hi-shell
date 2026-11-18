@@ -4,12 +4,12 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-// An installed icon or cursor theme: a few of its icons and its name; a tap applies it, the bin removes
+// An installed icon, cursor or GTK theme: a few of its icons (or colors) and its name; a tap applies it, the bin removes
 // a theme of the user's own (not the one in use).
 Rectangle {
     id: root
 
-    // IconStore.icons or IconStore.cursors
+    // Stores.icons or Stores.cursors
     required property var store
     required property var theme
     readonly property bool active: theme.id === root.store.current
@@ -46,6 +46,19 @@ Rectangle {
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     smooth: true
+                }
+            }
+            // A GTK theme: its main colors (background, base, text, selection).
+            Repeater {
+                model: root.theme.colors ?? []
+                Rectangle {
+                    required property string modelData
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: modelData
+                    border.width: 1
+                    border.color: Colors.m3outlineVariant
                 }
             }
         }

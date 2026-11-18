@@ -536,7 +536,7 @@ Scope {
                                 width: flick.width - 12
                                 sourceComponent: root.searchQuery.trim() !== "" ? searchResults : ({
                             home: home, general: general, bar: bar, desktop: desktop,
-                            style: style, icons: icons, motion: motion, panels: panels, modes: modes, wallpaper: wallpaper, dock: dock, notifications: notifications, power: power, contentfilter: contentfilter, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
+                            style: style, icons: icons, store: store, motion: motion, panels: panels, modes: modes, wallpaper: wallpaper, dock: dock, notifications: notifications, power: power, contentfilter: contentfilter, services: services, hyprland: hyprland, autostart: autostart, keybinds: keybinds, screentime: screentime, rules: rules, defaultapps: defaultapps, about: about, lock: lock, sounds: sounds
                         })[root.currentPage.id] ?? home
                                 onLoaded: {
                                     flick.targetY = 0;
@@ -556,6 +556,7 @@ Scope {
                             Component { id: desktop; DesktopPage {} }
                             Component { id: style; StylePage {} }
                             Component { id: icons; IconsPage {} }
+                            Component { id: store; StorePage {} }
                             Component { id: motion; MotionPage {} }
                             Component { id: panels; PanelsPage {} }
                             Component { id: modes; ModesPage {} }

@@ -9,10 +9,11 @@ import qs.services
 Rectangle {
     id: root
 
-    // IconStore.icons or IconStore.cursors
+    // Stores.icons or Stores.cursors
     required property var store
     required property var item
-    readonly property var have: root.store.installedFrom(item.id, item.files.map(f => variant(f)).concat([item.name]))
+    readonly property var files: item.files ?? []
+    readonly property var have: root.store.installedFrom(item.id, root.files.map(f => variant(f)).concat([item.name]))
     readonly property bool busy: root.store.installing === item.id
     property bool picking: false
 
@@ -122,7 +123,7 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 6
             Repeater {
-                model: root.item.files
+                model: root.files
                 Chip {
                     required property var modelData
                     text: root.variant(modelData)
@@ -136,7 +137,7 @@ Rectangle {
         }
 
         StyledText {
-            visible: root.item.files.length === 0
+            visible: root.files.length === 0
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
             text: Translation.tr("No archive to download: install it from its page")
@@ -145,7 +146,7 @@ Rectangle {
         }
 
         Flow {
-            visible: !root.busy && root.item.files.length > 0
+            visible: !root.busy && root.files.length > 0
             Layout.fillWidth: true
             spacing: 6
             Repeater {
@@ -164,13 +165,13 @@ Rectangle {
                 enabled: root.store.installing === ""
                 icon: root.picking ? "close" : "download"
                 text: root.picking ? Translation.tr("Cancel")
-                    : root.item.files.length > 1 ? Translation.tr("Install…")
+                    : root.files.length > 1 ? Translation.tr("Install…")
                     : root.have.length > 0 ? Translation.tr("Reinstall") : Translation.tr("Install")
                 onClicked: {
-                    if (root.item.files.length > 1)
+                    if (root.files.length > 1)
                         root.picking = !root.picking;
                     else
-                        root.store.install(root.item, root.item.files[0].index);
+                        root.store.install(root.item, root.files[0].index);
                 }
             }
         }

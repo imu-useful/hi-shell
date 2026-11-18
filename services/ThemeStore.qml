@@ -3,19 +3,21 @@ import Quickshell
 import Quickshell.Io
 import qs.common
 
-// Icon or cursor themes (Settings → Icons & cursors; one of these each in IconStore): the installed
-// ones with a few samples each, and the KDE Store's (store.kde.org: Full Icon Themes, Cursors) to
-// install from. Applying an icon theme writes KDE's, GTK's and qt*ct's; the shell then restarts
-// itself (IconThemeWatcher) so its own icons pick it up. Applying a cursor theme writes GTK's, KDE's
-// and gsettings', sets it in Hyprland and keeps it in appearance.cursorTheme, which CursorKeeper sets
-// again at every start. The work is done by services/icon_themes.py and cursor_themes.py.
+// One kind of theme of Settings → Themes and Store (one of these each in Stores): the installed ones
+// with a few samples each, and a store to install from: the KDE Store (store.kde.org: Full Icon
+// Themes, Cursors, GTK3/4 Themes) or Google Fonts. Applying an icon theme writes KDE's, GTK's and
+// qt*ct's; the shell then restarts itself (IconThemeWatcher) so its own icons pick it up. Applying a
+// cursor theme writes GTK's, KDE's and gsettings', sets it in Hyprland and keeps it in
+// appearance.cursorTheme, which CursorKeeper sets again at every start. A GTK theme goes to GTK's
+// settings and gsettings. Fonts aren't applied here: the page sets them as the shell's fonts.
+// The work is done by services/icon_themes.py, cursor_themes.py, gtk_themes.py and font_store.py.
 Scope {
     id: root
 
-    // icons | cursors
+    // icons | cursors | gtk | fonts
     property string kind: "icons"
     readonly property bool cursors: kind === "cursors"
-    readonly property string script: `${Quickshell.shellDir}/services/${cursors ? "cursor_themes" : "icon_themes"}.py`
+    readonly property string script: `${Quickshell.shellDir}/services/${({ icons: "icon_themes", cursors: "cursor_themes", gtk: "gtk_themes", fonts: "font_store" })[kind]}.py`
 
     // Installed: [{ id, name, path, removable, samples: [file paths] }]
     property var themes: []
@@ -28,6 +30,8 @@ Scope {
     property int page: 0
     property string query: ""
     property string sort: "popular"
+    // Fonts only: a category (sans-serif, serif, monospace, display, handwriting); "" = all.
+    property string filter: ""
     readonly property bool searching: searchProc.running
     readonly property bool hasMore: results.length < total
 
@@ -45,9 +49,10 @@ Scope {
         storeFile.reload();
     }
 
-    function search(q, s) {
+    function search(q, s, f) {
         query = q ?? query;
         sort = s ?? sort;
+        filter = f ?? filter;
         results = [];
         total = 0;
         page = 0;
@@ -64,7 +69,7 @@ Scope {
     function runSearch() {
         error = "";
         searchProc.running = false;
-        searchProc.command = ["python3", "-I", script, "search", "--query", query, "--sort", sort, "--page", String(page)];
+        searchProc.command = ["python3", "-I", script, "search", "--query", query, "--sort", sort, "--page", String(page)].concat(filter !== "" ? ["--filter", filter] : []);
         searchProc.running = true;
     }
 
@@ -200,7 +205,7 @@ Scope {
 
     FileView {
         id: storeFile
-        path: `${Paths.state}/${root.cursors ? "cursor" : "icon"}-store.json`
+        path: `${Paths.state}/${({ icons: "icon", cursors: "cursor", gtk: "gtk", fonts: "font" })[root.kind]}-store.json`
         printErrors: false
         onLoaded: {
             try {
