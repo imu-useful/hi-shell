@@ -68,6 +68,9 @@ const rules = {
     "weather.latitude": { min: -90, max: 90, def: 0 },
     "weather.longitude": { min: -180, max: 180, def: 0 },
     "weather.refreshMinutes": { min: 1, max: 1440, def: 15 },
+    "bedtime.time": { pattern: "^([01]?\\d|2[0-3]):[0-5]\\d$", hint: "must look like HH:MM", def: "22:00" },
+    "bedtime.wake": { pattern: "^([01]?\\d|2[0-3]):[0-5]\\d$", hint: "must look like HH:MM", def: "06:00" },
+    "bedtime.snoozeMinutes": { min: 1, max: 180, def: 10 },
     "battery.low": { min: 1, max: 100, def: 20 },
     "battery.critical": { min: 1, max: 100, def: 10 },
     "notifications.defaultTimeout": { min: 500, max: 600000, def: 6000 },
@@ -93,7 +96,7 @@ function problem(path, value) {
     if (r.pattern) {
         if (r.allowEmpty && value === "")
             return "";
-        return typeof value === "string" && new RegExp(r.pattern).test(value) ? "" : "must look like #rrggbb";
+        return typeof value === "string" && new RegExp(r.pattern).test(value) ? "" : (r.hint ?? "must look like #rrggbb");
     }
     if (r.enum) {
         if (r.allowOther && typeof value === "string" && value !== "")

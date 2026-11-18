@@ -498,6 +498,17 @@ JsonAdapter {
         property int refreshMinutes: 15
     }
 
+    property JsonObject bedtime: JsonObject {
+        // A full-screen "time to sleep" reminder every night (Settings > Screen time).
+        property bool enabled: false
+        // When it comes up ("HH:MM").
+        property string time: "22:00"
+        // Until when it keeps coming up ("HH:MM", the next morning when it's before `time`).
+        property string wake: "06:00"
+        // "Remind me later" brings it back after this many minutes.
+        property int snoozeMinutes: 10
+    }
+
     property JsonObject battery: JsonObject {
         // The charge (%) that counts as low.
         property int low: 20

@@ -1035,6 +1035,30 @@ const options = [
         "advanced": true
     },
     {
+        "path": "bedtime.enabled",
+        "page": "screentime",
+        "text": "A full-screen \"time to sleep\" reminder every night (Settings > Screen time).",
+        "advanced": false
+    },
+    {
+        "path": "bedtime.time",
+        "page": "screentime",
+        "text": "When it comes up (\"HH:MM\").",
+        "advanced": false
+    },
+    {
+        "path": "bedtime.wake",
+        "page": "screentime",
+        "text": "Until when it keeps coming up (\"HH:MM\", the next morning when it's before `time`).",
+        "advanced": false
+    },
+    {
+        "path": "bedtime.snoozeMinutes",
+        "page": "screentime",
+        "text": "\"Remind me later\" brings it back after this many minutes.",
+        "advanced": false
+    },
+    {
         "path": "battery.low",
         "page": "power",
         "text": "The charge (%) that counts as low.",

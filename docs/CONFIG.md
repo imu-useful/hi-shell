@@ -27,6 +27,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | [`translator`](#translator) | 2 |
 | [`clipboard`](#clipboard) | 1 |
 | [`weather`](#weather) | 6 |
+| [`bedtime`](#bedtime) | 4 |
 | [`battery`](#battery) | 3 |
 | [`focus`](#focus) | 1 |
 | [`notifications`](#notifications) | 3 |
@@ -331,6 +332,15 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `weather.longitude` | `real` | `0` | -180 … 180 | Settings › Services | Longitude of the place. |
 | `weather.imperial` | `bool` | `false` |  | Settings › Services | Use °F and miles. |
 | `weather.refreshMinutes` | `int` | `15` | 1 … 1440 | Settings › Services (advanced) | Minutes between weather updates. |
+
+## bedtime
+
+| Option | Type | Default | Values | Where | Description |
+| --- | --- | --- | --- | --- | --- |
+| `bedtime.enabled` | `bool` | `false` |  | Settings › Screen time | A full-screen "time to sleep" reminder every night (Settings > Screen time). |
+| `bedtime.time` | `string` | `"22:00"` | `#rrggbb` | Settings › Screen time | When it comes up ("HH:MM"). |
+| `bedtime.wake` | `string` | `"06:00"` | `#rrggbb` | Settings › Screen time | Until when it keeps coming up ("HH:MM", the next morning when it's before `time`). |
+| `bedtime.snoozeMinutes` | `int` | `10` | 1 … 180 | Settings › Screen time | "Remind me later" brings it back after this many minutes. |
 
 ## battery
 

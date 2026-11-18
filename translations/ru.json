@@ -1697,5 +1697,22 @@
     "Icon, cursor and GTK themes from the KDE Store, fonts from Google Fonts": "Темы значков, курсоров и GTK из KDE Store, шрифты из Google Fonts",
     "GTK": "GTK",
     "themes icons icon theme papirus tela breeze candy folders app icons pack cursor cursors mouse pointer arrow bibata size gtk theme gtk3 gtk4 adwaita fonts font installed": "темы значки иконки тема значков папки значки приложений набор курсор курсоры мышь указатель стрелка размер тема gtk шрифты шрифт установленные",
-    "store shop market download install get new kde store pling icons icon themes cursors cursor gtk themes fonts font google fonts": "магазин скачать установить новые значки иконки темы курсоры курсор темы gtk шрифты шрифт"
+    "store shop market download install get new kde store pling icons icon themes cursors cursor gtk themes fonts font google fonts": "магазин скачать установить новые значки иконки темы курсоры курсор темы gtk шрифты шрифт",
+    "How long you use your apps, daily limits and bedtime": "Сколько времени уходит на приложения, дневные лимиты и время сна",
+    "screen time bedtime sleep night go to bed reminder snooze usage used apps app limit limits minutes hours today week statistics focus time spent": "экранное время время сна сон спать ночь пора спать напоминание отложить использование приложения лимит лимиты минуты часы сегодня неделя статистика",
+    "In %1 min": "Через %1 мин",
+    "Not today": "Не сегодня",
+    "Time to sleep, %1": "Пора спать, %1",
+    "Save your work and get some rest. Tomorrow goes better after a good night.": "Сохраните работу и отдохните. После хорошего сна завтрашний день пройдёт лучше.",
+    "Bedtime": "Время сна",
+    "Remind me to go to sleep": "Напоминать, что пора спать",
+    "At bedtime the whole screen says it's time to sleep, with buttons to put it off, skip tonight, sleep or power off": "В это время на весь экран появляется напоминание с кнопками: отложить, не напоминать сегодня, сон или выключение",
+    "HH:MM, when the reminder comes up": "ЧЧ:ММ, когда появляется напоминание",
+    "Quiet from": "Не напоминать с",
+    "HH:MM, the morning time it stops coming back": "ЧЧ:ММ утра, после которого напоминание больше не появляется",
+    "Remind again in": "Напомнить снова через",
+    "Minutes, for the \"In … min\" button and Esc": "Минуты, для кнопки «Через … мин» и Esc",
+    "Show it now": "Показать сейчас",
+    "To see how it looks": "Посмотреть, как это выглядит",
+    "Show": "Показать"
 }

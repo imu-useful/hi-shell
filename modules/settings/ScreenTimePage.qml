@@ -4,6 +4,7 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 import qs.services
+import "../../common/Bedtime.js" as Logic
 
 // Screen time: today's apps (how long each had the focus), the week, and a daily limit per app.
 ColumnLayout {
@@ -354,6 +355,68 @@ ColumnLayout {
                     enabled: program.text.trim() !== ""
                     onClicked: root.addLimit()
                 }
+            }
+        }
+    }
+
+    // Bedtime: a full-screen reminder to go to sleep (services/Bedtime.qml).
+    Section {
+        icon: "bedtime"
+        title: Translation.tr("Bedtime")
+
+        SwitchRow {
+            icon: "bedtime"
+            title: Translation.tr("Remind me to go to sleep")
+            subtitle: Translation.tr("At bedtime the whole screen says it's time to sleep, with buttons to put it off, skip tonight, sleep or power off")
+            checked: Config.options.bedtime.enabled
+            onToggled: checked => Config.options.bedtime.enabled = checked
+        }
+        TextRow {
+            icon: "schedule"
+            title: Translation.tr("Bedtime")
+            subtitle: Translation.tr("HH:MM, when the reminder comes up")
+            fieldWidth: 100
+            placeholder: "22:00"
+            value: Config.options.bedtime.time
+            enabled: Config.options.bedtime.enabled
+            onEdited: text => {
+                if (Logic.minutesOf(text) >= 0)
+                    Config.options.bedtime.time = text.trim();
+            }
+        }
+        TextRow {
+            icon: "wb_twilight"
+            title: Translation.tr("Quiet from")
+            subtitle: Translation.tr("HH:MM, the morning time it stops coming back")
+            fieldWidth: 100
+            placeholder: "06:00"
+            value: Config.options.bedtime.wake
+            enabled: Config.options.bedtime.enabled
+            onEdited: text => {
+                if (Logic.minutesOf(text) >= 0)
+                    Config.options.bedtime.wake = text.trim();
+            }
+        }
+        StepperRow {
+            icon: "snooze"
+            title: Translation.tr("Remind again in")
+            subtitle: Translation.tr("Minutes, for the \"In … min\" button and Esc")
+            value: Config.options.bedtime.snoozeMinutes
+            step: 5
+            from: 5
+            to: 180
+            enabled: Config.options.bedtime.enabled
+            onChanged: value => Config.options.bedtime.snoozeMinutes = Math.round(value)
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "visibility"
+            title: Translation.tr("Show it now")
+            subtitle: Translation.tr("To see how it looks")
+            M3Button {
+                tonal: true
+                text: Translation.tr("Show")
+                onClicked: Bedtime.show()
             }
         }
     }
