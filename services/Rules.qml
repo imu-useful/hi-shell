@@ -259,9 +259,11 @@ Singleton {
         const error = Engine.validateRule(rule);
         if (error)
             return error;
-        const list = plainRules().filter(r => r?.id !== rule.id);
-        list.push(rule);
-        Config.setPath("rules", list);
+        // An edited rule keeps its place in the list; a new one goes last.
+        const list = plainRules();
+        const at = list.findIndex(r => r?.id === rule.id);
+        const next = at < 0 ? [...list, rule] : list.map((r, i) => i === at ? rule : r);
+        Config.setPath("rules", next);
         Config.flush();
         return "";
     }

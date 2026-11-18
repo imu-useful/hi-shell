@@ -11,7 +11,11 @@ hi rules edit my-rule         # the rule as JSON in $EDITOR (a new id starts fro
 hi rules off my-rule          # also: on, rm, show, facts (what conditions can see), check
 ```
 
-Also in Settings › Rules. Rules live in `config.json` under `rules`; `rulesEnabled: false` stops them all.
+Also in Settings › Rules: **New rule** (or the pencil next to a rule) opens an editor with fields: pick the
+conditions (all or any of them, each can be turned into its opposite with **Not**), the actions, and what else to do
+when the rule ends. "Change an option" finds the option by its name or description and offers a switch, choices or a
+number for its value. A rule the fields can't show (groups inside groups) opens as JSON, and **JSON** switches any rule
+to its text. Rules live in `config.json` under `rules`; `rulesEnabled: false` stops them all.
 
 ```json
 {

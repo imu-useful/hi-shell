@@ -4,6 +4,7 @@ import qs.common
 import qs.common.widgets
 import qs.services
 import "../../common/RulesEngine.js" as Engine
+import "../../common/RuleForm.js" as Form
 
 // Rules: "when this is true, do that" (Config rules, services/Rules.qml, docs/RULES.md).
 ColumnLayout {
@@ -15,6 +16,7 @@ ColumnLayout {
     // Reading the config (not just Rules.rules) keeps rules that don't parse in the list, with their error.
     readonly property var configRules: Config.options.rules
     readonly property var templateIds: Object.keys(Engine.templates)
+    property bool adding: false
 
     Section {
         icon: "rule"
@@ -32,7 +34,7 @@ ColumnLayout {
             Layout.margins: 14
             Layout.bottomMargin: 0
             wrapMode: Text.WordWrap
-            text: Translation.tr("A rule runs its actions when its condition turns true, and when it turns false the options it changed go back. Start from a template below, change a rule with Edit, or use `hi rules` in a terminal.")
+            text: Translation.tr("A rule runs its actions when its condition turns true, and when it turns false the options it changed go back. Make one with New rule or from a template below, change it with the pencil, or use `hi rules` in a terminal.")
             font.pixelSize: Appearance.font.size.labelMedium
             color: Colors.m3onSurfaceVariant
         }
@@ -46,7 +48,6 @@ ColumnLayout {
                 readonly property var bad: Rules.invalid.find(b => b.id === modelData.id) ?? null
                 readonly property bool active: Rules.activeIds.includes(modelData.id)
                 property bool editing: false
-                property string problem: ""
                 Layout.fillWidth: true
                 spacing: 0
 
@@ -57,8 +58,8 @@ ColumnLayout {
                     ListRow {
                         Layout.fillWidth: true
                         icon: row.bad ? "error" : row.active ? "play_circle" : "pause_circle"
-                        title: row.modelData.name || row.modelData.id
-                        subtitle: row.bad ? row.bad.error : (row.active ? Translation.tr("Active now") + " · " : "") + Engine.describe(row.modelData.when)
+                        title: row.modelData.name ? Translation.tr(row.modelData.name) : row.modelData.id
+                        subtitle: row.bad ? row.bad.error : (row.active ? Translation.tr("Active now") + " · " : "") + Form.describe(row.modelData.when, s => Translation.tr(s))
                     }
                     M3Switch {
                         checked: row.modelData.enabled !== false
@@ -74,55 +75,14 @@ ColumnLayout {
                     }
                 }
 
-                ColumnLayout {
-                    visible: row.editing
+                Loader {
+                    active: row.editing
+                    visible: active
                     Layout.fillWidth: true
                     Layout.margins: 14
-                    spacing: 8
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: Math.min(320, editor.contentHeight + 24)
-                        radius: Appearance.rounding.medium
-                        color: Colors.m3surfaceContainerHighest
-
-                        Flickable {
-                            anchors.fill: parent
-                            anchors.margins: 12
-                            contentHeight: editor.contentHeight
-                            clip: true
-                            TextEdit {
-                                id: editor
-                                width: parent.width
-                                text: JSON.stringify(row.modelData, null, 2)
-                                font.family: Appearance.font.mono
-                                font.pixelSize: Appearance.font.size.labelMedium
-                                color: Colors.m3onSurface
-                                wrapMode: TextEdit.WrapAnywhere
-                                selectByMouse: true
-                            }
-                        }
-                    }
-                    StyledText {
-                        visible: row.problem !== ""
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                        text: row.problem
-                        color: Colors.m3error
-                        font.pixelSize: Appearance.font.size.labelMedium
-                    }
-                    M3Button {
-                        icon: "check"
-                        text: Translation.tr("Save")
-                        onClicked: {
-                            try {
-                                row.problem = Rules.putRule(JSON.parse(editor.text));
-                                if (row.problem === "")
-                                    row.editing = false;
-                            } catch (e) {
-                                row.problem = e.message;
-                            }
-                        }
+                    sourceComponent: RuleEditor {
+                        rule: row.modelData
+                        onClosed: row.editing = false
                     }
                 }
             }
@@ -138,6 +98,34 @@ ColumnLayout {
     Section {
         icon: "library_add"
         title: Translation.tr("Add a rule")
+
+        ListRow {
+            visible: !root.adding
+            Layout.fillWidth: true
+            icon: "add_circle"
+            title: Translation.tr("New rule")
+            subtitle: Translation.tr("Pick the conditions and what to do, no JSON needed")
+            clickable: true
+            onClicked: root.adding = true
+        }
+        Loader {
+            active: root.adding
+            visible: active
+            Layout.fillWidth: true
+            Layout.margins: 14
+            sourceComponent: RuleEditor {
+                rule: ({ id: "" })
+                onClosed: root.adding = false
+            }
+        }
+        StyledText {
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            Layout.topMargin: 6
+            text: Translation.tr("Or start from a template")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
 
         Flow {
             Layout.fillWidth: true
