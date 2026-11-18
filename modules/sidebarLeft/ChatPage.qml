@@ -427,7 +427,7 @@ ColumnLayout {
 
                 StyledText {
                     visible: input.text === ""
-                    text: Claude.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Message Claude…")
+                    text: Claude.messages.count > 0 ? Translation.tr("Ask a follow-up…") : Translation.tr("Message %1…").arg(Claude.compat ? (Claude.modelName || Claude.providerName) : "Claude")
                     color: Colors.m3outline
                 }
             }

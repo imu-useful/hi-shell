@@ -1540,5 +1540,6 @@
     "Stop the download": "Остановить загрузку",
     "Download": "Скачать",
     "Remove from the disk": "Удалить с диска",
-    "No Ollama model yet: download one in the model list of the left sidebar's chat, or run `ollama pull llama3.2`.": "Моделей Ollama пока нет: скачайте любую в списке моделей чата в левой панели или выполните `ollama pull llama3.2`."
+    "No Ollama model yet: download one in the model list of the left sidebar's chat, or run `ollama pull llama3.2`.": "Моделей Ollama пока нет: скачайте любую в списке моделей чата в левой панели или выполните `ollama pull llama3.2`.",
+    "Message %1…": "Сообщение для %1…"
 }
