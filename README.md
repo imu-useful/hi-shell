@@ -19,6 +19,10 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 
 [Install](#installation) · [Screenshots](#screenshots) · [Shortcuts](#usage) · [Configuration](#configuration) · [Troubleshooting](#troubleshooting) · [Community](#community)
 
+
+> [!NOTE]
+> **hi-shell is taking a break.** Version 2.3.0 is the final release for now: there will be no updates until spring 2027. Everything keeps working as it is. The shell says so once in a window after the update (or right after the welcome on a fresh install). See you in the spring!
+
 <br>
 
 <img src="docs/keynote.webp" alt="hi-shell keynote: the show that opens the first run (rendered with tools/render_keynote.sh)" width="100%">
