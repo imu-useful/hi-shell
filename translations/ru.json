@@ -1956,10 +1956,13 @@
     "modes mode presentation screen share sharing hold notifications keep awake night light hide bar widgets viewing video fullscreen movie": "режимы режим презентация демонстрация экрана показ экрана удержание уведомления не гасить экран ночной свет скрыть панель виджеты просмотр видео полноэкранный фильм кино",
     "content filter adult sites block hosts tabs words keywords browser title close": "фильтр контента взрослые сайты блокировка hosts вкладки слова ключевые слова браузер заголовок закрыть",
     "about version quickshell source credits presets preset export import backup share": "о программе версия quickshell исходный код благодарности пресеты пресет экспорт импорт резервная копия поделиться",
-  "The name shown in greetings, cards and the lock screen; \"\" = the system user name.": "Имя в приветствиях, карточках и на экране блокировки; \"\" — имя системного пользователя.",
-  "The avatar picture (png/jpg); \"\" = ~/.face.": "Картинка аватарки (png/jpg); \"\" — ~/.face.",
-  "Shown in greetings, the cards and the lock screen; empty uses the system user name": "Показывается в приветствиях, карточках и на экране блокировки; пусто — имя системного пользователя",
-  "A picture file; empty uses ~/.face": "Файл с картинкой; пусто — ~/.face",
-  "Choose a picture": "Выбрать картинку",
-  "Choose…": "Выбрать…"
+    "The name shown in greetings, cards and the lock screen; \"\" = the system user name.": "Имя в приветствиях, карточках и на экране блокировки; \"\" — имя системного пользователя.",
+    "The avatar picture (png/jpg); \"\" = ~/.face.": "Картинка аватарки (png/jpg); \"\" — ~/.face.",
+    "Shown in greetings, the cards and the lock screen; empty uses the system user name": "Показывается в приветствиях, карточках и на экране блокировки; пусто — имя системного пользователя",
+    "A picture file; empty uses ~/.face": "Файл с картинкой; пусто — ~/.face",
+    "Choose a picture": "Выбрать картинку",
+    "Choose…": "Выбрать…",
+    "Temperature": "Температура",
+    "CPU %1 °C": "ЦП %1 °C",
+    "GPU %1 °C": "ГП %1 °C"
 }

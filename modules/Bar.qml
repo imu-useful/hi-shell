@@ -77,7 +77,13 @@ PanelWindow {
         divider: divider,
         focus: focus,
         zoneClock: zoneClock,
-        script: script
+        script: script,
+        timer: timerWidget,
+        todo: todo,
+        screenTime: screenTime,
+        brightness: brightness,
+        temperature: temperature,
+        uptime: uptime
     })
 
     // The Dynamic Island (the clock widget) takes the bar over while it shows music or a notification:
@@ -210,6 +216,12 @@ PanelWindow {
     Component { id: focus; FocusWidget {} }
     Component { id: zoneClock; ZoneClock {} }
     Component { id: script; ScriptWidget {} }
+    Component { id: timerWidget; TimerWidget {} }
+    Component { id: todo; TodoWidget {} }
+    Component { id: screenTime; ScreenTimeWidget {} }
+    Component { id: brightness; BrightnessWidget {} }
+    Component { id: temperature; TemperatureWidget {} }
+    Component { id: uptime; UptimeWidget {} }
 
     anchors.top: position !== "bottom"
     anchors.bottom: position !== "top"
