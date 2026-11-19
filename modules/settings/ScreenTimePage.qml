@@ -5,6 +5,7 @@ import qs.common
 import qs.common.widgets
 import qs.services
 import "../../common/Bedtime.js" as Logic
+import "../../common/Share.js" as Share
 
 // Screen time: today's apps (how long each had the focus), the week, and a daily limit per app.
 ColumnLayout {
@@ -60,10 +61,11 @@ ColumnLayout {
         return AppIcons.path(app);
     }
 
-    // One app: icon, name, time and a bar against `peak` (the most used app's seconds).
+    // One app: icon, name, time, its share of the day's `total` and a bar against `peak` (the most used app's seconds).
     component AppRow: RowLayout {
         required property var modelData
         property int peak: 1
+        property int total: 0
 
         Layout.fillWidth: true
         Layout.leftMargin: 16
@@ -94,6 +96,15 @@ ColumnLayout {
                     text: root.duration(modelData.seconds)
                     font.pixelSize: Appearance.font.size.labelMedium
                     color: Colors.m3onSurfaceVariant
+                }
+                StyledText {
+                    Layout.preferredWidth: 40
+                    horizontalAlignment: Text.AlignRight
+                    text: Share.percent(modelData.seconds, total)
+                    font.pixelSize: Appearance.font.size.labelMedium
+                    font.weight: Font.Medium
+                    font.features: { "tnum": 1 }
+                    color: Colors.m3primary
                 }
             }
             Rectangle {
@@ -134,6 +145,7 @@ ColumnLayout {
 
             AppRow {
                 peak: root.topSeconds
+                total: root.todayTotal
             }
         }
     }
@@ -244,6 +256,7 @@ ColumnLayout {
 
             AppRow {
                 peak: root.pickedApps.length ? root.pickedApps[0].seconds : 1
+                total: root.pickedTotal
             }
         }
     }

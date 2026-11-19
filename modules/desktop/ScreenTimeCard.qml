@@ -4,8 +4,9 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 import qs.services
+import "../../common/Share.js" as Share
 
-// Today's screen time: the total and the apps in the focus, most used first.
+// Today's screen time: the total and the apps in the focus, most used first, with their share of the total.
 DesktopCard {
     id: root
 
@@ -84,6 +85,15 @@ DesktopCard {
                         text: root.duration(modelData.seconds)
                         font.pixelSize: Appearance.font.size.labelMedium
                         color: Colors.m3onSurfaceVariant
+                    }
+                    StyledText {
+                        Layout.preferredWidth: 36
+                        horizontalAlignment: Text.AlignRight
+                        text: Share.percent(modelData.seconds, root.total)
+                        font.pixelSize: Appearance.font.size.labelMedium
+                        font.weight: Font.Medium
+                        font.features: { "tnum": 1 }
+                        color: Colors.m3primary
                     }
                 }
                 Rectangle {

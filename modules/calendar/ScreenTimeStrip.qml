@@ -4,6 +4,7 @@ import qs.common
 import qs.common.widgets
 import Quickshell
 import qs.services
+import "../../common/Share.js" as Share
 
 // Screen time under the calendar: a day's total and top apps (today's, or the one tapped in the bars), and
 // the week as bars, with arrows to the weeks before it (up to three).
@@ -51,14 +52,14 @@ ColumnLayout {
         }
     }
 
-    // The top apps of the day, as one line.
+    // The top apps of the day, as one line, each with its share of the day.
     StyledText {
         Layout.fillWidth: true
         visible: root.apps.length > 0
         wrapMode: Text.Wrap
         font.pixelSize: Appearance.font.size.labelSmall
         color: Colors.m3onSurfaceVariant
-        text: root.apps.slice(0, 4).map(a => `${DesktopEntries.heuristicLookup(a.app)?.name ?? a.app} ${ScreenTime.duration(a.seconds)}`).join("  ·  ")
+        text: root.apps.slice(0, 4).map(a => `${DesktopEntries.heuristicLookup(a.app)?.name ?? a.app} ${ScreenTime.duration(a.seconds)} (${Share.percent(a.seconds, root.total)})`).join("  ·  ")
     }
 
     // The week shown, with arrows to the weeks before it.
