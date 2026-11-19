@@ -94,6 +94,8 @@ ShellRoot {
 
     UpdateDialog {}
 
+    PauseNotice {}
+
     SecretHello {}
 
     FocusSettingsWindow {}

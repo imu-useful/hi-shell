@@ -85,6 +85,8 @@ Singleton {
 
     // Open the first-run welcome again (five taps on the avatar in Settings).
     signal showWelcome()
+    // The first-run welcome was finished or skipped (the break notice follows it).
+    signal welcomeFinished()
     // Play the startup greeting once more (Settings › Motion).
     signal previewGreeting()
     // The easter egg in Settings › About: a key typed into the secret setting ("" = none).

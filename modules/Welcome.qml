@@ -183,6 +183,7 @@ Scope {
     function finish(): void {
         root.open = false;
         doneFile.setText(new Date().toISOString() + "\n");
+        ShellState.welcomeFinished();
     }
 
     Connections {
