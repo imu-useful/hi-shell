@@ -1,6 +1,6 @@
 pkgbase = hi-shell
 	pkgdesc = A Quickshell desktop shell for Hyprland: bar, dock, launcher, sidebars, notifications, Material You colors
-	pkgver = 2.2.0
+	pkgver = 2.3.0
 	pkgrel = 1
 	url = https://github.com/imu-useful/hi-shell
 	install = hi-shell.install
@@ -48,7 +48,7 @@ pkgbase = hi-shell
 	optdepends = qrencode: hi qr
 	optdepends = starship: the prompt of the fish config
 	optdepends = claude-code: the AI chat and palette
-	source = hi-shell-2.2.0.tar.gz::https://github.com/imu-useful/hi-shell/archive/refs/tags/v2.2.0.tar.gz
-	sha256sums = ab16f9f85d8e07e791fc1b403704dad9ae2ce7d91e4a2d558d4def45bf15ffa8
+	source = hi-shell-2.3.0.tar.gz::https://github.com/imu-useful/hi-shell/archive/refs/tags/v2.3.0.tar.gz
+	sha256sums = e24ced25d05326f0267f17c6255a4f79e984b59ea6a99f10a21f5debdca4f59c
 
 pkgname = hi-shell
