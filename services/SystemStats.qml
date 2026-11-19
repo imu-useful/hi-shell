@@ -33,10 +33,12 @@ Singleton {
     property string gpuTempPath: ""
 
     property var prevCpu: null
-    // Some AMD APUs (Raven/Picasso) report gpu_busy_percent = 100 forever while the
-    // clock sits at its lowest state; that reading is bogus, so the GPU is hidden.
-    property bool gpuClockLowest: false
-    property bool gpuCounterBogus: false
+    // Some AMD APUs (Raven/Picasso) report gpu_busy_percent = 100 forever. A reading
+    // pinned at 100 for gpuPinnedPolls polls in a row is not trusted; the load is
+    // then measured from /proc/*/fdinfo instead (which agrees if the GPU is truly pegged).
+    readonly property int gpuPinnedPolls: 5
+    property int gpuPinnedCount: 0
+    readonly property bool gpuCounterBogus: gpuPinnedCount >= gpuPinnedPolls
     // Fallback load: GPU engine time of all DRM clients (/proc/*/fdinfo) per wall time.
     property real prevGpuNs: -1
     property real prevGpuAt: 0
@@ -96,7 +98,7 @@ Singleton {
         printErrors: false
         onLoaded: {
             const busy = Number(text());
-            root.gpuCounterBogus = busy >= 100 && root.gpuClockLowest;
+            root.gpuPinnedCount = busy >= 100 ? root.gpuPinnedCount + 1 : 0;
             if (!root.gpuCounterBogus)
                 root.gpuUsage = busy / 100;
         }
@@ -120,13 +122,6 @@ Singleton {
         }
     }
 
-    // First line of pp_dpm_sclk is the lowest clock; "*" marks the active one.
-    FileView {
-        id: gpuClock
-        path: root.gpuBusyPath ? root.gpuBusyPath.replace("gpu_busy_percent", "pp_dpm_sclk") : ""
-        printErrors: false
-        onLoaded: root.gpuClockLowest = (text().split("\n")[0] ?? "").includes("*")
-    }
 
     FileView {
         id: cpuTempFile
@@ -152,7 +147,6 @@ Singleton {
             meminfo.reload();
             uptimeFile.reload();
             if (root.gpuBusyPath) {
-                gpuClock.reload();
                 gpuBusy.reload();
                 if (root.gpuCounterBogus && !gpuFdinfo.running)
                     gpuFdinfo.running = true;
