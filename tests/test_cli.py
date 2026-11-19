@@ -200,7 +200,7 @@ class CliTest(unittest.TestCase):
 
     def test_every_command_in_the_completions_is_known_to_the_cli(self):
         for word in self.qs.run("__complete").stdout.split():
-            if word in ("start", "stop", "restart", "update", "install", "uninstall", "help", "log", "doctor", "edit"):
+            if word in ("start", "stop", "restart", "update", "install", "installer", "uninstall", "help", "log", "doctor", "edit"):
                 continue  # these run things for real
             out = self.qs.run(word)
             self.assertNotIn("Unknown command", out.stderr, word)

@@ -109,6 +109,23 @@ npm install -g @anthropic-ai/claude-code   # then run `claude` once to sign in
 ### Quick install
 
 ```sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/setup.sh)"
+```
+
+That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
+It opens the **installer window**: switch the parts you want on or off (packages, the Hyprland hook, the terminal configs,
+optional apps, starting the shell), pick where updates come from and press **Install**. The window asks for your sudo
+password once, only when a part installs packages (it checks it right away and doesn't keep it), then installs
+everything by itself and shows each step; **Details** has the full log (also saved to `~/.cache/hi-shell/install.log`).
+`hi installer` opens it again later, to add a part or repair the install.
+
+The window is GTK 4 + libadwaita: when `python-gobject`, `gtk4` or `libadwaita` is missing, `setup.sh` installs them
+with pacman first (asking for sudo in the terminal). Without a graphical session (a TTY, ssh), or with `setup.sh --text`,
+the text installer below runs instead. The window runs that same `install.sh` with `--yes` and the parts you picked.
+
+#### Text installer
+
+```sh
 git clone https://github.com/imu-useful/hi-shell.git ~/hi-shell
 ~/hi-shell/install.sh
 ```
@@ -118,8 +135,6 @@ or without cloning first (the repo goes to `~/.local/share/hi-shell/repo`):
 ```sh
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
 ```
-
-That line works in bash, zsh and fish (fish has no `<(...)`, so the usual `bash <(curl ...)` fails there).
 
 The installer first shows what it can install (packages, the Hyprland hook, the fish / kitty / fastfetch / btop / Dolphin configs, optional apps, starting the shell):
 type the numbers to switch parts on or off, Enter to continue. Then it asks before every action ("Should I ...?"):
@@ -630,6 +645,7 @@ translations/        interface translations (ru.json)
 hypr/hi-shell.lua    a stub for configs that still load the old single file (it loads the folder below)
 hypr/hi-shell/       Hyprland autostart, keybinds, Super tap, window and layer rules, Wait Mode submap (installed to ~/.config/hypr/hi-shell)
 run.sh               start the shell (Vulkan rendering when available)
+setup.sh             open the installer window (installer/: GTK 4 + libadwaita, runs install.sh with your picks)
 install.sh           install packages, link the repo, hook into Hyprland, offer the configs in dots/
 dots/                terminal configs (fish, kitty, fastfetch, btop)
 update.sh            pull and restart

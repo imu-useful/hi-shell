@@ -110,15 +110,15 @@ declare -A WANT=([deps]=$DEPS [hypr]=true [fish]=$DOTS [kitty]=$DOTS [fastfetch]
 # --only / --skip: the parts named switch on (the rest off) / off; a name that isn't a part stops the install.
 apply_part_flags() {
     local list n
-    if $LIST; then
-        for n in "${PARTS[@]}"; do printf '  %-10s %s\n' "$n" "${PART_NAME[$n]}"; done
-        exit 0
-    fi
     for list in "$ONLY" "$SKIP"; do
         for n in ${list//,/ }; do
             [[ -v PART_NAME[$n] ]] || die "no part called \"$n\" (see --list)"
         done
     done
+    if $LIST; then
+        for n in "${PARTS[@]}"; do printf '  %-10s %s\n' "$n" "${PART_NAME[$n]}"; done
+        exit 0
+    fi
     if [[ -n "$ONLY" ]]; then
         for n in "${PARTS[@]}"; do WANT[$n]=false; done
         for n in ${ONLY//,/ }; do WANT[$n]=true; done
@@ -188,6 +188,14 @@ choose_channel() {
 }
 choose_channel
 
+# The AUR helper's flags: with no questions (--yes, the installer window) paru would still stop to show the
+# PKGBUILDs, so it skips that review; yay's --noconfirm already does.
+aur_flags() { # aur_flags <helper path>
+    AUR_FLAGS=("${NOCONFIRM[@]}")
+    ((${#NOCONFIRM[@]})) && [[ "$(basename "$1")" == paru ]] && AUR_FLAGS+=(--skipreview)
+    return 0
+}
+
 # --- Packages ---
 PACMAN_PKGS=(
     matugen python pipewire wireplumber networkmanager bluez upower brightnessctl ddcutil
@@ -233,7 +241,8 @@ elif $DEPS; then
         if [[ -n "$helper" ]]; then
             echo "Missing from the AUR: ${aur_missing[*]}"
             if ask "Should I install them with $(basename "$helper")?"; then
-                "$helper" -S --needed "${NOCONFIRM[@]}" "${aur_missing[@]}"
+                aur_flags "$helper"
+                "$helper" -S --needed "${AUR_FLAGS[@]}" "${aur_missing[@]}"
             fi
         else
             warn "install ${aur_missing[*]} from the AUR (no paru or yay found)"
@@ -276,7 +285,10 @@ if ((${#app_repo[@]} + ${#app_aur[@]})); then
         helper=$(command -v paru || command -v yay || true)
         if [[ -n "$helper" ]]; then
             echo "From the AUR: ${app_aur[*]}"
-            ask "Should I install them with $(basename "$helper")?" && "$helper" -S --needed "${NOCONFIRM[@]}" "${app_aur[@]}"
+            if ask "Should I install them with $(basename "$helper")?"; then
+                aur_flags "$helper"
+                "$helper" -S --needed "${AUR_FLAGS[@]}" "${app_aur[@]}"
+            fi
         else
             warn "install ${app_aur[*]} from the AUR (no paru or yay found)"
         fi

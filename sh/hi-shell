@@ -2,7 +2,7 @@
 # hi-shell command line (also installed as `hi`).
 #
 #   Shell        hi start | stop | restart | status | log [-f] | doctor | version
-#   Install      hi update [--check] | channel [git|release] | install [options] | uninstall [--purge]
+#   Install      hi update [--check] | channel [git|release] | install [options] | installer | uninstall [--purge]
 #                hi completions bash|zsh|fish   (install.sh sets them up)
 #   Panels       hi settings [page|search <word>] | launcher | apps | overview | calendar | weather | processes
 #                hi sidebar [left|right] | bar [show|hide|toggle|edit|done|list|add|rm|monitor|instance] | lock | wait | present
@@ -628,7 +628,7 @@ sounds() {
 
 # --- Completions ---
 # One list of words for every shell: the completion scripts call `hi __complete <words before the cursor>`.
-COMMANDS="start stop restart status log doctor version update channel install uninstall completions config settings
+COMMANDS="start stop restart status log doctor version update channel install installer uninstall completions config settings
 launcher apps overview calendar weather processes sidebar bar lock session boot wait present ask theme wallpaper preset
 look rules dock desktop widgets script shot brightness display powersave notif todo focus screentime sounds play pause
 next prev qr keybinds ipc help"
@@ -703,6 +703,7 @@ case "$cmd" in
     update) update "$@" ;;
     channel) channel "$@" ;;
     install | reinstall | repair) repo_script install.sh "$@" ;;
+    installer | setup) repo_script setup.sh "$@" ;;
     uninstall) repo_script uninstall.sh "$@" ;;
     completions | completion) completions "$@" ;;
     __complete) complete_words "$@" ;;
