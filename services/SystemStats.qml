@@ -36,6 +36,10 @@ Singleton {
     // Some AMD APUs (Raven/Picasso) report gpu_busy_percent = 100 forever while the
     // clock sits at its lowest state; that reading is bogus, so the GPU is hidden.
     property bool gpuClockLowest: false
+    property bool gpuCounterBogus: false
+    // Fallback load: GPU engine time of all DRM clients (/proc/*/fdinfo) per wall time.
+    property real prevGpuNs: -1
+    property real prevGpuAt: 0
 
     readonly property string uptimeText: {
         const d = Math.floor(uptime / 86400), h = Math.floor(uptime % 86400 / 3600), m = Math.floor(uptime % 3600 / 60);
@@ -92,7 +96,27 @@ Singleton {
         printErrors: false
         onLoaded: {
             const busy = Number(text());
-            root.gpuUsage = busy >= 100 && root.gpuClockLowest ? -1 : busy / 100;
+            root.gpuCounterBogus = busy >= 100 && root.gpuClockLowest;
+            if (!root.gpuCounterBogus)
+                root.gpuUsage = busy / 100;
+        }
+    }
+
+    Process {
+        id: gpuFdinfo
+        command: ["sh", "-c", `grep -H -E '^(drm-client-id|drm-engine-(gfx|compute)):' /proc/[0-9]*/fdinfo/* 2>/dev/null | awk '
+            { split($1, a, "/"); fd = a[5]; sub(/:.*/, "", fd); key = a[3] SUBSEP fd
+              if ($0 ~ /drm-client-id/) id[key] = $NF; else eng[key] += $(NF-1) + 0 }
+            END { for (k in eng) { split(k, p, SUBSEP); c = p[1] "-" id[k]; if (!(c in seen) || eng[k] > seen[c]) seen[c] = eng[k] }
+                  for (c in seen) t += seen[c]; printf "%.0f\\n", t }'`]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const ns = Number(text.trim()), now = Date.now();
+                if (root.prevGpuNs >= 0 && ns >= root.prevGpuNs && now > root.prevGpuAt)
+                    root.gpuUsage = Math.min(1, (ns - root.prevGpuNs) / ((now - root.prevGpuAt) * 1e6));
+                root.prevGpuNs = ns;
+                root.prevGpuAt = now;
+            }
         }
     }
 
@@ -130,6 +154,8 @@ Singleton {
             if (root.gpuBusyPath) {
                 gpuClock.reload();
                 gpuBusy.reload();
+                if (root.gpuCounterBogus && !gpuFdinfo.running)
+                    gpuFdinfo.running = true;
             }
             if (root.cpuTempPath)
                 cpuTempFile.reload();
