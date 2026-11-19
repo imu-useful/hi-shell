@@ -33,6 +33,9 @@ Singleton {
     property string gpuTempPath: ""
 
     property var prevCpu: null
+    // Some AMD APUs (Raven/Picasso) report gpu_busy_percent = 100 forever while the
+    // clock sits at its lowest state; that reading is bogus, so the GPU is hidden.
+    property bool gpuClockLowest: false
 
     readonly property string uptimeText: {
         const d = Math.floor(uptime / 86400), h = Math.floor(uptime % 86400 / 3600), m = Math.floor(uptime % 3600 / 60);
@@ -87,7 +90,18 @@ Singleton {
         id: gpuBusy
         path: root.gpuBusyPath
         printErrors: false
-        onLoaded: root.gpuUsage = Number(text()) / 100
+        onLoaded: {
+            const busy = Number(text());
+            root.gpuUsage = busy >= 100 && root.gpuClockLowest ? -1 : busy / 100;
+        }
+    }
+
+    // First line of pp_dpm_sclk is the lowest clock; "*" marks the active one.
+    FileView {
+        id: gpuClock
+        path: root.gpuBusyPath ? root.gpuBusyPath.replace("gpu_busy_percent", "pp_dpm_sclk") : ""
+        printErrors: false
+        onLoaded: root.gpuClockLowest = (text().split("\n")[0] ?? "").includes("*")
     }
 
     FileView {
@@ -113,8 +127,10 @@ Singleton {
             stat.reload();
             meminfo.reload();
             uptimeFile.reload();
-            if (root.gpuBusyPath)
+            if (root.gpuBusyPath) {
+                gpuClock.reload();
                 gpuBusy.reload();
+            }
             if (root.cpuTempPath)
                 cpuTempFile.reload();
             if (root.gpuTempPath)
