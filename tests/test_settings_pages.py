@@ -47,6 +47,21 @@ class SettingsPagesTest(unittest.TestCase):
     def test_search_matches_group_names(self):
         self.assertIn("contentfilter", node_eval(PAGES, "search('habits').map(p => p.id)"))
 
+    def test_search_ignores_russian_endings_and_yo(self):
+        ru = json.dumps(str(ROOT / "translations" / "ru.json"))
+        tr = f"(s => JSON.parse(require('fs').readFileSync({ru}, 'utf8'))[s] ?? s)"
+        self.assertIn("wallpaper", node_eval(PAGES, f"search('обоев', {tr}).map(p => p.id)"))
+        self.assertIn("sounds", node_eval(PAGES, f"search('громкости звука', {tr}).map(p => p.id)"))
+        self.assertIn("home", node_eval(PAGES, f"search('темная', {tr}).map(p => p.id)"))
+        self.assertTrue(node_eval(PAGES, "matches('Экран блокировки', words('экрана блокировку'))"))
+        self.assertFalse(node_eval(PAGES, "matches('Экран блокировки', words('док'))"))
+
+    def test_options_and_page_keywords_are_translated_to_russian(self):
+        ru = json.loads((ROOT / "translations" / "ru.json").read_text())
+        missing = [o["text"] for o in index_options() if o["text"] not in ru]
+        missing += [k for k in node_eval(PAGES, "pages.map(p => p.keywords)") if k not in ru]
+        self.assertEqual(missing, [])
+
 
 if __name__ == "__main__":
     unittest.main()

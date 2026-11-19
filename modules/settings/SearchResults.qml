@@ -12,12 +12,9 @@ ColumnLayout {
     property string query: ""
     signal picked(string page, string tab, bool advanced)
 
-    readonly property var words: query.toLowerCase().trim().split(/\s+/).filter(w => w)
+    readonly property var words: Pages.words(query)
     readonly property var pageHits: Pages.search(query, Translation.tr)
-    readonly property var optionHits: OptionIndex.options.filter(o => {
-        const hay = `${o.path} ${o.text} ${Translation.tr(o.text)}`.toLowerCase();
-        return words.length > 0 && words.every(w => hay.includes(w));
-    }).slice(0, 40)
+    readonly property var optionHits: OptionIndex.options.filter(o => Pages.matches(`${o.path} ${o.text} ${Translation.tr(o.text)}`, words)).slice(0, 40)
 
     // "Group › Page" for an option's page.
     function pageTitle(id) {

@@ -98,18 +98,44 @@ function group(id) {
     return groups.find(g => g.id === id) ?? null;
 }
 
+// Search text: lower case, ё as е.
+function norm(text) {
+    return String(text).toLowerCase().replace(/ё/g, "е");
+}
+
+// A Russian word's ending (case, number, gender), cut off a typed word so that
+// "обоев" finds "обои" and "экрана" finds "Экран блокировки".
+const RU_ENDING = /(иями|ями|ами|ого|его|ому|ему|ыми|ими|ией|ия|ие|ий|ию|ой|ей|ый|ая|яя|ое|ее|ые|ов|ев|ам|ям|ах|ях|ом|ем|ую|юю|ь|а|я|о|е|ы|и|у|ю|й)$/;
+
+function stem(word) {
+    if (word.length < 4 || !/[а-я]/.test(word))
+        return word;
+    const s = word.replace(RU_ENDING, "");
+    return s.length >= 3 ? s : word;
+}
+
+// The words of a query, normalized and without Russian endings.
+function words(query) {
+    return norm(query).trim().split(/\s+/).filter(w => w).map(stem);
+}
+
+// True when the text has every one of the words (from words()).
+function matches(text, ws) {
+    const hay = norm(text);
+    return ws.length > 0 && ws.every(w => hay.includes(w));
+}
+
 // Pages matching every word of the query (title, group or keywords, in English or
 // through tr, the interface language), best first.
 function search(query, tr = s => s) {
-    const words = query.toLowerCase().trim().split(/\s+/).filter(w => w);
-    if (!words.length)
+    const ws = words(query);
+    if (!ws.length)
         return [];
     return pages.map(p => {
         const g = group(p.group)?.title ?? "";
-        const hay = `${p.title} ${g} ${p.keywords} ${tr(p.title)} ${tr(g)} ${tr(p.keywords)}`.toLowerCase();
-        if (!words.every(w => hay.includes(w)))
+        if (!matches(`${p.title} ${g} ${p.keywords} ${tr(p.title)} ${tr(g)} ${tr(p.keywords)}`, ws))
             return null;
-        const starts = p.title.toLowerCase().startsWith(words[0]) || tr(p.title).toLowerCase().startsWith(words[0]);
+        const starts = norm(p.title).startsWith(ws[0]) || norm(tr(p.title)).startsWith(ws[0]);
         return { page: p, score: starts ? 0 : 1 };
     }).filter(r => r).sort((a, b) => a.score - b.score).map(r => r.page);
 }
