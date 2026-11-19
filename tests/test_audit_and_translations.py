@@ -54,5 +54,29 @@ class TranslationsTest(unittest.TestCase):
         self.assertEqual(missing, [])
 
 
+class GermanTranslationTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ru = json.loads((ROOT / "translations" / "ru.json").read_text())
+        cls.de = json.loads((ROOT / "translations" / "de.json").read_text())
+
+    def test_every_string_the_russian_file_has_is_in_german_too(self):
+        self.assertEqual(sorted(k for k in self.ru if k not in self.de), [])
+
+    def test_placeholders_survive_the_translation(self):
+        def holes(text):
+            return sorted(re.findall(r"%\d", text))
+
+        bad = [k for k, v in self.de.items() if isinstance(v, str) and holes(k) != holes(v)]
+        self.assertEqual(bad, [])
+
+    def test_german_has_no_empty_or_non_text_values(self):
+        bad = [k for k, v in self.de.items() if not isinstance(v, str) or not v.strip()]
+        self.assertEqual(bad, [])
+
+    def test_german_is_a_built_in_language(self):
+        self.assertIn('code: "de"', (ROOT / "common" / "Translation.qml").read_text())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -98,9 +98,9 @@ function group(id) {
     return groups.find(g => g.id === id) ?? null;
 }
 
-// Search text: lower case, ё as е.
+// Search text: lower case, ё as е, ä ö ü as a o u and ß as ss.
 function norm(text) {
-    return String(text).toLowerCase().replace(/ё/g, "е");
+    return String(text).toLowerCase().replace(/ё/g, "е").replace(/ä/g, "a").replace(/ö/g, "o").replace(/ü/g, "u").replace(/ß/g, "ss");
 }
 
 // A Russian word's ending (case, number, gender), cut off a typed word so that

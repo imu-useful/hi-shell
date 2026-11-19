@@ -64,7 +64,7 @@ source = ${customFile}
         const font = Appearance.font.main;
         const icons = Appearance.font.icon;
         const wallpaper = Config.options.lock.wallpaper ? Wallpapers.still : "";
-        const lc = Translation.code === "ru" ? "ru_RU.UTF-8" : "en_US.UTF-8";
+        const lc = (Translation.localeNames[Translation.code] ?? "en_US") + ".UTF-8";
         const tr = s => sq(Translation.tr(s));
         const l = Config.options.lock;
         const accentColor = ({ secondary: Colors.m3secondary, tertiary: Colors.m3tertiary })[l.accent] ?? Colors.m3primary;

@@ -5,7 +5,9 @@
     translate.py --code fr --name Français --out FILE --provider openai --url https://api.openai.com/v1 --model gpt-4o-mini
 
 Collects every Translation.tr("...") and Translation.trn("...", "...") string of the shell (in the
-repo this script lives in), asks the model for each batch, and writes {English: translation} to FILE.
+repo this script lives in) and the keys of translations/ru.json (the strings that reach the interface
+some other way, like the settings pages' titles), asks the model for each batch, and writes
+{English: translation} to FILE. When FILE already has translations, only the missing strings are asked.
 The key comes from the environment (HI_AI_KEY), never from the command line. Prints "progress N M"
 lines while it works and "done N" at the end; errors go to stderr with exit code 1.
 """
@@ -43,7 +45,19 @@ def collect() -> list[str]:
             for one, many in TRN.findall(text):
                 found.add(unescape(one))
                 found.add(unescape(many))
+    reference = REPO / "translations" / "ru.json"
+    if reference.is_file():
+        found.update(json.loads(reference.read_text(encoding="utf-8")))
     return sorted(found)
+
+
+def load_done(path: Path) -> dict[str, str]:
+    """The translations FILE already holds (strings only), so a rerun asks for what is missing."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {k: v for k, v in data.items() if isinstance(v, str) and v.strip()} if isinstance(data, dict) else {}
 
 
 def ask_claude(prompt: str, model: str) -> str:
@@ -96,8 +110,8 @@ def main() -> int:
     args = ap.parse_args()
     key = os.environ.get("HI_AI_KEY", "")
 
-    strings = collect()
-    result: dict[str, str] = {}
+    result = load_done(args.out)
+    strings = [s for s in collect() if s not in result]
     failures = 0
     for i in range(0, len(strings), BATCH):
         batch = strings[i:i + BATCH]
