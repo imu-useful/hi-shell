@@ -7,6 +7,7 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | Section | Options |
 | --- | --- |
 | [`(general)`](#general) | 5 |
+| [`profile`](#profile) | 2 |
 | [`appearance`](#appearance) | 39 |
 | [`bar`](#bar) | 31 |
 | [`sidebar`](#sidebar) | 8 |
@@ -49,6 +50,13 @@ The file is `~/.config/hi-shell/config.json`; edits apply live. A value that bre
 | `rules` | `var` | `[]` |  | Settings › About | Rules: [{ id, name, enabled, when, then, else }] (see common/RulesEngine.js): when `when` turns true, `then` runs; when it turns false, what `then` set is put back and `else` runs. rulesEnabled: false stops them all. |
 | `settingsAdvanced` | `bool` | `false` |  | Settings › Wallpaper | Settings shows the rarely needed rows too (Settings › Overview). Off hides them; the search always finds them. |
 | `rulesEnabled` | `bool` | `true` |  | Settings › Rules | Off stops every rule and puts back what they changed. |
+
+## profile
+
+| Option | Type | Default | Values | Where | Description |
+| --- | --- | --- | --- | --- | --- |
+| `profile.name` | `string` | `""` |  | Settings › General | The name shown in greetings, cards and the lock screen; "" = the system user name. |
+| `profile.avatar` | `string` | `""` |  | Settings › General | The avatar picture (png/jpg); "" = ~/.face. |
 
 ## appearance
 

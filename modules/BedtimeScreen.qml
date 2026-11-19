@@ -132,7 +132,7 @@ Scope {
                         }
                         StyledText {
                             Layout.alignment: Qt.AlignHCenter
-                            text: Translation.tr("Time to sleep, %1").arg(Quickshell.env("USER"))
+                            text: Translation.tr("Time to sleep, %1").arg(Profile.name)
                             font.pixelSize: Appearance.font.size.headlineMedium
                             font.weight: Font.Medium
                         }

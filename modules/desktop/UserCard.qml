@@ -34,12 +34,12 @@ DesktopCard {
                 implicitWidth: 56
                 implicitHeight: 56
                 shape: "circle"
-                source: `file://${Paths.home}/.face`
+                source: Profile.avatarSource
             }
             ColumnLayout {
                 spacing: 0
                 StyledText {
-                    text: `${Quickshell.env("USER")}@${root.hostname}`
+                    text: `${Profile.name}@${root.hostname}`
                     font.weight: Font.Medium
                 }
                 StyledText {

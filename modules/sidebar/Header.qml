@@ -40,7 +40,7 @@ ColumnLayout {
             implicitWidth: 52
             implicitHeight: 52
             shape: "cookie9"
-            source: `file://${Paths.home}/.face`
+            source: Profile.avatarSource
 
             MaterialShape {
                 anchors.fill: parent
@@ -61,7 +61,7 @@ ColumnLayout {
             spacing: 0
             StyledText {
                 Layout.fillWidth: true
-                text: `${Quickshell.env("USER")}${root.hostname ? "@" + root.hostname : ""}`
+                text: `${Profile.name}${root.hostname ? "@" + root.hostname : ""}`
                 font.pixelSize: Appearance.font.size.titleMedium
                 font.weight: Font.Medium
                 elide: Text.ElideRight

@@ -164,7 +164,7 @@ ${block(l.avatar, `shape {
 }
 image {
     monitor =
-    path = ${Paths.home}/.face
+    path = ${Profile.avatarPath}
     size = ${avatar}
     rounding = -1
     border_size = 0

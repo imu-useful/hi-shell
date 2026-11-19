@@ -15,6 +15,18 @@ const options = [
         "advanced": false
     },
     {
+        "path": "profile.name",
+        "page": "general",
+        "text": "The name shown in greetings, cards and the lock screen; \"\" = the system user name.",
+        "advanced": false
+    },
+    {
+        "path": "profile.avatar",
+        "page": "general",
+        "text": "The avatar picture (png/jpg); \"\" = ~/.face.",
+        "advanced": false
+    },
+    {
         "path": "appearance.themedIcons",
         "page": "style",
         "text": "App icons in one color, the palette's primary (dock, workspaces, launcher).",

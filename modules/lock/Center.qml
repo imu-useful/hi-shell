@@ -90,14 +90,14 @@ ColumnLayout {
             anchors.fill: parent
             anchors.margins: 6
             shape: "circle"
-            source: `file://${Paths.home}/.face`
+            source: Profile.avatarSource
         }
     }
 
     StyledText {
         Layout.alignment: Qt.AlignHCenter
         readonly property int hour: Number(Qt.formatTime(clock.date, "H"))
-        text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Quickshell.env("USER")}`
+        text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Profile.name}`
         font.pixelSize: Appearance.font.size.titleMedium
         color: Colors.m3onSurfaceVariant
     }

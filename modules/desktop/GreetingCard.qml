@@ -77,14 +77,14 @@ DesktopCard {
             implicitWidth: 72
             implicitHeight: 72
             shape: "cookie9"
-            source: `file://${Paths.home}/.face`
+            source: Profile.avatarSource
         }
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 0
             readonly property int hour: clock.date.getHours()
             StyledText {
-                text: Translation.tr("Hi, %1!").arg(Quickshell.env("USER"))
+                text: Translation.tr("Hi, %1!").arg(Profile.name)
                 font.pixelSize: Appearance.font.size.titleLarge
                 font.weight: Font.DemiBold
                 color: Colors.m3primary

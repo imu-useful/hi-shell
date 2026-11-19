@@ -236,7 +236,7 @@ Scope {
                                 implicitWidth: 44
                                 implicitHeight: 44
                                 shape: "cookie9"
-                                source: `file://${Paths.home}/.face`
+                                source: Profile.avatarSource
 
                                 property int taps: 0
                                 readonly property int needed: 5
@@ -269,7 +269,7 @@ Scope {
                             ColumnLayout {
                                 spacing: 0
                                 StyledText {
-                                    text: Quickshell.env("USER")
+                                    text: Profile.name
                                     font.weight: Font.Medium
                                 }
                                 StyledText {

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Io
 import qs.common
 import qs.common.widgets
 import qs.services
@@ -11,6 +12,56 @@ ColumnLayout {
 
     // The model picked for the generated language (empty: the provider's default).
     property string langModelId: ""
+
+    Section {
+        icon: "account_circle"
+        title: Translation.tr("Profile")
+
+        TextRow {
+            icon: "badge"
+            title: Translation.tr("Name")
+            subtitle: Translation.tr("Shown in greetings, the cards and the lock screen; empty uses the system user name")
+            placeholder: Quickshell.env("USER")
+            value: o.profile.name
+            onEdited: text => o.profile.name = text.trim()
+        }
+        TextRow {
+            icon: "image"
+            title: Translation.tr("Avatar")
+            subtitle: Translation.tr("A picture file; empty uses ~/.face")
+            placeholder: "~/.face"
+            fieldWidth: 260
+            value: o.profile.avatar
+            onEdited: text => o.profile.avatar = text.trim()
+        }
+        ListRow {
+            Layout.fillWidth: true
+            icon: "photo_library"
+            title: Translation.tr("Choose a picture")
+            subtitle: Profile.avatarPath
+            M3Button {
+                text: Translation.tr("Choose…")
+                icon: "folder_open"
+                enabled: !avatarPicker.running
+                onClicked: avatarPicker.running = true
+            }
+            M3Button {
+                visible: o.profile.avatar !== ""
+                text: Translation.tr("Reset")
+                onClicked: o.profile.avatar = ""
+            }
+        }
+        Process {
+            id: avatarPicker
+            command: ["sh", "-c", "zenity --file-selection --title=\"$1\" --file-filter='Images | *.png *.jpg *.jpeg *.webp *.gif' 2>/dev/null || kdialog --getopenfilename \"$HOME\" 'image/*' 2>/dev/null", "sh", Translation.tr("Choose a picture")]
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    const path = text.trim();
+                    if (path) o.profile.avatar = path;
+                }
+            }
+        }
+    }
 
     Section {
         icon: "language"

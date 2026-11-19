@@ -11,6 +11,13 @@ JsonAdapter {
     // in ~/.config/hi-shell/translations.
     property var customLanguages: []
 
+    property JsonObject profile: JsonObject {
+        // The name shown in greetings, cards and the lock screen; "" = the system user name.
+        property string name: ""
+        // The avatar picture (png/jpg); "" = ~/.face.
+        property string avatar: ""
+    }
+
     property JsonObject appearance: JsonObject {
         // App icons in one color, the palette's primary (dock, workspaces, launcher).
         property bool themedIcons: false

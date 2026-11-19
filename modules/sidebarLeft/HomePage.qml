@@ -32,7 +32,7 @@ ColumnLayout {
                 implicitWidth: 62
                 implicitHeight: 62
                 shape: "cookie12"
-                source: `file://${Paths.home}/.face`
+                source: Profile.avatarSource
             }
 
             ColumnLayout {
@@ -42,7 +42,7 @@ ColumnLayout {
                 StyledText {
                     Layout.fillWidth: true
                     readonly property int hour: clock.date.getHours()
-                    text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Quickshell.env("USER")}!`
+                    text: `${hour < 5 ? Translation.tr("Good night") : hour < 12 ? Translation.tr("Good morning") : hour < 18 ? Translation.tr("Good afternoon") : Translation.tr("Good evening")}, ${Profile.name}!`
                     font.pixelSize: Appearance.font.size.titleLarge
                     font.weight: Font.Medium
                 }

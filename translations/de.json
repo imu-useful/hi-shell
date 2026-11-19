@@ -1901,5 +1901,11 @@
     "wallpaper wallpapers background draw live video gif slideshow random download folder cover mode clean desktop frame shape dance music beat image unsplash wallhaven api key folders online": "Hintergrundbild Hintergrundbilder Hintergrund zeichnen Live Video GIF Diashow zufällig Download Ordner Cover Modus aufgeräumter Desktop Rahmen Form tanzen Musik Beat Bild Unsplash Wallhaven API-Schlüssel Ordner online",
     "weather city location fahrenheit battery warnings low critical notifications timeout dnd do not disturb updates aur unsplash wallhaven api key folders": "Wetter Stadt Standort Fahrenheit Akku Warnungen niedrig kritisch Benachrichtigungen Zeitlimit Nicht stören Updates AUR Unsplash Wallhaven API-Schlüssel Ordner",
     "weather city location latitude longitude fahrenheit updates aur check screen capture recording sound ocr tesseract spotify client id": "Wetter Stadt Standort Breitengrad Längengrad Fahrenheit Updates AUR Prüfung Bildschirmaufnahme Aufzeichnung Ton OCR Tesseract Spotify Client-ID",
-    "workspace %1": "Arbeitsbereich %1"
+    "workspace %1": "Arbeitsbereich %1",
+  "The name shown in greetings, cards and the lock screen; \"\" = the system user name.": "Der Name in Begrüßungen, Karten und auf dem Sperrbildschirm; \"\" = der Systembenutzername.",
+  "The avatar picture (png/jpg); \"\" = ~/.face.": "Das Avatarbild (png/jpg); \"\" = ~/.face.",
+  "Shown in greetings, the cards and the lock screen; empty uses the system user name": "Wird in Begrüßungen, Karten und auf dem Sperrbildschirm angezeigt; leer = Systembenutzername",
+  "A picture file; empty uses ~/.face": "Eine Bilddatei; leer = ~/.face",
+  "Choose a picture": "Bild auswählen",
+  "Choose…": "Auswählen…"
 }

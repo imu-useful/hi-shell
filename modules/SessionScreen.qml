@@ -135,7 +135,7 @@ Scope {
                     spacing: 4
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: Translation.tr("Goodbye, %1?").arg(Quickshell.env("USER"))
+                        text: Translation.tr("Goodbye, %1?").arg(Profile.name)
                         font.pixelSize: Appearance.font.size.headlineMedium
                         font.weight: Font.Medium
                     }
