@@ -2,7 +2,7 @@
 # hi-shell from its tagged releases. The files go to /usr/share/hi-shell; each user then runs
 # `hi install` once (the ~/.config/quickshell link and the line in the Hyprland config).
 pkgname=hi-shell
-pkgver=2.3.0
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="A Quickshell desktop shell for Hyprland: bar, dock, launcher, sidebars, notifications, Material You colors"
 arch=('any')
@@ -43,7 +43,7 @@ optdepends=(
 )
 install=hi-shell.install
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('64eaa85330063bb06e1d135c2a818c73fcbabd6399e477d9d5a48fa08b1d2ebe')
+sha256sums=('844f877dba4cda2f31ff5f325f1730494baf0cf902bc77d8dd7b0e1d9d082402')
 
 package() {
     cd "$pkgname-$pkgver"
