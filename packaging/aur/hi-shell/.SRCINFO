@@ -49,6 +49,6 @@ pkgbase = hi-shell
 	optdepends = starship: the prompt of the fish config
 	optdepends = claude-code: the AI chat and palette
 	source = hi-shell-2.3.0.tar.gz::https://github.com/imu-useful/hi-shell/archive/refs/tags/v2.3.0.tar.gz
-	sha256sums = e24ced25d05326f0267f17c6255a4f79e984b59ea6a99f10a21f5debdca4f59c
+	sha256sums = 64eaa85330063bb06e1d135c2a818c73fcbabd6399e477d9d5a48fa08b1d2ebe
 
 pkgname = hi-shell
