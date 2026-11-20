@@ -8,13 +8,14 @@ import qs.common.widgets
 import qs.common.shapes
 import qs.services
 
-// The announcement of the break: the final release 2.3.0, and no updates until February 2027.
+// The announcement of the break: the final release 2.3.1, and no updates until February 2027.
 // Shown once per release: at the start after an update, or, on a fresh install, right after the welcome.
 // "Got it" (or Escape) writes the version to ~/.local/state/hi-shell/pause-notice-seen, so it doesn't come back.
 // `qs -c hi-shell ipc call pauseNotice open` shows it again (a preview: nothing is written).
 Scope {
     id: root
 
+    // The notice's id in the seen-file: still 2.3.0, so 2.3.1 (a fix release) doesn't show it again
     readonly property string version: "2.3.0"
     property bool preview: false
     property bool dismissed: false
@@ -142,7 +143,7 @@ Scope {
                     StyledText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
-                        text: Translation.tr("Version 2.3.0 is the final release for now")
+                        text: Translation.tr("Version 2.3.1 is the final release for now")
                         color: Colors.m3onSurfaceVariant
                         wrapMode: Text.Wrap
                     }
