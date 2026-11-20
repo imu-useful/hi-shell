@@ -7,12 +7,13 @@ import qs.common
 
 // Pending package updates: repo packages via checkupdates (pacman-contrib),
 // AUR via yay / paru. `run()` opens a terminal with the system upgrade.
-// NixOS has none of that: its updates come with nixos-rebuild, so this stays off there.
+// NixOS has none of that: its updates come with nixos-rebuild, so this stays off there. So does ALT Linux
+// (apt-get, whose package lists only root refreshes): there `up` in fish or apt-get dist-upgrade does it.
 Singleton {
     id: root
 
     readonly property var options: Config.options.updates
-    readonly property bool supported: Distro.id !== "nixos"
+    readonly property bool supported: !["nixos", "altlinux"].includes(Distro.id)
 
     // [{ name, from, to, aur }]
     property var packages: []

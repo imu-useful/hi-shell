@@ -69,14 +69,16 @@ if status is-interactive
     abbr -a gp 'git push'
     abbr -a gd 'git diff'
     abbr -a gl 'git log --oneline --graph -20'
-    # `up` updates the system with whatever this distribution uses (paru / yay on Arch, apt, dnf,
-    # zypper, xbps; NixOS is updated with nixos-rebuild, so it's left out).
+    # `up` updates the system with whatever this distribution uses (paru / yay on Arch, apt-get on ALT,
+    # apt, dnf, zypper, xbps; NixOS is updated with nixos-rebuild, so it's left out).
     if type -q paru
         abbr -a up 'paru -Syu'
     else if type -q yay
         abbr -a up 'yay -Syu'
     else if type -q pacman
         abbr -a up 'sudo pacman -Syu'
+    else if test -e /etc/altlinux-release; and type -q apt-get
+        abbr -a up 'sudo apt-get update; and sudo apt-get dist-upgrade'
     else if type -q apt
         abbr -a up 'sudo apt update; and sudo apt upgrade'
     else if type -q dnf

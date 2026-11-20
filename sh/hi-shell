@@ -81,7 +81,7 @@ doctor() {
 }
 
 qr() {
-    have qrencode || { echo "qrencode isn't installed (pacman -S qrencode)" >&2; return 1; }
+    have qrencode || { echo "qrencode isn't installed (the qrencode package)" >&2; return 1; }
     if [ $# -gt 0 ]; then
         text="$*"
     elif have wl-paste; then
