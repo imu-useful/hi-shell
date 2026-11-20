@@ -39,6 +39,45 @@ PARTS = {
     "neovim": {"group": "apps", "on": False, "sudo": True, "ru": ("Neovim", "Редактор"), "en": ("Neovim", "Editor")},
 }
 
+# What changes on another system than Arch: the parts' texts and the window's ones, by distro().
+DISTRO_PARTS = {
+    "alt": {
+        "deps": {"ru": ("Пакеты", "Всё, что нужно hi-shell, из Sisyphus (apt-get) и шрифт иконок с GitHub Google"),
+                 "en": ("Packages", "Everything hi-shell needs, from Sisyphus (apt-get), and the icon font from Google's GitHub")},
+        "steam": {"ru": ("Steam", "Ставится через epm play"), "en": ("Steam", "Installed with epm play")},
+    },
+}
+DISTRO_TEXT = {
+    "alt": {
+        "ru": {"password.body": "Пакеты ставит apt-get, ему нужны права администратора. Пароль нужен только на эту установку и нигде не сохраняется.",
+               "password.wrong": "Пароль не подошёл. Если он верный, sudo выключен: включите его от root командой control sudowheel enabled"},
+        "en": {"password.body": "apt-get installs the packages and needs administrator rights. The password is only used for this install and isn't saved.",
+               "password.wrong": "The password didn't work. If it's right, sudo is off: turn it on as root with control sudowheel enabled"},
+    },
+}
+
+
+def distro(env=None, root="/") -> str:
+    """"arch", "alt" (ALT Linux) or "nixos", like install.sh decides it (HI_SHELL_DISTRO wins)."""
+    env = os.environ if env is None else env
+    if env.get("HI_SHELL_DISTRO"):
+        return env["HI_SHELL_DISTRO"]
+    etc = os.path.join(root, "etc")
+    if os.path.exists(os.path.join(etc, "NIXOS")):
+        return "nixos"
+    if os.path.exists(os.path.join(etc, "altlinux-release")):
+        return "alt"
+    try:
+        with open(os.path.join(etc, "os-release"), encoding="utf-8") as f:
+            if any(line.strip().replace('"', "") == "ID=altlinux" for line in f):
+                return "alt"
+    except OSError:
+        pass
+    return "arch"
+
+
+DISTRO = distro()
+
 # The headings install.sh prints (":: Packages"), in order, and the part or group each one belongs to
 # (None: printed on every run).
 STEPS = (("Packages", "deps"), ("Optional apps", "apps"), ("Source", None), ("Link", None),
@@ -114,8 +153,9 @@ def language(env=None) -> str:
     return "en"
 
 
-def tr(lang: str, key: str, **values) -> str:
-    text = TEXT.get(lang, TEXT["en"]).get(key) or TEXT["en"][key]
+def tr(lang: str, key: str, distro_id=None, **values) -> str:
+    own = DISTRO_TEXT.get(distro_id or DISTRO, {})
+    text = own.get(lang, own.get("en", {})).get(key) or TEXT.get(lang, TEXT["en"]).get(key) or TEXT["en"][key]
     return text.format(**values) if values else text
 
 
@@ -133,19 +173,20 @@ def parse_list(output: str) -> list:
     return parts
 
 
-def describe(lang: str, name: str, fallback: str) -> dict:
+def describe(lang: str, name: str, fallback: str, distro_id=None) -> dict:
     """The row of one part: title, subtitle, group, default and whether it needs sudo."""
     meta = PARTS.get(name)
     if meta is None:
         return {"name": name, "title": name, "subtitle": fallback, "group": "other", "on": True, "sudo": False}
-    title, subtitle = meta.get(lang, meta["en"])
+    texts = {**meta, **DISTRO_PARTS.get(distro_id or DISTRO, {}).get(name, {})}
+    title, subtitle = texts.get(lang, texts["en"])
     return {"name": name, "title": title, "subtitle": subtitle, "group": meta["group"],
             "on": meta["on"], "sudo": meta.get("sudo", False)}
 
 
-def rows(lang: str, listed: list) -> list:
+def rows(lang: str, listed: list, distro_id=None) -> list:
     """The parts install.sh offers, described, grouped in GROUPS order (each group keeps install.sh's order)."""
-    described = [describe(lang, name, text) for name, text in listed]
+    described = [describe(lang, name, text, distro_id) for name, text in listed]
     return sorted(described, key=lambda r: GROUPS.index(r["group"]))
 
 
@@ -202,7 +243,7 @@ def step_heading(line: str):
     if not m:
         return None
     heading = m.group(1)
-    if heading.startswith("Packages"):  # ":: Packages (NixOS)"
+    if heading.startswith("Packages"):  # ":: Packages (NixOS)", ":: Packages (ALT Linux)"
         heading = "Packages"
     return heading if heading in HEADINGS else None
 

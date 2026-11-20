@@ -74,7 +74,8 @@ Short screen recordings of the shell.
 
 ## Requirements
 
-Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config).
+Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config). ALT Linux (Sisyphus) and NixOS work too:
+see [ALT Linux](#alt-linux) and [NixOS](#nixos) for what's different there.
 
 | Package | Used for |
 | --- | --- |
@@ -124,7 +125,7 @@ everything by itself and shows each step; **Details** has the full log (also sav
 `hi installer` opens it again later, to add a part or repair the install.
 
 The window is GTK 4 + libadwaita: when `python-gobject`, `gtk4` or `libadwaita` is missing, `setup.sh` installs them
-with pacman first (asking for sudo in the terminal). Without a graphical session (a TTY, ssh), or with `setup.sh --text`,
+with pacman (apt-get on ALT Linux) first, asking for sudo in the terminal. Without a graphical session (a TTY, ssh), or with `setup.sh --text`,
 the text installer below runs instead. The window runs that same `install.sh` with `--yes` and the parts you picked.
 
 #### Text installer
@@ -148,7 +149,7 @@ It also asks where updates come from: **release** (the latest tagged release, te
 
 The installer:
 
-1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (asks first; `--no-deps` skips it)
+1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (on ALT Linux: `apt-get`; asks first; `--no-deps` skips it)
 2. links the repo to `~/.config/quickshell/hi-shell`
 3. copies the folder `hypr/hi-shell/` to `~/.config/hypr/hi-shell/` (yours to edit) and loads it from your Hyprland config —
    `~/.config/hypr/custom/execs.lua` on illogical-impulse dots, `~/.config/hypr/hyprland.lua` otherwise (one marked line,
@@ -177,6 +178,24 @@ The files go to `/usr/share/hi-shell` and `hi` to `/usr/bin`. The shell then upd
 not from Settings → About; after an update, `hi restart`, and `hi install` brings new keybinds and rules to
 `~/.config/hypr/hi-shell/` (it asks before replacing a file you edited). To remove it: `hi uninstall`, then `sudo pacman -R hi-shell`.
 The optional programs (screenshots, OCR, night light, ...) are listed by `pacman -Qi hi-shell` and checked by `hi doctor`.
+
+### ALT Linux
+
+The installer (both the window and `install.sh`) installs the packages with `apt-get` there, under their ALT names
+(`quickshell`, `libqt6-multimedia`, `qalculate`, `notify-send`, `ImageMagick-tools`, ...). Use **Sisyphus**: hi-shell
+needs Hyprland 0.56+, and the stable branch p11 has 0.42 (the installer warns when the Hyprland it finds is too old).
+Things that are different there:
+
+- **sudo** is off on a fresh ALT install. Turn it on once, as root: `su -`, then `control sudowheel enabled` and
+  `gpasswd -a <you> wheel`, and log in again.
+- **The icon font** (Material Symbols) isn't packaged on ALT: the installer downloads it from
+  [Google's repository](https://github.com/google/material-design-icons/tree/master/variablefont) to
+  `~/.local/share/fonts/hi-shell/` (asks first). Uninstalling hi-shell leaves it there.
+- **Optional apps**: Telegram, Neovim and osu!lazer come from the repository; Zen Browser, Vesktop, Steam and Spotify
+  are installed with `epm play` (the `eepm` package).
+- **The Updates widget** is off (ALT's package lists are refreshed by root only); `up` in hi-shell's fish config runs
+  `sudo apt-get update; and sudo apt-get dist-upgrade`.
+- There's no ALT package of hi-shell itself yet: it's installed from git, like on Arch without the AUR package.
 
 ### NixOS
 

@@ -4,7 +4,7 @@
 #   ./uninstall.sh            keeps your settings, presets and the repo
 #   ./uninstall.sh --purge    also deletes settings, state and cache (asks first)
 #
-# Packages stay installed (other programs may use them); remove them with pacman if you like.
+# Packages stay installed (other programs may use them); remove them with your package manager if you like.
 set -euo pipefail
 
 QS_LINK="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/hi-shell"

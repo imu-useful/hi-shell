@@ -5,8 +5,8 @@
 #   ./setup.sh                  from a clone of the repo
 #
 # The window needs python-gobject, gtk4 and libadwaita; when one is missing it's installed first with
-# pacman (that asks for your sudo password here, in the terminal). Without a graphical session
-# (a TTY, ssh) the text installer, install.sh, runs instead.
+# pacman, or apt-get on ALT Linux (that asks for your sudo password here, in the terminal). Without a
+# graphical session (a TTY, ssh) the text installer, install.sh, runs instead.
 #
 # Options:
 #   --text      the text installer even in a graphical session
@@ -16,6 +16,7 @@ set -euo pipefail
 RAW_URL="${HI_SHELL_RAW_URL:-https://raw.githubusercontent.com/imu-useful/hi-shell/main}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hi-shell/setup"
 GUI_PKGS=(python python-gobject gtk4 libadwaita git)
+ALT_GUI_PKGS=(python3 python3-module-pygobject3 libgtk4-gir libadwaita-gir git-core)
 
 bold=$'\e[1m' green=$'\e[32m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
@@ -60,15 +61,24 @@ if $TEXT || ! graphical; then
     exec bash "$SRC/install.sh" "${INSTALL_ARGS[@]}"
 fi
 
+# ALT Linux: apt-get and rpm (sudo is off there by default: `control sudowheel enabled` as root turns it on).
+is_alt() { [[ -e /etc/altlinux-release ]] && command -v apt-get >/dev/null && command -v rpm >/dev/null; }
+
 if ! gui_ready || ! command -v git >/dev/null; then
-    command -v pacman >/dev/null || {
-        echo "The installer window needs PyGObject, GTK 4 and libadwaita; without pacman, the text installer runs."
-        exec bash "$SRC/install.sh"
-    }
     missing=()
-    for p in "${GUI_PKGS[@]}"; do pacman -Qq "$p" &>/dev/null || missing+=("$p"); done
-    step "The installer window needs: ${missing[*]}"
-    sudo pacman -S --needed "${missing[@]}" || die "couldn't install them; the text installer: bash $SRC/install.sh"
+    if is_alt; then
+        for p in "${ALT_GUI_PKGS[@]}"; do rpm -q --quiet "$p" 2>/dev/null || missing+=("$p"); done
+        step "The installer window needs: ${missing[*]}"
+        { sudo apt-get update && sudo apt-get install "${missing[@]}"; } ||
+            die "couldn't install them (no sudo? as root: control sudowheel enabled); the text installer: bash $SRC/install.sh"
+    elif command -v pacman >/dev/null; then
+        for p in "${GUI_PKGS[@]}"; do pacman -Qq "$p" &>/dev/null || missing+=("$p"); done
+        step "The installer window needs: ${missing[*]}"
+        sudo pacman -S --needed "${missing[@]}" || die "couldn't install them; the text installer: bash $SRC/install.sh"
+    else
+        echo "The installer window needs PyGObject, GTK 4 and libadwaita; without pacman or apt-get, the text installer runs."
+        exec bash "$SRC/install.sh"
+    fi
     gui_ready || die "the window still can't start; the text installer: bash $SRC/install.sh"
 fi
 

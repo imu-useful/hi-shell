@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# hi-shell installer for Arch Linux + Hyprland 0.56+ (Lua config).
+# hi-shell installer for Arch Linux and ALT Linux (Sisyphus) + Hyprland 0.56+ (Lua config); on NixOS it
+# sets everything up but the packages.
 #
 #   ./install.sh                 from a clone of the repo
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
@@ -59,6 +60,28 @@ if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/.package" && -f "$SCRIPT_DIR/shell.qml
     PACKAGED=true DEPS=false CHANNEL=release
 fi
 
+# The system: arch (pacman + AUR), alt (ALT Linux: apt-get + rpm) or nixos (the packages come from the Nix
+# config). HI_SHELL_DISTRO picks one by hand (the tests do).
+detect_distro() {
+    if [[ -n "${HI_SHELL_DISTRO:-}" ]]; then
+        echo "$HI_SHELL_DISTRO"
+    elif [[ -e /etc/NIXOS ]]; then
+        echo nixos
+    elif [[ -e /etc/altlinux-release ]] || grep -qsE '^ID="?altlinux"?$' /etc/os-release; then
+        echo alt
+    else
+        echo arch
+    fi
+}
+DISTRO="$(detect_distro)"
+case "$DISTRO" in
+    arch | alt | nixos) ;;
+    *) echo "HI_SHELL_DISTRO must be arch, alt or nixos" >&2; exit 1 ;;
+esac
+IS_NIXOS=false IS_ALT=false
+[[ "$DISTRO" == nixos ]] && IS_NIXOS=true
+[[ "$DISTRO" == alt ]] && IS_ALT=true
+
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
 warn() { echo "${yellow}warning:${reset} $*" >&2; }
@@ -100,6 +123,7 @@ declare -A PART_NAME=(
     [spotify]="App: Spotify"
     [neovim]="App: Neovim"
 )
+$IS_ALT && PART_NAME[deps]="Packages hi-shell needs (apt-get, ALT Sisyphus)"
 # Optional apps: the package to install (the first name found in a repo or the AUR wins).
 declare -A APP_PKG=(
     [zen]="zen-browser-bin" [telegram]="telegram-desktop" [vesktop]="vesktop vesktop-bin"
@@ -160,12 +184,13 @@ choose_parts() {
 
 [[ $EUID -eq 0 ]] && die "run as your user, not root (sudo is used where needed)"
 # NixOS has no pacman: its packages come from the Nix config (printed below); everything else is the same.
-IS_NIXOS=false
-[[ -e /etc/NIXOS ]] && IS_NIXOS=true
+# ALT Linux installs them with apt-get (Sisyphus: the stable branches have a Hyprland too old for hi-shell).
 if $IS_NIXOS; then
     echo "NixOS: packages are not installed here; see the list in the packages step."
+elif $IS_ALT; then
+    command -v apt-get >/dev/null && command -v rpm >/dev/null || die "ALT Linux without apt-get and rpm?"
 else
-    command -v pacman >/dev/null || die "hi-shell targets Arch Linux and NixOS (pacman not found)"
+    command -v pacman >/dev/null || die "hi-shell targets Arch Linux, ALT Linux and NixOS (pacman not found)"
 fi
 choose_parts
 $PACKAGED && DEPS=false
@@ -212,7 +237,72 @@ NIX_PKGS=(
     quickshell material-symbols
 )
 
-if $DEPS && $IS_NIXOS; then
+# ALT Linux (Sisyphus) names. Material Symbols isn't packaged there: install_symbols_font gets it.
+ALT_PKGS=(
+    hyprland quickshell matugen python3 pipewire wireplumber NetworkManager bluez upower brightnessctl ddcutil
+    libnotify notify-send hyprsunset hyprlock cliphist translate-shell grim slurp wl-clipboard hyprpicker
+    cava ImageMagick-tools curl qalculate tesseract tesseract-langpack-en tesseract-langpack-ru wf-recorder git-core
+    python3-module-fonttools wtype ffmpeg libqt6-multimedia starship
+)
+ALT_MIN_HYPRLAND=0.56
+SYMBOLS_FAMILY="Material Symbols Rounded"
+SYMBOLS_URL="https://github.com/google/material-design-icons/raw/master/variablefont/MaterialSymbolsRounded%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf"
+
+# sudo apt-get install, after an apt-get update (a stale package list fails on Sisyphus, which changes daily).
+alt_install() { # alt_install <package>...
+    local yes=()
+    ((${#NOCONFIRM[@]})) && yes=(-y)
+    sudo apt-get update && sudo apt-get install "${yes[@]}" "$@" && return 0
+    warn "apt-get failed. If sudo refused you: ALT turns sudo off by default; as root (su -) run"
+    warn "  control sudowheel enabled; gpasswd -a $USER wheel   then log in again and rerun the installer"
+    return 1
+}
+
+# The icon font from Google's repository into ~/.local/share/fonts/hi-shell, when no package brought it.
+install_symbols_font() {
+    if fc-list -q "$SYMBOLS_FAMILY" 2>/dev/null; then
+        echo "$SYMBOLS_FAMILY is installed."
+        return 0
+    fi
+    local dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/hi-shell"
+    local file="$dir/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf"
+    ask "The icon font ($SYMBOLS_FAMILY) isn't packaged here. Should I download it from Google's GitHub (15 MB) to $dir?" || return 0
+    mkdir -p "$dir"
+    if curl -fL --retry 2 -o "$file.part" "$SYMBOLS_URL"; then
+        mv "$file.part" "$file"
+        fc-cache -f "$dir" >/dev/null 2>&1 || true
+        echo "Installed $file"
+    else
+        rm -f "$file.part"
+        warn "couldn't download the icon font; get it yourself: $SYMBOLS_URL"
+    fi
+}
+
+# hi-shell's Hyprland files are Lua, which Hyprland reads from 0.56 on; ALT's stable branches have older ones.
+alt_check_hyprland() {
+    local version
+    version="$(rpm -q --qf '%{VERSION}' hyprland 2>/dev/null)" || { warn "Hyprland isn't installed (sudo apt-get install hyprland)"; return 0; }
+    if [[ "$(printf '%s\n' "$ALT_MIN_HYPRLAND" "$version" | sort -V | head -1)" != "$ALT_MIN_HYPRLAND" ]]; then
+        warn "Hyprland $version is too old: hi-shell needs $ALT_MIN_HYPRLAND+ (the Lua config), which ALT has in Sisyphus;"
+        warn "switch to Sisyphus (as root: apt-repo set Sisyphus; apt-get update; apt-get dist-upgrade) or wait for the next stable branch"
+    fi
+}
+
+if $DEPS && $IS_ALT; then
+    step "Packages (ALT Linux)"
+    missing=()
+    for p in "${ALT_PKGS[@]}"; do rpm -q --quiet "$p" 2>/dev/null || missing+=("$p"); done
+    if ((${#missing[@]})); then
+        echo "Missing: ${missing[*]}"
+        if ask "Should I install them with apt-get?"; then
+            alt_install "${missing[@]}" || die "the packages weren't installed"
+        fi
+    else
+        echo "All packages are installed."
+    fi
+    install_symbols_font
+    alt_check_hyprland
+elif $DEPS && $IS_NIXOS; then
     step "Packages (NixOS)"
     echo "Add these to environment.systemPackages in your NixOS configuration, then nixos-rebuild switch:"
     echo "  ${NIX_PKGS[*]}"
@@ -259,6 +349,41 @@ if $IS_NIXOS; then
     for app in "${APP_PARTS[@]}"; do [[ ${WANT[$app]} == true ]] && warn "$app: add it to your NixOS configuration (not installed here)"; done
     APP_PARTS=()
 fi
+# ALT Linux: a package of the repository, or "epm:<name>" for an app that `epm play` (eepm) installs.
+declare -A ALT_APP_PKG=(
+    [zen]="epm:zen-browser" [telegram]="telegram-desktop" [vesktop]="epm:vesktop"
+    [osu]="osu-lazer" [steam]="epm:steam" [spotify]="epm:spotify" [neovim]="neovim"
+)
+if $IS_ALT; then
+    alt_repo=() alt_epm=()
+    for app in "${APP_PARTS[@]}"; do
+        [[ ${WANT[$app]} == true ]] || continue
+        p=${ALT_APP_PKG[$app]}
+        if [[ "$p" == epm:* ]]; then
+            alt_epm+=("${p#epm:}")
+        elif ! rpm -q --quiet "$p" 2>/dev/null; then
+            alt_repo+=("$p")
+        fi
+    done
+    if ((${#alt_repo[@]} + ${#alt_epm[@]})); then
+        step "Optional apps"
+        if ((${#alt_repo[@]})); then
+            echo "From the repository: ${alt_repo[*]}"
+            if ask "Should I install them with apt-get?"; then alt_install "${alt_repo[@]}" || true; fi
+        fi
+        if ((${#alt_epm[@]})); then
+            echo "With epm play: ${alt_epm[*]}"
+            if ! command -v epm >/dev/null; then
+                warn "epm isn't installed: sudo apt-get install eepm, then epm play ${alt_epm[*]}"
+            elif ask "Should I install them with epm play?"; then
+                epm_yes=()
+                ((${#NOCONFIRM[@]})) && epm_yes=(--auto)
+                for p in "${alt_epm[@]}"; do epm play "${epm_yes[@]}" "$p" || warn "epm play $p failed"; done
+            fi
+        fi
+    fi
+    APP_PARTS=()
+fi
 for app in "${APP_PARTS[@]}"; do
     [[ ${WANT[$app]} == true ]] || continue
     found=""
@@ -298,6 +423,8 @@ fi
 if ! command -v qs >/dev/null; then
     if $IS_NIXOS; then
         die "quickshell (qs) is not installed; add quickshell to environment.systemPackages"
+    elif $IS_ALT; then
+        die "quickshell (qs) is not installed; sudo apt-get install quickshell"
     else
         die "quickshell (qs) is not installed; install quickshell-git from the AUR"
     fi
@@ -310,7 +437,7 @@ step "Source"
 if $PACKAGED; then
     REPO="$SCRIPT_DIR"
     echo "Using the pacman package: $REPO (it updates with the system)"
-elif [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/shell.qml" && -d "$SCRIPT_DIR/.git" ]]; then
+elif [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/shell.qml" && -e "$SCRIPT_DIR/.git" ]]; then
     REPO="$SCRIPT_DIR"
     echo "Using this checkout: $REPO"
 elif [[ -d "$CLONE_DIR/.git" ]]; then
