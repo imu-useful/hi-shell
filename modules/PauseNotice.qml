@@ -8,7 +8,7 @@ import qs.common.widgets
 import qs.common.shapes
 import qs.services
 
-// The announcement of the break: the final release 2.3.0, and no updates until spring 2027.
+// The announcement of the break: the final release 2.3.0, and no updates until February 2027.
 // Shown once per release: at the start after an update, or, on a fresh install, right after the welcome.
 // "Got it" (or Escape) writes the version to ~/.local/state/hi-shell/pause-notice-seen, so it doesn't come back.
 // `qs -c hi-shell ipc call pauseNotice open` shows it again (a preview: nothing is written).
@@ -157,7 +157,7 @@ Scope {
                             id: body
                             anchors.fill: parent
                             anchors.margins: 16
-                            text: Translation.tr("There will be no updates until spring 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in the spring!")
+                            text: Translation.tr("There will be no updates until February 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in February!")
                             wrapMode: Text.Wrap
                             elide: Text.ElideNone
                         }

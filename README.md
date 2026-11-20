@@ -21,7 +21,7 @@ Built on [Quickshell](https://quickshell.org). Colors from your wallpaper, anima
 
 
 > [!NOTE]
-> **hi-shell is taking a break.** Version 2.3.0 is the final release for now: there will be no updates until spring 2027. Everything keeps working as it is. The shell says so once in a window after the update (or right after the welcome on a fresh install). See you in the spring!
+> **hi-shell is taking a break.** Version 2.3.0 is the final release for now: there will be no updates until February 2027. Everything keeps working as it is. The shell says so once in a window after the update (or right after the welcome on a fresh install). See you in February!
 
 <br>
 
