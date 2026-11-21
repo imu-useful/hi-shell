@@ -46,6 +46,11 @@ DISTRO_PARTS = {
                  "en": ("Packages", "Everything hi-shell needs, from Sisyphus (apt-get), and the icon font from Google's GitHub")},
         "steam": {"ru": ("Steam", "Ставится через epm play"), "en": ("Steam", "Installed with epm play")},
     },
+    "debian": {
+        "deps": {"ru": ("Пакеты", "Всё, что нужно hi-shell, через apt-get (Hyprland на Debian 13 из backports), matugen и шрифт иконок с GitHub"),
+                 "en": ("Packages", "Everything hi-shell needs, with apt-get (Hyprland from the backports on Debian 13), matugen and the icon font from GitHub")},
+        "steam": {"ru": ("Steam", "Ставится из Flathub"), "en": ("Steam", "Installed from Flathub")},
+    },
 }
 DISTRO_TEXT = {
     "alt": {
@@ -54,11 +59,17 @@ DISTRO_TEXT = {
         "en": {"password.body": "apt-get installs the packages and needs administrator rights. The password is only used for this install and isn't saved.",
                "password.wrong": "The password didn't work. If it's right, sudo is off: turn it on as root with control sudowheel enabled"},
     },
+    "debian": {
+        "ru": {"password.body": "Пакеты ставит apt-get, ему нужны права администратора. Пароль нужен только на эту установку и нигде не сохраняется.",
+               "password.wrong": "Пароль не подошёл. Если он верный, вас нет в группе sudo: от root выполните adduser <имя> sudo и войдите заново"},
+        "en": {"password.body": "apt-get installs the packages and needs administrator rights. The password is only used for this install and isn't saved.",
+               "password.wrong": "The password didn't work. If it's right, you're not in the sudo group: as root run adduser <you> sudo and log in again"},
+    },
 }
 
 
 def distro(env=None, root="/") -> str:
-    """"arch", "alt" (ALT Linux) or "nixos", like install.sh decides it (HI_SHELL_DISTRO wins)."""
+    """"arch", "alt" (ALT Linux), "debian" or "nixos", like install.sh decides it (HI_SHELL_DISTRO wins)."""
     env = os.environ if env is None else env
     if env.get("HI_SHELL_DISTRO"):
         return env["HI_SHELL_DISTRO"]
@@ -69,8 +80,11 @@ def distro(env=None, root="/") -> str:
         return "alt"
     try:
         with open(os.path.join(etc, "os-release"), encoding="utf-8") as f:
-            if any(line.strip().replace('"', "") == "ID=altlinux" for line in f):
-                return "alt"
+            ids = {line.strip().replace('"', "") for line in f}
+        if "ID=altlinux" in ids:
+            return "alt"
+        if "ID=debian" in ids:
+            return "debian"
     except OSError:
         pass
     return "arch"

@@ -9,11 +9,12 @@ import qs.common
 // AUR via yay / paru. `run()` opens a terminal with the system upgrade.
 // NixOS has none of that: its updates come with nixos-rebuild, so this stays off there. So does ALT Linux
 // (apt-get, whose package lists only root refreshes): there `up` in fish or apt-get dist-upgrade does it.
+// Debian too, for now: `up` in fish runs apt update and apt upgrade.
 Singleton {
     id: root
 
     readonly property var options: Config.options.updates
-    readonly property bool supported: !["nixos", "altlinux"].includes(Distro.id)
+    readonly property bool supported: !["nixos", "altlinux", "debian"].includes(Distro.id)
 
     // [{ name, from, to, aur }]
     property var packages: []

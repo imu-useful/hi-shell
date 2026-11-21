@@ -14,4 +14,11 @@ dir=$(cd "$(dirname "$(readlink -f "$0")")" && pwd)
 family=$(python3 -c 'import json,os,sys; print(json.load(open(sys.argv[1])).get("appearance", {}).get("fonts", {}).get("icon", "Material Symbols Rounded"))' "${XDG_CONFIG_HOME:-$HOME/.config}/hi-shell/config.json" 2>/dev/null || echo "Material Symbols Rounded")
 python3 "$dir/services/icon_font.py" --family "${family:-Material Symbols Rounded}" --scan "$dir" --out "${XDG_CACHE_HOME:-$HOME/.cache}/hi-shell/icons" >/dev/null 2>&1 || true
 
+# ~/.local/bin on the PATH: install.sh puts matugen there where it isn't packaged (Debian), and a session
+# started by a display manager doesn't always have it.
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) PATH="$HOME/.local/bin:$PATH"; export PATH ;;
+esac
+
 exec qs -c hi-shell "$@"

@@ -78,7 +78,7 @@ class AltInstallTest(unittest.TestCase):
     def test_an_unknown_distro_is_refused(self):
         r = self.install(HI_SHELL_DISTRO="gentoo")
         self.assertNotEqual(r.returncode, 0)
-        self.assertIn("arch, alt or nixos", r.stderr)
+        self.assertIn("arch, alt, debian or nixos", r.stderr)
 
     def test_missing_packages_come_from_apt_get_with_their_alt_names(self):
         r = self.install()

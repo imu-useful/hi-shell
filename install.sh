@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# hi-shell installer for Arch Linux and ALT Linux (Sisyphus) + Hyprland 0.56+ (Lua config); on NixOS it
-# sets everything up but the packages.
+# hi-shell installer for Arch Linux, ALT Linux (Sisyphus) and Debian (13 trixie with its backports, testing, sid)
+# + Hyprland 0.56+ (Lua config); on NixOS it sets everything up but the packages.
 #
 #   ./install.sh                 from a clone of the repo
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/imu-useful/hi-shell/main/install.sh)"
@@ -60,8 +60,8 @@ if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/.package" && -f "$SCRIPT_DIR/shell.qml
     PACKAGED=true DEPS=false CHANNEL=release
 fi
 
-# The system: arch (pacman + AUR), alt (ALT Linux: apt-get + rpm) or nixos (the packages come from the Nix
-# config). HI_SHELL_DISTRO picks one by hand (the tests do).
+# The system: arch (pacman + AUR), alt (ALT Linux: apt-get + rpm), debian (apt-get + dpkg) or nixos (the
+# packages come from the Nix config). HI_SHELL_DISTRO picks one by hand (the tests do).
 detect_distro() {
     if [[ -n "${HI_SHELL_DISTRO:-}" ]]; then
         echo "$HI_SHELL_DISTRO"
@@ -69,18 +69,21 @@ detect_distro() {
         echo nixos
     elif [[ -e /etc/altlinux-release ]] || grep -qsE '^ID="?altlinux"?$' /etc/os-release; then
         echo alt
+    elif grep -qsE '^ID="?debian"?$' /etc/os-release; then
+        echo debian
     else
         echo arch
     fi
 }
 DISTRO="$(detect_distro)"
 case "$DISTRO" in
-    arch | alt | nixos) ;;
-    *) echo "HI_SHELL_DISTRO must be arch, alt or nixos" >&2; exit 1 ;;
+    arch | alt | debian | nixos) ;;
+    *) echo "HI_SHELL_DISTRO must be arch, alt, debian or nixos" >&2; exit 1 ;;
 esac
-IS_NIXOS=false IS_ALT=false
+IS_NIXOS=false IS_ALT=false IS_DEBIAN=false
 [[ "$DISTRO" == nixos ]] && IS_NIXOS=true
 [[ "$DISTRO" == alt ]] && IS_ALT=true
+[[ "$DISTRO" == debian ]] && IS_DEBIAN=true
 
 bold=$'\e[1m' green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
@@ -124,6 +127,7 @@ declare -A PART_NAME=(
     [neovim]="App: Neovim"
 )
 $IS_ALT && PART_NAME[deps]="Packages hi-shell needs (apt-get, ALT Sisyphus)"
+$IS_DEBIAN && PART_NAME[deps]="Packages hi-shell needs (apt-get, Debian; Hyprland from the backports on stable)"
 # Optional apps: the package to install (the first name found in a repo or the AUR wins).
 declare -A APP_PKG=(
     [zen]="zen-browser-bin" [telegram]="telegram-desktop" [vesktop]="vesktop vesktop-bin"
@@ -189,8 +193,10 @@ if $IS_NIXOS; then
     echo "NixOS: packages are not installed here; see the list in the packages step."
 elif $IS_ALT; then
     command -v apt-get >/dev/null && command -v rpm >/dev/null || die "ALT Linux without apt-get and rpm?"
+elif $IS_DEBIAN; then
+    command -v apt-get >/dev/null && command -v dpkg-query >/dev/null || die "Debian without apt-get and dpkg?"
 else
-    command -v pacman >/dev/null || die "hi-shell targets Arch Linux, ALT Linux and NixOS (pacman not found)"
+    command -v pacman >/dev/null || die "hi-shell targets Arch Linux, ALT Linux, Debian and NixOS (pacman not found)"
 fi
 choose_parts
 $PACKAGED && DEPS=false
@@ -288,7 +294,131 @@ alt_check_hyprland() {
     fi
 }
 
-if $DEPS && $IS_ALT; then
+# Debian names. Debian 13 (trixie) has Hyprland and Quickshell only in its backports: DEB_HYPR_PKGS come from
+# there (apt-get -t trixie-backports), testing and sid have them in the main archive. matugen and the icon font
+# aren't packaged: install_matugen and install_symbols_font get them.
+DEB_PKGS=(
+    python3 pipewire wireplumber network-manager bluez upower brightnessctl ddcutil libnotify-bin
+    cliphist translate-shell grim slurp wl-clipboard cava imagemagick curl qalc tesseract-ocr tesseract-ocr-eng
+    tesseract-ocr-rus wf-recorder git python3-fonttools wtype ffmpeg qml6-module-qtmultimedia starship
+)
+DEB_HYPR_PKGS=(hyprland quickshell hyprlock hyprsunset hyprpicker)
+# 0.55 already reads the Lua config (trixie-backports has 0.55.2); hi-shell is made and tested on 0.56+.
+DEB_MIN_HYPRLAND=0.55
+DEB_TESTED_HYPRLAND=0.56
+DEB_OS_RELEASE="${HI_SHELL_OS_RELEASE:-/etc/os-release}"
+DEB_APT_DIR="${HI_SHELL_APT_DIR:-/etc/apt}"
+DEB_YES=()
+((${#NOCONFIRM[@]})) && DEB_YES=(-y)
+# matugen's own release build (a static-ish x86_64 binary, glibc 2.39+; trixie has 2.41), checked by its sha256.
+MATUGEN_VERSION=4.2.0
+MATUGEN_SHA256=a2e3b50e49ed6439999ba3c252ed04fabd98ee4e9d12e5e5dff2e66370569751
+MATUGEN_URL="https://github.com/InioX/matugen/releases/download/v$MATUGEN_VERSION/matugen-$MATUGEN_VERSION-x86_64.tar.gz"
+
+# The backports suite of a Debian release ("trixie-backports"); nothing on testing and sid (no VERSION_ID there).
+deb_backports() {
+    local id codename
+    id="$(sed -n 's/^VERSION_ID=//p' "$DEB_OS_RELEASE" 2>/dev/null | tr -d '"')"
+    codename="$(sed -n 's/^VERSION_CODENAME=//p' "$DEB_OS_RELEASE" 2>/dev/null | tr -d '"')"
+    [[ -n "$id" && -n "$codename" ]] && echo "$codename-backports"
+    return 0
+}
+deb_installed() { [[ "$(dpkg-query -W -f='${db:Status-Status}' "$1" 2>/dev/null)" == installed ]]; }
+deb_available() { apt-cache policy "$1" 2>/dev/null | grep -q 'Candidate: [^(]'; }
+# A suite named in apt's sources (one-line or deb822 files; commented lines don't count).
+deb_has_suite() { grep -rqsE "^[^#]*[[:space:]]$1([[:space:]]|$)" "$DEB_APT_DIR/sources.list" "$DEB_APT_DIR/sources.list.d"; }
+
+# sudo apt-get <args>; when it fails, how to get sudo (the Debian installer leaves you out of the sudo
+# group when you gave root a password).
+deb_apt() {
+    sudo apt-get "$@" && return 0
+    warn "apt-get failed. If sudo refused you: you're not in the sudo group; as root (su -) run"
+    warn "  apt-get install sudo; adduser $USER sudo   then log in again and rerun the installer"
+    return 1
+}
+
+# Adds <suite> (the backports) to apt's sources, asking first; true when it's there.
+deb_add_suite() {
+    deb_has_suite "$1" && return 0
+    local file="$DEB_APT_DIR/sources.list.d/hi-shell-backports.sources"
+    ask "Hyprland and Quickshell are in Debian's $1. Should I add it to apt's sources ($file)?" || return 1
+    printf 'Types: deb\nURIs: http://deb.debian.org/debian\nSuites: %s\nComponents: main\nSigned-By: /usr/share/keyrings/debian-archive-keyring.gpg\n' "$1" |
+        sudo tee "$file" >/dev/null
+}
+
+# matugen into ~/.local/bin (run.sh puts that on the shell's PATH), when it isn't installed.
+install_matugen() {
+    command -v matugen >/dev/null && return 0
+    local bin="$HOME/.local/bin" tmp
+    if [[ "$(uname -m)" != x86_64 ]]; then
+        warn "matugen isn't packaged for Debian and has no release build for $(uname -m): cargo install matugen"
+        return 0
+    fi
+    ask "matugen (the colors from the wallpaper) isn't packaged for Debian. Should I download its release $MATUGEN_VERSION from GitHub to $bin?" || return 0
+    tmp="$(mktemp -d)"
+    if curl -fL --retry 2 -o "$tmp/matugen.tar.gz" "$MATUGEN_URL" &&
+        echo "$MATUGEN_SHA256  $tmp/matugen.tar.gz" | sha256sum -c --status - &&
+        tar -xzf "$tmp/matugen.tar.gz" -C "$tmp" matugen; then
+        mkdir -p "$bin"
+        install -m 755 "$tmp/matugen" "$bin/matugen"
+        echo "Installed $bin/matugen"
+    else
+        warn "couldn't install matugen (the download failed or its checksum didn't match): $MATUGEN_URL"
+    fi
+    rm -rf "$tmp"
+}
+
+deb_check_hyprland() {
+    local version
+    version="$(dpkg-query -W -f='${Version}' hyprland 2>/dev/null)" || { warn "Hyprland isn't installed"; return 0; }
+    version="${version#*:}" version="${version%%[+~-]*}"
+    if [[ "$(printf '%s\n' "$DEB_MIN_HYPRLAND" "$version" | sort -V | head -1)" != "$DEB_MIN_HYPRLAND" ]]; then
+        warn "Hyprland $version is too old: hi-shell needs $DEB_MIN_HYPRLAND+ (the Lua config); Debian 13 has 0.55 in trixie-backports"
+    elif [[ "$(printf '%s\n' "$DEB_TESTED_HYPRLAND" "$version" | sort -V | head -1)" != "$DEB_TESTED_HYPRLAND" ]]; then
+        echo "Hyprland $version: hi-shell is made for $DEB_TESTED_HYPRLAND+; $version reads the same Lua config, but a few things may differ."
+    fi
+}
+
+deb_packages() {
+    local backports from=() missing=() hypr_missing=() unavailable=() p
+    backports="$(deb_backports)"
+    if [[ -n "$backports" ]]; then
+        if deb_add_suite "$backports"; then
+            from=(-t "$backports")
+        else
+            warn "without $backports, Debian stable has no Hyprland or Quickshell"
+        fi
+    fi
+    for p in "${DEB_PKGS[@]}"; do deb_installed "$p" || missing+=("$p"); done
+    for p in "${DEB_HYPR_PKGS[@]}"; do deb_installed "$p" || hypr_missing+=("$p"); done
+    if ((${#missing[@]} + ${#hypr_missing[@]} == 0)); then
+        echo "All packages are installed."
+        return 0
+    fi
+    echo "Missing: ${missing[*]} ${hypr_missing[*]}"
+    ask "Should I install them with apt-get?" || return 0
+    deb_apt update || die "apt-get update failed"
+    # What no source of yours has is left out (and named), so the rest still installs.
+    local base=() hypr=()
+    for p in "${missing[@]}"; do if deb_available "$p"; then base+=("$p"); else unavailable+=("$p"); fi; done
+    for p in "${hypr_missing[@]}"; do if deb_available "$p"; then hypr+=("$p"); else unavailable+=("$p"); fi; done
+    if ((${#unavailable[@]})); then
+        warn "not in your apt sources: ${unavailable[*]}"
+        [[ " ${unavailable[*]} " == *" translate-shell "* ]] &&
+            warn "translate-shell is in contrib: add contrib to Components in $DEB_APT_DIR/sources.list.d/debian.sources"
+    fi
+    if ((${#base[@]})); then deb_apt install "${DEB_YES[@]}" "${base[@]}" || die "the packages weren't installed"; fi
+    if ((${#hypr[@]})); then deb_apt install "${DEB_YES[@]}" "${from[@]}" "${hypr[@]}" || die "the packages weren't installed"; fi
+    return 0
+}
+
+if $DEPS && $IS_DEBIAN; then
+    step "Packages (Debian)"
+    deb_packages
+    install_matugen
+    install_symbols_font
+    deb_check_hyprland
+elif $DEPS && $IS_ALT; then
     step "Packages (ALT Linux)"
     missing=()
     for p in "${ALT_PKGS[@]}"; do rpm -q --quiet "$p" 2>/dev/null || missing+=("$p"); done
@@ -384,6 +514,51 @@ if $IS_ALT; then
     fi
     APP_PARTS=()
 fi
+# Debian: a package (on stable from the backports when they're in apt's sources: telegram-desktop is only
+# there), or "flatpak:<id>" for an app from Flathub.
+declare -A DEB_APP_PKG=(
+    [zen]="flatpak:app.zen_browser.zen" [telegram]="telegram-desktop" [vesktop]="flatpak:dev.vencord.Vesktop"
+    [osu]="flatpak:sh.ppy.osu" [steam]="flatpak:com.valvesoftware.Steam" [spotify]="flatpak:com.spotify.Client"
+    [neovim]="neovim"
+)
+if $IS_DEBIAN; then
+    deb_repo=() deb_flat=() deb_from=()
+    backports="$(deb_backports)"
+    [[ -n "$backports" ]] && deb_has_suite "$backports" && deb_from=(-t "$backports")
+    for app in "${APP_PARTS[@]}"; do
+        [[ ${WANT[$app]} == true ]] || continue
+        p=${DEB_APP_PKG[$app]}
+        if [[ "$p" == flatpak:* ]]; then
+            deb_flat+=("${p#flatpak:}")
+        elif ! deb_installed "$p"; then
+            deb_repo+=("$p")
+        fi
+    done
+    if ((${#deb_repo[@]} + ${#deb_flat[@]})); then
+        step "Optional apps"
+        if ((${#deb_repo[@]})); then
+            echo "From the repository: ${deb_repo[*]}"
+            if ask "Should I install them with apt-get?"; then
+                deb_apt update && deb_apt install "${DEB_YES[@]}" "${deb_from[@]}" "${deb_repo[@]}" || true
+            fi
+        fi
+        if ((${#deb_flat[@]})); then
+            echo "From Flathub: ${deb_flat[*]}"
+            if ask "Should I install them with flatpak (for your user)?"; then
+                command -v flatpak >/dev/null || deb_apt install "${DEB_YES[@]}" flatpak || true
+                flat_yes=()
+                ((${#NOCONFIRM[@]})) && flat_yes=(--noninteractive)
+                if ! command -v flatpak >/dev/null; then
+                    warn "flatpak isn't installed: sudo apt-get install flatpak, then flatpak install flathub ${deb_flat[*]}"
+                elif ! flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo ||
+                    ! flatpak install --user "${flat_yes[@]}" flathub "${deb_flat[@]}"; then
+                    warn "flatpak install failed: flatpak install --user flathub ${deb_flat[*]}"
+                fi
+            fi
+        fi
+    fi
+    APP_PARTS=()
+fi
 for app in "${APP_PARTS[@]}"; do
     [[ ${WANT[$app]} == true ]] || continue
     found=""
@@ -425,6 +600,8 @@ if ! command -v qs >/dev/null; then
         die "quickshell (qs) is not installed; add quickshell to environment.systemPackages"
     elif $IS_ALT; then
         die "quickshell (qs) is not installed; sudo apt-get install quickshell"
+    elif $IS_DEBIAN; then
+        die "quickshell (qs) is not installed; sudo apt-get install -t trixie-backports quickshell (Debian 13; testing and sid: without -t)"
     else
         die "quickshell (qs) is not installed; install quickshell-git from the AUR"
     fi

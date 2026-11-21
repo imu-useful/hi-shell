@@ -74,8 +74,8 @@ Short screen recordings of the shell.
 
 ## Requirements
 
-Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config). ALT Linux (Sisyphus) and NixOS work too:
-see [ALT Linux](#alt-linux) and [NixOS](#nixos) for what's different there.
+Arch Linux + Hyprland **0.56+** (the integration file uses the Lua config). ALT Linux (Sisyphus), Debian (13 trixie,
+testing, sid) and NixOS work too: see [ALT Linux](#alt-linux), [Debian](#debian) and [NixOS](#nixos) for what's different there.
 
 | Package | Used for |
 | --- | --- |
@@ -125,7 +125,7 @@ everything by itself and shows each step; **Details** has the full log (also sav
 `hi installer` opens it again later, to add a part or repair the install.
 
 The window is GTK 4 + libadwaita: when `python-gobject`, `gtk4` or `libadwaita` is missing, `setup.sh` installs them
-with pacman (apt-get on ALT Linux) first, asking for sudo in the terminal. Without a graphical session (a TTY, ssh), or with `setup.sh --text`,
+with pacman (apt-get on ALT Linux and Debian) first, asking for sudo in the terminal. Without a graphical session (a TTY, ssh), or with `setup.sh --text`,
 the text installer below runs instead. The window runs that same `install.sh` with `--yes` and the parts you picked.
 
 #### Text installer
@@ -149,7 +149,7 @@ It also asks where updates come from: **release** (the latest tagged release, te
 
 The installer:
 
-1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (on ALT Linux: `apt-get`; asks first; `--no-deps` skips it)
+1. installs the packages above with `pacman` and, for the AUR ones, `paru` or `yay` (on ALT Linux and Debian: `apt-get`; asks first; `--no-deps` skips it)
 2. links the repo to `~/.config/quickshell/hi-shell`
 3. copies the folder `hypr/hi-shell/` to `~/.config/hypr/hi-shell/` (yours to edit) and loads it from your Hyprland config —
    `~/.config/hypr/custom/execs.lua` on illogical-impulse dots, `~/.config/hypr/hyprland.lua` otherwise (one marked line,
@@ -196,6 +196,30 @@ Things that are different there:
 - **The Updates widget** is off (ALT's package lists are refreshed by root only); `up` in hi-shell's fish config runs
   `sudo apt-get update; and sudo apt-get dist-upgrade`.
 - There's no ALT package of hi-shell itself yet: it's installed from git, like on Arch without the AUR package.
+
+### Debian
+
+The installer (both the window and `install.sh`) installs the packages with `apt-get` there, under their Debian names
+(`network-manager`, `libnotify-bin`, `qalc`, `tesseract-ocr-rus`, `qml6-module-qtmultimedia`, ...). Things that are
+different there:
+
+- **Hyprland and Quickshell** aren't in Debian 13 (trixie) itself, only in **trixie-backports**: the installer adds that
+  suite to apt's sources (`/etc/apt/sources.list.d/hi-shell-backports.sources`, asks first) and installs `hyprland`,
+  `quickshell`, `hyprlock`, `hyprsunset` and `hyprpicker` from it (`apt-get install -t trixie-backports`); the rest comes
+  from trixie. Testing and sid have them in the main archive.
+- **Hyprland 0.55** is what trixie-backports has. It reads the same Lua config, but hi-shell is made and tested on 0.56+,
+  so a few things may differ (the installer says so); testing has 0.57.
+- **matugen** isn't packaged: the installer downloads its release build (x86_64, checked by its sha256) to
+  `~/.local/bin/matugen`; `run.sh` puts `~/.local/bin` on the shell's PATH. On other CPUs: `cargo install matugen`.
+- **The icon font** (Material Symbols) isn't packaged either: it's downloaded like on [ALT Linux](#alt-linux).
+- **translate-shell** is in `contrib`: add `contrib` to `Components` in `/etc/apt/sources.list.d/debian.sources`, or the
+  installer leaves it out (and says so).
+- **sudo**: when you gave root a password while installing Debian, your user isn't in the `sudo` group. As root
+  (`su -`): `apt-get install sudo; adduser <you> sudo`, and log in again.
+- **Optional apps**: Telegram (from the backports on Debian 13) and Neovim come from apt; Zen Browser, Vesktop,
+  osu!lazer, Steam and Spotify from Flathub (`flatpak install --user`; flatpak is installed when missing).
+- **The Updates widget** is off; `up` in hi-shell's fish config runs `sudo apt update; and sudo apt upgrade`.
+- Debian's derivatives (Ubuntu, Mint, ...) aren't detected as Debian: their package versions differ.
 
 ### NixOS
 

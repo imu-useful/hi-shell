@@ -5,7 +5,7 @@
 #   ./setup.sh                  from a clone of the repo
 #
 # The window needs python-gobject, gtk4 and libadwaita; when one is missing it's installed first with
-# pacman, or apt-get on ALT Linux (that asks for your sudo password here, in the terminal). Without a
+# pacman, or apt-get on ALT Linux and Debian (that asks for your sudo password here, in the terminal). Without a
 # graphical session (a TTY, ssh) the text installer, install.sh, runs instead.
 #
 # Options:
@@ -17,6 +17,7 @@ RAW_URL="${HI_SHELL_RAW_URL:-https://raw.githubusercontent.com/imu-useful/hi-she
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hi-shell/setup"
 GUI_PKGS=(python python-gobject gtk4 libadwaita git)
 ALT_GUI_PKGS=(python3 python3-module-pygobject3 libgtk4-gir libadwaita-gir git-core)
+DEB_GUI_PKGS=(python3 python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 git)
 
 bold=$'\e[1m' green=$'\e[32m' red=$'\e[31m' reset=$'\e[0m'
 step() { echo "${bold}${green}::${reset}${bold} $*${reset}"; }
@@ -63,6 +64,7 @@ fi
 
 # ALT Linux: apt-get and rpm (sudo is off there by default: `control sudowheel enabled` as root turns it on).
 is_alt() { [[ -e /etc/altlinux-release ]] && command -v apt-get >/dev/null && command -v rpm >/dev/null; }
+is_debian() { grep -qsE '^ID="?debian"?$' /etc/os-release && command -v apt-get >/dev/null && command -v dpkg-query >/dev/null; }
 
 if ! gui_ready || ! command -v git >/dev/null; then
     missing=()
@@ -71,6 +73,13 @@ if ! gui_ready || ! command -v git >/dev/null; then
         step "The installer window needs: ${missing[*]}"
         { sudo apt-get update && sudo apt-get install "${missing[@]}"; } ||
             die "couldn't install them (no sudo? as root: control sudowheel enabled); the text installer: bash $SRC/install.sh"
+    elif is_debian; then
+        for p in "${DEB_GUI_PKGS[@]}"; do
+            [[ "$(dpkg-query -W -f='${db:Status-Status}' "$p" 2>/dev/null)" == installed ]] || missing+=("$p")
+        done
+        step "The installer window needs: ${missing[*]}"
+        { sudo apt-get update && sudo apt-get install "${missing[@]}"; } ||
+            die "couldn't install them (no sudo? as root: adduser $USER sudo); the text installer: bash $SRC/install.sh"
     elif command -v pacman >/dev/null; then
         for p in "${GUI_PKGS[@]}"; do pacman -Qq "$p" &>/dev/null || missing+=("$p"); done
         step "The installer window needs: ${missing[*]}"
