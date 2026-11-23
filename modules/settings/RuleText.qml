@@ -9,6 +9,8 @@ Rectangle {
     property string value: ""
     property string placeholder: ""
     property bool mono: false
+    // What is typed right now, before edited() fires.
+    readonly property alias text: field.text
     signal edited(string text)
 
     implicitWidth: 160

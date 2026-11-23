@@ -147,8 +147,8 @@ ColumnLayout {
             M3Button {
                 icon: "auto_awesome"
                 text: RuleMaker.running ? Translation.tr("Thinking…") : Translation.tr("Make")
-                enabled: !RuleMaker.running && aiText.value.trim() !== ""
-                onClicked: RuleMaker.generate(aiText.value)
+                enabled: !RuleMaker.running && aiText.text.trim() !== ""
+                onClicked: RuleMaker.generate(aiText.text)
             }
         }
         StyledText {
