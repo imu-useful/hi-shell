@@ -15,7 +15,7 @@ Also in Settings › Rules: **New rule** (or the pencil next to a rule) opens an
 conditions (all or any of them, each can be turned into its opposite with **Not**), the actions, and what else to do
 when the rule ends. "Change an option" finds the option by its name or description and offers a switch, choices or a
 number for its value. A rule the fields can't show (groups inside groups) opens as JSON, and **JSON** switches any rule
-to its text. Rules live in `config.json` under `rules`; `rulesEnabled: false` stops them all.
+to its text. **Or describe it and let the AI make it**: type what the rule should do in your own words ("dark mode from 22:00 to 07:00 on weekdays") and the AI chat's provider and model (Settings › General) write it; the rule opens in the editor, so check it (commands above all) before saving. Rules live in `config.json` under `rules`; `rulesEnabled: false` stops them all.
 
 ```json
 {

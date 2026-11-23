@@ -1967,5 +1967,14 @@
     "GPU %1 °C": "ГП %1 °C",
     "hi-shell is taking a break": "hi-shell уходит на перерыв",
     "Version 2.3.2 is the final release for now": "Версия 2.3.2 — финальный релиз на ближайшее время",
-    "There will be no updates until February 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in February!": "Обновлений не будет до февраля 2027 года: у меня закончились идеи, что добавлять, и заканчивается подписка.\n\nВсё, что у вас есть, продолжит работать как работает. Спасибо, что пользуетесь hi-shell. Увидимся в феврале!"
+    "There will be no updates until February 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in February!": "Обновлений не будет до февраля 2027 года: у меня закончились идеи, что добавлять, и заканчивается подписка.\n\nВсё, что у вас есть, продолжит работать как работает. Спасибо, что пользуетесь hi-shell. Увидимся в феврале!",
+    "Or describe it and let the AI make it": "Или опишите словами, и правило сделает ИИ",
+    "Dark mode from 22:00 to 07:00 on weekdays": "Тёмная тема с 22:00 до 07:00 по будням",
+    "Thinking…": "Думаю…",
+    "Make": "Сделать",
+    "Check what the AI made, commands above all, then save it": "Проверьте, что сделал ИИ (особенно команды), и сохраните",
+    "Set up the AI provider in Settings → General first": "Сначала настройте провайдера ИИ в Настройки → Общие",
+    "The AI's answer isn't a rule": "Ответ ИИ — не правило",
+    "The AI made a rule that doesn't work: %1": "ИИ сделал неработающее правило: %1",
+    "Couldn't make the rule": "Не удалось сделать правило"
 }

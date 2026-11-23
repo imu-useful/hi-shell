@@ -118,6 +118,71 @@ ColumnLayout {
                 onClosed: root.adding = false
             }
         }
+        // Described in words, made by the AI chat's model; opens in the editor and is saved from there.
+        StyledText {
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            Layout.topMargin: 6
+            text: Translation.tr("Or describe it and let the AI make it")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        RowLayout {
+            visible: RuleMaker.draft === null
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            Layout.rightMargin: 14
+            spacing: 8
+
+            RuleText {
+                id: aiText
+                Layout.fillWidth: true
+                placeholder: Translation.tr("Dark mode from 22:00 to 07:00 on weekdays")
+                onEdited: text => {
+                    value = text;
+                    if (text.trim() !== "")
+                        RuleMaker.generate(text);
+                }
+            }
+            M3Button {
+                icon: "auto_awesome"
+                text: RuleMaker.running ? Translation.tr("Thinking…") : Translation.tr("Make")
+                enabled: !RuleMaker.running && aiText.value.trim() !== ""
+                onClicked: RuleMaker.generate(aiText.value)
+            }
+        }
+        StyledText {
+            visible: RuleMaker.error !== "" && !RuleMaker.running
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            wrapMode: Text.WordWrap
+            text: RuleMaker.error
+            color: Colors.m3error
+            font.pixelSize: Appearance.font.size.labelMedium
+        }
+        StyledText {
+            visible: RuleMaker.draft !== null
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            wrapMode: Text.WordWrap
+            text: Translation.tr("Check what the AI made, commands above all, then save it")
+            font.pixelSize: Appearance.font.size.labelMedium
+            color: Colors.m3onSurfaceVariant
+        }
+        Loader {
+            active: RuleMaker.draft !== null
+            visible: active
+            Layout.fillWidth: true
+            Layout.margins: 14
+            sourceComponent: RuleEditor {
+                rule: RuleMaker.draft
+                onClosed: {
+                    RuleMaker.clear();
+                    aiText.value = "";
+                }
+            }
+        }
+
         StyledText {
             Layout.fillWidth: true
             Layout.leftMargin: 14

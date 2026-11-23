@@ -1913,5 +1913,14 @@
     "GPU %1 °C": "GPU %1 °C",
     "hi-shell is taking a break": "hi-shell macht eine Pause",
     "Version 2.3.2 is the final release for now": "Version 2.3.2 ist vorerst die letzte Veröffentlichung",
-    "There will be no updates until February 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in February!": "Bis Februar 2027 gibt es keine Updates: Mir sind die Ideen ausgegangen, und mein Abo läuft aus.\n\nAlles, was Sie haben, funktioniert weiterhin wie bisher. Danke, dass Sie hi-shell nutzen. Bis Februar!"
+    "There will be no updates until February 2027: I've run out of ideas for what to add, and my subscription is ending.\n\nEverything you have keeps working as it is. Thank you for using hi-shell. See you in February!": "Bis Februar 2027 gibt es keine Updates: Mir sind die Ideen ausgegangen, und mein Abo läuft aus.\n\nAlles, was Sie haben, funktioniert weiterhin wie bisher. Danke, dass Sie hi-shell nutzen. Bis Februar!",
+    "Or describe it and let the AI make it": "Oder beschreibe sie, und die KI erstellt sie",
+    "Dark mode from 22:00 to 07:00 on weekdays": "Dunkler Modus von 22:00 bis 07:00 an Werktagen",
+    "Thinking…": "Denke nach …",
+    "Make": "Erstellen",
+    "Check what the AI made, commands above all, then save it": "Prüfe, was die KI erstellt hat, vor allem Befehle, und speichere es dann",
+    "Set up the AI provider in Settings → General first": "Richte zuerst den KI-Anbieter unter Einstellungen → Allgemein ein",
+    "The AI's answer isn't a rule": "Die Antwort der KI ist keine Regel",
+    "The AI made a rule that doesn't work: %1": "Die KI hat eine Regel erstellt, die nicht funktioniert: %1",
+    "Couldn't make the rule": "Die Regel konnte nicht erstellt werden"
 }
